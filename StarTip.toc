@@ -26,4 +26,3 @@ Modules\Position.lua
 Modules\PvP.lua
 Modules\RaidIcon.lua
 Modules\Text.lua
-
