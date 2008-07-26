@@ -25,4 +25,6 @@ Modules\Bars.lua
 Modules\Position.lua
 Modules\PvP.lua
 Modules\RaidIcon.lua
+Modules\Targeting.lua
 Modules\Text.lua
+
