@@ -13,6 +13,6 @@ externals:
     LibTalentQuery-1.0: http://svn.wowace.com/wowace/trunk/LibTalentQuery-1.0/
     TalentGuess-1.0: http://shadowed-wow.googlecode.com/svn/trunk/TalentGuess-1.0/
     LibMobHealth-4.0: http://svn.wowace.com/wowace/trunk/LibMobHealth-4.0/
-    
+
 ignore:
     .gitignore
