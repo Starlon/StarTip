@@ -1,18 +1,18 @@
 externals:
-    Libs/AceAddon-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceAddon-3.0/
-    Libs/AceHook-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceHook-3.0/
-    Libs/AceTimer-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceTimer-3.0/
-    Libs/AceConfig-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceConfig-3.0/
-    Libs/AceConsole-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceConsole-3.0/
-    Libs/AceDB-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceDB-3.0/
+    Libs/AceAddon-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceAddon-3.0
+    Libs/AceHook-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceHook-3.0
+    Libs/AceTimer-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceTimer-3.0
+    Libs/AceConfig-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceConfig-3.0
+    Libs/AceConsole-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceConsole-3.0
+    Libs/AceDB-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceDB-3.0
     Libs/AceEvent-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceEvent-3.0
-    Libs/AceGUI-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceGUI-3.0/
-    Libs/AceLocale-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceLocale-3.0/
-    Libs/AceDBOptions-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceDBOptions-3.0/
-    Libs/LibSharedMedia-3.0: http://svn.wowace.com/wowace/trunk/LibSharedMedia-3.0/
-    Libs/LibTalentQuery-1.0: http://svn.wowace.com/wowace/trunk/LibTalentQuery-1.0/
-    Libs/TalentGuess-1.0: http://shadowed-wow.googlecode.com/svn/trunk/TalentGuess-1.0/
-    Libs/LibMobHealth-4.0: http://svn.wowace.com/wowace/trunk/LibMobHealth-4.0/
+    Libs/AceGUI-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceGUI-3.0
+    Libs/AceLocale-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceLocale-3.0
+    Libs/AceDBOptions-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceDBOptions-3.0
+    Libs/LibSharedMedia-3.0: http://svn.wowace.com/wowace/trunk/LibSharedMedia-3.0
+    Libs/LibTalentQuery-1.0: http://svn.wowace.com/wowace/trunk/LibTalentQuery-1.0
+    Libs/TalentGuess-1.0: http://shadowed-wow.googlecode.com/svn/trunk/TalentGuess-1.0
+    Libs/LibMobHealth-4.0: http://svn.wowace.com/wowace/trunk/LibMobHealth-4.0
 
 ignore:
     .gitignore
