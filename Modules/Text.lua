@@ -110,7 +110,7 @@ local updateTalents = function()
 		return 
 	end
 	local nameRealm = select(1, UnitName("mouseover")) .. (select(2, UnitName("mouseover")) or '')
-	if spec[nameRealm] then
+	if spec[nameRealm] and spec[nameRealm][4] and spec[nameRealm][1] and spec[nameRealm][2] and spec[nameRealm][3] then
 		local specText = ('%s (%d/%d/%d)'):format(spec[nameRealm][4], spec[nameRealm][1], spec[nameRealm][2], spec[nameRealm][3])
 		local lineNum
 		if NUM_LINES < GameTooltip:NumLines() then
@@ -177,7 +177,12 @@ local updateTalents = function()
 
 		self:CancelTimer(talentTimer)
 		talentTimer =  nil
-		GameTooltip:Show()	
+		GameTooltip:Show()
+	elseif spec[nameRealm] then
+		for k in pairs(spec[nameRealm]) do
+			spec[nameRealm][k] = nil
+		end
+		spec[nameRealm] = nil
 	end
 end
 
@@ -222,7 +227,6 @@ function mod:TalentQuery_Ready(e, name, realm)
 		elseif highPoints[1] > 0 then
 			spec[nameRealm][4] = specNames[indexOf(spec[nameRealm], highPoints[1])]
 		end
-		if spec[nameRealm][3] == nil then spec[nameRealm] = nil end
 	end
 end
 
