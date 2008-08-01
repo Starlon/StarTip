@@ -391,7 +391,7 @@ local lines = setmetatable({
 			if maxHealth == 100 then 
 				value = health .. "%"
 			elseif maxHealth ~= 0 then
-				value = format("%s/%s", short(health), short(maxHealth))
+				value = format("%s/%s (%%%d)", short(health), short(maxHealth), health/maxHealth*100)
 			end
 			return value
 		end,
@@ -411,7 +411,7 @@ local lines = setmetatable({
 			if maxMana == 100 then
 				value = mana
 			elseif maxMana ~= 0 then
-				value = format("%s/%s", short(mana), short(maxMana))
+				value = format("%s/%s (%%%d)", short(mana), short(maxMana), mana/maxMana*100)
 			end
 			return value		
 		end,

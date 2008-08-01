@@ -250,14 +250,12 @@ end
 
 function mod:OnEnable()
 	self:RegisterEvent("REGEN_DISABLED")
-	self:RegisterEvent("REGEN_ENABLED")
 	self:SecureHook("GameTooltip_SetDefaultAnchor")
 	StarTip:SetOptionsDisabled(options, false)
 end
 
 function mod:OnDisable()
 	self:UnregisterEvent("REGEN_DISABLED")
-	self:UnregisterEvent("REGEN_ENABLED")
 	self:Unhook("GameTooltip_SetDefaultAnchor")
 	StarTip:SetOptionsDisabled(options, true)
 end
@@ -271,7 +269,7 @@ local oldX, oldY
 local currentAnchor
 local xoffset, yoffset
 local positionTooltip = function()
-	if self.inCombat and self.db.profile.inCombat ~= 1 then
+	if InCombatLockdown() and self.db.profile.inCombat ~= 1 then
 		local anchor = anchors[self.db.profile.inCombat]
 		if anchor:find("^CURSOR_") then
 			anchor = anchor:sub(8)
@@ -292,7 +290,7 @@ end
 local getIndex = function(owner)
 	local index
 	if UnitExists("mouseover") then
-		if self.inCombat then
+		if InCombatLockdown() then
 			index = self.db.profile.inCombat
 		elseif owner == UIParent then
 			index = self.db.profile.anchor
@@ -308,7 +306,7 @@ end
 local setOffsets = function(owner)
 	if owner == UIParent then
 		if UnitExists("mouseover") then
-			if self.inCombat then
+			if InCombatLockdown() then
 				xoffset = self.db.profile.inCombatXOffset
 				yoffset = self.db.profile.inCombatYOffset
 			else
@@ -348,21 +346,11 @@ function mod:GameTooltip_SetDefaultAnchor(this, owner)
 	end
 end
 
-local checkHide = function()
+function mod:REGEN_DISABLED()
 	local index = getIndex(GameTooltip:GetOwner())
 	if index == #selections then
 		GameTooltip:Hide()
 	end
-end
-
-function mod:REGEN_DISABLED()
-	self.inCombat = true
-	checkHide()
-end
-
-function mod:REGEN_ENABLED()
-	self.inCombat = false
-	checkHide()
 end
 
 function mod:OnHide()
