@@ -250,12 +250,14 @@ end
 
 function mod:OnEnable()
 	self:RegisterEvent("REGEN_DISABLED")
+	self:RegisterEvent("REGEN_ENABLED")
 	self:SecureHook("GameTooltip_SetDefaultAnchor")
 	StarTip:SetOptionsDisabled(options, false)
 end
 
 function mod:OnDisable()
 	self:UnregisterEvent("REGEN_DISABLED")
+	self:UnregisterEvent("REGEN_ENABLED")
 	self:Unhook("GameTooltip_SetDefaultAnchor")
 	StarTip:SetOptionsDisabled(options, true)
 end
@@ -269,15 +271,6 @@ local oldX, oldY
 local currentAnchor
 local xoffset, yoffset
 local positionTooltip = function()
-	if InCombatLockdown() and self.db.profile.inCombat ~= 1 then
-		local anchor = anchors[self.db.profile.inCombat]
-		if anchor:find("^CURSOR_") then
-			anchor = anchor:sub(8)
-		end
-		GameTooltip:SetPoint(anchor, UIParent, anchor, self.db.profile.inCombatXOffset, self.db.profile.inCombatYOffset)
-		updateFrame:SetScript("OnUpdate", nil)
-		return 
-	end
 	local x, y = GetCursorPosition()
 	local effScale = GameTooltip:GetEffectiveScale()
 	if x ~= oldX or y ~= oldY then
@@ -328,9 +321,11 @@ local setOffsets = function(owner)
 	end
 end
 
+local currentOwner
 function mod:GameTooltip_SetDefaultAnchor(this, owner)
-	GameTooltip:ClearAllPoints()
+	this:ClearAllPoints()
 	setOffsets(owner)
+	currentOwner = owner
 	local index = getIndex(owner)
 	if index == #selections then
 		this:Hide()
@@ -341,17 +336,17 @@ function mod:GameTooltip_SetDefaultAnchor(this, owner)
 		updateFrame:SetScript("OnUpdate", positionTooltip)
 		positionTooltip()
 	else
-		updateFrame:SetScript("OnUpdate", nil)
+		if updateFrame:GetScript("OnUpdate") then updateFrame:SetScript("OnUpdate", nil) end
 		this:SetPoint(anchors[index], UIParent, anchors[index], xoffset, yoffset)
 	end
 end
 
 function mod:REGEN_DISABLED()
-	local index = getIndex(GameTooltip:GetOwner())
-	if index == #selections then
-		GameTooltip:Hide()
-	end
+	updateFrame:SetScript("OnUpdate", nil)
+	self:GameTooltip_SetDefaultAnchor(GameTooltip, currentOwner)
 end
+
+mod.REGEN_ENABLED = mod.REGEN_DISABLED
 
 function mod:OnHide()
 	updateFrame:SetScript("OnUpdate", nil)
