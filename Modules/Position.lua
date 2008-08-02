@@ -342,6 +342,7 @@ function mod:GameTooltip_SetDefaultAnchor(this, owner)
 end
 
 function mod:REGEN_DISABLED()
+	if not currentOwner then return end
 	updateFrame:SetScript("OnUpdate", nil)
 	self:GameTooltip_SetDefaultAnchor(GameTooltip, currentOwner)
 end
