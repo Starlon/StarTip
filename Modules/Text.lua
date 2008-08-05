@@ -52,6 +52,7 @@ local linesToAddRightG = {}
 local linesToAddRightB = {}
 local unitLocation
 local unitName
+local unitGuild
 local NUM_LINES
 
 -- Thanks to ckknight for this
@@ -282,7 +283,8 @@ local lines = setmetatable({
 		name = "Guild",
 		left = function() return "Guild:" end,
 		right = function()
-			return GetGuildInfo("mouseover")
+			local guild = GetGuildInfo("mouseover")
+			if guild then return guild else return unitGuild end
 		end,
 		updating = false
 	},
@@ -391,7 +393,7 @@ local lines = setmetatable({
 			if maxHealth == 100 then 
 				value = health .. "%"
 			elseif maxHealth ~= 0 then
-				value = format("%s/%s (%%%d)", short(health), short(maxHealth), health/maxHealth*100)
+				value = format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100)
 			end
 			return value
 		end,
@@ -411,7 +413,7 @@ local lines = setmetatable({
 			if maxMana == 100 then
 				value = mana
 			elseif maxMana ~= 0 then
-				value = format("%s/%s (%%%d)", short(mana), short(maxMana), mana/maxMana*100)
+				value = format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100)
 			end
 			return value		
 		end,
@@ -595,6 +597,7 @@ local getName = function()
 end
 
 -- Taken from LibDogTag-Unit-3.0
+local LEVEL_start = "^" .. (type(LEVEL) == "string" and LEVEL or "Level")
 local getLocation = function()
 	if UnitIsVisible("mouseover") or not UnitIsConnected("mouseover") then
 		return nil
@@ -605,7 +608,7 @@ local getLocation = function()
 	if not left_2 or not left_3 then
 		return nil
 	end
-	local hasGuild = not left_2:find("^" .. LEVEL)
+	local hasGuild = not left_2:find(LEVEL_start)
 	local factionText = not hasGuild and left_3 or self.leftLines[4]:GetText()
 	if factionText == PVP then
 		factionText = nil
@@ -620,9 +623,16 @@ local getLocation = function()
 	end
 end
 
+local getGuild = function()
+	local left_2 = self.leftLines[2]:GetText()
+	if left_2:find(LEVEL_start) then return nil end
+	return "<" .. left_2 .. ">"
+end
+
 function mod:SetUnit()
 	unitName = getName()
 	unitLocation = getLocation()
+	unitGuild = getGuild()
 	
 	-- Taken from CowTip
 	local lastLine = 2

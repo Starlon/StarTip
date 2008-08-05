@@ -20,7 +20,7 @@ function mod:SetUnit()
 	if UnitInRaid("player") then
 		local txt = ''
 		for i=1, GetNumRaidMembers() do
-			if UnitGUID("mouseover") == UnitGUID("raid" .. i .. "target") then
+			if UnitExists("mouseover") and UnitGUID("mouseover") == UnitGUID("raid" .. i .. "target") then
 				local c = RAID_CLASS_COLORS[select(2, UnitClass("raid" .. i))] 
 				local name = UnitName("raid" .. i)
 				txt = txt .. ("|cFF%02x%02x%02x%s|r "):format(c.r*255, c.g*255, c.b*255, name)
