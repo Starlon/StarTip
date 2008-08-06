@@ -219,6 +219,7 @@ function mod:TalentQuery_Ready(e, name, realm)
 			spec[nameRealm][tab] = pointsspent
 			specNames[tab] = treename
 		end
+		if highPoints[1] == nil or highPoints[2] == nil or highPoints[3] == nil  then spec[nameRealm] = nil return end
 		table.sort(highPoints, function(a,b) return a>b end)
 		local first, second = select(1, indicesOf(spec[nameRealm], highPoints[1])), select(2, indicesOf(spec[nameRealm], highPoints[1]))
 		if highPoints[1] > 0 and highPoints[2] > 0 and highPoints[1] - highPoints[2] <= 5 and highPoints[1] ~= highPoints[2] then
