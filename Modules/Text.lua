@@ -631,6 +631,8 @@ local getGuild = function()
 end
 
 function mod:SetUnit()
+	if not UnitExists("mouseover") then return end
+	
 	unitName = getName()
 	unitLocation = getLocation()
 	unitGuild = getGuild()
