@@ -19,6 +19,7 @@ local defaults = {
 		showMP = true,
 		hpTexture = StarTip:GetLSMIndexByName("statusbar", LSM:GetDefault("statusbar")),
 		mpTexture = StarTip:GetLSMIndexByName("statusbar", LSM:GetDefault("statusbar")),
+		useGradient = false,
 	}
 }
 
@@ -35,6 +36,14 @@ local options = {
 				set = function(info, v) self.db.profile.showHP = v end,
 				order = 1
 			},
+			useGradient = {
+				name = "Use Gradient",
+				desc = "Set whether to use a gradient based on unit health",
+				type = "toggle",
+				get = function() return self.db.profile.useGradient end,
+				set = function(info, v) self.db.profile.useGradient = v end,
+				order = 3
+			},
 			texture = {
 				name = "Texture",
 				desc = "Change the status bar's texture",
@@ -46,7 +55,7 @@ local options = {
 					self.hpBar:SetStatusBarTexture(LSM:Fetch("statusbar", LSM:List("statusbar")[v]))
 				end,
 				order = 2
-			}
+			},
 		}
 	},
 	mpBar = {
@@ -145,13 +154,23 @@ function mod:OnHide()
 	self.mpBar:Hide()
 end
 
+local function colorGradient(perc)
+    if perc <= 0.5 then
+        return 1, perc*2, 0
+    else
+        return 2 - perc*2, 1, 0
+    end
+end
+
 -- Colors, snagged from oUF
 local power = {
 	[0] = { r = 48/255, g = 113/255, b = 191/255}, -- Mana
 	[1] = { r = 226/255, g = 45/255, b = 75/255}, -- Rage
 	[2] = { r = 255/255, g = 178/255, b = 0}, -- Focus
 	[3] = { r = 1, g = 1, b = 34/255}, -- Energy
-	[4] = { r = 0, g = 1, b = 1} -- Happiness
+	[4] = { r = 0, g = 1, b = 1}, -- Happiness
+	[5] = {}, --Unknown
+	[6] = { r = 0.23, g = 0.12, b = 0.77 } -- Runic Power
 }
 local health = {
 	[0] = {r = 49/255, g = 207/255, b = 37/255}, -- Health
@@ -172,7 +191,10 @@ function mod:UpdateHealth()
 	self.hpBar:SetValue(min)
 
 	local color
-	if(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
+	if self.db.profile.useGradient then
+		color = {}
+		color.r, color.g, color.b = colorGradient(min/max)
+	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
 		color = health[1]
 	else
 		color = UnitIsPlayer(unit) and RAID_CLASS_COLORS[select(2, UnitClass(unit))] or UnitReactionColor[UnitReaction(unit, "player")]
