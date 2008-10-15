@@ -6,8 +6,7 @@ local GameTooltip = _G.GameTooltip
 local GameTooltipStatusBar = _G.GameTooltipStatusBar
 local UnitIsPlayer = _G.UnitIsPlayer
 local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
-local UnitReactionColor = _G.UnitReactionColor
-local UnitReaction = _G.UnitReaction
+local UnitSelectionColor = _G.UnitSelectionColor
 local UnitClass = _G.UnitClass
 local self = mod
 local timer
@@ -196,8 +195,11 @@ function mod:UpdateHealth()
 		color.r, color.g, color.b = colorGradient(min/max)
 	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
 		color = health[1]
+	elseif UnitIsPlayer(unit) then 
+		color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
 	else
-		color = UnitIsPlayer(unit) and RAID_CLASS_COLORS[select(2, UnitClass(unit))] or UnitReactionColor[UnitReaction(unit, "player")]
+		color = {}
+		color.r, color.g, color.b = UnitSelectionColor(unit)
 	end
 	if not color then color = health[0] end
 	self.hpBar:SetStatusBarColor(color.r, color.g, color.b)

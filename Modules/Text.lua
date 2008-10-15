@@ -21,8 +21,7 @@ local UnitIsGhost = _G.UnitIsGhost
 local UnitIsDead = _G.UnitIsDead
 local UnitLevel = _G.UnitLevel
 local UnitClassification = _G.UnitClassification
-local UnitReaction = _G.UnitReaction
-local UnitReactionColor = _G.UnitReactionColor
+local UnitSelectionColor = _G.UnitSelectionColor
 local UnitRace = _G.UnitRace
 local GetNumTalentTabs = _G.GetNumTalentTabs
 local GetTalentTabInfo = _G.GetTalentTabInfo
@@ -39,7 +38,6 @@ local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local timer, talentTimer
 local TalentQuery = LibStub:GetLibrary("LibTalentQuery-1.0", true)
 local TalentGuess = LibStub:GetLibrary("TalentGuess-1.0", true) and LibStub:GetLibrary("TalentGuess-1.0"):Register()
-local LibMobHealth = LibStub:GetLibrary("LibMobHealth-4.0")
 local spec = setmetatable({}, {__mode='v'})
 local factionList = {}
 local linesToAdd = {}
@@ -258,7 +256,13 @@ local lines = setmetatable({
 		db = "Name:",
 		name = "UnitName",
 		left = function()
-			local c = UnitIsPlayer("mouseover") and RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))] or UnitReactionColor[UnitReaction("mouseover", "player")]
+			local c
+			if UnitIsPlayer("mouseover") then
+				c = RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
+			else
+				c = {}
+				c.r, c.g, c.b = UnitSelectionColor("mouseover")
+			end
 			return unitName, c
 		end,
 		right = nil,
@@ -270,7 +274,13 @@ local lines = setmetatable({
 		left = function() return "Target:" end,
 		right = function()
 			if UnitExists("mouseovertarget") then
-				local c = UnitIsPlayer("mouseovertarget") and RAID_CLASS_COLORS[select(2, UnitClass("mouseovertarget"))] or UnitReactionColor[UnitReaction("mouseovertarget", "player")]
+				local c
+				if UnitIsPlayer("mouseovertarget") then
+					c = RAID_CLASS_COLORS[select(2, UnitClass("mouseovertarget"))]
+				else
+					c = {}
+					c.r, c.g, c.b = UnitSelectionColor("mouseovertarget")
+				end
 				local name = UnitName("mouseovertarget")
 				return name, c
 			else
@@ -389,7 +399,7 @@ local lines = setmetatable({
 		name = "Health",
 		left = function() return "Health:" end,
 		right = function()
-			local health, maxHealth = LibMobHealth:GetUnitHealth("mouseover")	
+			local health, maxHealth = UnitHealth("mouseover"), UnitHealthMax("mouseover")	
 			local value
 			if maxHealth == 100 then 
 				value = health .. "%"
