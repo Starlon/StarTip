@@ -188,7 +188,6 @@ function mod:GameTooltipHide(this, ...)
 		end
 	end
 	if kind == 2 then
-		StarTip:OnTooltipHide()
 		self.justFade = true
 		return GameTooltip:FadeOut()
 	else
