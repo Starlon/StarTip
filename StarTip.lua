@@ -87,9 +87,9 @@ function StarTip:OnInitialize()
 end
 
 function StarTip:OnEnable()
-	self:RawHookScript(GameTooltip, "OnTooltipSetUnit")
-	self:RawHookScript(GameTooltip, "OnTooltipSetItem")
-	self:RawHookScript(GameTooltip, "OnTooltipSetSpell")
+	self:HookScript(GameTooltip, "OnTooltipSetUnit")
+	self:HookScript(GameTooltip, "OnTooltipSetItem")
+	self:HookScript(GameTooltip, "OnTooltipSetSpell")
 	self:RawHookScript(GameTooltip, "OnHide", "OnTooltipHide")
 	self:RawHookScript(GameTooltip, "OnShow", "OnTooltipShow")
 	
@@ -112,10 +112,20 @@ function StarTip:OpenConfig()
 	AceConfigDialog:SetDefaultSize("StarTip", 500, 450)
 	AceConfigDialog:Open("StarTip")	
 end
-
-function StarTip:OnTooltipSetUnit(...)
-	self.hooks[GameTooltip].OnTooltipSetUnit(...)
+	
+local ff = CreateFrame("Frame")
+function StarTip:OnTooltipSetUnit()
 	if not self.justSetUnit then
+		if not UnitExists("mouseover") then
+			if ff:GetScript("OnUpdate") then
+				ff:SetScript("OnUpdate", nil)
+			else
+				ff:SetScript("OnUpdate", function() GameTooltip:SetUnit("mouseover") end)
+			end
+			return
+		else
+			if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
+		end
 		for k, v in self:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
 		end
@@ -128,7 +138,6 @@ function StarTip:OnTooltipSetItem(...)
 			if v.SetItem and v:IsEnabled() then v:SetItem() end
 		end
 	end
-	self.hooks[GameTooltip].OnTooltipSetItem(...)
 end
 
 function StarTip:OnTooltipSetSpell(...)
@@ -137,7 +146,6 @@ function StarTip:OnTooltipSetSpell(...)
 			if v.SetSpell and v:IsEnabled() then v:SetSpell() end
 		end
 	end
-	self.hooks[GameTooltip].OnTooltipSetSpell(...)
 end
 
 function StarTip:OnTooltipHide(...)

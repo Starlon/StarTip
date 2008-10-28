@@ -640,8 +640,19 @@ local getGuild = function()
 	return "<" .. left_2 .. ">"
 end
 
+local ff = CreateFrame("Frame")
 function mod:SetUnit()
-	if not UnitExists("mouseover") then return end
+	--[[self = mod
+	if not UnitExists("mouseover") then 
+		if ff:GetScript("OnUpdate") then
+			ff:SetScript("OnUpdate", nil)
+		else
+			ff:SetScript("OnUpdate", self.SetUnit)
+		end
+		return 
+	end]]
+	
+	if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 	
 	unitName = getName()
 	unitLocation = getLocation()
@@ -714,4 +725,6 @@ function mod:SetUnit()
 	-- End
 	
 	timer = timer or self:ScheduleRepeatingTimer(updateLines, .5)
+	
+	GameTooltip:Show()
 end
