@@ -112,14 +112,6 @@ function expireQuery()
 end
 
 local updateTalents = function()
-	if expired then
-		TalentQuery:NotifyInspect("player")
-		TalentQuery.frame:Hide()
-		TalentQuery:Query("mouseover")
-		expireTimer = self:ScheduleTimer(expireQuery, EXPIRE_TIME)	
-		expired = nil
-		return
-	end
 	if not UnitExists("mouseover") then 
 		self:CancelTimer(talentTimer)
 		self:CancelTimer(expireTimer)
@@ -127,6 +119,14 @@ local updateTalents = function()
 		talentTimer = nil
 		return 
 	end
+	if expired then
+		TalentQuery:NotifyInspect("player")
+		TalentQuery.frame:Hide()
+		TalentQuery:Query("mouseover")
+		expireTimer = self:ScheduleTimer(expireQuery, EXPIRE_TIME)	
+		expired = nil
+		return
+	end	
 	local nameRealm = select(1, UnitName("mouseover")) .. (select(2, UnitName("mouseover")) or '')
 	if spec[nameRealm] and spec[nameRealm][4] and spec[nameRealm][1] and spec[nameRealm][2] and spec[nameRealm][3] then
 		local specText = ('%s (%d/%d/%d)'):format(spec[nameRealm][4], spec[nameRealm][1], spec[nameRealm][2], spec[nameRealm][3])
