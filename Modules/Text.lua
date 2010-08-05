@@ -54,7 +54,7 @@ local unitGuild
 local NUM_LINES
 local expired
 local expireTimer
-local EXPIRE_TIME = 3
+local EXPIRE_TIME = 1
 
 -- Thanks to ckknight for this
 local short = function(value)
@@ -107,11 +107,12 @@ end})
 
 function expireQuery()
 	expired = true
+	self:CancelTimer(expireTimer)
+	expireTimer = nil
 end
 
 local updateTalents = function()
 	if expired then
-		self:CancelTimer(expireTimer)
 		TalentQuery:NotifyInspect("player")
 		TalentQuery.frame:Hide()
 		TalentQuery:Query("mouseover")
@@ -461,7 +462,6 @@ local lines = setmetatable({
 		right = function()
 			if not TalentQuery or not UnitIsPlayer("mouseover") then return end
 			if UnitIsUnit("mouseover", "player") then
-				StarTip:Print("hmm")
 				self:TalentQuery_Ready(_, UnitName("player"))
 			else
 				TalentQuery:NotifyInspect("mouseover")
@@ -469,6 +469,7 @@ local lines = setmetatable({
 				talentTimer = talentTimer or self:ScheduleRepeatingTimer(updateTalents, 0)
 				if expireTimer then
 					self:CancelTimer(expireTimer)
+					expireTimer = nil
 				end
 				expireTimer = self:ScheduleTimer(expireQuery, EXPIRE_TIME)
 			end

@@ -345,7 +345,7 @@ local function delayAnchor()
 end
 
 function mod:GameTooltip_SetDefaultAnchor(this, owner)
-	if owner == currentOwner and this == currentThis then
+	if owner == currentOwner and this == currentThis and owner ~= UIParent then
 		return
 	end	
 	currentOwner = owner
