@@ -721,3 +721,14 @@ function mod:SetUnit()
 	
 	GameTooltip:Show()
 end
+
+function mod:OnHide()
+	if talentTimer then
+		self:CancelTimer(talentTimer)
+		talentTimer = nil
+	end
+	if expireTimer then
+		self:CancelTimer(expireTimer)
+		expireTimer = nil
+	end
+end
