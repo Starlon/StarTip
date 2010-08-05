@@ -1,8 +1,6 @@
---do return end
-
 local mod = StarTip:NewModule("Talents", "AceTimer-3.0", "AceEvent-3.0")
-local text = StarTip:GetModule("Text")
 mod.name = "Talents"
+local text = StarTip:GetModule("Text")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -13,6 +11,7 @@ local GetNumTalentTabs = _G.GetNumTalentTabs
 local GetTalentTabInfo = _G.GetTalentTabInfo
 local UnitExists = _G.UnitExists
 local UnitIsPlayer = _G.UnitIsPlayer
+local UnitName = _G.UnitName
 local unitLocation
 local unitName
 local unitGuild
@@ -111,6 +110,7 @@ local updateTalents = function()
 		expired = nil
 		return
 	end	
+	local text = StarTip:GetModule("Text")
 	local nameRealm = select(1, UnitName("mouseover")) .. (select(2, UnitName("mouseover")) or '')
 	if spec[nameRealm] and spec[nameRealm][4] and spec[nameRealm][1] and spec[nameRealm][2] and spec[nameRealm][3] then
 		local specText = ('%s (%d/%d/%d)'):format(spec[nameRealm][4], spec[nameRealm][1], spec[nameRealm][2], spec[nameRealm][3])
@@ -195,51 +195,6 @@ end
 
 function mod:OnDisable()
 	if TalentQuery then TalentQuery.UnregisterCallback(self, "TalentQuery_Ready") end
-end
-
-local getName = function()
-	if self.db.profile.titles then
-		local name = self.leftLines[1]:GetText()
-		if UnitIsPlayer("mouseover") and name:find(" %- ") then
-			name = name:sub(1, name:find(" %- "))
-		end
-		return name
-	else
-		return UnitName("mouseover")
-	end
-end
-
--- Taken from LibDogTag-Unit-3.0
-local LEVEL_start = "^" .. (type(LEVEL) == "string" and LEVEL or "Level")
-local getLocation = function()
-	if UnitIsVisible("mouseover") or not UnitIsConnected("mouseover") then
-		return nil
-	end
-	
-	local left_2 = self.leftLines[2]:GetText()
-	local left_3 = self.leftLines[3]:GetText()
-	if not left_2 or not left_3 then
-		return nil
-	end
-	local hasGuild = not left_2:find(LEVEL_start)
-	local factionText = not hasGuild and left_3 or self.leftLines[4]:GetText()
-	if factionText == PVP then
-		factionText = nil
-	end
-	local hasFaction = factionText and not UnitPlayerControlled("mouseover") and not UnitIsPlayer("mouseover") and (UnitFactionGroup("mouseover") or factionList[factionText])
-	if hasGuild and hasFaction then
-		return self.leftLines[5]:GetText()
-	elseif hasGuild or hasFaction then
-		return self.leftLines[4]:GetText()
-	else
-		return left_3
-	end
-end
-
-local getGuild = function()
-	local left_2 = self.leftLines[2]:GetText()
-	if left_2:find(LEVEL_start) then return nil end
-	return "<" .. left_2 .. ">"
 end
 
 function mod:SetUnit()

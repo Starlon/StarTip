@@ -43,12 +43,20 @@ local linesToAddRight = {}
 local linesToAddRightR = {}
 local linesToAddRightG = {}
 local linesToAddRightB = {}
-local unitLocation
-local unitName
-local unitGuild
+local lines
+
+local function errorhandler(err)
+	return geterrorhandler()(err)
+end
+
+local executeCode = function(tag, code)
+	if not code then return end
+
+	return assert(loadstring(code, tag))(xpcall, errorhandler)
+end
 
 -- Thanks to ckknight for this
-local short = function(value)
+mod.short = function(value)
 	if value >= 10000000 or value <= -10000000 then
 		value = ("%.1fm"):format(value / 1000000)
 	elseif value >= 1000000 or value <= -1000000 then
@@ -62,13 +70,6 @@ local short = function(value)
 	end
 	return value
 end
-
-local classifications = {
-	worldboss = "Boss",
-	rareelite = "+ Rare",
-	elite = "+",
-	rare = "Rare"
-}
 
 local powers = {
 	["WARRIOR"] = "Rage:",
@@ -84,7 +85,7 @@ powers = setmetatable(powers, {__index=function(self,key)
 	end
 end})
 
-local unitHasAura = function(aura)
+mod.unitHasAura = function(aura)
 	local i = 1
 	while true do
 		local buff = UnitBuff("mouseover", i, true)
@@ -105,228 +106,6 @@ local options = {
 	},
 }
 
-local lines = setmetatable({
-	[1] = {
-		db = "Name:",
-		name = "UnitName",
-		left = function()
-			local c
-			if UnitIsPlayer("mouseover") then
-				c = RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
-			else
-				c = {}
-				c.r, c.g, c.b = UnitSelectionColor("mouseover")
-			end
-			return unitName, c
-		end,
-		right = nil,
-		updating = false
-	},
-	[2] = {
-		db = "Target:",
-		name = "Target",
-		left = function() return "Target:" end,
-		right = function()
-			if UnitExists("mouseovertarget") then
-				local c
-				if UnitIsPlayer("mouseovertarget") then
-					c = RAID_CLASS_COLORS[select(2, UnitClass("mouseovertarget"))]
-				else
-					c = {}
-					c.r, c.g, c.b = UnitSelectionColor("mouseovertarget")
-				end
-				local name = UnitName("mouseovertarget")
-				return name, c
-			else
-				return "None", {r=1, g=1, b=1}
-			end
-		end,
-		updating = true
-	},
-	[3] = {
-		db = "Guild:",
-		name = "Guild",
-		left = function() return "Guild:" end,
-		right = function()
-			local guild = GetGuildInfo("mouseover")
-			if guild then return guild else return unitGuild end
-		end,
-		updating = false
-	},
-	[4] = {
-		db = "Rank:",
-		name = "Rank",
-		left = function() return "Rank:" end,
-		right =  function()
-			return select(2, GetGuildInfo("mouseover"))
-		end,	
-		updating = false
-	},
-	[5] = {
-		db = "Realm:",
-		name = "Realm",
-		left = function() return "Realm:" end,
-		right = function()
-			return select(2, UnitName("mouseover"))
-		end,
-		updating = false
-	},
-	[6] = {
-		db = "Level:",
-		name = "Level",
-		left = function() return "Level:" end,
-		right = function()
-			local lvl = UnitLevel("mouseover")
-			local class = UnitClassification("mouseover")
-    
-			if lvl <= 0 then 
-				lvl = ''
-			end
-
-			if classifications[class] then
-				lvl = lvl .. classifications[class]
-			end
-
-			return lvl
-		end,
-		updating = false
-	},
-	[7] = {
-		db = "Race:",
-		name = "Race",
-		left = function() return "Race:" end,
-		right = function()
-			local race
-			if UnitIsPlayer("mouseover") then
-				race = UnitRace("mouseover");
-			else
-				race = UnitCreatureFamily("mouseover") or UnitCreatureType("mouseover")
-			end
-			return race		
-		end,
-		updating = false
-	},
-	[8] = {
-		db = "Class:",
-		name = "Class",
-		left = function() return "Class:" end,
-		right = function()
-			local class = UnitClass("mouseover")
-			if class == UnitName("mouseover") then return end
-			local c = UnitIsPlayer("mouseover") and RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
-			return class, c
-		end,
-		updating = false
-	},
-	[9] = {
-		db = "Faction:",
-		name = "Faction",
-		left = function() return "Faction:" end,
-		right = function()
-			return UnitFactionGroup("mouseover")
-		end,
-		updating = false
-	},
-	[10] = {
-		db = "Status:",
-		name = "Status",
-		left = function() return "Status:" end,
-		right = function()
-			if not UnitIsConnected("mouseover") then
-				return "Offline"
-			elseif unitHasAura(GetSpellInfo(19752)) then
-				return "Divine Intervention"
-			elseif UnitIsFeignDeath("mouseover") then
-				return "Feigned Death"
-			elseif UnitIsGhost("mouseover") then
-				return "Ghost"
-			elseif UnitIsDead("mouseover") and  unitHasAura(GetSpellInfo(20707)) then
-				return "Soulstoned"
-			elseif UnitIsDead("mouseover") then
-				return "Dead"
-			end
-		end,
-		updating = true
-	},
-	[11] = {
-		db = "Health:",
-		name = "Health",
-		left = function() return "Health:" end,
-		right = function()
-			local health, maxHealth = UnitHealth("mouseover"), UnitHealthMax("mouseover")	
-			local value
-			if maxHealth == 100 then 
-				value = health .. "%"
-			elseif maxHealth ~= 0 then
-				value = format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100)
-			end
-			return value
-		end,
-		updating = true
-	},
-	[12] = {
-		db = "Mana:",
-		name = "Mana",
-		left = function()
-			local class = select(2, UnitClass("mouseover"))
-			return powers[class]
-		end,
-		right = function()
-			local mana = UnitMana("mouseover")
-			local maxMana = UnitManaMax("mouseover")
-			local value
-			if maxMana == 100 then
-				value = mana
-			elseif maxMana ~= 0 then
-				value = format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100)
-			end
-			return value		
-		end,
-		updating = true
-	},
-	[13] = {
-		db = "Location:",
-		name = "Location",
-		left = function() return "Location:" end,
-		right = function()
-			return unitLocation
-		end,
-		updating = true
-	},
-}, {__call=function(this)
-	local lineNum = 0
-	for i, v in ipairs(this) do
-		if self.db.profile[v.db] then
-			local left, right, c
-			if v.right then 
-				right, c = v.right() 
-				left = v.left()
-			else 
-				right = ''
-				left, c = v.left()
-			end
-			if left and right then 
-				lineNum = lineNum + 1
-				if v.right then
-					GameTooltip:AddDoubleLine(' ', ' ', 1, 1, 1, 1, 1, 1)
-					mod.leftLines[lineNum]:SetText(left)
-					mod.rightLines[lineNum]:SetText(right)
-					if type(c) == "table" and c.r then
-						mod.rightLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
-					end
-				else
-					GameTooltip:AddLine(' ', 1, 1, 1)
-					mod.leftLines[lineNum]:SetText(left)
-					if type(c) == "table" and c.r then
-						mod.leftLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
-					end
-				end
-			end
-		end
-	end
-	self.NUM_LINES = lineNum
-end})
-
 local function updateLines()
 	if not UnitExists("mouseover") then
 		mod:CancelTimer(timer)
@@ -335,8 +114,8 @@ local function updateLines()
 	end
 	for _, v in ipairs(lines) do
 		if v.updating and v.right and self.db.profile[v.db] then
-			local left = v.left()
-			local right, c = v.right()
+			local left = executeCode(v.name, v.left)
+			local right, c = executeCode(v.name, v.right)
 			if left and right then
 				for i = 1, self.NUM_LINES do
 					if mod.leftLines[i]:GetText() == left then
@@ -351,9 +130,224 @@ local function updateLines()
 	end
 end
 
-local defaults = {profile={titles=true}}
+local defaults = {profile={titles=true, lines={
+	[1] = {
+		db = "Name:",
+		name = "UnitName",
+		left = [[
+			local text = StarTip:GetModule("Text")
+			local c
+			if UnitIsPlayer("mouseover") then
+				c = RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
+			else
+				c = {}
+				c.r, c.g, c.b = UnitSelectionColor("mouseover")
+			end
+			return text.unitName, c
+		]],
+		right = nil,
+		updating = false
+	},
+	[2] = {
+		db = "Target:",
+		name = "Target",
+		left = 'return "Target:"',
+		right = [[
+			if UnitExists("mouseovertarget") then
+				local c
+				if UnitIsPlayer("mouseovertarget") then
+					c = RAID_CLASS_COLORS[select(2, UnitClass("mouseovertarget"))]
+				else
+					c = {}
+					c.r, c.g, c.b = UnitSelectionColor("mouseovertarget")
+				end
+				local name = UnitName("mouseovertarget")
+				return name, c
+			else
+				return "None", {r=1, g=1, b=1}
+			end
+		]],
+		updating = true
+	},
+	[3] = {
+		db = "Guild:",
+		name = "Guild",
+		left = 'return "Guild:"',
+		right = [[
+			local guild = GetGuildInfo("mouseover")
+			local text = StarTip:GetModule("Text")
+			if guild then return guild else return text.unitGuild end
+		]],
+		updating = false
+	},
+	[4] = {
+		db = "Rank:",
+		name = "Rank",
+		left = 'return "Rank:"',
+		right = [[
+			return select(2, GetGuildInfo("mouseover"))
+		]],	
+		updating = false
+	},
+	[5] = {
+		db = "Realm:",
+		name = "Realm",
+		left = 'return "Realm:"',
+		right = [[
+			return select(2, UnitName("mouseover"))
+		]],
+		updating = false
+	},
+	[6] = {
+		db = "Level:",
+		name = "Level",
+		left = 'return "Level:"',
+		right = [[
+			local classifications = {
+				worldboss = "Boss",
+				rareelite = "+ Rare",
+				elite = "+",
+				rare = "Rare"
+			}		
+			
+			local lvl = UnitLevel("mouseover")
+			local class = UnitClassification("mouseover")
+    
+			if lvl <= 0 then 
+				lvl = ''
+			end
 
-do
+			if classifications[class] then
+				lvl = lvl .. classifications[class]
+			end
+
+			return lvl
+		]],
+		updating = false
+	},
+	[7] = {
+		db = "Race:",
+		name = "Race",
+		left = 'return "Race:"',
+		right = [[
+			local race
+			if UnitIsPlayer("mouseover") then
+				race = UnitRace("mouseover");
+			else
+				race = UnitCreatureFamily("mouseover") or UnitCreatureType("mouseover")
+			end
+			return race		
+		]],
+		updating = false
+	},
+	[8] = {
+		db = "Class:",
+		name = "Class",
+		left = 'return "Class:"',
+		right = [[
+			local class = UnitClass("mouseover")
+			if class == UnitName("mouseover") then return end
+			local c = UnitIsPlayer("mouseover") and RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
+			return class, c
+		]],
+		updating = false
+	},
+	[9] = {
+		db = "Faction:",
+		name = "Faction",
+		left = 'return "Faction:"',
+		right = [[
+			return UnitFactionGroup("mouseover")
+		]],
+		updating = false
+	},
+	[10] = {
+		db = "Status:",
+		name = "Status",
+		left = 'return "Status:"',
+		right = [[
+			local text = StarTip:GetModule("Text")
+			if not UnitIsConnected("mouseover") then
+				return "Offline"
+			elseif text.unitHasAura(GetSpellInfo(19752)) then
+				return "Divine Intervention"
+			elseif UnitIsFeignDeath("mouseover") then
+				return "Feigned Death"
+			elseif UnitIsGhost("mouseover") then
+				return "Ghost"
+			elseif UnitIsDead("mouseover") and  unitHasAura(GetSpellInfo(20707)) then
+				return "Soulstoned"
+			elseif UnitIsDead("mouseover") then
+				return "Dead"
+			end
+		]],
+		updating = true
+	},
+	[11] = {
+		db = "Health:",
+		name = "Health",
+		left = 'return "Health:"',
+		right = [[
+			local text = StarTip:GetModule("Text")
+			local health, maxHealth = UnitHealth("mouseover"), UnitHealthMax("mouseover")	
+			local value
+			if maxHealth == 100 then 
+				value = health .. "%"
+			elseif maxHealth ~= 0 then
+				value = format("%s/%s (%d%%)", text.short(health), text.short(maxHealth), health/maxHealth*100)
+			end
+			return value
+		]],
+		updating = true
+	},
+	[12] = {
+		db = "Mana:",
+		name = "Mana",
+		left = [[
+			local powers = {
+				["WARRIOR"] = "Rage:",
+				["ROGUE"] = "Energy:",
+			}
+
+			powers = setmetatable(powers, {__index=function(self,key)
+				if type(key) == nil then return nil end
+				if rawget(self,key) then
+					return self[key]
+				else
+					return "Mana:"
+				end
+			end})
+			
+			local class = select(2, UnitClass("mouseover"))
+			return powers[class]
+		]],
+		right = [[
+			local text = StarTip:GetModule("Text")
+			local mana = UnitMana("mouseover")
+			local maxMana = UnitManaMax("mouseover")
+			local value
+			if maxMana == 100 then
+				value = mana
+			elseif maxMana ~= 0 then
+				value = format("%s/%s (%d%%)", text.short(mana), text.short(maxMana), mana/maxMana*100)
+			end
+			return value		
+		]],
+		updating = true
+	},
+	[13] = {
+		db = "Location:",
+		name = "Location",
+		left = 'return "Location:"',
+		right = [[
+			local text = StarTip:GetModule("Text")
+			return text.unitLocation
+		]],
+		updating = true
+	},
+}}}
+
+--[[do
 	local lnum = 1
 	for i, v in ipairs(lines) do
 		options[v.db] = {
@@ -367,7 +361,7 @@ do
 		lnum = lnum + 1
 		defaults.profile[v.db] = true
 	end
-end
+end]]
 
 function mod:OnInitialize()	
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
@@ -378,12 +372,43 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-	local i = 1
-	while true do
-		if not self.db.profile[i] then break end
-		lines[i] = self.db.profile[i]
-		i = i + 1
+	local llines = {}
+	for i, v in ipairs(self.db.profile.lines) do
+		llines[i] = v
 	end
+	lines = setmetatable(llines, {__call=function(this)
+		local lineNum = 0
+		for i, v in ipairs(this) do
+			--if self.db.profile[v.db] then
+				local left, right, c
+				if v.right then 
+					right, c = executeCode(v.name, v.right)
+					left = executeCode(v.name, v.left)
+				else 
+					right = ''
+					left, c = executeCode(v.name, v.left)
+				end
+				if left and right then 
+					lineNum = lineNum + 1
+					if v.right then
+						GameTooltip:AddDoubleLine(' ', ' ', 1, 1, 1, 1, 1, 1)
+						mod.leftLines[lineNum]:SetText(left)
+						mod.rightLines[lineNum]:SetText(right)
+						if type(c) == "table" and c.r then
+							mod.rightLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
+						end
+					else
+						GameTooltip:AddLine(' ', 1, 1, 1)
+						mod.leftLines[lineNum]:SetText(left)
+						if type(c) == "table" and c.r then
+							mod.leftLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
+						end
+					end
+				end
+			--end
+		end
+		self.NUM_LINES = lineNum
+	end})	
 	if TalentQuery then TalentQuery.RegisterCallback(self, "TalentQuery_Ready") end
 	StarTip:SetOptionsDisabled(options, false)
 end
@@ -464,9 +489,9 @@ function mod:SetUnit()
 		
 	if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 	
-	unitName = getName()
-	unitLocation = getLocation()
-	unitGuild = getGuild()
+	self.unitName = getName()
+	self.unitLocation = getLocation()
+	self.unitGuild = getGuild()
 	
 	-- Taken from CowTip
 	local lastLine = 2
