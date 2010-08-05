@@ -254,7 +254,7 @@ elseif UnitIsFeignDeath("mouseover") then
     return "Feigned Death"
 elseif UnitIsGhost("mouseover") then
     return "Ghost"
-elseif UnitIsDead("mouseover") and  unitHasAura(GetSpellInfo(20707)) then
+elseif UnitIsDead("mouseover") and  text.unitHasAura(GetSpellInfo(20707)) then
     return "Soulstoned"
 elseif UnitIsDead("mouseover") then
     return "Dead"
@@ -434,7 +434,6 @@ function mod:RebuildOpts()
 		}
 	}
     for i, v in ipairs(self.db.profile.lines) do
-        StarTip:Print("hmm")
         options["line" .. i] = {
             name = v.name,
             type = "group",

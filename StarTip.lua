@@ -57,7 +57,6 @@ function StarTip:OnEnable()
 	end
 	
 	for k, v in self:IterateModules() do
-		defaults.profile.modules[k] = true
 		options.args.modules.args[v:GetName()] = {
 			name = v.name,
 			type = "group",
