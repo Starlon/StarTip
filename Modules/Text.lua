@@ -37,6 +37,7 @@ local UnitIsUnit = _G.UnitIsUnit
 local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local timer, talentTimer
 local TalentQuery = LibStub:GetLibrary("LibTalentQuery-1.0", true)
+local RangeCheck = LibStub:GetLibrary("LibRangeCheck-2.0", true)
 local spec = setmetatable({}, {__mode='v'})
 local factionList = {}
 local linesToAdd = {}
@@ -51,6 +52,9 @@ local unitLocation
 local unitName
 local unitGuild
 local NUM_LINES
+local expired
+local expireTimer
+local EXPIRE_TIME = 3
 
 -- Thanks to ckknight for this
 local short = function(value)
@@ -101,9 +105,24 @@ powers = setmetatable(powers, {__index=function(self,key)
 	end
 end})
 
+function expireQuery()
+	expired = true
+end
+
 local updateTalents = function()
+	if expired then
+		self:CancelTimer(expireTimer)
+		TalentQuery:NotifyInspect("player")
+		TalentQuery.frame:Hide()
+		TalentQuery:Query("mouseover")
+		expireTimer = self:ScheduleTimer(expireQuery, EXPIRE_TIME)	
+		expired = nil
+		return
+	end
 	if not UnitExists("mouseover") then 
 		self:CancelTimer(talentTimer)
+		self:CancelTimer(expireTimer)
+		expireTimer = nil
 		talentTimer = nil
 		return 
 	end
@@ -166,11 +185,16 @@ local updateTalents = function()
 
 		self:CancelTimer(talentTimer)
 		talentTimer =  nil
+		if expireTimer then
+			mod:CancelTimer(expireTimer)
+			expireTimer = nil
+		end
+		if spec[nameRealm][1] == 0 and spec[nameRealm][2] == 0 and spec[nameRealm][3] == 0 then
+			spec[nameRealm] = nil
+		end
+		GameTooltip:Hide()
 		GameTooltip:Show()
 	elseif spec[nameRealm] then
-		for k in pairs(spec[nameRealm]) do
-			spec[nameRealm][k] = nil
-		end
 		spec[nameRealm] = nil
 	end
 end
@@ -197,17 +221,18 @@ function mod:TalentQuery_Ready(e, name, realm)
 	if not TalentQuery then return end
 	local nameRealm = name .. (realm or '')
 	local isnotplayer = (name ~= UnitName("player"))
-	if not spec[nameRealm] then
+	if not spec[nameRealm] then		
 		spec[nameRealm] = {[4]=NONE}
 		local highPoints = {}
 		local specNames = {}
+		local group = GetActiveTalentGroup(true)
 		for tab = 1, GetNumTalentTabs(isnotplayer) do
-			local treename, _, pointsspent = GetTalentTabInfo(tab, isnotplayer)
+			local treename, _, pointsspent = GetTalentTabInfo(tab, isnotplayer, nil, group)
 			highPoints[tab] = pointsspent
 			spec[nameRealm][tab] = pointsspent
 			specNames[tab] = treename
 		end
-		if highPoints[1] == nil or highPoints[2] == nil or highPoints[3] == nil  then spec[nameRealm] = nil return end
+		if highPoints[1] == nil or highPoints[2] == nil or highPoints[3] == nil then spec[nameRealm] = nil return end
 		table.sort(highPoints, function(a,b) return a>b end)
 		local first, second = select(1, indicesOf(spec[nameRealm], highPoints[1])), select(2, indicesOf(spec[nameRealm], highPoints[1]))
 		if highPoints[1] > 0 and highPoints[2] > 0 and highPoints[1] - highPoints[2] <= 5 and highPoints[1] ~= highPoints[2] then
@@ -434,12 +459,18 @@ local lines = setmetatable({
 		name = "Talents",
 		left = function() return "Talents:" end,
 		right = function()
-			local name = UnitName("mouseover")
-			if TalentQuery and UnitIsUnit("mouseover", "player") then
-				mod:TalentQuery_Ready(_, name)
-			elseif TalentQuery and UnitExists("mouseover") and UnitIsPlayer("mouseover") then
+			if not TalentQuery or not UnitIsPlayer("mouseover") then return end
+			if UnitIsUnit("mouseover", "player") then
+				StarTip:Print("hmm")
+				self:TalentQuery_Ready(_, UnitName("player"))
+			else
+				TalentQuery:NotifyInspect("mouseover")
 				TalentQuery:Query("mouseover")
 				talentTimer = talentTimer or self:ScheduleRepeatingTimer(updateTalents, 0)
+				if expireTimer then
+					self:CancelTimer(expireTimer)
+				end
+				expireTimer = self:ScheduleTimer(expireQuery, EXPIRE_TIME)
 			end
 		end,
 		updating = false
@@ -612,7 +643,7 @@ function mod:SetUnit()
 		end
 		return 
 	end]]
-	
+		
 	if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 	
 	unitName = getName()
