@@ -119,7 +119,9 @@ local function updateLines()
     end
 end
 
-local defaults = {profile={titles=true, lines={
+local defaults = {profile={titles=true, empty = true, lines = {}}}
+
+local defaultLines={
     [1] = {
         name = "UnitName",
         left = [[
@@ -321,7 +323,7 @@ return text.unitLocation
 ]],
         updating = true
     },
-}}}
+}
 
 local options = {}
 
@@ -343,6 +345,12 @@ end]]
 
 function mod:OnInitialize()    
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+	if self.db.profile.empty then
+		for i, v in ipairs(defaultLines) do
+			tinsert(self.db.profile.lines, v)
+		end
+		self.db.profile.empty = false
+	end
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
@@ -507,7 +515,19 @@ function mod:RebuildOpts()
 						self:CreateLines()
                     end,
                     order = 5
-                }
+                },
+				delete = {
+					name = "Delete",
+					desc = "Delete this line",
+					type = "execute",
+					func = function()
+						table.remove(self.db.profile.lines, i)
+						self:RebuildOpts()
+						StarTip:RebuildOpts()
+						self:CreateLines()
+					end,
+					order = 6
+				},
             },
             order = i + 5
         }
