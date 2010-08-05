@@ -350,6 +350,30 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
+	self:CreateLines()
+    if TalentQuery then TalentQuery.RegisterCallback(self, "TalentQuery_Ready") end
+    
+    StarTip:SetOptionsDisabled(options, false)
+end
+
+function mod:OnDisable()
+    if TalentQuery then TalentQuery.UnregisterCallback(self, "TalentQuery_Ready") end
+    StarTip:SetOptionsDisabled(options, true)
+end
+
+function mod:GetOptions()
+    self:RebuildOpts()
+    return options
+end
+
+function mod:UPDATE_FACTION()
+    for i = 1, GetNumFactions() do
+        local name = GetFactionInfo(i)
+        factionList[name] = true
+    end
+end
+
+function mod:CreateLines()
     local llines = {}
     for i, v in ipairs(self.db.profile.lines) do
         llines[i] = v
@@ -387,26 +411,6 @@ function mod:OnEnable()
         end
         self.NUM_LINES = lineNum
     end})    
-    if TalentQuery then TalentQuery.RegisterCallback(self, "TalentQuery_Ready") end
-    
-    StarTip:SetOptionsDisabled(options, false)
-end
-
-function mod:OnDisable()
-    if TalentQuery then TalentQuery.UnregisterCallback(self, "TalentQuery_Ready") end
-    StarTip:SetOptionsDisabled(options, true)
-end
-
-function mod:GetOptions()
-    self:RebuildOpts()
-    return options
-end
-
-function mod:UPDATE_FACTION()
-    for i = 1, GetNumFactions() do
-        local name = GetFactionInfo(i)
-        factionList[name] = true
-    end
 end
 
 function validateCode(code) 
@@ -429,6 +433,7 @@ function mod:RebuildOpts()
 				if v == "" then return end
 				tinsert(self.db.profile.lines, {name = v, left = "", right = "", updating = false})
 				self:RebuildOpts()
+				self:CreateLines()
 			end,
 			order = 5
 		}
@@ -475,9 +480,14 @@ function mod:RebuildOpts()
                     func = function()
                         if i == 1 then return end
                         local tmp = self.db.profile.lines[i - 1]
+						if not v.left then v.left = "" end
+						if not v.right then v.right = "" end
+						if not tmp.left then tmp.left = "" end
+						if not tmp.right then tmp.right = "" end
                         self.db.profile.lines[i - 1] = v
                         self.db.profile.lines[i] = tmp
                         self:RebuildOpts()
+						self:CreateLines()
                     end,
                     order = 4
                 },
@@ -491,6 +501,7 @@ function mod:RebuildOpts()
                         self.db.profile.lines[i + 1] = v
                         self.db.profile.lines[i] = tmp
                         self:RebuildOpts()
+						self:CreateLines()
                     end,
                     order = 5
                 }
