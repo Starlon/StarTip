@@ -112,7 +112,7 @@ function expireQuery()
 end
 
 local updateTalents = function()
-	if not UnitExists("mouseover") then 
+	if not UnitExists("mouseover") or not UnitIsPlayer("mouseover") then 
 		self:CancelTimer(talentTimer)
 		self:CancelTimer(expireTimer)
 		expireTimer = nil
