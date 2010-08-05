@@ -325,7 +325,6 @@ local currentOwner
 local currentThis
 local f = CreateFrame("Frame")
 local function delayAnchor()
-	f:SetScript("OnUpdate", nil)
 	local this = currentThis
 	local owner = currentOwner
 	this:ClearAllPoints()
@@ -346,9 +345,12 @@ local function delayAnchor()
 end
 
 function mod:GameTooltip_SetDefaultAnchor(this, owner)
+	if owner == currentOwner and this == currentThis then
+		return
+	end	
 	currentOwner = owner
 	currentThis = this
-	if not f:GetScript("OnUpdate") then f:SetScript("OnUpdate", delayAnchor) end
+	f:SetScript("OnUpdate", delayAnchor)
 end
 
 function mod:REGEN_DISABLED()
@@ -361,4 +363,5 @@ mod.REGEN_ENABLED = mod.REGEN_DISABLED
 
 function mod:OnHide()
 	updateFrame:SetScript("OnUpdate", nil)
+	f:SetScript("OnUpdate", nil)
 end
