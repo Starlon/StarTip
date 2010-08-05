@@ -445,6 +445,21 @@ function mod:RebuildOpts()
 				self:CreateLines()
 			end,
 			order = 5
+		},
+		defaults = {
+			name = "Restore Defaults",
+			desc = "Roll back to defaults.",
+			type = "execute",
+			func = function()
+				self.db.profile.lines = {}
+				for i, v in ipairs(defaultLines) do
+					tinsert(self.db.profile.lines, v)
+				end
+				self:RebuildOpts()
+				StarTip:RebuildOpts()
+				self:CreateLines()
+			end,
+			order = 6
 		}
 	}
     for i, v in ipairs(self.db.profile.lines) do
