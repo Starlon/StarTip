@@ -115,7 +115,7 @@ local updateTalents = function()
 	if spec[nameRealm] and spec[nameRealm][4] and spec[nameRealm][1] and spec[nameRealm][2] and spec[nameRealm][3] then
 		local specText = ('%s (%d/%d/%d)'):format(spec[nameRealm][4], spec[nameRealm][1], spec[nameRealm][2], spec[nameRealm][3])
 		local lineNum
-		if text.NUM_LINES < GameTooltip:NumLines() then
+		if (text.NUM_LINES or 0xdeadbeef) < GameTooltip:NumLines() then -- sometimes the text module hasn't initialized before this test
 			lineNum = text.NUM_LINES + 1
 			local j = 0
 			for i = lineNum, GameTooltip:NumLines() do

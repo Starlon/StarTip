@@ -64,6 +64,16 @@ local options = {
 		get = get,
 		set = set,
 		order = 7
+	},
+	test = {
+		name = "test",
+		type = "group",
+		args = {
+			test = {
+				name = "Test",
+				type = "toggle"
+			}
+		}
 	}
 }
 

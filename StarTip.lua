@@ -26,7 +26,36 @@ local options = {
 StarTip:SetDefaultModuleState(false)
 
 function StarTip:OnInitialize()
+	
+	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
 
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", options)
+	self:RegisterChatCommand("startip", "OpenConfig")
+
+	self.leftLines = {}
+	self.rightLines = {}
+	for i = 1, 50 do
+		GameTooltip:AddDoubleLine(' ', ' ')
+		self.leftLines[i] = _G["GameTooltipTextLeft" .. i]
+		self.rightLines[i] = _G["GameTooltipTextRight" .. i]
+	end
+	GameTooltip:Show()
+	GameTooltip:Hide()
+end
+
+function StarTip:OnEnable()
+	GameTooltip:HookScript("OnTooltipSetUnit", self.OnTooltipSetUnit)
+	GameTooltip:HookScript("OnTooltipSetItem", self.OnTooltipSetItem)
+	GameTooltip:HookScript("OnTooltipSetSpell", self.OnTooltipSetSpell)
+	self:RawHookScript(GameTooltip, "OnHide", "OnTooltipHide")
+	self:RawHookScript(GameTooltip, "OnShow", "OnTooltipShow")
+	
+	for k,v in self:IterateModules() do
+		if self.db.profile.modules[k]  == nil or self.db.profile.modules[k] then
+			v:Enable()
+		end
+	end
+	
 	for k, v in self:IterateModules() do
 		defaults.profile.modules[k] = true
 		options.args.modules.args[v:GetName()] = {
@@ -65,39 +94,11 @@ function StarTip:OnInitialize()
 					self:DisableModule(k)
 				end
 			end,
-			get = function() return self.db.profile.modules[k] end,
+			get = function() return self.db.profile.modules[k] == nil or self.db.profile.modules[k] end,
 			order = 2
 		}
 		options.args.modules.args[v:GetName()].args = t
-	end
-
-	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", options)
-	self:RegisterChatCommand("startip", "OpenConfig")
-
-	self.leftLines = {}
-	self.rightLines = {}
-	for i = 1, 50 do
-		GameTooltip:AddDoubleLine(' ', ' ')
-		self.leftLines[i] = _G["GameTooltipTextLeft" .. i]
-		self.rightLines[i] = _G["GameTooltipTextRight" .. i]
-	end
-	GameTooltip:Show()
-	GameTooltip:Hide()
-end
-
-function StarTip:OnEnable()
-	GameTooltip:HookScript("OnTooltipSetUnit", self.OnTooltipSetUnit)
-	GameTooltip:HookScript("OnTooltipSetItem", self.OnTooltipSetItem)
-	GameTooltip:HookScript("OnTooltipSetSpell", self.OnTooltipSetSpell)
-	self:RawHookScript(GameTooltip, "OnHide", "OnTooltipHide")
-	self:RawHookScript(GameTooltip, "OnShow", "OnTooltipShow")
-	
-	for k,v in self:IterateModules() do
-		if self.db.profile.modules[k] then
-			v:Enable()
-		end
-	end
+	end	
 end
 
 function StarTip:OnDisable()
@@ -109,7 +110,7 @@ function StarTip:OnDisable()
 end
 
 function StarTip:OpenConfig()
-	AceConfigDialog:SetDefaultSize("StarTip", 500, 450)
+	AceConfigDialog:SetDefaultSize("StarTip", 800, 450)
 	AceConfigDialog:Open("StarTip")	
 end
 	
