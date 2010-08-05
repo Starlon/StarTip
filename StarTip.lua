@@ -56,6 +56,18 @@ function StarTip:OnEnable()
 		end
 	end
 	
+	self:RebuildOpts()
+end
+
+function StarTip:OnDisable()
+	self:Unhook(GameTooltip, "OnTooltipSetUnit")
+	self:Unhook(GameTooltip, "OnTooltipSetItem")
+	self:Unhook(GameTooltip, "OnTooltipSetSpell")
+	self:Unhook(GameTooltip, "OnHide")
+	self:Unhook(GameTooltip, "OnShow")
+end
+
+function StarTip:RebuildOpts()
 	for k, v in self:IterateModules() do
 		options.args.modules.args[v:GetName()] = {
 			name = v.name,
@@ -98,14 +110,6 @@ function StarTip:OnEnable()
 		}
 		options.args.modules.args[v:GetName()].args = t
 	end	
-end
-
-function StarTip:OnDisable()
-	self:Unhook(GameTooltip, "OnTooltipSetUnit")
-	self:Unhook(GameTooltip, "OnTooltipSetItem")
-	self:Unhook(GameTooltip, "OnTooltipSetSpell")
-	self:Unhook(GameTooltip, "OnHide")
-	self:Unhook(GameTooltip, "OnShow")
 end
 
 function StarTip:OpenConfig()

@@ -433,6 +433,7 @@ function mod:RebuildOpts()
 				if v == "" then return end
 				tinsert(self.db.profile.lines, {name = v, left = "", right = "", updating = false})
 				self:RebuildOpts()
+				StarTip:RebuildOpts()
 				self:CreateLines()
 			end,
 			order = 5
@@ -487,6 +488,7 @@ function mod:RebuildOpts()
                         self.db.profile.lines[i - 1] = v
                         self.db.profile.lines[i] = tmp
                         self:RebuildOpts()
+						StarTip:RebuildOpts()
 						self:CreateLines()
                     end,
                     order = 4
@@ -501,6 +503,7 @@ function mod:RebuildOpts()
                         self.db.profile.lines[i + 1] = v
                         self.db.profile.lines[i] = tmp
                         self:RebuildOpts()
+						StarTip:RebuildOpts()
 						self:CreateLines()
                     end,
                     order = 5
