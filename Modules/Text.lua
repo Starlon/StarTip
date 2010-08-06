@@ -119,6 +119,25 @@ local function updateLines()
     end
 end
 
+--[[
+local newFont, delFont
+do
+	local pool = setmetatable({},{__mode='k'})
+	newFont = function(key) 
+		local t = next(pool)
+		if not t then
+			t = CreateFont(key)
+			t:CopyFontObject(GameTooltipText)			
+		end
+		pool[t] = nil
+		return t
+	end
+	delFont = function(tbl)
+		pool[tbl] = true
+	end
+end
+]]
+
 local defaults = {profile={titles=true, empty = true, lines = {}}}
 
 local defaultLines={
@@ -136,7 +155,8 @@ end
 return text.unitName, c
 ]],
         right = nil,
-        updating = false
+        updating = false,
+		bold = true
     },
     [2] = {
         name = "Target",
@@ -358,9 +378,10 @@ function mod:CreateLines()
     for i, v in ipairs(self.db.profile.lines) do
         llines[i] = v
     end
-    lines = setmetatable(llines, {__call=function(this)
+    lines = setmetatable(llines, {__call=function(self)
         local lineNum = 0
-        for i, v in ipairs(this) do
+		GameTooltip:ClearLines()
+        for i, v in ipairs(self) do
             --if self.db.profile[v.db] then
                 local left, right, c
                 if v.right then 
@@ -373,25 +394,41 @@ function mod:CreateLines()
                 if left and right then 
                     lineNum = lineNum + 1
                     if v.right then
-                        GameTooltip:AddDoubleLine(' ', ' ', 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine(' ', ' ', 1, 1, 1, 1, 1, 1)
                         mod.leftLines[lineNum]:SetText(left)
                         mod.rightLines[lineNum]:SetText(right)
                         if type(c) == "table" and c.r then
                             mod.rightLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
                         end
+						--[[if v.bold then
+							mod.leftLines[lineNum]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
+							mod.rightLines[lineNum]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
+						end]]
                     else
-                        GameTooltip:AddLine(' ', 1, 1, 1)
+						GameTooltip:AddLine(' ', 1, 1, 1)
                         mod.leftLines[lineNum]:SetText(left)
                         if type(c) == "table" and c.r then
                             mod.leftLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
                         end
+						--[[if v.bold then
+							mod.leftLines[lineNum]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
+						end]]
                     end
                 end
 				StarTip:del(c)
             --end
         end
         self.NUM_LINES = lineNum
-    end})    
+    end})
+	for i, v in ipairs(self.db.profile.lines) do
+		if v.bold then
+			mod.leftLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
+			mod.rightLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
+		else
+			mod.leftLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 12, "MONOCHROME")
+			mod.rightLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 12, "MONOCHROME")
+		end
+	end
 end
 
 function mod:RebuildOpts()
@@ -423,9 +460,10 @@ function mod:RebuildOpts()
 				self:CreateLines()
 			end,
 			order = 6
-		}
+		},
 	}
     for i, v in ipairs(self.db.profile.lines) do
+		if type(v) ~= "table" then break end
         options["line" .. i] = {
             name = v.name,
             type = "group",
@@ -512,6 +550,17 @@ function mod:RebuildOpts()
                     end,
                     order = 5
                 },
+				bold = {
+					name = "Bold",
+					desc = "Whether to bold this line or not",
+					type = "toggle",
+					get = function() return self.db.profile.lines[i].bold end,
+					set = function(info, v) 
+						self.db.profile.lines[i].bold = v
+						self:CreateLines() 
+					end,
+					order = 6
+				},
 				delete = {
 					name = "Delete",
 					desc = "Delete this line",
@@ -522,7 +571,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
 					end,
-					order = 6
+					order = 7
 				},
             },
             order = i + 5

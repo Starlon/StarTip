@@ -1,5 +1,5 @@
 ﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0") 
-local LibQTip = LibStub('LibQTip-1.0')
+--local LibQTip = LibStub('LibQTip-1.0')
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
@@ -18,9 +18,13 @@ local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("StarTip", {
 local defaults = {
 	profile = {
 		modules = {},
-		minimap = {hide=true}
+		minimap = {hide=true},
+		modifier = 1
 	}
 }
+
+local modNames = {"None", "Ctrl", "Alt", "Shift"}
+local modFuncs = {function() return true end, IsControlKeyDown, IsAltKeyDown, IsShiftKeyDown}
 
 local options = {
 	type = "group",
@@ -52,7 +56,17 @@ local options = {
 						end
 					end,
 					order = 1
-				}
+				},
+				modifier = {
+					name = "Modifier",
+					desc = "Whether to use a modifier key or not",
+					type = "select",
+					values = {"None", "Ctrl", "Alt", "Shift"},
+					get = function() return StarTip.db.profile.modifier end,
+					set = function() StarTip.db.profile.modifier = v end,
+					order = 6
+				},		
+				
 			}
 		}
 	}
@@ -207,7 +221,7 @@ function StarTip:OpenConfig()
 end
 	
 local ff = CreateFrame("Frame")
-function StarTip.OnTooltipSetUnit()
+function StarTip.OnTooltipSetUnit()	
 	if not StarTip.justSetUnit then
 		if not UnitExists("mouseover") then
 			if ff:GetScript("OnUpdate") then
@@ -225,7 +239,7 @@ function StarTip.OnTooltipSetUnit()
 	end
 end
 
-function StarTip.OnTooltipSetItem(self, ...)
+function StarTip.OnTooltipSetItem(self, ...)	
 	if not StarTip.justSetItem then
 		for k, v in StarTip:IterateModules() do
 			if v.SetItem and v:IsEnabled() then v:SetItem(...) end
@@ -233,7 +247,7 @@ function StarTip.OnTooltipSetItem(self, ...)
 	end
 end
 
-function StarTip.OnTooltipSetSpell(...)
+function StarTip.OnTooltipSetSpell(...)	
 	if not StarTip.justSetSpell then
 		for k, v in StarTip:IterateModules() do
 			if v.SetSpell and v:IsEnabled() then v:SetSpell(...) end
@@ -249,20 +263,22 @@ function StarTip:OnTooltipHide(...)
 	end
 	self.hooks[GameTooltip].OnHide(...)
 
-	LibQTip:Release(self.tooltip)
+	--LibQTip:Release(self.tooltip)
 	self.tooltip = nil
   	
 end
 
 function StarTip:OnTooltipShow(...)
+	if self.db.profile.modifier > 1 and modFuncs[self.db.profile.modifier or 1] then
+		if modFuncs[self.db.profile.modifier]() then
+			return
+		end
+	end
 	if not self.justShow then
 		for k, v in self:IterateModules() do
 			if v.OnShow and v:IsEnabled() then v:OnShow(...) end
 		end
 	end
-   -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
-	local tooltip = LibQTip:Acquire("GameTooltip", 2, "LEFT", "CENTER", "RIGHT")
-	StarTip.tooltip = tooltip 
           
     self.hooks[GameTooltip].OnShow(...)
 end
