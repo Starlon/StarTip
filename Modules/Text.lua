@@ -629,17 +629,7 @@ local getGuild = function()
 end
 
 local ff = CreateFrame("Frame")
-function mod:SetUnit()
-    --[[self = mod
-    if not UnitExists("mouseover") then 
-        if ff:GetScript("OnUpdate") then
-            ff:SetScript("OnUpdate", nil)
-        else
-            ff:SetScript("OnUpdate", self.SetUnit)
-        end
-        return 
-    end]]
-        
+function mod:SetUnit()        
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
     
     self.unitName = getName()

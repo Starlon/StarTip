@@ -210,6 +210,10 @@ function mod:SetUnit()
 			expireTimer = nil
 		end
 		expireTimer = self:ScheduleTimer(expireQuery, EXPIRE_TIME)
+		if IsControlKeyDown() then
+			local nameRealm = select(1, UnitName("mouseover")) .. (select(2, UnitName("mouseover")) or '')
+			spec[nameRealm] = nil
+		end
 	end
 end
 
