@@ -510,7 +510,7 @@ function mod:RebuildOpts()
                 },
                 updating = {
                     name = "Updating",
-                    desc = "Whether this line refreshes while hovering over object/unit.",
+                    desc = "Whether this line refreshes while hovering over unit.",
                     type = "toggle",
                     get = function() return v.updating end,
                     set = function(info, val) v.updating = val end,
@@ -542,6 +542,10 @@ function mod:RebuildOpts()
                     func = function()
                         if i == #self.db.profile.lines then return end
                         local tmp = self.db.profile.lines[i + 1]
+						if not v.left then v.left = "" end
+						if not v.right then v.right = "" end
+						if not tmp.left then tmp.left = "" end
+						if not tmp.right then tmp.right = "" end
                         self.db.profile.lines[i + 1] = v
                         self.db.profile.lines[i] = tmp
                         self:RebuildOpts()
