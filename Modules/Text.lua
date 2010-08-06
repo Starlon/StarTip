@@ -184,7 +184,7 @@ end
         right = [[
 local guild = GetGuildInfo("mouseover")
 local text = StarTip:GetModule("Text")
-if guild then return guild else return text.unitGuild end
+if guild then return "<" .. guild .. ">" else return text.unitGuild end
 ]],
         updating = false
     },
