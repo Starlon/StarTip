@@ -42,6 +42,9 @@ externals:
     Libs/LibQTip-1.0:
         url: svn://svn.wowace.com/wow/libqtip-1-0/mainline/trunk
         tag: latest
+	Lib/LibDBIcon-1.0:
+	    url: svn://svn.wowace.com/wow/libdbicon-1-0/mainline/trunk
+		tag: latest
 	Libs/LibDBroker-1.0:
 	    url: git://github.com/tekkub/libdatabroker-1-1.git
 		tag: v1.1.4
