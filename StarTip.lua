@@ -261,20 +261,14 @@ function StarTip:OnTooltipShow(...)
 		end
 	end
    -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
-   local tooltip = LibQTip:Acquire("GameTooltip", 3, "LEFT", "CENTER", "RIGHT")
-   StarTip.tooltip = tooltip 
-   
-   -- Add an header filling only the first two columns
-   tooltip:AddHeader('Anchor', 'Tooltip')
-   
-   -- Add an new line, using all columns
-   tooltip:AddLine('Hello', 'World', '!')
-   
-   -- Use smart anchoring code to anchor the tooltip to our frame
-   tooltip:SmartAnchorTo(_G.GameTooltip)
-   
-   -- Show it, et voil?
-   self.hooks[GameTooltip].OnShow(...)
+	local tooltip = LibQTip:Acquire("GameTooltip", 3, "LEFT", "CENTER", "RIGHT")
+	StarTip.tooltip = tooltip 
+      
+    -- Use smart anchoring code to anchor the tooltip to our frame
+    tooltip:SmartAnchorTo(_G.GameTooltip)
+    
+    -- Show it, et voil?
+    self.hooks[GameTooltip].OnShow(...)
 end
 
 function StarTip:GetLSMIndexByName(category, name)
