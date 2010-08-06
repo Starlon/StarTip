@@ -1,13 +1,24 @@
-StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0") 
+﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0") 
+local LibQTip = LibStub('LibQTip-1.0')
+local LibDBIcon = LibStub("LibDBIcon-1.0")
+local LSM = _G.LibStub("LibSharedMedia-3.0")
+local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local ipairs, pairs = _G.ipairs, _G.pairs
-local LSM = _G.LibStub("LibSharedMedia-3.0")
+
+local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("StarTip", {
+	type = "data source",
+	text = "StarTip",
+	icon = "Interface\\Icons\\INV_Chest_Cloth_17",
+	OnClick = function() StarTip:OpenConfig() end
+})
 
 local defaults = {
 	profile = {
-		modules = {}
+		modules = {},
+		minimap = {hide=true}
 	}
 }
 
@@ -19,10 +30,78 @@ local options = {
 			desc = "Modules",
 			type = "group",
 			args = {}
+		},
+		settings = {
+			name = "Settings",
+			desc = "Settings",
+			type = "group",
+			args = {
+				minimap = {
+					name = "Minimap",
+					desc = "Toggle showing minimap button",
+					type = "toggle",
+					get = function() 
+						return not StarTip.db.profile.minimap.hide
+					end,
+					set = function(info, v)
+						StarTip.db.profile.minimap.hide = not v
+						if not v then 
+							LibDBIcon:Hide("StarTipLDB") 
+						else
+							LibDBIcon:Show("StarTipLDB")
+						end
+					end,
+					order = 1
+				}
+			}
 		}
 	}
 }
 
+do
+	local pool = setmetatable({},{__mode='k'})
+	
+	function StarTip:new(...)
+		local t = next(pool)
+		if t then
+			pool[t] = nil
+			for i=1, select("#", ...) do
+				t[i] = select(i, ...)
+			end
+		else
+			t = {...}
+		end
+		t.__starref__ = true
+		return t
+	end
+	function StarTip:newDict(...)
+		local t = next(pool)
+		if t then
+			pool[t] = nil
+		else
+			t = {}			
+		end
+		for i=1, select("#", ...), 2 do
+			t[select(i, ...)] = select(i+1, ...)
+		end
+		t.__starref__ = true
+		return t
+	end	
+	function StarTip:del(...)
+		for i=1, select("#", ...) do
+			local t = select(i, ...)
+			if (t and type(t) ~= table) or t == nil then break end
+			for k, v in pairs(t) do
+				if type(k) == "table" then
+					if t.__starref__ then StarTip:del(k) end
+					t.__starref__ = nil
+				end
+				t[k] = nil
+			end
+			pool[t] = true			
+		end
+	end
+end
 StarTip:SetDefaultModuleState(false)
 
 function StarTip:OnInitialize()
@@ -31,7 +110,9 @@ function StarTip:OnInitialize()
 
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", options)
 	self:RegisterChatCommand("startip", "OpenConfig")
-
+	AceConfigDialog:AddToBlizOptions("StarTip")
+	LibDBIcon:Register("StarTipLDB", LDB, self.db.profile.minimap)
+	
 	self.leftLines = {}
 	self.rightLines = {}
 	for i = 1, 50 do
@@ -41,9 +122,16 @@ function StarTip:OnInitialize()
 	end
 	GameTooltip:Show()
 	GameTooltip:Hide()
+	
 end
 
 function StarTip:OnEnable()
+	if self.db.profile.minimap.hide then
+		LibDBIcon:Hide("StarTipLDB")
+	else
+		LibDBIcon:Show("StarTipLDB")
+	end
+
 	GameTooltip:HookScript("OnTooltipSetUnit", self.OnTooltipSetUnit)
 	GameTooltip:HookScript("OnTooltipSetItem", self.OnTooltipSetItem)
 	GameTooltip:HookScript("OnTooltipSetSpell", self.OnTooltipSetSpell)
@@ -55,11 +143,12 @@ function StarTip:OnEnable()
 			v:Enable()
 		end
 	end
-	
+		
 	self:RebuildOpts()
 end
 
 function StarTip:OnDisable()
+	LibDBIcon:Hide("StarTipLDB")
 	self:Unhook(GameTooltip, "OnTooltipSetUnit")
 	self:Unhook(GameTooltip, "OnTooltipSetItem")
 	self:Unhook(GameTooltip, "OnTooltipSetSpell")
@@ -136,10 +225,10 @@ function StarTip.OnTooltipSetUnit()
 	end
 end
 
-function StarTip.OnTooltipSetItem(...)
+function StarTip.OnTooltipSetItem(self, ...)
 	if not StarTip.justSetItem then
 		for k, v in StarTip:IterateModules() do
-			if v.SetItem and v:IsEnabled() then v:SetItem() end
+			if v.SetItem and v:IsEnabled() then v:SetItem(...) end
 		end
 	end
 end
@@ -147,7 +236,7 @@ end
 function StarTip.OnTooltipSetSpell(...)
 	if not StarTip.justSetSpell then
 		for k, v in StarTip:IterateModules() do
-			if v.SetSpell and v:IsEnabled() then v:SetSpell() end
+			if v.SetSpell and v:IsEnabled() then v:SetSpell(...) end
 		end
 	end
 end
@@ -155,19 +244,37 @@ end
 function StarTip:OnTooltipHide(...)
 	if not self.justHide then
 		for k, v in self:IterateModules() do
-			if v.OnHide and v:IsEnabled() then v:OnHide() end
+			if v.OnHide and v:IsEnabled() then v:OnHide(...) end
 		end
 	end
 	self.hooks[GameTooltip].OnHide(...)
+
+	LibQTip:Release(self.tooltip)
+	self.tooltip = nil
+  	
 end
 
 function StarTip:OnTooltipShow(...)
 	if not self.justShow then
 		for k, v in self:IterateModules() do
-			if v.OnShow and v:IsEnabled() then v:OnShow() end
+			if v.OnShow and v:IsEnabled() then v:OnShow(...) end
 		end
 	end
-	self.hooks[GameTooltip].OnShow(...)
+   -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
+   local tooltip = LibQTip:Acquire("GameTooltip", 3, "LEFT", "CENTER", "RIGHT")
+   StarTip.tooltip = tooltip 
+   
+   -- Add an header filling only the first two columns
+   tooltip:AddHeader('Anchor', 'Tooltip')
+   
+   -- Add an new line, using all columns
+   tooltip:AddLine('Hello', 'World', '!')
+   
+   -- Use smart anchoring code to anchor the tooltip to our frame
+   tooltip:SmartAnchorTo(_G.GameTooltip)
+   
+   -- Show it, et voil?
+   self.hooks[GameTooltip].OnShow(...)
 end
 
 function StarTip:GetLSMIndexByName(category, name)

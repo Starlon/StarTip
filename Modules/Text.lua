@@ -52,7 +52,14 @@ end
 local executeCode = function(tag, code)
     if not code then return end
 
-    return assert(loadstring(code, tag))(xpcall, errorhandler)
+	local runnable, err = loadstring(code, tag)
+	
+	if not runnable then 
+		StarTip:Print(err)
+		return "" 
+	end
+		
+    return runnable(xpcall, errorhandler)
 end
 
 -- Thanks to ckknight for this
@@ -71,19 +78,11 @@ mod.short = function(value)
     return value
 end
 
-local powers = {
+mod.powers = {
     ["WARRIOR"] = "Rage:",
     ["ROGUE"] = "Energy:",
+	["DEATHKNIGHT"] = "Rune Power"
 }
-
-powers = setmetatable(powers, {__index=function(self,key)
-    if type(key) == nil then return nil end
-    if rawget(self,key) then
-        return self[key]
-    else
-        return "Mana:"
-    end
-end})
 
 mod.unitHasAura = function(aura)
     local i = 1
@@ -105,6 +104,7 @@ local function updateLines()
         if v.updating and v.right and self.db.profile[v.db] then
             local left = executeCode(v.name, v.left)
             local right, c = executeCode(v.name, v.right)
+			StarTip:del(c)
             if left and right then
                 for i = 1, self.NUM_LINES do
                     if mod.leftLines[i]:GetText() == left then
@@ -130,7 +130,7 @@ local c
 if UnitIsPlayer("mouseover") then
     c = RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
 else
-    c = {}
+    c = StarTip:new()
     c.r, c.g, c.b = UnitSelectionColor("mouseover")
 end
 return text.unitName, c
@@ -147,13 +147,13 @@ if UnitExists("mouseovertarget") then
     if UnitIsPlayer("mouseovertarget") then
         c = RAID_CLASS_COLORS[select(2, UnitClass("mouseovertarget"))]
     else
-        c = {}
+        c = StarTip:new()
         c.r, c.g, c.b = UnitSelectionColor("mouseovertarget")
     end
     local name = UnitName("mouseovertarget")
     return name, c
 else
-    return "None", {r=1, g=1, b=1}
+    return "None", StarTip:newDict("r", 1, "g", 1, "b", 1)
 end
 ]],
         updating = true
@@ -188,12 +188,11 @@ return select(2, UnitName("mouseover"))
         name = "Level",
         left = 'return "Level:"',
         right = [[
-local classifications = {
-    worldboss = "Boss",
-    rareelite = "+ Rare",
-    elite = "+",
-    rare = "Rare"
-}        
+local classifications = StarTip.newDict(
+    "worldboss", "Boss",
+    "rareelite", "+ Rare",
+    "elite", "+",
+    "rare", "Rare")
             
 local lvl = UnitLevel("mouseover")
 local class = UnitClassification("mouseover")
@@ -205,6 +204,8 @@ end
 if classifications[class] then
     lvl = lvl .. classifications[class]
 end
+
+StarTip:del(classifications)
 
 return lvl
 ]],
@@ -283,34 +284,21 @@ return value
     [12] = {
         name = "Mana",
         left = [[
-local powers = {
-    ["WARRIOR"] = "Rage:",
-    ["ROGUE"] = "Energy:",
-}
-
-powers = setmetatable(powers, {__index=function(self,key)
-    if type(key) == nil then return nil end
-    if rawget(self,key) then
-        return self[key]
-    else
-        return "Mana:"
-    end
-end})
+local text = StarTip:GetModule("Text")
             
 local class = select(2, UnitClass("mouseover"))
-return powers[class]
+return text.powers[class] or "Mana:"
 ]],
         right = [[
 local text = StarTip:GetModule("Text")
 local mana = UnitMana("mouseover")
 local maxMana = UnitManaMax("mouseover")
-local value
 if maxMana == 100 then
     value = mana
 elseif maxMana ~= 0 then
     value = format("%s/%s (%d%%)", text.short(mana), text.short(maxMana), mana/maxMana*100)
 end
-return value        
+return value
 ]],
         updating = true
     },
@@ -326,22 +314,6 @@ return text.unitLocation
 }
 
 local options = {}
-
---[[do
-    local lnum = 1
-    for i, v in ipairs(lines) do
-        options[v.db] = {
-            name = v.name,
-            desc = "Toggle showing this line",
-            type = "toggle",
-            set = function(info, val) self.db.profile[v.db] = val end,
-            get = function() return self.db.profile[v.db] end,
-            order = 5 + lnum
-        }
-        lnum = lnum + 1
-        defaults.profile[v.db] = true
-    end
-end]]
 
 function mod:OnInitialize()    
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
@@ -415,20 +387,11 @@ function mod:CreateLines()
                         end
                     end
                 end
+				StarTip:del(c)
             --end
         end
         self.NUM_LINES = lineNum
     end})    
-end
-
-function validateCode(code) 
-    local ret, err = loadstring(code, "validate")
-    if not ret then
-        StarTip:Print(("Code failed to execute. Error message: %s"):format(err or ""))
-        return false
-    end
-    StarTip:Print(("Code executed without error. Return value: %s"):format(ret or ""))
-    return true
 end
 
 function mod:RebuildOpts()
@@ -473,7 +436,16 @@ function mod:RebuildOpts()
                     desc = "Left text code",
                     get = function() return v.left end,
                     set = function(info, val) v.left = val end,
-                    validate = validateCode,
+                    validate = function()
+						local ret, err = loadstring(v.left or "", "validate")
+						if not ret then
+							StarTip:Print(("Code failed to execute. Error message: %s"):format(err or ""))
+							return false
+						end
+						StarTip:Print(("Code executed without error. Return value: %s"):format(ret(xpcall, errorhandler) or ""))
+					return true
+					
+					end,
                     multiline = true,
 					width = "full",
                     order = 1
@@ -484,7 +456,16 @@ function mod:RebuildOpts()
                     desc = "Right text code",
                     get = function() return v.right end,
                     set = function(info, val) v.right = val end,
-                    validate = validateCode,
+                    validate = function()
+						local ret, err = loadstring(v.right or "", "validate")
+						if not ret then
+							local text = ("Code failed to execute. Error message: %s"):format(err or "")
+							StarTip:Print(text)
+							return text
+						end
+						StarTip:Print(("Code executed without error. Return value: %s"):format(ret(xpcall, errorhandler) or ""))
+						return true
+					end,
                     multiline = true,
 					width = "full",
                     order = 2
