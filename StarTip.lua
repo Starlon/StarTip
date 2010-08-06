@@ -152,6 +152,7 @@ function StarTip:OnEnable()
 	GameTooltip:HookScript("OnTooltipSetSpell", self.OnTooltipSetSpell)
 	self:RawHookScript(GameTooltip, "OnHide", "OnTooltipHide")
 	self:RawHookScript(GameTooltip, "OnShow", "OnTooltipShow")
+	self:SecureHook(GameTooltip, "Show", self.GameTooltipShow)
 	
 	for k,v in self:IterateModules() do
 		if self.db.profile.modules[k]  == nil or self.db.profile.modules[k] then
@@ -224,24 +225,12 @@ function StarTip:OpenConfig()
 	AceConfigDialog:Open("StarTip")	
 end
 	
-local ff = CreateFrame("Frame")
-local fffunc = function(this)
-	this:SetScript("OnUpdate", nil)
-	GameTooltip:SetUnit("mouseover")
-end
-
 function StarTip.OnTooltipSetUnit()	
 	if not StarTip.justSetUnit then
---[[		if not UnitExists("mouseover") then
-			ff:SetScript("OnUpdate", fffunc)
-			return
-		else
-			if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
-		end
-		]]
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
 		end
+		StarTip.justSetUnit = nil
 	end
 end
 
@@ -250,6 +239,7 @@ function StarTip.OnTooltipSetItem(self, ...)
 		for k, v in StarTip:IterateModules() do
 			if v.SetItem and v:IsEnabled() then v:SetItem(...) end
 		end
+		StarTip.justSetItem = nil
 	end
 end
 
@@ -258,6 +248,7 @@ function StarTip.OnTooltipSetSpell(...)
 		for k, v in StarTip:IterateModules() do
 			if v.SetSpell and v:IsEnabled() then v:SetSpell(...) end
 		end
+		StarTip.justSetSpell = nil
 	end
 end
 
@@ -266,32 +257,18 @@ function StarTip:OnTooltipHide(...)
 		for k, v in self:IterateModules() do
 			if v.OnHide and v:IsEnabled() then v:OnHide(...) end
 		end
+		self.justHide = nil
 	end
-	self.hooks[GameTooltip].OnHide(...)
-
-	--LibQTip:Release(self.tooltip)
-	self.tooltip = nil
-  	
-end
-do 
-	local hook = GameTooltip.Show
-	local function hookScript(...)
-		hook(...)
-		if StarTip.db.profile.modifier > 1 and type(modFuncs[StarTip.db.profile.modifier]) == "function" then
-			if modFuncs[StarTip.db.profile.modifier]() then
-				StarTip:Print("pork")
-				GameTooltip:Hide()
-				return
-			end
-		end			
-	end
-	GameTooltip.Show = hookScript
+	self.hooks[GameTooltip].OnHide(...)  	
 end
 
-local hideFrame = CreateFrame("Frame")
-local function hideTooltip(self)
-	GameTooltip:Hide()
-	self:SetScript("OnUpdate", nil)
+
+function StarTip:GameTooltipShow(...)
+	if StarTip.db.profile.modifier > 1 and type(modFuncs[StarTip.db.profile.modifier]) == "function" then
+		if not modFuncs[StarTip.db.profile.modifier]() then				
+			GameTooltip:Hide()
+		end
+	end			
 end
 
 function StarTip:OnTooltipShow(this, ...)
@@ -320,14 +297,13 @@ function StarTip:OnTooltipShow(this, ...)
 	end
 
 	self.hooks[GameTooltip].OnShow(this, ...)
-	
+	--[[
 	if self.db.profile.modifier > 1 and type(modFuncs[StarTip.db.profile.modifier]) == "function" then
 		if modFuncs[self.db.profile.modifier]() then
 			self:Print("pork")
-			this:Hide()
-			--hideFrame:SetScript("OnUpdate", hideTooltip)
+			--this:Hide()
 		end
-	end
+	end]]
 
 end
 
@@ -373,14 +349,21 @@ function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up)
 		mod = (modifier == "LSHIFT" or modifier == "RSHIFT") and "LSHIFT"
 		modifier = "LSHIFT"
 	end
+		
 	if mod ~= modifier then
 		return
 	end
+	
+	if up == 0 then
+		GameTooltip:Hide()
+		return
+	end
+	
+	local mouseover_unit = StarTip:GetMouseoverUnit()
+
 	local frame = GetMouseFocus()
 	if frame == WorldFrame or frame == UIParent then
-		local mouseover_unit = StarTip:GetMouseoverUnit()
 		if not UnitExists(mouseover_unit) then
-			self:Print("unit no exist")
 			GameTooltip:Hide()
 			return
 		end
@@ -388,6 +371,7 @@ function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up)
 		GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
 		GameTooltip:SetUnit(mouseover_unit)
 		GameTooltip:Show()
+		self:Print("shown")
 	else
 		local OnLeave, OnEnter = frame:GetScript("OnLeave"), frame:GetScript("OnEnter")
 		if OnLeave then
