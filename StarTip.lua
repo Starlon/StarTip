@@ -261,13 +261,9 @@ function StarTip:OnTooltipShow(...)
 		end
 	end
    -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
-	local tooltip = LibQTip:Acquire("GameTooltip", 3, "LEFT", "CENTER", "RIGHT")
+	local tooltip = LibQTip:Acquire("GameTooltip", 2, "LEFT", "CENTER", "RIGHT")
 	StarTip.tooltip = tooltip 
-      
-    -- Use smart anchoring code to anchor the tooltip to our frame
-    tooltip:SmartAnchorTo(_G.GameTooltip)
-    
-    -- Show it, et voil?
+          
     self.hooks[GameTooltip].OnShow(...)
 end
 
