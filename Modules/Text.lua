@@ -57,11 +57,7 @@ do
 
 		local runnable = pool[code]
 		local err
-		
-		if runnable then
-			StarTip:Print("recycled runnable")
-		end
-		
+				
 		if not runnable then
 			runnable, err = loadstring(code, tag)
 			if runnable then
