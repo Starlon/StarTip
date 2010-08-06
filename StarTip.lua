@@ -315,10 +315,8 @@ function StarTip:GameTooltipShow(...)
 			if GameTooltip:IsOwned(UIParent) then
 				if GameTooltip:GetUnit() then
 					-- world unit
-					StarTip:Print("world unit")
 					show = StarTip.db.profile.unitShow
 				else
-					StarTip:Print("world object")
 					-- world object
 					show = StarTip.db.profile.objectShow
 				end
@@ -332,7 +330,6 @@ function StarTip:GameTooltipShow(...)
 				end
 			end
 
-			StarTip:Print("show " .. show)
 			if show == 1 then -- always shown
 				show = true
 			elseif show == 2 then -- only show out of combat
@@ -344,7 +341,7 @@ function StarTip:GameTooltipShow(...)
 			end
 	end
 	
-	if not show then StarTip:Print("hide"); GameTooltip:Hide() end
+	if not show then GameTooltip:Hide() end
 end
 
 function StarTip:OnTooltipShow(this, ...)
