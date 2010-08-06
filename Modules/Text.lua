@@ -394,7 +394,6 @@ function mod:CreateLines()
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
-            --if self.db.profile[v.db] then
                 local left, right, c
                 if v.right then 
                     right, c = executeCode(v.name, v.right)
@@ -412,33 +411,25 @@ function mod:CreateLines()
                         if type(c) == "table" and c.r then
                             mod.rightLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
                         end
-						--[[if v.bold then
-							mod.leftLines[lineNum]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
-							mod.rightLines[lineNum]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
-						end]]
                     else
 						GameTooltip:AddLine(' ', 1, 1, 1)
                         mod.leftLines[lineNum]:SetText(left)
                         if type(c) == "table" and c.r then
                             mod.leftLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
                         end
-						--[[if v.bold then
-							mod.leftLines[lineNum]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
-						end]]
                     end
                 end
 				StarTip:del(c)
-            --end
         end
         self.NUM_LINES = lineNum
     end})
 	for i, v in ipairs(self.db.profile.lines) do
 		if v.bold then
-			mod.leftLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
-			mod.rightLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE, MONOCHROME")
+			mod.leftLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+			mod.rightLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
 		else
-			mod.leftLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 12, "MONOCHROME")
-			mod.rightLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 12, "MONOCHROME")
+			mod.leftLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 12)
+			mod.rightLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 12)
 		end
 	end
 end
@@ -489,10 +480,10 @@ function mod:RebuildOpts()
                     validate = function()
 						local ret, err = loadstring(v.left or "", "validate")
 						if not ret then
-							StarTip:Print(("Code failed to execute. Error message: %s"):format(err or ""))
+							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
 							return false
 						end
-						StarTip:Print(("Code executed without error. Return value: %s"):format(ret(xpcall, errorhandler) or ""))
+						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret(xpcall, errorhandler) or ""))
 					return true
 					
 					end,
