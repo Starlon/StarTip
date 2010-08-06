@@ -49,17 +49,33 @@ local function errorhandler(err)
     return geterrorhandler()(err)
 end
 
-local executeCode = function(tag, code)
-    if not code then return end
+local executeCode
+do 
+	local pool = setmetatable({},{__mode='v'})
+	executeCode = function(tag, code)
+		if not code then return end
 
-	local runnable, err = loadstring(code, tag)
-	
-	if not runnable then 
-		StarTip:Print(err)
-		return "" 
-	end
+		local runnable = pool[code]
+		local err
 		
-    return runnable(xpcall, errorhandler)
+		if runnable then
+			StarTip:Print("recycled runnable")
+		end
+		
+		if not runnable then
+			runnable, err = loadstring(code, tag)
+			if runnable then
+				pool[code] = runnable
+			end
+		end
+	
+		if not runnable then 
+			StarTip:Print(err)
+			return "" 
+		end
+		
+		return runnable(xpcall, errorhandler)
+	end
 end
 
 -- Thanks to ckknight for this
