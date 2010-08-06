@@ -63,7 +63,7 @@ local options = {
 					type = "select",
 					values = {"None", "Ctrl", "Alt", "Shift"},
 					get = function() return StarTip.db.profile.modifier end,
-					set = function() StarTip.db.profile.modifier = v end,
+					set = function(info, v) StarTip.db.profile.modifier = v end,
 					order = 6
 				},		
 				
@@ -116,6 +116,7 @@ do
 		end
 	end
 end
+
 StarTip:SetDefaultModuleState(false)
 
 function StarTip:OnInitialize()
@@ -159,6 +160,8 @@ function StarTip:OnEnable()
 	end
 		
 	self:RebuildOpts()
+	
+	self:RegisterEvent("MODIFIER_STATE_CHANGED")
 end
 
 function StarTip:OnDisable()
@@ -168,6 +171,7 @@ function StarTip:OnDisable()
 	self:Unhook(GameTooltip, "OnTooltipSetSpell")
 	self:Unhook(GameTooltip, "OnHide")
 	self:Unhook(GameTooltip, "OnShow")
+	self:UnRegisterEvent("MODIFIER_STATE_CHANGED")
 end
 
 function StarTip:RebuildOpts()
@@ -221,18 +225,20 @@ function StarTip:OpenConfig()
 end
 	
 local ff = CreateFrame("Frame")
+local fffunc = function(this)
+	this:SetScript("OnUpdate", nil)
+	GameTooltip:SetUnit("mouseover")
+end
+
 function StarTip.OnTooltipSetUnit()	
 	if not StarTip.justSetUnit then
-		if not UnitExists("mouseover") then
-			if ff:GetScript("OnUpdate") then
-				ff:SetScript("OnUpdate", nil)
-			else
-				ff:SetScript("OnUpdate", function() GameTooltip:SetUnit("mouseover") end)
-			end
+--[[		if not UnitExists("mouseover") then
+			ff:SetScript("OnUpdate", fffunc)
 			return
 		else
 			if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 		end
+		]]
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
 		end
@@ -267,20 +273,62 @@ function StarTip:OnTooltipHide(...)
 	self.tooltip = nil
   	
 end
-
-function StarTip:OnTooltipShow(...)
-	if self.db.profile.modifier > 1 and modFuncs[self.db.profile.modifier or 1] then
-		if modFuncs[self.db.profile.modifier]() then
-			return
-		end
+do 
+	local hook = GameTooltip.Show
+	local function hookScript(...)
+		hook(...)
+		if StarTip.db.profile.modifier > 1 and type(modFuncs[StarTip.db.profile.modifier]) == "function" then
+			if modFuncs[StarTip.db.profile.modifier]() then
+				StarTip:Print("pork")
+				GameTooltip:Hide()
+				return
+			end
+		end			
 	end
+	GameTooltip.Show = hookScript
+end
+
+local hideFrame = CreateFrame("Frame")
+local function hideTooltip(self)
+	GameTooltip:Hide()
+	self:SetScript("OnUpdate", nil)
+end
+
+function StarTip:OnTooltipShow(this, ...)
 	if not self.justShow then
 		for k, v in self:IterateModules() do
-			if v.OnShow and v:IsEnabled() then v:OnShow(...) end
+			if v.OnShow and v:IsEnabled() then v:OnShow(this, ...) end
 		end
 	end
-          
-    self.hooks[GameTooltip].OnShow(...)
+	local show
+	if this:IsOwned(UIParent) then
+		if this:GetUnit() then
+			-- world unit
+			show = self.db.profile.unitShow
+		else
+			-- world object
+			show = self.db.profile.objectShow
+		end
+	else
+		if this:GetUnit() then
+			-- unit frame
+			show = self.db.profile.unitFrameShow
+		else
+			-- non-unit frame
+			show = self.db.profile.otherFrameShow
+		end
+	end
+
+	self.hooks[GameTooltip].OnShow(this, ...)
+	
+	if self.db.profile.modifier > 1 and type(modFuncs[StarTip.db.profile.modifier]) == "function" then
+		if modFuncs[self.db.profile.modifier]() then
+			self:Print("pork")
+			this:Hide()
+			--hideFrame:SetScript("OnUpdate", hideTooltip)
+		end
+	end
+
 end
 
 function StarTip:GetLSMIndexByName(category, name)
@@ -297,6 +345,60 @@ function StarTip:SetOptionsDisabled(t, bool)
 			if k ~= "toggle" then v.disabled = bool end
 		else
 			self:SetOptionsDisabled(v.args, bool)
+		end
+	end
+end
+
+-- Taken from CowTip
+function StarTip:GetMouseoverUnit()
+	local _, tooltipUnit = GameTooltip:GetUnit()
+	if not tooltipUnit or not UnitExists(tooltipUnit) or UnitIsUnit(tooltipUnit, "mouseover") then
+		return "mouseover"
+	else
+		return tooltipUnit
+	end
+end
+
+-- Taken from CowTip
+function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up)
+	self:Print("mod changed")
+	local mod
+	if self.db.profile.modifier == 2 then
+		mod = (modifier == "LCTRL" or modifier == "RCTRL") and "LCTRL"
+		modifier = "LCTRL"
+	elseif self.db.profile.modifier == 3 then
+		mod = (modifier == "LALT" or modifier == "RALT") and "LALT"
+		modifier = "LALT"
+	elseif self.db.profilemodifier == 4 then
+		mod = (modifier == "LSHIFT" or modifier == "RSHIFT") and "LSHIFT"
+		modifier = "LSHIFT"
+	end
+	if mod ~= modifier then
+		return
+	end
+	local frame = GetMouseFocus()
+	if frame == WorldFrame or frame == UIParent then
+		local mouseover_unit = StarTip:GetMouseoverUnit()
+		if not UnitExists(mouseover_unit) then
+			self:Print("unit no exist")
+			GameTooltip:Hide()
+			return
+		end
+		GameTooltip:Hide()
+		GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
+		GameTooltip:SetUnit(mouseover_unit)
+		GameTooltip:Show()
+	else
+		local OnLeave, OnEnter = frame:GetScript("OnLeave"), frame:GetScript("OnEnter")
+		if OnLeave then
+			_G.this = frame
+			OnLeave(frame)
+			_G.this = nil
+		end
+		if OnEnter then
+			_G.this = frame
+			OnEnter(frame)
+			_G.this = nil
 		end
 	end
 end
