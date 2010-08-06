@@ -144,6 +144,16 @@ function mod:SetUnit()
 	timer = timer or self:ScheduleRepeatingTimer(updateBars, .5)
 end
 
+function mod:SetItem()
+	self.hpBar:Hide()
+	self.mpBar:Hide()
+end
+
+function mod:SetSpell()
+	self.hpBar:Hide()
+	self.mpBar:Hide()
+end
+
 function mod:OnHide()
 	if timer then
 		self:CancelTimer(timer)

@@ -335,6 +335,8 @@ function StarTip:GameTooltipShow(...)
 			elseif show == 2 then -- only show out of combat
 				if InCombatLockdown() then
 					show = false
+				else
+					show = true
 				end
 			elseif show == 3 then -- never show
 				show = false
