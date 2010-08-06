@@ -297,14 +297,6 @@ function StarTip:OnTooltipShow(this, ...)
 	end
 
 	self.hooks[GameTooltip].OnShow(this, ...)
-	--[[
-	if self.db.profile.modifier > 1 and type(modFuncs[StarTip.db.profile.modifier]) == "function" then
-		if modFuncs[self.db.profile.modifier]() then
-			self:Print("pork")
-			--this:Hide()
-		end
-	end]]
-
 end
 
 function StarTip:GetLSMIndexByName(category, name)
@@ -337,7 +329,6 @@ end
 
 -- Taken from CowTip
 function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up)
-	self:Print("mod changed")
 	local mod
 	if self.db.profile.modifier == 2 then
 		mod = (modifier == "LCTRL" or modifier == "RCTRL") and "LCTRL"
@@ -371,7 +362,6 @@ function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up)
 		GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
 		GameTooltip:SetUnit(mouseover_unit)
 		GameTooltip:Show()
-		self:Print("shown")
 	else
 		local OnLeave, OnEnter = frame:GetScript("OnLeave"), frame:GetScript("OnEnter")
 		if OnLeave then
