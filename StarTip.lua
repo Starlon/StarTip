@@ -19,12 +19,18 @@ local defaults = {
 	profile = {
 		modules = {},
 		minimap = {hide=true},
-		modifier = 1
+		modifier = 1,
+		unitShow = 1,
+		objectShow = 1,
+		unitFrameShow = 1,
+		otherFrameShow = 1
 	}
 }
-
+			
 local modNames = {"None", "Ctrl", "Alt", "Shift"}
 local modFuncs = {function() return true end, IsControlKeyDown, IsAltKeyDown, IsShiftKeyDown}
+
+local showChoices = {"Always", "Out of Combat", "Never"}
 
 local options = {
 	type = "group",
@@ -65,8 +71,43 @@ local options = {
 					get = function() return StarTip.db.profile.modifier end,
 					set = function(info, v) StarTip.db.profile.modifier = v end,
 					order = 6
-				},		
-				
+				},
+				unitShow = {
+					name = "Unit",
+					desc = "Whether to show unit tooltips",
+					type = "select",
+					values = showChoices,
+					get = function() return StarTip.db.profile.unitShow end,
+					set = function(info, v) StarTip.db.profile.unitShow = v end,
+					order = 7
+				},
+				objectShow = {
+					name = "Object",
+					desc = "Whether to show object tooltips",
+					type = "select",
+					values = showChoices,
+					get = function() return StarTip.db.profile.objectShow end,
+					set = function(info, v) StarTip.db.profile.objectShow = v end,
+					order = 8				
+				},
+				unitFrameShow = {
+					name = "Unit Frame",
+					desc = "Whether to show unit frame tooltips",
+					type = "select",
+					values = showChoices,
+					get = function() return StarTip.db.profile.unitFrameShow end,
+					set = function(info, v) StarTip.db.profile.unitFrameShow = v end,
+					order = 9				
+				},
+				otherFrameShow = {
+					name = "Other Frame",
+					desc = "Whether to show other frame tooltips",
+					type = "select",
+					values = showChoices,
+					get = function() return StarTip.db.profile.otherFrameShow end,
+					set = function(info, v) StarTip.db.profile.otherFrameShow = v end,
+					order = 10				
+				},
 			}
 		}
 	}
@@ -264,11 +305,46 @@ end
 
 
 function StarTip:GameTooltipShow(...)
+	local show = true
 	if StarTip.db.profile.modifier > 1 and type(modFuncs[StarTip.db.profile.modifier]) == "function" then
-		if not modFuncs[StarTip.db.profile.modifier]() then				
-			GameTooltip:Hide()
+		if not modFuncs[StarTip.db.profile.modifier]() then	
+			show = false
 		end
-	end			
+	end
+	if show ~= false then
+			if GameTooltip:IsOwned(UIParent) then
+				if GameTooltip:GetUnit() then
+					-- world unit
+					StarTip:Print("world unit")
+					show = StarTip.db.profile.unitShow
+				else
+					StarTip:Print("world object")
+					-- world object
+					show = StarTip.db.profile.objectShow
+				end
+			else
+				if GameTooltip:GetUnit() then
+					-- unit frame
+					show = StarTip.db.profile.unitFrameShow
+				else
+					-- non-unit frame
+					show = StarTip.db.profile.otherFrameShow
+				end
+			end
+
+			StarTip:Print("show " .. show)
+			if show == 1 then -- always shown
+				show = true
+			elseif show == 2 then -- only show out of combat
+				if InCombatLockdown() then
+					show = false
+				end
+			elseif show == 3 then -- never show
+				show = false
+			end
+	end
+	
+	if not show then StarTip:Print("hide"); GameTooltip:Hide() end
 end
 
 function StarTip:OnTooltipShow(this, ...)
@@ -277,26 +353,9 @@ function StarTip:OnTooltipShow(this, ...)
 			if v.OnShow and v:IsEnabled() then v:OnShow(this, ...) end
 		end
 	end
-	local show
-	if this:IsOwned(UIParent) then
-		if this:GetUnit() then
-			-- world unit
-			show = self.db.profile.unitShow
-		else
-			-- world object
-			show = self.db.profile.objectShow
-		end
-	else
-		if this:GetUnit() then
-			-- unit frame
-			show = self.db.profile.unitFrameShow
-		else
-			-- non-unit frame
-			show = self.db.profile.otherFrameShow
-		end
-	end
-
+	
 	self.hooks[GameTooltip].OnShow(this, ...)
+	
 end
 
 function StarTip:GetLSMIndexByName(category, name)
@@ -327,7 +386,7 @@ function StarTip:GetMouseoverUnit()
 	end
 end
 
--- Taken from CowTip
+-- Taken from CowTip and modified a bit
 function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up)
 	local mod
 	if self.db.profile.modifier == 2 then
