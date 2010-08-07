@@ -164,6 +164,7 @@ local defaultLines={
     [1] = {
         name = "UnitName",
         left = [[
+local self = StarTip:GetModule("Text")
 local c
 if self.UnitIsPlayer("mouseover") then
     c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
@@ -182,6 +183,7 @@ return self.unitName, c
         name = "Target",
         left = 'return "Target:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 if self.UnitExists("mouseovertarget") then
     local c
     if self.UnitIsPlayer("mouseovertarget") then
@@ -203,6 +205,7 @@ end
         name = "Guild",
         left = 'return "Guild:"',
         right = [[
+local self = StarTip:GetModule("Text")
 local guild = self.GetGuildInfo("mouseover")
 if guild then return "<" .. guild .. ">" else return self.unitGuild end
 ]],
@@ -213,6 +216,7 @@ if guild then return "<" .. guild .. ">" else return self.unitGuild end
         name = "Rank",
         left = 'return "Rank:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 return select(2, self.GetGuildInfo("mouseover"))
 ]],    
         updating = false,
@@ -222,6 +226,7 @@ return select(2, self.GetGuildInfo("mouseover"))
         name = "Realm",
         left = 'return "Realm:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 return select(2, self.UnitName("mouseover"))
 ]],
         updating = false,
@@ -231,6 +236,7 @@ return select(2, self.UnitName("mouseover"))
         name = "Level",
         left = 'return "Level:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 local classifications = StarTip.newDict(
     "worldboss", "Boss",
     "rareelite", "+ Rare",
@@ -259,6 +265,7 @@ return lvl
         name = "Race",
         left = 'return "Race:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 local race
 if self.UnitIsPlayer("mouseover") then
     race = self.UnitRace("mouseover");
@@ -274,6 +281,7 @@ return race
         name = "Class",
         left = 'return "Class:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 local class = self.UnitClass("mouseover")
 if class == self.UnitName("mouseover") then return end
 local c = self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
@@ -286,6 +294,7 @@ return class, c
         name = "Faction",
         left = 'return "Faction:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 return self.UnitFactionGroup("mouseover")
 ]],
         updating = false,
@@ -295,6 +304,7 @@ return self.UnitFactionGroup("mouseover")
         name = "Status",
         left = 'return "Status:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 if not self.UnitIsConnected("mouseover") then
     return "Offline"
 elseif self.unitHasAura(self.GetSpellInfo(19752)) then
@@ -303,7 +313,7 @@ elseif self.UnitIsFeignDeath("mouseover") then
     return "Feigned Death"
 elseif self.UnitIsGhost("mouseover") then
     return "Ghost"
-elseif self.UnitIsDead("mouseover") and  text.unitHasAura(self.GetSpellInfo(20707)) then
+elseif self.UnitIsDead("mouseover") and  self.unitHasAura(self.GetSpellInfo(20707)) then
     return "Soulstoned"
 elseif self.UnitIsDead("mouseover") then
     return "Dead"
@@ -316,6 +326,7 @@ end
         name = "Health",
         left = 'return "Health:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 local health, maxHealth = self.UnitHealth("mouseover"), self.UnitHealthMax("mouseover")    
 local value
 if maxHealth == 100 then 
@@ -331,7 +342,7 @@ return value
     [12] = {
         name = "Mana",
         left = [[
-            
+local self = StarTip:GetModule("Text")            
 local class = select(2, self.UnitClass("mouseover"))
 if not self.UnitIsPlayer("mouseover") then
 	class = "MAGE"
@@ -340,6 +351,7 @@ end
 return self.powers[class] or "Mana:"
 ]],
         right = [[
+local self = StarTip:GetModule("Text")		
 local mana = self.UnitMana("mouseover")
 local maxMana = self.UnitManaMax("mouseover")
 if maxMana == 100 then
@@ -356,6 +368,7 @@ return value
         name = "Location",
         left = 'return "Location:"',
         right = [[
+local self = StarTip:GetModule("Text")		
 return self.unitLocation
 ]],
         updating = true,
@@ -614,6 +627,16 @@ function mod:RebuildOpts()
 					end,
 					order = 6
 				},
+				enabled = {
+					name = "Enabled",
+					desc = "Whether to show this line or not",
+					type = "toggle",
+					get = function() return self.db.profile.lilnes[i].enabled end,
+					set = function(info, v)
+						self.db.profile.lines[i].enabled = v
+					end,
+					order = 7
+				},
 				delete = {
 					name = "Delete",
 					desc = "Delete this line",
@@ -624,7 +647,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
 					end,
-					order = 7
+					order = 8
 				},
             },
             order = i + 5

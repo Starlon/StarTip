@@ -142,19 +142,20 @@ do
 		t.__starref__ = true
 		return t
 	end	
-	function StarTip:del(...)
+	function StarTip.del(t, ...)
+		if type(t) ~= "table" or not t.__starref__ then return end
 		for i=1, select("#", ...) do
 			local t = select(i, ...)
 			if (t and type(t) ~= table) or t == nil then break end
 			for k, v in pairs(t) do
 				if type(k) == "table" then
-					if t.__starref__ then StarTip:del(k) end
-					t.__starref__ = nil
+					StarTip:del(k)
 				end
-				t[k] = nil
+				pool[k] = true
 			end
-			pool[t] = true			
 		end
+		t.__starref__ = nil
+		pool[t] = true			
 	end
 end
 
@@ -194,9 +195,17 @@ do
 			return "" 
 		end
 		
-		local table = {self = StarTip:GetModule("Text"), _G = _G, StarTip = StarTip, select = select, format = format}
+		
+		local table = StarTip:new()
+		table.self = StarTip:GetModule("Text")
+		table._G = _G
+		table.StarTip = StarTip
+		table.select = select
+		table.format = format
 		
 		setfenv(runnable, table)
+		
+		StarTip.del(table)
 		
 		return runnable(xpcall, errorhandler)
 	end
