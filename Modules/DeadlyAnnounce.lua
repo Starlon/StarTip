@@ -56,7 +56,10 @@ function mod:InitializeDBM()
 	local text = nil
    
 	local function ShowAnnounce(t)
-		tinsert(history, t.text)
+		local new = StarTip.new()
+		new.text = t.text
+		new.time = _G.GetTime()
+		tinsert(history, new)
 	end
    
 	local function NewAnnounce(announce, _, spellId, ...)
@@ -145,7 +148,7 @@ local skip
 local function hideDW()
 	skip = true
 	GameTooltip:SetUnit("mouseover")
-	skip = nil
+	skip = false
 	mod.shown = false
 end
 
@@ -155,11 +158,13 @@ function mod:SetUnit()
 	if #history == 0 or skip then return end
 	
 	if #history > 10 then
+		local tmp = history[#history]
+		StarTip.del(tmp)
 		tremove(history, #history)
 	end
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine("--- DeadlyAnnounce ---")
-	for i = 1, #history do
+	for i = #history, 1, -1 do
 		GameTooltip:AddLine(history[i], 1, 1, 1)
 	end
 	

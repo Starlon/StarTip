@@ -140,7 +140,7 @@ local c
 if self.UnitIsPlayer("mouseover") then
     c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
 else
-    c = StarTip:new()
+    c = StarTip.new()
     c.r, c.g, c.b = self.UnitSelectionColor("mouseover")
 end
 return self.unitName, c
@@ -159,13 +159,13 @@ if self.UnitExists("mouseovertarget") then
     if self.UnitIsPlayer("mouseovertarget") then
         c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseovertarget"))]
     else
-        c = StarTip:new()
+        c = StarTip.new()
         c.r, c.g, c.b = self.UnitSelectionColor("mouseovertarget")
     end
     local name = self.UnitName("mouseovertarget")
     return name, c
 else
-    return "None", StarTip:newDict("r", 1, "g", 1, "b", 1)
+    return "None", StarTip.newDict("r", 1, "g", 1, "b", 1)
 end
 ]],
         updating = true,

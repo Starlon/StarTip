@@ -1,4 +1,5 @@
 ﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0") 
+StarTip.__starref__ = true
 --local LibQTip = LibStub('LibQTip-1.0')
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
@@ -116,8 +117,13 @@ local options = {
 do
 	local pool = setmetatable({},{__mode='k'})
 	
-	function StarTip:new(...)
+	function StarTip.new(...)
 		local t = next(pool)
+		if select(1, ...) == StarTip then
+			StarTip:Print("Warning: Passing self parameter to new.")
+			if not t then t = {} end
+			return t
+		end
 		if t then
 			pool[t] = nil
 			for i=1, select("#", ...) do
@@ -129,22 +135,32 @@ do
 		t.__starref__ = true
 		return t
 	end
-	function StarTip:newDict(...)
+	function StarTip.newDict(...)
+		local test
+		if select(1, ...) == StarTip then
+			test = true
+		end
 		local t = next(pool)
 		if t then
 			pool[t] = nil
 		else
 			t = {}			
 		end
-		for i=1, select("#", ...), 2 do
+		for i=(test and 2 or 1), select("#", ...), 2 do
 			t[select(i, ...)] = select(i+1, ...)
 		end
 		t.__starref__ = true
 		return t
 	end	
-	function StarTip.del(t, ...)
+	function StarTip.del(...)
+		local t = select(1, ...)
+		local test
+		if t == StarTip then
+			test = true
+			t = select(2, ...)
+		end
 		if type(t) ~= "table" or not t.__starref__ then return end
-		for i=1, select("#", ...) do
+		for i=(test and 2 or 1), select("#", ...) do
 			local t = select(i, ...)
 			if (t and type(t) ~= table) or t == nil then break end
 			for k, v in pairs(t) do
