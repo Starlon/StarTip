@@ -162,6 +162,18 @@ local function errorhandler(err)
     return geterrorhandler()(err)
 end
 
+local function copy(tbl)
+	local localCopy = {}
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			localCopy[k] = copy(v)
+		elseif type(v) ~= "function" then
+			localCopy[k] = v
+		end
+	end
+	return localCopy
+end
+
 do 
 	local pool = setmetatable({},{__mode='v'})
 	StarTip.executeCode = function(tag, code, data)
@@ -183,7 +195,6 @@ do
 		end
 		
 		local table = {self = StarTip:GetModule("Text"), _G = _G, StarTip = StarTip, select = select, format = format}
-		_G.self = table.self
 		
 		setfenv(runnable, table)
 		
