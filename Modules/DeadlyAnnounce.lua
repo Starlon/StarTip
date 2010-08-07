@@ -1,8 +1,8 @@
 if not DBM and not BigWigs then return end
-local mod = StarTip:NewModule("DeadlyWhispers")
-mod.name = "DeadlyWhispers"
+local mod = StarTip:NewModule("DeadlyAnnounce")
+mod.name = "DeadlyAnnounce"
 mod.toggled = true
-mod.desc = "Show last DBM messages, such as whispers, announces, etc... You can filter out unwanted messages."
+mod.desc = "Show the last DBM announcements."
 
 local _G = _G
 local StarTip = _G.StarTip
@@ -14,13 +14,14 @@ local self = mod
 local defaults = {
 	profile = {
 		delay = 3
-	}
+	},
 }
+
 
 local options = {
 	delay = {
 		name = "Hide Delay",
-		desc = "Enter the time to delay before hiding DeadlyWhispers",
+		desc = "Enter the time to delay before hiding DeadlyAnnounce",
 		type = "input",
 		get = function()
 			return mod.db.profile.delay
@@ -30,7 +31,7 @@ local options = {
 		end,
 		pattern = "%d",
 		order = 5
-	}
+	}	
 }
 
 local history = {}
@@ -136,6 +137,7 @@ local function hideDW()
 	skip = true
 	GameTooltip:SetUnit("mouseover")
 	skip = nil
+	mod.shown = false
 end
 
 function mod:SetUnit()
@@ -145,10 +147,12 @@ function mod:SetUnit()
 		tremove(history, #history)
 	end
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine("--- DeadlyWhispers ---")
+	GameTooltip:AddLine("--- DeadlyAnnounce ---")
 	for i = 1, #history do
 		GameTooltip:AddLine(history[i], 1, 1, 1)
 	end
 	
 	StarTip:ScheduleTimer(hideDW, self.db.profile.delay)
+	
+	self.shown = true
 end

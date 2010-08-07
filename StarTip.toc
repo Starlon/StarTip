@@ -23,6 +23,6 @@ Modules\PvP.lua
 Modules\RaidIcon.lua
 Modules\Targeting.lua
 Modules\Text.lua
+Modules\DeadlyAnnounce.lua
 Modules\Talents.lua
-Modules\DeadlyWhispers.lua
 

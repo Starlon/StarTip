@@ -30,6 +30,7 @@ local linesToAddRightB = {}
 local TalentQuery = LibStub:GetLibrary("LibTalentQuery-1.0", true)
 local spec = setmetatable({}, {__mode='v'})
 local timer, talentTimer
+local dw = StarTip:GetModule("DeadlyAnnounce", true)
 
 local talentTrees = {
 	["Druid"] = {"Balance", "Feral Combat", "Restoration"},
@@ -96,6 +97,8 @@ function expireQuery()
 end
 
 local updateTalents = function()
+	if dw and dw.shown then return end
+	
 	if not UnitExists("mouseover") or not UnitIsPlayer("mouseover") then 
 		self:CancelTimer(talentTimer)
 		self:CancelTimer(expireTimer)
@@ -200,6 +203,11 @@ end
 
 function mod:SetUnit()
 	if not TalentQuery or not UnitIsPlayer("mouseover") then return end
+	
+	if dw and dw.shown then
+		return
+	end
+	
 	if UnitIsUnit("mouseover", "player") then
 		self:TalentQuery_Ready(_, UnitName("player"))
 	else
