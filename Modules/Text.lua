@@ -1,6 +1,5 @@
 local mod = StarTip:NewModule("Text", "AceTimer-3.0", "AceEvent-3.0")
 mod.name = "Text"
-mod.toggled = true
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -12,31 +11,28 @@ local select = _G.select
 local format = _G.format
 local floor = _G.floor
 local tostring = _G.tostring
-mod._G = _G
-mod.UnitExists = _G.UnitExists
-mod.UnitIsPlayer = _G.UnitIsPlayer
-mod.UnitBuff = _G.UnitBuff
-mod.GetSpellInfo = _G.GetSpellInfo
-mod.UnitIsConnected = _G.UnitIsConnected
-mod.UnitIsFeignDeath = _G.UnitIsFeignDeath
-mod.UnitIsGhost = _G.UnitIsGhost
-mod.UnitIsDead = _G.UnitIsDead
-mod.UnitLevel = _G.UnitLevel
-mod.UnitClassification = _G.UnitClassification
-mod.UnitSelectionColor = _G.UnitSelectionColor
-mod.UnitRace = _G.UnitRace
-mod.GetGuildInfo = _G.GetGuildInfo
-mod.UnitName = _G.UnitName
-mod.UnitClass = _G.UnitClass
-mod.UnitHealth = _G.UnitHealth
-mod.UnitHealthMax = _G.UnitHealthMax
-mod.UnitMana = _G.UnitMana
-mod.UnitManaMax = _G.UnitManaMax
-mod.UnitFactionGroup = _G.UnitFactionGroup
-mod.UnitCreatureFamily = _G.UnitCreatureFamily
-mod.UnitCreatureType = _G.UnitCreatureType
-mod.UnitIsUnit = _G.UnitIsUnit
-mod.RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
+local UnitExists = _G.UnitExists
+local UnitIsPlayer = _G.UnitIsPlayer
+local UnitBuff = _G.UnitBuff
+local GetSpellInfo = _G.GetSpellInfo
+local UnitIsConnected = _G.UnitIsConnected
+local UnitIsFeignDeath = _G.UnitIsFeignDeath
+local UnitIsGhost = _G.UnitIsGhost
+local UnitIsDead = _G.UnitIsDead
+local UnitLevel = _G.UnitLevel
+local UnitClassification = _G.UnitClassification
+local UnitSelectionColor = _G.UnitSelectionColor
+local UnitRace = _G.UnitRace
+local GetGuildInfo = _G.GetGuildInfo
+local UnitName = _G.UnitName
+local UnitClass = _G.UnitClass
+local UnitMana = _G.UnitMana
+local UnitManaMax = _G.UnitManaMax
+local UnitFactionGroup = _G.UnitFactionGroup
+local UnitCreatureFamily = _G.UnitCreatureFamily
+local UnitCreatureType = _G.UnitCreatureType
+local UnitIsUnit = _G.UnitIsUnit
+local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local timer
 local factionList = {}
@@ -54,11 +50,10 @@ local function errorhandler(err)
     return geterrorhandler()(err)
 end
 
---[[
 local executeCode
 do 
 	local pool = setmetatable({},{__mode='v'})
-	executeCode = function(tag, code, data)
+	executeCode = function(tag, code)
 		if not code then return end
 
 		local runnable = pool[code]
@@ -79,8 +74,6 @@ do
 		return runnable(xpcall, errorhandler)
 	end
 end
-]]
-
 
 -- Thanks to ckknight for this
 mod.short = function(value)
@@ -122,8 +115,8 @@ local function updateLines()
     end
     for _, v in ipairs(lines) do
         if v.updating and v.right and self.db.profile[v.db] then
-            local left = StarTip.executeCode(v.name, v.left)
-            local right, c = StarTip.executeCode(v.name, v.right)
+            local left = executeCode(v.name, v.left)
+            local right, c = executeCode(v.name, v.right)
 			StarTip:del(c)
             if left and right then
                 for i = 1, self.NUM_LINES do
@@ -164,68 +157,65 @@ local defaultLines={
     [1] = {
         name = "UnitName",
         left = [[
+local text = StarTip:GetModule("Text")
 local c
-if self.UnitIsPlayer("mouseover") then
-    c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
+if UnitIsPlayer("mouseover") then
+    c = RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
 else
     c = StarTip:new()
-    c.r, c.g, c.b = self.UnitSelectionColor("mouseover")
+    c.r, c.g, c.b = UnitSelectionColor("mouseover")
 end
-return self.unitName, c
+return text.unitName, c
 ]],
         right = nil,
         updating = false,
-		bold = true,
-		enabled = true
+		bold = true
     },
     [2] = {
         name = "Target",
         left = 'return "Target:"',
         right = [[
-if self.UnitExists("mouseovertarget") then
+if UnitExists("mouseovertarget") then
     local c
-    if self.UnitIsPlayer("mouseovertarget") then
-        c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseovertarget"))]
+    if UnitIsPlayer("mouseovertarget") then
+        c = RAID_CLASS_COLORS[select(2, UnitClass("mouseovertarget"))]
     else
         c = StarTip:new()
-        c.r, c.g, c.b = self.UnitSelectionColor("mouseovertarget")
+        c.r, c.g, c.b = UnitSelectionColor("mouseovertarget")
     end
-    local name = self.UnitName("mouseovertarget")
+    local name = UnitName("mouseovertarget")
     return name, c
 else
     return "None", StarTip:newDict("r", 1, "g", 1, "b", 1)
 end
 ]],
         updating = true,
-		enabled = true
     },
     [3] = {
         name = "Guild",
         left = 'return "Guild:"',
         right = [[
-local guild = self.GetGuildInfo("mouseover")
-if guild then return "<" .. guild .. ">" else return self.unitGuild end
+local guild = GetGuildInfo("mouseover")
+local text = StarTip:GetModule("Text")
+if guild then return "<" .. guild .. ">" else return text.unitGuild end
 ]],
-        updating = false,
-		enabled = true
+        updating = false
     },
     [4] = {
         name = "Rank",
         left = 'return "Rank:"',
         right = [[
-return select(2, self.GetGuildInfo("mouseover"))
+return select(2, GetGuildInfo("mouseover"))
 ]],    
-        updating = false,
-		enabled = true
+        updating = false
     },
     [5] = {
         name = "Realm",
         left = 'return "Realm:"',
         right = [[
-return select(2, self.UnitName("mouseover"))
+return select(2, UnitName("mouseover"))
 ]],
-        updating = false,
-		enabled = true
+        updating = false
     },
     [6] = {
         name = "Level",
@@ -237,8 +227,8 @@ local classifications = StarTip.newDict(
     "elite", "+",
     "rare", "Rare")
             
-local lvl = self.UnitLevel("mouseover")    
-local class = self.UnitClassification("mouseover")
+local lvl = UnitLevel("mouseover")
+local class = UnitClassification("mouseover")
     
 if lvl <= 0 then 
     lvl = ''
@@ -252,114 +242,111 @@ StarTip:del(classifications)
 
 return lvl
 ]],
-        updating = false,
-		enabled = true
+        updating = false
     },
     [7] = {
         name = "Race",
         left = 'return "Race:"',
         right = [[
 local race
-if self.UnitIsPlayer("mouseover") then
-    race = self.UnitRace("mouseover");
+if UnitIsPlayer("mouseover") then
+    race = UnitRace("mouseover");
 else
-    race = self.UnitCreatureFamily("mouseover") or self.UnitCreatureType("mouseover")
+    race = UnitCreatureFamily("mouseover") or UnitCreatureType("mouseover")
 end
 return race        
 ]],
-        updating = false,
-		enabled = true
+        updating = false
     },
     [8] = {
         name = "Class",
         left = 'return "Class:"',
         right = [[
-local class = self.UnitClass("mouseover")
-if class == self.UnitName("mouseover") then return end
-local c = self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
+local class = UnitClass("mouseover")
+if class == UnitName("mouseover") then return end
+local c = UnitIsPlayer("mouseover") and RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
 return class, c
 ]],
-        updating = false,
-		enabled = true
+        updating = false
     },
     [9] = {
         name = "Faction",
         left = 'return "Faction:"',
         right = [[
-return self.UnitFactionGroup("mouseover")
+return UnitFactionGroup("mouseover")
 ]],
-        updating = false,
-		enabled = true
+        updating = false
     },
     [10] = {
         name = "Status",
         left = 'return "Status:"',
         right = [[
-if not self.UnitIsConnected("mouseover") then
+local text = StarTip:GetModule("Text")
+if not UnitIsConnected("mouseover") then
     return "Offline"
-elseif self.unitHasAura(self.GetSpellInfo(19752)) then
+elseif text.unitHasAura(GetSpellInfo(19752)) then
     return "Divine Intervention"
-elseif self.UnitIsFeignDeath("mouseover") then
+elseif UnitIsFeignDeath("mouseover") then
     return "Feigned Death"
-elseif self.UnitIsGhost("mouseover") then
+elseif UnitIsGhost("mouseover") then
     return "Ghost"
-elseif self.UnitIsDead("mouseover") and  text.unitHasAura(self.GetSpellInfo(20707)) then
+elseif UnitIsDead("mouseover") and  text.unitHasAura(GetSpellInfo(20707)) then
     return "Soulstoned"
-elseif self.UnitIsDead("mouseover") then
+elseif UnitIsDead("mouseover") then
     return "Dead"
 end
 ]],
-        updating = true,
-		enabled = true
+        updating = true
     },
     [11] = {
         name = "Health",
         left = 'return "Health:"',
         right = [[
-local health, maxHealth = self.UnitHealth("mouseover"), self.UnitHealthMax("mouseover")    
+local text = StarTip:GetModule("Text")
+local health, maxHealth = UnitHealth("mouseover"), UnitHealthMax("mouseover")    
 local value
 if maxHealth == 100 then 
     value = health .. "%"
 elseif maxHealth ~= 0 then
-    value = format("%s/%s (%d%%)", self.short(health), self.short(maxHealth), health/maxHealth*100)
+    value = format("%s/%s (%d%%)", text.short(health), text.short(maxHealth), health/maxHealth*100)
 end
 return value
 ]],
-        updating = true,
-		enabled = true
+        updating = true
     },
     [12] = {
         name = "Mana",
         left = [[
+local text = StarTip:GetModule("Text")
             
-local class = select(2, self.UnitClass("mouseover"))
-if not self.UnitIsPlayer("mouseover") then
+local class = select(2, UnitClass("mouseover"))
+if not UnitIsPlayer("mouseover") then
 	class = "MAGE"
 end
 
-return self.powers[class] or "Mana:"
+return text.powers[class] or "Mana:"
 ]],
         right = [[
-local mana = self.UnitMana("mouseover")
-local maxMana = self.UnitManaMax("mouseover")
+local text = StarTip:GetModule("Text")
+local mana = UnitMana("mouseover")
+local maxMana = UnitManaMax("mouseover")
 if maxMana == 100 then
     value = mana
 elseif maxMana ~= 0 then
-    value = format("%s/%s (%d%%)", self.short(mana), self.short(maxMana), mana/maxMana*100)
+    value = format("%s/%s (%d%%)", text.short(mana), text.short(maxMana), mana/maxMana*100)
 end
 return value
 ]],
-        updating = true,
-		enabled = true
+        updating = true
     },
     [13] = {
         name = "Location",
         left = 'return "Location:"',
         right = [[
-return self.unitLocation
+local text = StarTip:GetModule("Text")
+return text.unitLocation
 ]],
-        updating = true,
-		enabled = true
+        updating = true
     },
 }
 
@@ -379,7 +366,6 @@ function mod:OnInitialize()
 					vv.right = v.right
 					v.rightDirty = nil
 				end
-				v.tagged = true
 			end
 		end
 	end
@@ -389,13 +375,7 @@ function mod:OnInitialize()
 			tinsert(self.db.profile.lines, v)
 		end
 	end
-	
-	if self.db.profile.empty then
-		for i, v in ipairs(defaultLines) do
-			tinsert(self.db.profile.lines, v)
-		end
-		self.db.profile.empty = false
-	end
+
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
@@ -437,13 +417,13 @@ function mod:CreateLines()
         for i, v in ipairs(self) do
                 local left, right, c
                 if v.right then 
-                    right, c = StarTip.executeCode(v.name, v.right)
-                    left = StarTip.executeCode(v.name, v.left)
+                    right, c = executeCode(v.name, v.right)
+                    left = executeCode(v.name, v.left)
                 else 
                     right = ''
-                    left, c = StarTip.executeCode(v.name, v.left)
+                    left, c = executeCode(v.name, v.left)
                 end
-                if left and right then 
+                if left and right and v.enabled then 
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ', 1, 1, 1, 1, 1, 1)
@@ -614,6 +594,14 @@ function mod:RebuildOpts()
 					end,
 					order = 6
 				},
+				enabled = {
+					name = "Enabled",
+					desc = "Whether this line is enabled or not",
+					type = "toggle",
+					get = function() return self.db.profile.lines[i].enabled end,
+					set = function(info, v) self.db.profile.lines[i].enabled = v end,
+					order = 7
+				},				
 				delete = {
 					name = "Delete",
 					desc = "Delete this line",
@@ -624,7 +612,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
 					end,
-					order = 7
+					order = 8
 				},
             },
             order = i + 5
