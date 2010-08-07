@@ -158,6 +158,50 @@ do
 	end
 end
 
+local function errorhandler(err)
+    return geterrorhandler()(err)
+end
+
+local function copy(tbl)
+	local localCopy = {}
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			localCopy[k] = copy(v)
+		elseif type(v) ~= "function" then
+			localCopy[k] = v
+		end
+	end
+	return localCopy
+end
+
+do 
+	local pool = setmetatable({},{__mode='v'})
+	StarTip.executeCode = function(tag, code, data)
+		if not code then return end
+
+		local runnable = pool[code]
+		local err
+				
+		if not runnable then
+			runnable, err = loadstring(code, tag)
+			if runnable then
+				pool[code] = runnable
+			end
+		end
+	
+		if not runnable then 
+			StarTip:Print(err)
+			return "" 
+		end
+		
+		local table = {self = StarTip:GetModule("Text"), _G = _G, StarTip = StarTip, select = select, format = format}
+		
+		setfenv(runnable, table)
+		
+		return runnable(xpcall, errorhandler)
+	end
+end
+
 StarTip:SetDefaultModuleState(false)
 
 function StarTip:OnInitialize()
