@@ -3,7 +3,7 @@ local mod = StarTip:NewModule("DeadlyAnnounce")
 mod.name = "DeadlyAnnounce"
 mod.toggled = true
 mod.desc = "Show the last DBM announcements."
-
+mod.defaultOff = true
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip
@@ -13,12 +13,25 @@ local self = mod
 
 local defaults = {
 	profile = {
-		delay = 3
+		delay = 3,
+		hide = true
 	},
 }
 
 
 local options = {
+	hide = {
+		name = "Hide DeadlyAnnounce",
+		desc = "Toggle whether to hide DeadlyAnnounce after a delay",
+		type = "toggle",
+		get = function()
+			return mod.db.profile.hide
+		end,
+		set = function(info, v)
+			mod.db.profile.hide = v
+		end,
+		order = 5
+	},
 	delay = {
 		name = "Hide Delay",
 		desc = "Enter the time to delay before hiding DeadlyAnnounce",
@@ -30,8 +43,8 @@ local options = {
 			mod.db.profile.delay = v
 		end,
 		pattern = "%d",
-		order = 5
-	}	
+		order = 6
+	},
 }
 
 local history = {}
@@ -137,6 +150,8 @@ local function hideDW()
 end
 
 function mod:SetUnit()
+	if not mod:IsEnabled() then return end
+	
 	if #history == 0 or skip then return end
 	
 	if #history > 10 then

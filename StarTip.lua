@@ -196,7 +196,7 @@ function StarTip:OnEnable()
 	self:SecureHook(GameTooltip, "Show", self.GameTooltipShow)
 	
 	for k,v in self:IterateModules() do
-		if self.db.profile.modules[k]  == nil or self.db.profile.modules[k] then
+		if (self.db.profile.modules[k]  == nil and not v.defaultOff) or self.db.profile.modules[k] then
 			v:Enable()
 		end
 	end
@@ -257,7 +257,7 @@ function StarTip:RebuildOpts()
 						self:DisableModule(k)
 					end
 				end,
-				get = function() return self.db.profile.modules[k] == nil or self.db.profile.modules[k] end,
+				get = function() return (self.db.profile.modules[k]  == nil and not v.defaultOff) or self.db.profile.modules[k] end,
 				order = 2
 			}
 		end
