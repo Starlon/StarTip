@@ -271,8 +271,8 @@ function StarTip.OnTooltipSetUnit()
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
 		end
-		StarTip.justSetUnit = nil
 	end
+	StarTip.justSetUnit = nil
 end
 
 function StarTip.OnTooltipSetItem(self, ...)	
@@ -280,8 +280,8 @@ function StarTip.OnTooltipSetItem(self, ...)
 		for k, v in StarTip:IterateModules() do
 			if v.SetItem and v:IsEnabled() then v:SetItem(...) end
 		end
-		StarTip.justSetItem = nil
 	end
+	StarTip.justSetItem = nil
 end
 
 function StarTip.OnTooltipSetSpell(...)	
@@ -289,8 +289,8 @@ function StarTip.OnTooltipSetSpell(...)
 		for k, v in StarTip:IterateModules() do
 			if v.SetSpell and v:IsEnabled() then v:SetSpell(...) end
 		end
-		StarTip.justSetSpell = nil
 	end
+	StarTip.justSetSpell = nil
 end
 
 function StarTip:OnTooltipHide(...)
@@ -298,8 +298,8 @@ function StarTip:OnTooltipHide(...)
 		for k, v in self:IterateModules() do
 			if v.OnHide and v:IsEnabled() then v:OnHide(...) end
 		end
-		self.justHide = nil
 	end
+	self.justHide = nil
 	self.hooks[GameTooltip].OnHide(...)  	
 end
 
@@ -352,6 +352,8 @@ function StarTip:OnTooltipShow(this, ...)
 			if v.OnShow and v:IsEnabled() then v:OnShow(this, ...) end
 		end
 	end
+	
+	self.justShow = false
 	
 	self.hooks[GameTooltip].OnShow(this, ...)
 	
