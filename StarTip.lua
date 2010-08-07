@@ -195,6 +195,7 @@ do
 		end
 		
 		local table = {self = StarTip:GetModule("Text"), _G = _G, StarTip = StarTip, select = select, format = format}
+		_G.self = table.self
 		
 		setfenv(runnable, table)
 		
