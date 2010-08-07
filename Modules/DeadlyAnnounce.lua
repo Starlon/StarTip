@@ -43,7 +43,7 @@ function mod:InitializeDBM()
 	local text = nil
    
 	local function ShowAnnounce(t)
-	
+		tinsert(history, t.text)
 	end
    
 	local function NewAnnounce(announce, _, spellId, ...)
@@ -68,7 +68,6 @@ function mod:InitializeDBM()
 		end
 	end
 	
-	tinsert(history, text)
 	end
       
 	local function HookAnnounce(boss)      
