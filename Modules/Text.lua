@@ -189,7 +189,7 @@ else
     return "None", StarTip:newDict("r", 1, "g", 1, "b", 1)
 end
 ]],
-        updating = true
+        updating = true,
     },
     [3] = {
         name = "Guild",
@@ -354,6 +354,22 @@ local options = {}
 
 function mod:OnInitialize()    
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+	
+	for i, v in ipairs(defaultLines) do
+		for j, vv in ipairs(self.db.profile.lines) do
+			if v.name == vv.name then
+				if v.left ~= vv.left and not vv.leftDirty then
+					vv.left = v.left
+					v.leftDirty = nil
+				end
+				if v.right ~= vv.right and not vv.rightDirty then
+					vv.right = v.right
+					v.rightDirty = nil
+				end
+			end
+		end
+	end
+	
 	if self.db.profile.empty then
 		for i, v in ipairs(defaultLines) do
 			tinsert(self.db.profile.lines, v)
@@ -486,7 +502,7 @@ function mod:RebuildOpts()
                     type = "input",
                     desc = "Left text code",
                     get = function() return v.left end,
-                    set = function(info, val) v.left = val end,
+                    set = function(info, val) v.left = val; v.leftDirty = true end,
                     validate = function()
 						local ret, err = loadstring(v.left or "", "validate")
 						if not ret then
@@ -506,7 +522,7 @@ function mod:RebuildOpts()
                     type = "input",
                     desc = "Right text code",
                     get = function() return v.right end,
-                    set = function(info, val) v.right = val end,
+                    set = function(info, val) v.right = val; v.rightDirty = true end,
                     validate = function()
 						local ret, err = loadstring(v.right or "", "validate")
 						if not ret then
