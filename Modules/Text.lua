@@ -54,34 +54,6 @@ local function errorhandler(err)
     return geterrorhandler()(err)
 end
 
---[[
-local executeCode
-do 
-	local pool = setmetatable({},{__mode='v'})
-	executeCode = function(tag, code, data)
-		if not code then return end
-
-		local runnable = pool[code]
-		local err
-				
-		if not runnable then
-			runnable, err = loadstring(code, tag)
-			if runnable then
-				pool[code] = runnable
-			end
-		end
-	
-		if not runnable then 
-			StarTip:Print(err)
-			return "" 
-		end
-		
-		return runnable(xpcall, errorhandler)
-	end
-end
-]]
-
-
 -- Thanks to ckknight for this
 mod.short = function(value)
     if value >= 10000000 or value <= -10000000 then
@@ -101,7 +73,7 @@ end
 mod.powers = {
     ["WARRIOR"] = "Rage:",
     ["ROGUE"] = "Energy:",
-	["DEATHKNIGHT"] = "Rune Power"
+	["DEATHKNIGHT"] = "Rune Power:"
 }
 
 mod.unitHasAura = function(aura)
@@ -122,8 +94,8 @@ local function updateLines()
     end
     for _, v in ipairs(lines) do
         if v.updating and v.right and self.db.profile[v.db] then
-            local left = StarTip.executeCode(v.name, v.left)
-            local right, c = StarTip.executeCode(v.name, v.right)
+            local left = StarTip.executeCode(v.name, v.left, mod)
+            local right, c = StarTip.executeCode(v.name, v.right, mod)
 			StarTip:del(c)
             if left and right then
                 for i = 1, self.NUM_LINES do
@@ -164,7 +136,6 @@ local defaultLines={
     [1] = {
         name = "UnitName",
         left = [[
-local self = StarTip:GetModule("Text")
 local c
 if self.UnitIsPlayer("mouseover") then
     c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
@@ -182,8 +153,7 @@ return self.unitName, c
     [2] = {
         name = "Target",
         left = 'return "Target:"',
-        right = [[
-local self = StarTip:GetModule("Text")		
+        right = [[		
 if self.UnitExists("mouseovertarget") then
     local c
     if self.UnitIsPlayer("mouseovertarget") then
@@ -205,7 +175,6 @@ end
         name = "Guild",
         left = 'return "Guild:"',
         right = [[
-local self = StarTip:GetModule("Text")
 local guild = self.GetGuildInfo("mouseover")
 if guild then return "<" .. guild .. ">" else return self.unitGuild end
 ]],
@@ -216,7 +185,6 @@ if guild then return "<" .. guild .. ">" else return self.unitGuild end
         name = "Rank",
         left = 'return "Rank:"',
         right = [[
-local self = StarTip:GetModule("Text")		
 return select(2, self.GetGuildInfo("mouseover"))
 ]],    
         updating = false,
@@ -226,7 +194,6 @@ return select(2, self.GetGuildInfo("mouseover"))
         name = "Realm",
         left = 'return "Realm:"',
         right = [[
-local self = StarTip:GetModule("Text")		
 return select(2, self.UnitName("mouseover"))
 ]],
         updating = false,
@@ -236,7 +203,6 @@ return select(2, self.UnitName("mouseover"))
         name = "Level",
         left = 'return "Level:"',
         right = [[
-local self = StarTip:GetModule("Text")		
 local classifications = StarTip.newDict(
     "worldboss", "Boss",
     "rareelite", "+ Rare",
@@ -265,7 +231,6 @@ return lvl
         name = "Race",
         left = 'return "Race:"',
         right = [[
-local self = StarTip:GetModule("Text")		
 local race
 if self.UnitIsPlayer("mouseover") then
     race = self.UnitRace("mouseover");
@@ -281,7 +246,6 @@ return race
         name = "Class",
         left = 'return "Class:"',
         right = [[
-local self = StarTip:GetModule("Text")		
 local class = self.UnitClass("mouseover")
 if class == self.UnitName("mouseover") then return end
 local c = self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
@@ -294,7 +258,6 @@ return class, c
         name = "Faction",
         left = 'return "Faction:"',
         right = [[
-local self = StarTip:GetModule("Text")		
 return self.UnitFactionGroup("mouseover")
 ]],
         updating = false,
@@ -304,7 +267,6 @@ return self.UnitFactionGroup("mouseover")
         name = "Status",
         left = 'return "Status:"',
         right = [[
-local self = StarTip:GetModule("Text")		
 if not self.UnitIsConnected("mouseover") then
     return "Offline"
 elseif self.unitHasAura(self.GetSpellInfo(19752)) then
@@ -326,7 +288,6 @@ end
         name = "Health",
         left = 'return "Health:"',
         right = [[
-local self = StarTip:GetModule("Text")		
 local health, maxHealth = self.UnitHealth("mouseover"), self.UnitHealthMax("mouseover")    
 local value
 if maxHealth == 100 then 
@@ -342,7 +303,7 @@ return value
     [12] = {
         name = "Mana",
         left = [[
-local self = StarTip:GetModule("Text")            
+            
 local class = select(2, self.UnitClass("mouseover"))
 if not self.UnitIsPlayer("mouseover") then
 	class = "MAGE"
@@ -351,7 +312,6 @@ end
 return self.powers[class] or "Mana:"
 ]],
         right = [[
-local self = StarTip:GetModule("Text")		
 local mana = self.UnitMana("mouseover")
 local maxMana = self.UnitManaMax("mouseover")
 if maxMana == 100 then
@@ -368,7 +328,6 @@ return value
         name = "Location",
         left = 'return "Location:"',
         right = [[
-local self = StarTip:GetModule("Text")		
 return self.unitLocation
 ]],
         updating = true,
@@ -450,11 +409,11 @@ function mod:CreateLines()
         for i, v in ipairs(self) do
                 local left, right, c
                 if v.right then 
-                    right, c = StarTip.executeCode(v.name, v.right)
-                    left = StarTip.executeCode(v.name, v.left)
+                    right, c = StarTip.executeCode(v.name, v.right, mod)
+                    left = StarTip.executeCode(v.name, v.left, mod)
                 else 
                     right = ''
-                    left, c = StarTip.executeCode(v.name, v.left)
+                    left, c = StarTip.executeCode(v.name, v.left, mod)
                 end
                 if left and right then 
                     lineNum = lineNum + 1

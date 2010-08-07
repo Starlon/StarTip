@@ -177,7 +177,7 @@ end
 
 do 
 	local pool = setmetatable({},{__mode='v'})
-	StarTip.executeCode = function(tag, code, data)
+	StarTip.executeCode = function(tag, code, self, dontSandbox)
 		if not code then return end
 
 		local runnable = pool[code]
@@ -196,16 +196,18 @@ do
 		end
 		
 		
-		local table = StarTip:new()
-		table.self = StarTip:GetModule("Text")
-		table._G = _G
-		table.StarTip = StarTip
-		table.select = select
-		table.format = format
+		if not dontSandbox then
+			local table = StarTip.new()
+			table.self = self
+			table._G = _G
+			table.StarTip = StarTip
+			table.select = select
+			table.format = format
 		
-		setfenv(runnable, table)
+			setfenv(runnable, table)
 		
-		StarTip.del(table)
+			StarTip.del(table)
+		end
 		
 		return runnable(xpcall, errorhandler)
 	end
