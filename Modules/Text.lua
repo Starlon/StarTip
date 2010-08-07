@@ -94,8 +94,8 @@ local function updateLines()
     end
     for _, v in ipairs(lines) do
         if v.updating and v.right and self.db.profile[v.db] then
-            local left = StarTip.executeCode(v.name, v.left, mod)
-            local right, c = StarTip.executeCode(v.name, v.right, mod)
+            local left = StarTip.ExecuteCode(mod, v.name, v.left)
+            local right, c = StarTip.ExecuteCode(mod, v.name, v.right)
 			StarTip:del(c)
             if left and right then
                 for i = 1, self.NUM_LINES do
@@ -409,11 +409,11 @@ function mod:CreateLines()
         for i, v in ipairs(self) do
                 local left, right, c
                 if v.right then 
-                    right, c = StarTip.executeCode(v.name, v.right, mod)
-                    left = StarTip.executeCode(v.name, v.left, mod)
+                    right, c = StarTip.ExecuteCode(mod, v.name, v.right)
+                    left = StarTip.ExecuteCode(mod, v.name, v.left)
                 else 
                     right = ''
-                    left, c = StarTip.executeCode(v.name, v.left, mod)
+                    left, c = StarTip.ExecuteCode(mod, v.name, v.left)
                 end
                 if left and right then 
                     lineNum = lineNum + 1

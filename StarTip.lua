@@ -177,8 +177,8 @@ end
 
 do 
 	local pool = setmetatable({},{__mode='v'})
-	StarTip.executeCode = function(tag, code, self, dontSandbox)
-		if not code then return end
+	StarTip.ExecuteCode = function(self, tag, code, dontSandbox)
+		if not self or not tag or not code then return end
 
 		local runnable = pool[code]
 		local err
