@@ -1,6 +1,5 @@
 ﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0") 
 StarTip.__starref__ = true
---local LibQTip = LibStub('LibQTip-1.0')
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
@@ -15,6 +14,57 @@ local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("StarTip", {
 	icon = "Interface\\Icons\\INV_Chest_Cloth_17",
 	OnClick = function() StarTip:OpenConfig() end
 })
+
+StarTip.anchors = {
+	"CURSOR_TOP",
+	"CURSOR_TOPRIGHT",
+	"CURSOR_TOPLEFT",
+	"CURSOR_BOTTOM",
+	"CURSOR_BOTTOMRIGHT",
+	"CURSOR_BOTTOMLEFT",
+	"CURSOR_LEFT",
+	"CURSOR_RIGHT",
+	"TOP",
+	"TOPRIGHT",
+	"TOPLEFT",
+	"BOTTOM",
+	"BOTTOMRIGHT",
+	"BOTTOMLEFT",
+	"RIGHT",
+	"LEFT",
+	"CENTER"
+}
+
+StarTip.anchorText = {
+	"Cursor Top",
+	"Cursor Top-right",
+	"Cursor Top-left",
+	"Cursor Bottom",
+	"Cursor Bottom-right",
+	"Cursor Bottom-left",
+	"Cursor Left",
+	"Cursor Right",
+	"Screen Top",
+	"Screen Top-right",
+	"Screen Top-left",
+	"Screen Bottom",
+	"Screen Bottom-right",
+	"Screen Bottom-left",
+	"Screen Right",
+	"Screen Left",
+	"Screen Center"
+}
+
+StarTip.opposites = {
+	TOP = "BOTTOM",
+	TOPRIGHT = "BOTTOMLEFT",
+	TOPLEFT = "BOTTOMRIGHT",
+	BOTTOM = "TOP",
+	BOTTOMRIGHT = "TOPLEFT",
+	BOTTOMLEFT = "TOPRIGHT",
+	LEFT = "RIGHT",
+	RIGHT = "LEFT",
+}
 
 local defaults = {
 	profile = {

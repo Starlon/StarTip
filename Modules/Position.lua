@@ -23,59 +23,8 @@ local defaults = {
 	}
 }
 
-local anchors = {
-	"CURSOR_TOP",
-	"CURSOR_TOPRIGHT",
-	"CURSOR_TOPLEFT",
-	"CURSOR_BOTTOM",
-	"CURSOR_BOTTOMRIGHT",
-	"CURSOR_BOTTOMLEFT",
-	"CURSOR_LEFT",
-	"CURSOR_RIGHT",
-	"TOP",
-	"TOPRIGHT",
-	"TOPLEFT",
-	"BOTTOM",
-	"BOTTOMRIGHT",
-	"BOTTOMLEFT",
-	"RIGHT",
-	"LEFT",
-	"CENTER"
-}
-
-local anchorText = {
-	"Cursor Top",
-	"Cursor Top-right",
-	"Cursor Top-left",
-	"Cursor Bottom",
-	"Cursor Bottom-right",
-	"Cursor Bottom-left",
-	"Cursor Left",
-	"Cursor Right",
-	"Screen Top",
-	"Screen Top-right",
-	"Screen Top-left",
-	"Screen Bottom",
-	"Screen Bottom-right",
-	"Screen Bottom-left",
-	"Screen Right",
-	"Screen Left",
-	"Screen Center"
-}
-
-local opposites = {
-	TOP = "BOTTOM",
-	TOPRIGHT = "BOTTOMLEFT",
-	TOPLEFT = "BOTTOMRIGHT",
-	BOTTOM = "TOP",
-	BOTTOMRIGHT = "TOPLEFT",
-	BOTTOMLEFT = "TOPRIGHT",
-	LEFT = "RIGHT",
-	RIGHT = "LEFT",
-}
-
 local selections = {}
-for i, v in ipairs(anchorText) do
+for i, v in ipairs(StarTip.anchorText) do
 	selections[i] = v
 end
 selections[#selections+1] = "Hide"
@@ -333,14 +282,14 @@ local function delayAnchor()
 	if index == #selections then
 		this:Hide()
 		return
-	elseif anchors[index]:find("^CURSOR_")  then
+	elseif StarTip.anchors[index]:find("^CURSOR_")  then
 		oldX, oldY = 0, 0
-		currentAnchor = opposites[anchors[index]:sub(8)]
+		currentAnchor = StarTip.opposites[StarTip.anchors[index]:sub(8)]
 		updateFrame:SetScript("OnUpdate", positionTooltip)
 		positionTooltip()
 	else
 		if updateFrame:GetScript("OnUpdate") then updateFrame:SetScript("OnUpdate", nil) end
-		this:SetPoint(anchors[index], UIParent, anchors[index], xoffset, yoffset)
+		this:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
 	end
 end
 

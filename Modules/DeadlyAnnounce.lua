@@ -4,20 +4,34 @@ mod.name = "DeadlyAnnounce"
 mod.toggled = true
 mod.desc = "Show the last DBM announcements."
 mod.defaultOff = true
+local LibQTip = LibStub('LibQTip-1.0')
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip
 local ShoppingTooltip1 = _G.ShoppingTooltip1
 local ShoppingTooltip2 = _G.ShoppingTooltip2
 local self = mod
+local begin = GetTime()
+
+local anchorText = {
+	"Top",
+	"Top-right",
+	"Top-left",
+	"Bottom",
+	"Bottom-right",
+	"Bottom-left",
+	"Left",
+	"Right",
+	"Single Tooltip"
+}
 
 local defaults = {
 	profile = {
 		delay = 3,
-		hide = true
+		hide = true,
+		position = #anchorText
 	},
 }
-
 
 local options = {
 	hide = {
@@ -45,6 +59,15 @@ local options = {
 		pattern = "%d",
 		order = 6
 	},
+	position = {
+		name = "Position",
+		desc = "Select where to place tooltip.",
+		type = "select",
+		values = anchorText,
+		get = function() return mod.db.profile.position end,
+		set = function(info, v) mod.db.profile.position = v end,
+		order = 7
+	}
 }
 
 local history = {}
@@ -128,11 +151,13 @@ function mod:OnEnable()
 				
 		local function NewBoss(module, ...)
 			local mod = BigWigs:GetBossModule(module)         
-			-StarTip:SecureHook(mod, "DelayedMessage", function(key, delay, text, ...) tinsert(history, text) end)         
+			StarTip:SecureHook(mod, "DelayedMessage", function(key, delay, text, ...) tinsert(history, {text = text, time = GetTime()}) end)         
 		end
 		
 		StarTip:SecureHook(BigWigs, "NewBoss", NewBoss)
 	end
+	
+	tinsert(history, {text = "Test", time = GetTime()})
 end
 
 function mod:OnDisable()
@@ -164,8 +189,18 @@ function mod:SetUnit()
 	end
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine("--- DeadlyAnnounce ---")
-	for i = #history, 1, -1 do
-		GameTooltip:AddLine(history[i], 1, 1, 1)
+	
+	local length = 0
+	
+	for i = #history + 1, 1, -1 do
+		local time = history[i].time - history[i + 1].time
+		length = length + time
+	end
+	
+	for i = #history + 1, 1, -1 do
+		local time = GetTime()
+		time = time - history[i].time
+		GameTooltip:AddLine(time .. ": " .. history[i].text, 1, 1, 1)
 	end
 	
 	StarTip:ScheduleTimer(hideDW, self.db.profile.delay)
