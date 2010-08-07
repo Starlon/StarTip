@@ -1,4 +1,4 @@
-﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0") 
+﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0") 
 --local LibQTip = LibStub('LibQTip-1.0')
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
@@ -225,20 +225,21 @@ function StarTip:RebuildOpts()
 			args = nil
 		}
 
-		if v.toggled then
-			if v.GetOptions then
-				t = v:GetOptions()
-				t.optionsHeader = {
-					name = "Settings",
-					type = "header",
-					order = 3
-				}
-				if v:GetName() == "Bars" then
-					options.args.modules.args[v:GetName()].childGroups = "tab"
-				end
-			else
-				t = {}
+		if v.GetOptions then
+			t = v:GetOptions()
+			t.optionsHeader = {
+				name = "Settings",
+				type = "header",
+				order = 3
+			}
+			if v:GetName() == "Bars" then
+				options.args.modules.args[v:GetName()].childGroups = "tab"
 			end
+		else
+			t = {}
+		end
+
+		if v.toggled then
 			t.header = {
 				name = v.name,
 				type = "header",
@@ -259,11 +260,8 @@ function StarTip:RebuildOpts()
 				get = function() return self.db.profile.modules[k] == nil or self.db.profile.modules[k] end,
 				order = 2
 			}
-			
-			options.args.modules.args[v:GetName()].args = t
-		else
-			options.args.modules.args[v:GetName()] = nil
 		end
+		options.args.modules.args[v:GetName()].args = t
 	end	
 end
 
