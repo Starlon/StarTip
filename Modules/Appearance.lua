@@ -1,5 +1,6 @@
 local mod = StarTip:NewModule("Appearance")
 mod.name = "Appearance"
+mod.noToggle = true
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip

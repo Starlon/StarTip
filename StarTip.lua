@@ -218,46 +218,52 @@ end
 
 function StarTip:RebuildOpts()
 	for k, v in self:IterateModules() do
+		local t = {}
 		options.args.modules.args[v:GetName()] = {
 			name = v.name,
 			type = "group",
 			args = nil
 		}
-		local t
-		if v.GetOptions then
-			t = v:GetOptions()
-			t.optionsHeader = {
-				name = "Settings",
-				type = "header",
-				order = 3
-			}
-			if v:GetName() == "Bars" then
-				options.args.modules.args[v:GetName()].childGroups = "tab"
-			end
-		else
-			t = {}
-		end
-		t.header = {
-			name = v.name,
-			type = "header",
-			order = 1
-		}
-		t.toggle = {
-			name = "Enable",
-			desc = "Enable or disable this module",
-			type = "toggle",
-			set = function(info,v)
-				self.db.profile.modules[k] = v
-				if v then
-					self:EnableModule(k)
-				else
-					self:DisableModule(k)
+
+		if v.toggled then
+			if v.GetOptions then
+				t = v:GetOptions()
+				t.optionsHeader = {
+					name = "Settings",
+					type = "header",
+					order = 3
+				}
+				if v:GetName() == "Bars" then
+					options.args.modules.args[v:GetName()].childGroups = "tab"
 				end
-			end,
-			get = function() return self.db.profile.modules[k] == nil or self.db.profile.modules[k] end,
-			order = 2
-		}
-		options.args.modules.args[v:GetName()].args = t
+			else
+				t = {}
+			end
+			t.header = {
+				name = v.name,
+				type = "header",
+				order = 1
+			}
+			t.toggle = {
+				name = "Enable",
+				desc = "Enable or disable this module",
+				type = "toggle",
+				set = function(info,v)
+					self.db.profile.modules[k] = v
+					if v then
+						self:EnableModule(k)
+					else
+						self:DisableModule(k)
+					end
+				end,
+				get = function() return self.db.profile.modules[k] == nil or self.db.profile.modules[k] end,
+				order = 2
+			}
+			
+			options.args.modules.args[v:GetName()].args = t
+		else
+			options.args.modules.args[v:GetName()] = nil
+		end
 	end	
 end
 

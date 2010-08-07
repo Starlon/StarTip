@@ -1,5 +1,6 @@
 local mod = StarTip:NewModule("Targeting", "AceEvent-3.0")
 mod.name = "Targeting"
+mod.toggled = true
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local UnitFactionGroup = _G.UnitFactionGroup

@@ -1,5 +1,6 @@
 local mod = StarTip:NewModule("RaidIcon", "AceEvent-3.0")
 mod.name = "RaidIcon"
+mod.toggled = true
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local GetRaidTargetIndex = _G.GetRaidTargetIndex
