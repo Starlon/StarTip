@@ -118,9 +118,6 @@ function mod:OnEnable()
 		
 		StarTip:SecureHook(BigWigs, "NewBoss", NewBoss)
 	end
-	
-	history[1] = "Test"
-	history[2] = "foo"
 end
 
 function mod:OnDisable()
