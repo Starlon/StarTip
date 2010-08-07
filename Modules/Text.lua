@@ -320,6 +320,10 @@ return value
 local text = StarTip:GetModule("Text")
             
 local class = select(2, UnitClass("mouseover"))
+if not UnitIsPlayer("mouseover") then
+	class = "MAGE"
+end
+
 return text.powers[class] or "Mana:"
 ]],
         right = [[
