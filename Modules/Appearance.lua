@@ -157,7 +157,7 @@ local options = {
 			self.db.profile.bgColor[info[#info]][2] = g
 			self.db.profile.bgColor[info[#info]][3] = b
 			self.db.profile.bgColor[info[#info]][4] = a
-			self:SetBackdropColor()
+			self:SetBackdropColor(true)
 		end,
 		args = {
 			header = {
@@ -284,6 +284,7 @@ end
 function mod:SetUnit()
 	self.origBackdrop = self.origBackdrop or GameTooltip:GetBackdrop()
 	self.origBackdropColor = self.origBackdropColor or {GameTooltip:GetBackdropColor()}
+	self:SetBackdropColor()
 end
 
 function mod:OnHide()
