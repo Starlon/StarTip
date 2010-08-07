@@ -12,6 +12,8 @@ local defaults = {
 	profile = {
 		scale = 1,
 		font = StarTip:GetLSMIndexByName("font", LSM:GetDefault("font")),
+		fontSizeNormal = 12,
+		fontSizeBold = 14,		
 		edgeFile = StarTip:GetLSMIndexByName("border", "Blizzard Tooltip"),
 		background = StarTip:GetLSMIndexByName("background", "Blizzard Tooltip"),
 		bgColor = { -- Default colors from CowTip
@@ -27,7 +29,7 @@ local defaults = {
 		},
 		borderColor = { 1, 1, 1, 1 },
 		padding = 4,
-		edgeSize = 16,
+		edgeSize = 16
 	}
 }
 
@@ -73,6 +75,22 @@ local options = {
 		set = set,
 		order = 5
 	},
+	--[[fontSizeNormal = {
+		name = "Normal font size",
+		desc = "Set the normal font size",
+		type = "input",
+		get = function() StarTip:Print("test"); return 1 end,
+		order = 6
+	},
+	fontSizeBold = {
+		name = "Bold font size",
+		desc = "Set the bold font size",
+		type = "input",
+		get = get,
+		set = set,
+		pattern = "%d",
+		order = 7
+	},]]
 	edgeFile = {
 		name = "Tooltip Border",
 		desc = "Set the tooltip's border style",
@@ -80,7 +98,7 @@ local options = {
 		values = LSM:List("border"),
 		get = get,
 		set = set,
-		order = 6
+		order = 8
 	},
 	background = {
 		name = "Tooltip Background",
@@ -89,7 +107,7 @@ local options = {
 		values = LSM:List("background"),
 		get = get,
 		set = set,
-		order = 7
+		order = 9
 	},
 	borderColor = {
 		name = "Tooltip Border Color",
@@ -103,7 +121,7 @@ local options = {
 			self.db.profile.borderColor[3] = b
 			self.db.profile.borderColor[4] = a
 		end,
-		order = 8
+		order = 10
 	},
 	padding = {
 		name = "Tooltip Padding",
@@ -114,7 +132,7 @@ local options = {
 		step = 1,
 		get = get,
 		set = set,
-		order = 9
+		order = 11
 	},
 	edgeSize = {
 		name = "Tooltip Edge Size",
@@ -125,7 +143,7 @@ local options = {
 		step = 1,
 		get = get,
 		set = set,
-		order = 10
+		order = 12
 	},
 	bgColor = {
 		name = "Background Color",

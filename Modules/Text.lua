@@ -33,6 +33,7 @@ local UnitCreatureFamily = _G.UnitCreatureFamily
 local UnitCreatureType = _G.UnitCreatureType
 local UnitIsUnit = _G.UnitIsUnit
 local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
+local LSM = _G.LibStub("LibSharedMedia-3.0")
 local timer
 local factionList = {}
 local linesToAdd = {}
@@ -424,12 +425,17 @@ function mod:CreateLines()
         self.NUM_LINES = lineNum
     end})
 	for i, v in ipairs(self.db.profile.lines) do
+		local appearance = StarTip:GetModule("Appearance")
+		
+		local font = appearance.db.profile.font
+		local fontsList = LSM:List("font")
+		font = LSM:Fetch("font", fontsList[font])
 		if v.bold then
-			mod.leftLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
-			mod.rightLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+			mod.leftLines[i]:SetFont(font, appearance.db.profile.fontSizeBold, "OUTLINE")
+			mod.rightLines[i]:SetFont(font, appearance.db.profile.fontSizeBold, "OUTLINE")
 		else
-			mod.leftLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 12)
-			mod.rightLines[i]:SetFont("Fonts\\FRIZQT__.TTF", 12)
+			mod.leftLines[i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+			mod.rightLines[i]:SetFont(font, appearance.db.profile.fontSizeNormal)
 		end
 	end
 end
