@@ -1,4 +1,4 @@
---if not DBM and not BigWigs then return end
+if not DBM and not BigWigs then return end
 local mod = StarTip:NewModule("DeadlyWhispers")
 mod.name = "DeadlyWhispers"
 mod.toggled = true
@@ -35,7 +35,69 @@ local options = {
 
 local history = {}
 
-local messageFlag
+-- Borrowed from BosModTTS
+function mod:InitializeDBM()
+	local sound = nil
+	local timer = nil
+	local text = nil
+   
+	local function ShowAnnounce(t)
+	
+	end
+   
+	local function NewAnnounce(announce, _, spellId, ...)
+	if announce == nil then
+		local spellName = spellId
+		text = self.localization.warnings[spellId]
+	else
+		local spellName = GetSpellInfo(spellId) or "unknown"
+         
+		if announce == "move" or announce == "you" or announce == "warningspell" then
+			if announce == "warningspell" then
+				announce = "spell"
+			end
+           
+			text = DBM_CORE_AUTO_SPEC_WARN_TEXTS[announce]:format(spellName)
+            
+		else
+            local spellHaste = select(7, GetSpellInfo(53142)) / 10000 -- 53142 = Dalaran Portal, should have 10000 ms cast time
+            local timer = (select(7, GetSpellInfo(spellId)) or 1000) / spellHaste
+         
+            text = DBM_CORE_AUTO_ANNOUNCE_TEXTS[announce]:format(spellName, (timer / 1000))		
+		end
+	end
+	
+	tinsert(history, text)
+	end
+      
+	local function HookAnnounce(boss)      
+		local mod = DBM:GetModByName(boss)
+		local announces = mod.announces
+      
+		for i=1, #announces do
+			StarTip:Hook(announces[i], "Show", ShowAnnounce)
+		end
+	end
+		
+   
+	local function NewMod(_, boss, ...)
+		local mod = DBM:GetModByName(boss)
+      
+		self.localization = DBM:GetModLocalization(boss)
+      
+		StarTip:SecureHook(mod, "NewTargetAnnounce", function(...) NewAnnounce("target", ...) end)
+		StarTip:SecureHook(mod, "NewSpellAnnounce", function(...) NewAnnounce("spell", ...) end)
+		StarTip:SecureHook(mod, "NewCastAnnounce", function(...) NewAnnounce("cast", ...) end)
+		StarTip:SecureHook(mod, "NewAnnounce", function(...) NewAnnounce(nil, ...) end)
+		StarTip:SecureHook(mod, "NewSpecialWarningMove", function(...) NewAnnounce("move", ...) end)
+		StarTip:SecureHook(mod, "NewSpecialWarningYou", function(...) NewAnnounce("you", ...) end)
+		StarTip:SecureHook(mod, "NewSpecialWarningSpell", function(...) NewAnnounce("warningspell", ...) end)
+      
+		timer = StarTip:ScheduleTimer(function() HookAnnounce(boss) end, 1)
+	end 
+
+	StarTip:SecureHook(DBM, "NewMod", NewMod)
+end
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
@@ -44,7 +106,7 @@ end
 
 function mod:OnEnable()
 	if DBM then
-	
+		self:InitializeDBM()
 	elseif BigWigs then
 		local mod = BigWigs:GetBossModule(module)
 				
