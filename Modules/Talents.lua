@@ -33,6 +33,21 @@ mod.spec = spec
 local timer, talentTimer
 local dw = StarTip:GetModule("DeadlyAnnounce", true)
 
+local options = {
+	onctrl = {
+		name = "Clear on Ctrl",
+		desc = "Whether to clear talents cache or not when pressing down CTRL.",
+		type = "toggle",
+		get = function() 
+			return mod.db.profile.onctrl
+		end,
+		set = function(info, v)
+			mod.db.profile.onctrl = v
+		end,
+		order = 5
+	}
+}
+
 local talentTrees = {
 	["Druid"] = {"Balance", "Feral Combat", "Restoration"},
 	["Hunter"] = {"Beast Mastery", "Marksmanship", "Survival"},
@@ -118,7 +133,7 @@ local updateTalents = function()
 	local text = StarTip:GetModule("Text")
 	local nameRealm = select(1, UnitName("mouseover")) .. (select(2, UnitName("mouseover")) or '')
 	if spec[nameRealm] and spec[nameRealm][4] and spec[nameRealm][1] and spec[nameRealm][2] and spec[nameRealm][3] then
-		local specText = ('%s (%d/%d/%d)'):format(spec[nameRealm][4], spec[nameRealm][1], spec[nameRealm][2], spec[nameRealm][3])
+		local specText = mod:SpecText(select(1, UnitName("mouseover")), select(2, UnitName("mouseover")))
 		local lineNum
 		if (text.NUM_LINES or 0xdeadbeef) < GameTooltip:NumLines() then -- sometimes the text module hasn't initialized before this test
 			lineNum = text.NUM_LINES + 1
@@ -192,6 +207,7 @@ local updateTalents = function()
 end
 
 function mod:OnInitialize()	
+	self.db = StarTip.db:RegisterNamespace(self:GetName(), {profile = {onctrl = true}})
 	self.leftLines = StarTip.leftLines
 	self.rightLines = StarTip.rightLines
 end
@@ -202,6 +218,10 @@ end
 
 function mod:OnDisable()
 	if TalentQuery then TalentQuery.UnregisterCallback(self, "TalentQuery_Ready") end
+end
+
+function mod:GetOptions()
+	return options
 end
 
 function mod:SetUnit()
@@ -247,21 +267,32 @@ function mod:OnHide()
 end
 
 function mod:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
-	self.modifier = true
 	local mod = (modifier == "LCTRL" or modifier == "RCTRL") and "LCTRL"
-		
-	StarTip:Print("1")
-	if mod ~= "LCTRL" or not UnitExists("mouseover") then
+	
+	if mod ~= "LCTRL" or not self:IsEnabled() then
 		return
 	end
 	
-	StarTip:Print("2")
+	if self.db.profile.onctrl and UnitIsPlayer("mouseover") then
+		StarTip.del(spec)
 		
-	local nameRealm = select(1, UnitName("mouseover")) .. (select(2, UnitName("mouseover")) or '')
-	
-	StarTip:Print(nameRealm)
-	
-	spec[nameRealm] = nil
-	
-	self.modifier = false
+		local nameRealm = self:NameRealm()
+		local specText = self:SpecText(nameRealm)
+		for i = 1, GameTooltip:NumLines() do
+			if StarTip.leftLines[i]:GetText() == "Talents:" and specText ~= "" then
+				StarTip.rightLines[i]:SetText("Reload")
+			end
+		end
+		spec = setmetatable(StarTip.new(), {__mode='v'})
+	end
 end
+
+function mod:NameRealm()
+	return select(1, (UnitName("mouseover")) or "") .. (select(2, UnitName("mouseover")) or "") 
+end
+
+function mod:SpecText(nameRealm)
+	if not spec[nameRealm] then return "" end
+	return ('%s (%d/%d/%d)'):format(spec[nameRealm][4], spec[nameRealm][1], spec[nameRealm][2], spec[nameRealm][3])
+end
+
