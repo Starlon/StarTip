@@ -341,7 +341,7 @@ return self.unitLocation
 		name = "Marquee",
 		left = 'return "StarTip v1.4"',
 		updating = true,
-		enabled = true,
+		enabled = false,
 		marquee = true,
 		width = 20,
 		prefix = 'return "---"',
@@ -432,6 +432,8 @@ function mod:CreateLines()
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
+			if v.enabled then
+				
                 local left, right, c
                 if v.right then 
                     right, c = StarTip.ExecuteCode(mod, v.name, v.right)
@@ -467,6 +469,7 @@ function mod:CreateLines()
                 end
 				StarTip.del(c)
 				StarTip.del(cc)
+			end
         end
         self.NUM_LINES = lineNum
     end})
