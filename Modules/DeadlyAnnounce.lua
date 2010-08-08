@@ -162,8 +162,10 @@ function mod:OnEnable()
 end
 
 function mod:OnDisable()
-	local mod = BigWigs:GetBossModule(module)
-	StarTip:RemoveHook(mod, "DelayMessage")
+	if BigWigs then
+		local mod = BigWigs:GetBossModule(module)
+		StarTip:RemoveHook(mod, "DelayMessage")
+	end
 end
 
 function mod:GetOptions()
@@ -235,7 +237,8 @@ end
 
 local lastGuid
 function mod:SetUnit()
-	StarTip:Print("set unit")
+
+	if self.modifier then return end
 	
 	line = 1
 

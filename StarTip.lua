@@ -521,7 +521,12 @@ function StarTip:GetMouseoverUnit()
 end
 
 -- Taken from CowTip and modified a bit
-function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up)
+function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
+	for i, v in self:IterateModules() do
+		if v.MODIFIER_STATE_CHANGED then
+			v:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
+		end
+	end
 	local mod
 	if self.db.profile.modifier == 2 then
 		mod = (modifier == "LCTRL" or modifier == "RCTRL") and "LCTRL"

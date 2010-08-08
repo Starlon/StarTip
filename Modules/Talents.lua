@@ -29,6 +29,7 @@ local linesToAddRightG = {}
 local linesToAddRightB = {}
 local TalentQuery = LibStub:GetLibrary("LibTalentQuery-1.0", true)
 local spec = setmetatable({}, {__mode='v'})
+mod.spec = spec
 local timer, talentTimer
 local dw = StarTip:GetModule("DeadlyAnnounce", true)
 
@@ -142,7 +143,9 @@ local updateTalents = function()
 		else
 			lineNum = GameTooltip:NumLines() + 1
 		end
+				
 		GameTooltip:AddDoubleLine(' ', ' ')
+		
 		local left = mod.leftLines[lineNum]
 		local right = mod.rightLines[lineNum]
 		left:SetText("Talents:")
@@ -208,6 +211,12 @@ function mod:SetUnit()
 		return
 	end
 	
+	for i = 1, GameTooltip:NumLines() do
+		if StarTip.leftLines[i]:GetText() == "Talents:" then
+			self.oldLine = i
+		end
+	end
+	
 	if UnitIsUnit("mouseover", "player") then
 		self:TalentQuery_Ready(_, UnitName("player"))
 	else
@@ -237,3 +246,22 @@ function mod:OnHide()
 	end
 end
 
+function mod:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
+	self.modifier = true
+	local mod = (modifier == "LCTRL" or modifier == "RCTRL") and "LCTRL"
+		
+	StarTip:Print("1")
+	if mod ~= "LCTRL" or not UnitExists("mouseover") then
+		return
+	end
+	
+	StarTip:Print("2")
+		
+	local nameRealm = select(1, UnitName("mouseover")) .. (select(2, UnitName("mouseover")) or '')
+	
+	StarTip:Print(nameRealm)
+	
+	spec[nameRealm] = nil
+	
+	self.modifier = false
+end
