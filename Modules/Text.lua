@@ -54,6 +54,10 @@ local function errorhandler(err)
     return geterrorhandler()(err)
 end
 
+local ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALIGN_PINGPONG = 1, 2, 3, 4, 5, 6
+
+local SCROLL_RIGHT, SCROLL_LEFT = 1, 2
+
 -- Thanks to ckknight for this
 mod.short = function(value)
     if value >= 10000000 or value <= -10000000 then
@@ -309,7 +313,7 @@ if not self.UnitIsPlayer("mouseover") then
 	class = "MAGE"
 end
 
-return self.powers[class] or "Mana:"
+return (self.powers[class] or "Mana:")
 ]],
         right = [[
 local mana = self.UnitMana("mouseover")
@@ -333,6 +337,22 @@ return self.unitLocation
         updating = true,
 		enabled = true
     },
+	[14] = {
+		name = "Marquee",
+		left = 'return "StarTip v1.4"',
+		updating = true,
+		enabled = true,
+		marquee = true,
+		width = 20,
+		prefix = 'return "---"',
+		postfix = 'return "---"',
+		bold = true,
+		align = 'M',
+		update = 1000,
+		scroll = 1,
+		speed = 500,
+		direction = DIRECTION_LEFT		
+	}
 }
 
 local options = {}
@@ -398,6 +418,11 @@ function mod:UPDATE_FACTION()
     end
 end
 
+local function makeMarquee(line, text)
+	
+	return text
+end
+
 function mod:CreateLines()
     local llines = {}
     for i, v in ipairs(self.db.profile.lines) do
@@ -410,11 +435,16 @@ function mod:CreateLines()
                 local left, right, c
                 if v.right then 
                     right, c = StarTip.ExecuteCode(mod, v.name, v.right)
-                    left = StarTip.ExecuteCode(mod, v.name, v.left)
+                    left, cc = StarTip.ExecuteCode(mod, v.name, v.left)
                 else 
                     right = ''
                     left, c = StarTip.ExecuteCode(mod, v.name, v.left)
                 end
+								
+				if v.marquee and v.width and left then
+					left = makeMarquee(v, left)
+					right = ''
+				end
                 if left and right then 
                     lineNum = lineNum + 1
                     if v.right then
@@ -424,6 +454,9 @@ function mod:CreateLines()
                         if type(c) == "table" and c.r then
                             mod.rightLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
                         end
+						if type(cc) == "table" and cc.r then
+							mod.leftLines[lineNum]:SetVertexColor(cc.r, cc.g, cc.b)
+						end
                     else
 						GameTooltip:AddLine(' ', 1, 1, 1)
                         mod.leftLines[lineNum]:SetText(left)
@@ -432,7 +465,8 @@ function mod:CreateLines()
                         end
                     end
                 end
-				StarTip:del(c)
+				StarTip.del(c)
+				StarTip.del(cc)
         end
         self.NUM_LINES = lineNum
     end})
