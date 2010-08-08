@@ -418,6 +418,14 @@ function StarTip.OnTooltipSetSpell(...)
 	StarTip.justSetSpell = nil
 end
 
+function StarTip:HideAll()
+	for k, v in StarTip:IterateModules() do
+		if v.OnHide then
+			--v:OnHide()
+		end
+	end
+end
+
 function StarTip:OnTooltipHide(...)
 	if not self.justHide then
 		for k, v in self:IterateModules() do

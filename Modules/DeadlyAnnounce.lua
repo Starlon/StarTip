@@ -1,4 +1,4 @@
-if not DBM and not BigWigs then return end
+--if not DBM and not BigWigs then return end
 local mod = StarTip:NewModule("DeadlyAnnounce")
 mod.name = "DeadlyAnnounce"
 mod.toggled = true
@@ -157,7 +157,8 @@ function mod:OnEnable()
 		StarTip:SecureHook(BigWigs, "NewBoss", NewBoss)
 	end
 	
-	tinsert(history, {text = "Test", time = GetTime()})
+	tinsert(history, {text = "Test", time = GetTime() - 5})
+	tinsert(history, {text = "Fobar", time = GetTime()})
 end
 
 function mod:OnDisable()
@@ -169,41 +170,121 @@ function mod:GetOptions()
 	return options
 end
 
+local newFont, delFont
+do
+	local pool = {}
+	newFont = function()
+		local font = next(pool)
+		if not font then
+			font = CreateFont("DA")
+		end
+		pool[font] = nil
+	end
+	
+	delFont = function(font)
+		pool[font] = true
+	end
+
+
+end
+
+local line = 1
+function mod:AddLine(text1, text2, r, g, b)
+	
+	if not text1 then return end
+	
+	if not r then
+		r = 1
+		g = 1
+		b = 1
+	end
+	
+	if mod.db.profile.position == #anchorText then
+		if text2 then
+			GameTooltip:AddDoubleLine(text1, text2)
+			StarTip.leftLines[line]:SetVertexColor(r, g, b)
+			StarTip.rightLines[line]:SetVertexColor(r, g, b)
+		else
+			GameTooltip:AddLine(text1)
+			StarTip.leftLines[line]:SetVertexColor(r, g, b)
+		end
+	else
+		local font = newFont()
+		font:CopyFontObject(StarTip.leftLines[1]:GetFontObject())
+		font:SetTextColor(r, g, b)
+		self.tooltip:SetFont(font)
+		delFont(font)
+		self.tooltip:AddLine(text1, text2)
+	end
+	
+	line = line + 1
+end
+
+local function hideAll()
+	StarTip.HideAll()
+	StarTip.hideTimer = nil
+end
+
 local skip
-local function hideDW()
+function hideDW()
 	skip = true
 	GameTooltip:SetUnit("mouseover")
 	skip = false
 	mod.shown = false
 end
 
+local lastGuid
 function mod:SetUnit()
-	if not mod:IsEnabled() then return end
+	StarTip:Print("set unit")
 	
-	if #history == 0 or skip then return end
+	line = 1
+
+	if self.hideDWTimer and mod.shown then -- and StarTip:TimeLeft(self.hdDWTimer) then
+		StarTip:CancelTimer(self.hideDWTimer)
+		mod.shown = false
+	end
+	
+	if skip or mod.shown then return end
+	
+	if mod.db.profile.position == #anchorText then
+		GameTooltip:ClearLines()
+	else	
+		self.tooltip = LibQTip:Acquire("DeadlyAnnounce", 2, "LEFT", "CENTER", "CENTER", "CENTER","RIGHT")
+	end
+
+	self:AddLine("--- Deadly Announce ---")
+	
+	if #history == 0 then 
+		if #history == 0 then
+			self:AddLine("Nothing to show", nil, 1, 0, 0)
+			StarTip:ScheduleTimer(hideDW, self.db.profile.delay)
+		end
+		return
+	end
 	
 	if #history > 10 then
 		local tmp = history[#history]
 		StarTip.del(tmp)
 		tremove(history, #history)
 	end
-	GameTooltip:ClearLines()
-	GameTooltip:AddLine("--- DeadlyAnnounce ---")
-	
+		
 	local length = 0
 	
-	for i = #history + 1, 1, -1 do
+	for i = #history - 1, 1, -1 do
 		local time = history[i].time - history[i + 1].time
 		length = length + time
 	end
 	
-	for i = #history + 1, 1, -1 do
+	for i = #history, 1, -1 do
 		local time = GetTime()
 		time = time - history[i].time
-		GameTooltip:AddLine(time .. ": " .. history[i].text, 1, 1, 1)
+		self:AddLine(time .. ": " .. history[i].text, nil, 1, 0, 0)
 	end
+
+	StarTip:ScheduleTimer(hideAll, .1)
 	
-	StarTip:ScheduleTimer(hideDW, self.db.profile.delay)
+	self.hideDWTimer = StarTip:ScheduleTimer(hideDW, self.db.profile.delay)
 	
 	self.shown = true
+	
 end

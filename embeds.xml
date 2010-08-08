@@ -18,6 +18,6 @@
 <Script file="Libs\LibTalentQuery-1.0\LibTalentQuery-1.0.lua"/>
 <Script file="Libs\LibDatabroker-1.1\LibDatabroker-1.1.lua"/>
 <Script file="Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua"/>
-<Script file="Libs\LibQtip-1.0\LibQtip-1.0"/>
+<Script file="Libs\LibQtip-1.0\LibQtip-1.0.lua"/>
 
 </Ui>

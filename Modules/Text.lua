@@ -590,7 +590,7 @@ function mod:RebuildOpts()
 					name = "Enabled",
 					desc = "Whether to show this line or not",
 					type = "toggle",
-					get = function() return self.db.profile.lilnes[i].enabled end,
+					get = function() return self.db.profile.lines[i].enabled end,
 					set = function(info, v)
 						self.db.profile.lines[i].enabled = v
 					end,
