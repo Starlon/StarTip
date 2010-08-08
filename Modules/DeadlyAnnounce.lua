@@ -258,10 +258,8 @@ function mod:SetUnit()
 	self:AddLine("--- Deadly Announce ---")
 	
 	if #history == 0 then 
-		if #history == 0 then
-			self:AddLine("Nothing to show", nil, 1, 0, 0)
-			StarTip:ScheduleTimer(hideDW, self.db.profile.delay)
-		end
+		self:AddLine("Nothing to show", nil, 1, 0, 0)
+		StarTip:ScheduleTimer(hideDW, self.db.profile.delay)
 		return
 	end
 	
