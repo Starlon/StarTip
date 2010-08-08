@@ -1,6 +1,7 @@
 local mod = StarTip:NewModule("Talents", "AceTimer-3.0", "AceEvent-3.0")
 mod.name = "Talents"
 mod.toggled = true
+mod.defaultOff = true
 local text = StarTip:GetModule("Text")
 local _G = _G
 local GameTooltip = _G.GameTooltip
