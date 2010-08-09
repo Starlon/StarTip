@@ -295,7 +295,7 @@ function mod:SetUnit()
 	for i = #history, 1, -1 do
 		local time = GetTime()
 		time = time - history[i].time
-		self:AddLine(time .. ": " .. history[i].text, nil, 1, 0, 0)
+		self:AddLine(history[i].text, nil, 1, 0, 0)
 	end
 
 	self.hideTimer = StarTip:ScheduleTimer(hideAll, .1)
