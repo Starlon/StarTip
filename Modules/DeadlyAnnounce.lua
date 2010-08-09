@@ -29,7 +29,8 @@ local defaults = {
 	profile = {
 		delay = 3,
 		hide = true,
-		position = #anchorText
+		position = #anchorText,
+		onctrl = true
 	},
 }
 
@@ -67,6 +68,14 @@ local options = {
 		get = function() return mod.db.profile.position end,
 		set = function(info, v) mod.db.profile.position = v end,
 		order = 7
+	},
+	onctrl = {
+		name = "Hide On Ctrl",
+		desc = "Whether to hide DeadlyAnnounce when you press the CTRL key.",
+		type = "toggle",
+		get = function() return mod.db.profile.onctrl end,
+		set = function(info, v) mod.db.profile.onctrl = true end,
+		order = 8
 	}
 }
 
@@ -224,7 +233,7 @@ end
 
 local function hideAll()
 	StarTip.HideAll()
-	StarTip.hideTimer = nil
+	mod.hideTimer = nil
 end
 
 local skip
@@ -233,6 +242,8 @@ function hideDW()
 	GameTooltip:SetUnit("mouseover")
 	skip = false
 	mod.shown = false
+	mod.hideDWTimer = nil
+	mod.count = 0
 end
 
 local lastGuid
@@ -242,7 +253,12 @@ function mod:SetUnit()
 	
 	line = 1
 
-	if self.hideDWTimer and mod.shown then -- and StarTip:TimeLeft(self.hdDWTimer) then
+	if mod.shown and (mod.count or 0) > 3 then
+		mod.count = 0
+		return
+	end
+	
+	if self.hideDWTimer and mod.shown then
 		StarTip:CancelTimer(self.hideDWTimer)
 		mod.shown = false
 	end
@@ -282,10 +298,29 @@ function mod:SetUnit()
 		self:AddLine(time .. ": " .. history[i].text, nil, 1, 0, 0)
 	end
 
-	StarTip:ScheduleTimer(hideAll, .1)
+	self.hideTimer = StarTip:ScheduleTimer(hideAll, .1)
 	
 	self.hideDWTimer = StarTip:ScheduleTimer(hideDW, self.db.profile.delay)
 	
 	self.shown = true
 	
+	self.count = (self.count or 0) + 1
+end
+
+function mod:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
+	local mod = (modifier == "LCTRL" or modifier == "RCTRL") and "LCTRL"
+	
+	if mod ~= "LCTRL" or not self:IsEnabled() then
+		return
+	end
+	
+	if self.db.profile.onctrl then
+		if self.hideTimer and StarTip.TimeLeft and StarTip:TimeLeft(self.hideTimer) > 0 then
+			StarTip:CancelTimer(self.hideTimer)
+		end
+		if self.hideDWTimer and StarTip.TimeLeft and StarTip:TimeLeft(self.hideDWTimer) > 0 then
+			StarTip:CancelTimer(self.hideDWTimer)
+		end
+		hideDW()
+	end
 end
