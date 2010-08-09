@@ -1,8 +1,12 @@
 local mod = StarTip:NewModule("Text", "AceTimer-3.0", "AceEvent-3.0")
 mod.name = "Text"
 mod.toggled = true
-local Evaluator = LibStub("LibEvaluator-1.0"):New()
-local LibProperty = LibStub("LibProperty-1.0")
+assert(LibStub("StarLibEvaluator-1.0", true), "Text module requires StarLibEvaluator-1.0")
+local Evaluator = LibStub("StarLibEvaluator-1.0"):New()
+local LibProperty = LibStub("StarLibProperty-1.0", true)
+assert(LibProperty, "Text module requires StarLibProperty-1.0")
+local LibMarquee = LibStub("LibMarquee-1.0", true)
+assert(LibMarquee, "Text module requires LibMarquee-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip

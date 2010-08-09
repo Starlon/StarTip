@@ -1,9 +1,10 @@
 
-local MAJOR = "LibProperty-1.0" 
+local MAJOR = "StarLibProperty-1.0" 
 local MINOR = 1
 assert(LibStub, MAJOR.." requires LibStub") 
 local LibProperty = LibStub:NewLibrary(MAJOR, MINOR)
-local Evaluator = LibStub("LibEvaluator-1.0"):New()
+if not LibStub("StarLibEvaluator-1.0") then return end
+local Evaluator = LibStub("StarLibEvaluator-1.0"):New()
 
 if not LibProperty or not Evaluator then return end
 

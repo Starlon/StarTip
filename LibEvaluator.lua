@@ -1,6 +1,6 @@
 
 
-local MAJOR = "LibEvaluator-1.0" 
+local MAJOR = "StarLibEvaluator-1.0" 
 local MINOR = 1
 assert(LibStub, MAJOR.." requires LibStub") 
 local LibEvaluator = LibStub:NewLibrary(MAJOR, MINOR)

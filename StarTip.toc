@@ -15,10 +15,6 @@ embeds.xml
 
 Localization\enUS.lua
 
-LibEvaluator.lua
-LibProperty.lua
-LibMarquee.lua
-
 StarTip.lua
 Modules\Fade.lua
 Modules\Appearance.lua
