@@ -54,7 +54,7 @@ local linesToAddRight = {}
 local linesToAddRightR = {}
 local linesToAddRightG = {}
 local linesToAddRightB = {}
-local lines
+local lines = {}
 
 local function errorhandler(err)
     return geterrorhandler()(err)
@@ -398,11 +398,11 @@ function mod:OnInitialize()
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
+	self:RegisterEvent("PLAYER_LOGIN")
     StarTip:SetOptionsDisabled(options, true)
 end
 
 function mod:OnEnable()
-	self:CreateLines()
     if TalentQuery then TalentQuery.RegisterCallback(self, "TalentQuery_Ready") end
     
     StarTip:SetOptionsDisabled(options, false)
@@ -486,8 +486,17 @@ function mod:CreateLines()
 				StarTip.del(c)
 				StarTip.del(cc)
 			end
+			local tmp = v.marquee
+			
+			if v.marquee and not v.marqueeObj then
+				StarTip:Print("test")
+				v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v)
+				v.marqueeObj:Start()
+			end
+			
         end
         self.NUM_LINES = lineNum
+
     end})
 	for i, v in ipairs(self.db.profile.lines) do
 		local appearance = StarTip:GetModule("Appearance")
@@ -503,6 +512,22 @@ function mod:CreateLines()
 			mod.rightLines[i]:SetFont(font, appearance.db.profile.fontSizeNormal)
 		end
 	end
+end
+
+function mod:OnHide()
+	for i, v in ipairs(lines) do
+		if v.marqueeObj and v.marqueeObj.Stop then
+			v.marqueeObj:Stop()
+			v.marqueObj = nil
+		end
+	end
+end
+
+function mod:PLAYER_LOGIN()
+	for i, v in ipairs(mod.db.profile.lines) do
+		v.marqueeObj = nil
+	end
+	mod:CreateLines()
 end
 
 function mod:RebuildOpts()

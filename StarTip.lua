@@ -241,35 +241,6 @@ local function copy(tbl)
 	return localCopy
 end
 
---[[
-local property = {}
-
-property.Eval = function(self, runnable)
-	local is_valid
-	local result
-end
-
-property.P2N = function(self)
-	
-end
-
-property.P2S = function(self)
-
-end
-
-property.SetValue = function(self)
-
-end
-
-do 
-	StarTip.EvalCode = function(self, property)
-		if not self or not property then return end
-		
-		
-	end
-	
-end
---]]
 StarTip:SetDefaultModuleState(false)
 
 function StarTip:OnInitialize()
