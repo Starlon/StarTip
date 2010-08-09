@@ -1,6 +1,7 @@
 local mod = StarTip:NewModule("Text", "AceTimer-3.0", "AceEvent-3.0")
 mod.name = "Text"
 mod.toggled = true
+local Evaluator = LibStub("LibEvaluator-1.0"):New()
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -442,6 +443,7 @@ function mod:CreateLines()
         llines[i] = v
     end
     lines = setmetatable(llines, {__call=function(self)
+		
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
@@ -449,17 +451,18 @@ function mod:CreateLines()
 				
                 local left, right, c
                 if v.right then 
-                    right, c = StarTip.ExecuteCode(mod, v.name, v.right)
-                    left, cc = StarTip.ExecuteCode(mod, v.name, v.left)
+                    right, c = Evaluator.ExecuteCode(mod, v.name, v.right)
+                    left, cc = Evaluator.ExecuteCode(mod, v.name, v.left)
                 else 
                     right = ''
-                    left, c = StarTip.ExecuteCode(mod, v.name, v.left)
+                    left, c = Evaluator.ExecuteCode(mod, v.name, v.left)
                 end
 								
 				if v.marquee and v.width and left then
 					left = makeMarquee(v, left)
 					right = ''
 				end
+				
                 if left and right then 
                     lineNum = lineNum + 1
                     if v.right then

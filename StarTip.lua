@@ -241,56 +241,6 @@ local function copy(tbl)
 	return localCopy
 end
 
-do 
-	local pool = setmetatable({},{__mode='v'})
-	StarTip.ExecuteCode = function(self, tag, code, dontSandbox, defval, dontDefault)
-		if not defval and not dontDefault then defval = "" end
-		
-		if not self or not tag or not code then return end
-
-		local runnable = pool[code]
-		local err
-				
-		if not runnable then
-			runnable, err = loadstring(code, tag)
-			if runnable then
-				pool[code] = runnable
-			end
-		end
-	
-		if not runnable then 
-			StarTip:Print(err)
-			return nil, err, 0
-		end
-		
-		
-		if not dontSandbox then
-			local table = StarTip.new()
-			table.self = self
-			table._G = _G
-			table.StarTip = StarTip
-			table.select = select
-			table.format = format
-		
-			setfenv(runnable, table)
-		
-			StarTip.del(table)
-		end
-		
-		local ret = runnable(xpcall, errorhandler)
-		
-		defval = loadstring('return ' .. (defval or ""), "defval") or function() StarTip:Print("Error at defval"); return "" end
-				
-		local isDefval = false
-		if not ret then ret = defval; isDefval = true end
-		
-		if type(ret) == "function" then
-			ret = ret()
-		end
-		
-		return ret, err, strlen(ret or "")
-	end
-end
 --[[
 local property = {}
 

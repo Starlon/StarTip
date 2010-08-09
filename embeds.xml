@@ -20,5 +20,6 @@
 <Script file="Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua"/>
 <Script file="Libs\LibQtip-1.0\LibQtip-1.0.lua"/>
 <Script file="Property.lua"/>
+<Script file="Evaluator.lua"/>
 
 </Ui>
