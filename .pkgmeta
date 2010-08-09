@@ -59,3 +59,6 @@ externals:
     Libs/LibMarquee-1.0:
 	    url: svn://svn.curseforge.net/wow/libmarquee-1-0/mainline/trunk
         tag: latest
+    Libs/StarLibLCD-1.0:
+        url: svn://svn.curseforge.net/wow/starliblcd-1-0/mainline/trunk
+        tag: latest

@@ -23,6 +23,6 @@
 <Script file = "Libs\StarLibProperty-1.0\StarLibProperty-1.0.lua"/>
 <Script file = "Libs\StarLibTimer-1.0\StarLibTimer-1.0.lua"/>
 <Script file = "Libs\LibMarquee-1.0\LibMarquee-1.0.lua"/>
-
+<Script file = "Libs\StarLibLCD-1.0\StarLibLCD-1.0.lua"/>
 
 </Ui>
