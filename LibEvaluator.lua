@@ -3,19 +3,19 @@
 local MAJOR = "LibEvaluator-1.0" 
 local MINOR = 1
 assert(LibStub, MAJOR.." requires LibStub") 
-local Evaluator = LibStub:NewLibrary(MAJOR, MINOR)
-if not Evaluator then return end
+local LibEvaluator = LibStub:NewLibrary(MAJOR, MINOR)
+if not LibEvaluator then return end
 
-if not Evaluator.__index then
-	Evaluator.__index = Evaluator
-	Evaluator.pool = setmetatable({}, {__mode = "k"})
+if not LibEvaluator.__index then
+	LibEvaluator.__index = LibEvaluator
+	LibEvaluator.pool = setmetatable({}, {__mode = "k"})
 end
 
-Evaluator.__call = function(...)
+LibEvaluator.__call = function(...)
 	self.ExecuteCode(...)
 end
 
-function Evaluator:New() 
+function LibEvaluator:New() 
 
 	local obj = next(self.pool)
 
@@ -30,9 +30,13 @@ function Evaluator:New()
 	return obj	
 end
 
+function LibEvaluator:Del(ev)
+	LibEvaluator.pool[ev] = true
+end
+
 do 
 	local pool = setmetatable({},{__mode='v'})
-	Evaluator.ExecuteCode = function(self, tag, code, dontSandbox, defval)
+	LibEvaluator.ExecuteCode = function(self, tag, code, dontSandbox, defval)
 		if not defval and not dontDefault then defval = "" end
 		
 		if not self or not tag or not code then return end

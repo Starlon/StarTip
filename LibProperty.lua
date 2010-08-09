@@ -43,6 +43,10 @@ function LibProperty:New(v, line, name, defval)
 	return obj	
 end
 
+function LibProperty:Del(prop)
+	LibProperty.pool[prop] = true
+end
+
 function LibProperty:Eval()
 	if not self.is_valid then return -1 end
 	
