@@ -1,5 +1,5 @@
 ﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip: @project-version@", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0") 
-StarTip.version = GetAddOnMetadata("StarTip", "X-StarTip-Version")
+StarTip.version = GetAddOnMetadata("StarTip", "X-StarTip-Version") or ""
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
@@ -243,7 +243,9 @@ end
 
 do 
 	local pool = setmetatable({},{__mode='v'})
-	StarTip.ExecuteCode = function(self, tag, code, dontSandbox)
+	StarTip.ExecuteCode = function(self, tag, code, dontSandbox, defval, dontDefault)
+		if not defval and not dontDefault then defval = "" end
+		
 		if not self or not tag or not code then return end
 
 		local runnable = pool[code]
@@ -258,7 +260,7 @@ do
 	
 		if not runnable then 
 			StarTip:Print(err)
-			return "" 
+			return nil, err, 0
 		end
 		
 		
@@ -275,10 +277,49 @@ do
 			StarTip.del(table)
 		end
 		
-		return runnable(xpcall, errorhandler)
+		local ret = runnable(xpcall, errorhandler)
+		
+		defval = loadstring('return ' .. (defval or ""), "defval") or function() StarTip:Print("Error at defval"); return "" end
+				
+		local isDefval = false
+		if not ret then ret = defval; isDefval = true end
+		
+		if type(ret) == "function" then
+			ret = ret()
+		end
+		
+		return ret, err, strlen(ret or "")
 	end
 end
+--[[
+local property = {}
 
+property.Eval = function(self, runnable)
+	local is_valid
+	local result
+end
+
+property.P2N = function(self)
+	
+end
+
+property.P2S = function(self)
+
+end
+
+property.SetValue = function(self)
+
+end
+
+do 
+	StarTip.EvalCode = function(self, property)
+		if not self or not property then return end
+		
+		
+	end
+	
+end
+--]]
 StarTip:SetDefaultModuleState(false)
 
 function StarTip:OnInitialize()

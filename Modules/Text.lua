@@ -377,17 +377,18 @@ function mod:OnInitialize()
 	end
 	
 	for i, v in ipairs(defaultLines) do
-		if not v.tagged then
+		if not v.tagged and not v.deleted then
 			tinsert(self.db.profile.lines, v)
 		end
 	end
 	
-	if self.db.profile.empty then
+	--[[if self.db.profile.empty then
 		for i, v in ipairs(defaultLines) do
 			tinsert(self.db.profile.lines, v)
 		end
 		self.db.profile.empty = false
-	end
+	end]]
+	
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
@@ -418,6 +419,18 @@ function mod:UPDATE_FACTION()
     end
 end
 
+
+function mod:MarqUpdate(line)
+	local str = ''
+	local update = 0
+	
+	update = update + StarTip:EvalCode(line.prefix)
+	update = update + StarTip:EvalCode(line.postfix)
+	update = update + StarTip:EvalCode(line.style)
+	
+	StarTip:EvalCode(line.left)
+end
+
 local function makeMarquee(line, text)
 	
 	return text
@@ -432,7 +445,7 @@ function mod:CreateLines()
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
-			if v.enabled then
+			if v.enabled and not v.deleted then
 				
                 local left, right, c
                 if v.right then 
@@ -521,7 +534,7 @@ function mod:RebuildOpts()
 		},
 	}
     for i, v in ipairs(self.db.profile.lines) do
-		if type(v) ~= "table" then break end
+		if type(v) ~= "table" or v.deleted then break end
         options["line" .. i] = {
             name = v.name,
             type = "group",
@@ -533,12 +546,15 @@ function mod:RebuildOpts()
                     get = function() return v.left end,
                     set = function(info, val) v.left = val; v.leftDirty = true end,
                     validate = function()
-						local ret, err = loadstring(v.left or "", "validate")
+						local ret, err = StarTip:ExecuteCode("validate", v.left)
+						
 						if not ret then
 							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
+							v.error = true
 							return false
 						end
-						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret(xpcall, errorhandler) or ""))
+						
+						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret or ""))
 					return true
 					
 					end,
@@ -553,14 +569,16 @@ function mod:RebuildOpts()
                     get = function() return v.right end,
                     set = function(info, val) v.right = val; v.rightDirty = true end,
                     validate = function()
-						local ret, err = loadstring(v.right or "", "validate")
+						local ret, err = StarTip:ExecuteCode("validate", v.right)
+						
 						if not ret then
-							local text = ("Code failed to execute. Error message: %s"):format(err or "")
-							StarTip:Print(text)
-							return text
+							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
+							return false
 						end
-						StarTip:Print(("Code executed without error. Return value: %s"):format(ret(xpcall, errorhandler) or ""))
-						return true
+						
+						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret or ""))
+					return true
+					
 					end,
                     multiline = true,
 					width = "full",
@@ -638,7 +656,22 @@ function mod:RebuildOpts()
 					desc = "Delete this line",
 					type = "execute",
 					func = function()
-						table.remove(self.db.profile.lines, i)
+						local deleted
+						
+						for j, vv in ipairs(defaultLines) do
+							if vv.name == v.name then
+								deleted = true
+							else
+								
+							end
+						end
+						
+						if deleted then
+							v.deleted = true
+						else
+							table.remove(self.db.profile.lines, i)
+						end
+						
 						self:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
