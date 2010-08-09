@@ -249,7 +249,7 @@ end
 local lastGuid
 function mod:SetUnit()
 
-	if self.modifier then return end
+	if self.modifier  or IsResting() then return end
 	
 	line = 1
 
