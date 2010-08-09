@@ -56,9 +56,12 @@ externals:
     LIbs/StarLibEvaluator-1.0:
 		url: svn://svn.curseforge.net/wow/starlibevaluator-1-0/mainline/trunk
 		tag: latest
-    Libs/LibMarquee-1.0:
-	    url: svn://svn.curseforge.net/wow/libmarquee-1-0/mainline/trunk
+    Libs/StarLibMarquee-1.0:
+	    url: svn://svn.curseforge.net/wow/starlibmarquee-1-0/mainline/trunk
         tag: latest
     Libs/StarLibLCD-1.0:
         url: svn://svn.curseforge.net/wow/starliblcd-1-0/mainline/trunk
+        tag: latest
+    Libs/StarLibError-1.0:
+        url: svn://svn.curseforge.net/wow/starliberror-1-0/mainline/trunk
         tag: latest

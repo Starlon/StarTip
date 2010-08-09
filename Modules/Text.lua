@@ -5,8 +5,8 @@ assert(LibStub("StarLibEvaluator-1.0", true), "Text module requires StarLibEvalu
 local Evaluator = LibStub("StarLibEvaluator-1.0"):New()
 local LibProperty = LibStub("StarLibProperty-1.0", true)
 assert(LibProperty, "Text module requires StarLibProperty-1.0")
-local LibMarquee = LibStub("LibMarquee-1.0", true)
-assert(LibMarquee, "Text module requires LibMarquee-1.0")
+local LibMarquee = LibStub("StarLibMarquee-1.0", true)
+assert(LibMarquee, "Text module requires StarLibMarquee-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip

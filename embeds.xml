@@ -19,10 +19,11 @@
 <Script file = "Libs\LibDatabroker-1.1\LibDatabroker-1.1.lua"/>
 <Script file = "Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua"/>
 <Script file = "Libs\LibQtip-1.0\LibQtip-1.0.lua"/>
+<Script file = "Libs\StarLibError-1.0\StarLibError-1.0.lua"/>
 <Script file = "Libs\StarLibEvaluator-1.0\StarLibEvaluator-1.0.lua"/>
 <Script file = "Libs\StarLibProperty-1.0\StarLibProperty-1.0.lua"/>
 <Script file = "Libs\StarLibTimer-1.0\StarLibTimer-1.0.lua"/>
-<Script file = "Libs\LibMarquee-1.0\LibMarquee-1.0.lua"/>
+<Script file = "Libs\StarLibMarquee-1.0\StarLibMarquee-1.0.lua"/>
 <Script file = "Libs\StarLibLCD-1.0\StarLibLCD-1.0.lua"/>
 
 </Ui>
