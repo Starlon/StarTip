@@ -2,6 +2,7 @@ local mod = StarTip:NewModule("Text", "AceTimer-3.0", "AceEvent-3.0")
 mod.name = "Text"
 mod.toggled = true
 local Evaluator = LibStub("LibEvaluator-1.0"):New()
+local LibProperty = LibStub("LibProperty-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -425,11 +426,13 @@ function mod:MarqUpdate(line)
 	local str = ''
 	local update = 0
 	
-	update = update + StarTip:EvalCode(line.prefix)
-	update = update + StarTip:EvalCode(line.postfix)
-	update = update + StarTip:EvalCode(line.style)
+	update = update + line.prefixProp:Eval()
+	update = update + line.postfixProp:Eval()
+	update = update + line.styleProp:Eval()
 	
-	StarTip:EvalCode(line.left)
+	line.leftStyle:Eval()
+	
+	
 end
 
 local function makeMarquee(line, text)
@@ -447,6 +450,12 @@ function mod:CreateLines()
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
+			if not self.leftProperty then
+				self.leftProp = LibProperty:New(self, v.name .. " left", v.left)
+				self.rightProp = LibProperty:New(self, v.name .. " right", v.right)
+				self.prefixProp = LibProperty:New(self, v.name .. " prefix", v.prefix)
+				self.postfixProp = LibProperty:New(self, v.name .. " postfix", v.postfix)
+			end
 			if v.enabled and not v.deleted then
 				
                 local left, right, c

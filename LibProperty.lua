@@ -3,7 +3,7 @@ local MAJOR = "LibProperty-1.0"
 local MINOR = 1
 assert(LibStub, MAJOR.." requires LibStub") 
 local LibProperty = LibStub:NewLibrary(MAJOR, MINOR)
-local Evaluator = LibStub("LibEvaluator-1.0")
+local Evaluator = LibStub("LibEvaluator-1.0"):New()
 
 if not LibProperty or not Evaluator then return end
 
@@ -12,13 +12,14 @@ if not LibProperty.pool then
 	LibProperty.__index = LibProperty
 end
 
-function LibProperty:New(v, line, name, defval) 
+function LibProperty:New(v, expression, name, defval)
+	if not v or not line or not name then return end
 	self.visitor = v
 	self.is_valid = false
-	self.expression = line.left
+	self.expression = expression
 	
 	if self.expression ~= nil and type(expression) == "string" then
-		self.result = Evaluator(self.expression, defval)
+		self.result = Evaluator.ExecuteCode(v, self.expression, defval)
 		if self.result == nil then
 			StarTip:Print(("Property: %s in \"%s\""):format(self.result, self.expression))
 		end
@@ -54,7 +55,7 @@ function LibProperty:Eval()
 	
 	local old = self.result
 	
-	self.result = strlen(StarTip:ExecuteCode(self.expression)) and 1
+	self.result = strlen(Evaluator.ExecuteCode(self.visitor, self.expression)) and 1
 	
 	if old == result then
 		update = 0
