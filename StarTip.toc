@@ -27,3 +27,4 @@ Modules\Text.lua
 Modules\DeadlyAnnounce.lua
 Modules\Talents.lua
 
+
