@@ -48,3 +48,14 @@ externals:
     Libs/LibQtip-1.0:
         url: svn://svn.wowace.com/wow/libqtip-1-0/mainline/trunk
 		tag: latest
+	Libs/StarLibProperty-1.0:
+	    url: svn://svn.curseforge.net/wow/starlibproperty-1-0/mainline/trunk
+    Libs/StarLibTimer-1.0:
+        url: svn://svn.curseforge.net/wow/starlibtimer-1-0/mainline/trunk
+		tag: latest
+    LIbs/StarLibEvaluator-1.0:
+		url: svn://svn.curseforge.net/wow/starlibevaluator-1-0/mainline/trunk
+		tag: latest
+    Libs/LibMarquee-1.0:
+	    url: svn://svn.curseforge.net/wow/libmarquee-1-0/mainline/trunk
+        tag: latest
