@@ -339,7 +339,7 @@ return self.unitLocation
     },
 	[14] = {
 		name = "Marquee",
-		left = 'return "StarTip v1.4"',
+		left = 'return "StarTip " .. StarTip.version',
 		updating = true,
 		enabled = false,
 		marquee = true,

@@ -1,5 +1,5 @@
-﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0") 
-StarTip.__starref__ = true
+﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip: @project-version@", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0") 
+StarTip.version = GetAddOnMetadata("StarTip", "X-StarTip-Version")
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
@@ -284,7 +284,7 @@ StarTip:SetDefaultModuleState(false)
 function StarTip:OnInitialize()
 	
 	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
-
+	
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", options)
 	self:RegisterChatCommand("startip", "OpenConfig")
 	AceConfigDialog:AddToBlizOptions("StarTip")
@@ -297,6 +297,7 @@ function StarTip:OnInitialize()
 		self.leftLines[i] = _G["GameTooltipTextLeft" .. i]
 		self.rightLines[i] = _G["GameTooltipTextRight" .. i]
 	end
+	
 	GameTooltip:Show()
 	GameTooltip:Hide()
 	
@@ -421,7 +422,7 @@ end
 function StarTip:HideAll()
 	for k, v in StarTip:IterateModules() do
 		if v.OnHide then
-			--v:OnHide()
+			v:OnHide()
 		end
 	end
 end
