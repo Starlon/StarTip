@@ -166,8 +166,8 @@ function mod:OnEnable()
 		StarTip:SecureHook(BigWigs, "NewBoss", NewBoss)
 	end
 	
-	tinsert(history, {text = "Test", time = GetTime() - 5})
-	tinsert(history, {text = "Fobar", time = GetTime()})
+	--tinsert(history, {text = "Test", time = GetTime() - 5})
+	--tinsert(history, {text = "Fobar", time = GetTime()})
 end
 
 function mod:OnDisable()
