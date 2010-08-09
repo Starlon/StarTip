@@ -422,19 +422,6 @@ function mod:UPDATE_FACTION()
 end
 
 
-function mod:MarqUpdate(line)
-	local str = ''
-	local update = 0
-	
-	update = update + line.prefixProp:Eval()
-	update = update + line.postfixProp:Eval()
-	update = update + line.styleProp:Eval()
-	
-	line.leftStyle:Eval()
-	
-	
-end
-
 local function makeMarquee(line, text)
 	
 	return text
