@@ -442,10 +442,11 @@ function mod:CreateLines()
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
 			if not self.leftProperty then
-				--self.leftProp = LibProperty:New(self, v.name .. " left", v.left)
-				--self.rightProp = LibProperty:New(self, v.name .. " right", v.right)
-				--self.prefixProp = LibProperty:New(self, v.name .. " prefix", v.prefix)
-				--self.postfixProp = LibProperty:New(self, v.name .. " postfix", v.postfix)
+				--[[self.leftProp = LibProperty:New(mod, v.name .. " left", v.left)
+				self.rightProp = LibProperty:New(mod, v.name .. " right", v.right)
+				self.prefixProp = LibProperty:New(mod, v.name .. " prefix", v.prefix)
+				self.postfixProp = LibProperty:New(mod, v.name .. " postfix", v.postfix)
+				]]
 			end
 			if v.enabled and not v.deleted then
 				
@@ -490,6 +491,10 @@ function mod:CreateLines()
 			
 			if v.marquee and not v.marqueeObj then
 				v.string = v.left
+				if v.marqueeObj then
+					v.marqueeObj:Stop() -- just to be double sure
+					v.marqueeObj:Del()
+				end
 				v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v)
 				v.marqueeObj:Start()
 			end
