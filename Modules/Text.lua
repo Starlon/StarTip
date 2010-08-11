@@ -456,7 +456,9 @@ function mod:CreateLines()
 			end
 			if v.enabled and not v.deleted then
 				
-                local left, right, c
+                local left, right, c = '', ''
+				
+				
                 if v.right then 
                     right, c = Evaluator.ExecuteCode(mod, v.name, v.right)
                     left, cc = Evaluator.ExecuteCode(mod, v.name, v.left)
@@ -464,7 +466,7 @@ function mod:CreateLines()
                     right = ''
                     left, c = Evaluator.ExecuteCode(mod, v.name, v.left)
                 end
-												
+				
                 if left and right then 
                     lineNum = lineNum + 1
                     if v.right then
@@ -488,9 +490,8 @@ function mod:CreateLines()
 				StarTip.del(c)
 				StarTip.del(cc)
 			end
-			local tmp = v.marquee
-			if v.marquee then
-				local tmp = mod.leftLines[lineNum]:GetText()
+
+			if v.marquee and v.lastLine ~= lineNum then				
 				GameTooltip:AddLine(' ', 1, 1, 1)
 				lineNum = lineNum + 1
 				v.string = v.left
@@ -498,11 +499,11 @@ function mod:CreateLines()
 					v.marqueeObj:Stop() -- just to be double sure
 					v.marqueeObj:Del()
 				end
-				v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v, StarTip.db.profile.errorLevel)
+				if not v.marqueeObj then
+					v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v, StarTip.db.profile.errorLevel)
+				end				
 				v.marqueeObj:Start()
 				v.lastLine = lineNum
-				mod.leftLines[lineNum]:SetText(tmp)
-				
 			end
         end
         self.NUM_LINES = lineNum
@@ -528,7 +529,6 @@ function mod:OnHide()
 	for i, v in ipairs(lines) do
 		if v.marqueeObj then
 			v.marqueeObj:Stop()
-			v.marqueeObj = nil
 		end
 	end
 end
