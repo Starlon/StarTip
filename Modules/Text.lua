@@ -497,7 +497,6 @@ function mod:CreateLines()
 				v.string = v.left
 				if v.marqueeObj then
 					v.marqueeObj:Stop() -- just to be double sure
-					v.marqueeObj:Del()
 				end
 				if not v.marqueeObj then
 					v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v, StarTip.db.profile.errorLevel)
@@ -529,6 +528,7 @@ function mod:OnHide()
 	for i, v in ipairs(lines) do
 		if v.marqueeObj then
 			v.marqueeObj:Stop()
+			v.marqueeObj = nil
 		end
 	end
 end
