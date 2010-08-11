@@ -4,6 +4,7 @@ local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local ipairs, pairs = _G.ipairs, _G.pairs
@@ -174,16 +175,11 @@ local options = {
 	}
 }
 
+local new, newDict, del
 do
 	local pool = setmetatable({},{__mode='k'})
-	local tst = {}
-	function StarTip.new(...)
+	function StarTip.new(self, ...)
 		local t = next(pool)
-		if select(1, ...) == StarTip then
-			StarTip:Print("Warning: Passing self parameter to new.")
-			if not t then t = {} end
-			return t
-		end
 		if t then
 			pool[t] = nil
 			for i=1, select("#", ...) do
@@ -193,13 +189,11 @@ do
 			t = {...}
 		end
 		t.__starref__ = true
+		
 		return t
 	end
 	function StarTip.newDict(...)
 		local test
-		if select(1, ...) == StarTip then
-			test = true
-		end
 		local t = next(pool)
 		if t then
 			pool[t] = nil
@@ -215,10 +209,6 @@ do
 	function StarTip.del(...)
 		local t = select(1, ...)
 		local test
-		if t == StarTip then
-			test = true
-			t = select(2, ...)
-		end
 		if type(t) ~= "table" or not t.__starref__ then return end
 		for i=(test and 2 or 1), select("#", ...) do
 			local t = select(i, ...)
@@ -229,6 +219,10 @@ do
 				end
 				pool[k] = true
 			end
+		end
+		local count = 0
+		for k, v in pairs(t) do
+			t[k] = nil
 		end
 		t.__starref__ = nil
 		pool[t] = true			
@@ -272,7 +266,6 @@ function StarTip:OnInitialize()
 	
 	GameTooltip:Show()
 	GameTooltip:Hide()
-	
 end
 
 function StarTip:OnEnable()

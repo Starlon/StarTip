@@ -106,7 +106,7 @@ local function updateLines()
         if v.updating and v.right and self.db.profile[v.db] then
             local left = StarTip.ExecuteCode(mod, v.name, v.left)
             local right, c = StarTip.ExecuteCode(mod, v.name, v.right)
-			StarTip:del(c)
+			StarTip.del(c)
             if left and right then
                 for i = 1, self.NUM_LINES do
                     if mod.leftLines[i]:GetText() == left then
@@ -150,7 +150,7 @@ local c
 if self.UnitIsPlayer("mouseover") then
     c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
 else
-    c = StarTip.new()
+    c = self:new()
     c.r, c.g, c.b = self.UnitSelectionColor("mouseover")
 end
 return self.unitName, c
@@ -169,13 +169,13 @@ if self.UnitExists("mouseovertarget") then
     if self.UnitIsPlayer("mouseovertarget") then
         c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseovertarget"))]
     else
-        c = StarTip.new()
+        c = self:new()
         c.r, c.g, c.b = self.UnitSelectionColor("mouseovertarget")
     end
     local name = self.UnitName("mouseovertarget")
     return name, c
 else
-    return "None", StarTip.newDict("r", 1, "g", 1, "b", 1)
+    return "None", self:newDict("r", 1, "g", 1, "b", 1)
 end
 ]],
         updating = true,
@@ -213,7 +213,7 @@ return select(2, self.UnitName("mouseover"))
         name = "Level",
         left = 'return "Level:"',
         right = [[
-local classifications = StarTip.newDict(
+local classifications = self:newDict(
     "worldboss", "Boss",
     "rareelite", "+ Rare",
     "elite", "+",
@@ -230,7 +230,7 @@ if classifications[class] then
     lvl = lvl .. classifications[class]
 end
 
-StarTip:del(classifications)
+self.del(classifications)
 
 return lvl
 ]],
@@ -345,7 +345,7 @@ return self.unitLocation
     },
 	[14] = {
 		name = "Marquee",
-		left = 'return "StarTip " .. StarTip.version',
+		left = 'return "StarTip " .. self._G.StarTip.version',
 		updating = true,
 		enabled = false,
 		marquee = true,
@@ -394,6 +394,10 @@ function mod:OnInitialize()
 		end
 		self.db.profile.empty = false
 	end]]
+	
+	self.new = StarTip.new
+	self.newDict = StarTip.newDict
+	self.del = StarTip.del
 	
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
@@ -485,9 +489,8 @@ function mod:CreateLines()
 				StarTip.del(cc)
 			end
 			local tmp = v.marquee
-			
-			if v.marquee and false then
-				local tmp = mod.leftLines[lineNum]
+			if v.marquee then
+				local tmp = mod.leftLines[lineNum]:GetText()
 				GameTooltip:AddLine(' ', 1, 1, 1)
 				lineNum = lineNum + 1
 				v.string = v.left
@@ -497,10 +500,10 @@ function mod:CreateLines()
 				end
 				v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v, StarTip.db.profile.errorLevel)
 				v.marqueeObj:Start()
-				mod.leftLines[lineNum] = tmp
+				v.lastLine = lineNum
+				mod.leftLines[lineNum]:SetText(tmp)
 				
 			end
-			
         end
         self.NUM_LINES = lineNum
 
