@@ -437,7 +437,6 @@ function mod:CreateLines()
         llines[i] = v
     end
     lines = setmetatable(llines, {__call=function(self)
-		
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
@@ -487,7 +486,8 @@ function mod:CreateLines()
 			end
 			local tmp = v.marquee
 			
-			if v.marquee then
+			if v.marquee and false then
+				local tmp = mod.leftLines[lineNum]
 				GameTooltip:AddLine(' ', 1, 1, 1)
 				lineNum = lineNum + 1
 				v.string = v.left
@@ -497,6 +497,7 @@ function mod:CreateLines()
 				end
 				v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v, StarTip.db.profile.errorLevel)
 				v.marqueeObj:Start()
+				mod.leftLines[lineNum] = tmp
 				
 			end
 			

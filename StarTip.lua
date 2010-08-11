@@ -75,7 +75,7 @@ local defaults = {
 		objectShow = 1,
 		unitFrameShow = 1,
 		otherFrameShow = 1,
-		errorLevel = 1
+		errorLevel = 2
 	}
 }
 			
@@ -164,7 +164,7 @@ local options = {
 					name = "Error Level",
 					desc = "StarTip's error level",
 					type = "select",
-					values = {"Quiet", "Normal", "Verbose"},
+					values = LibStub("StarLibError-1.0").defaultTexts,
 					get = function() return StarTip.db.profile.errorLevel end,
 					set = function(info, v) StarTip.db.profile.errorLevel = v end,
 					order = 11
@@ -176,7 +176,7 @@ local options = {
 
 do
 	local pool = setmetatable({},{__mode='k'})
-	
+	local tst = {}
 	function StarTip.new(...)
 		local t = next(pool)
 		if select(1, ...) == StarTip then
