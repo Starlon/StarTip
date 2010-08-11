@@ -140,6 +140,18 @@ do
 end
 ]]
 
+function copy(t)
+	local tmp = StarTip.new()
+	for k, v in pairs(t) do
+		if type(v) == "table" then
+			v = copy(v)
+		end	
+		tmp[k] = v
+	end
+	
+	return tmp
+end
+
 local defaults = {profile={titles=true, empty = true, lines = {}}}
 
 local defaultLines={
@@ -438,7 +450,7 @@ end
 function mod:CreateLines()
     local llines = {}
     for i, v in ipairs(self.db.profile.lines) do
-        llines[i] = v
+        llines[i] = copy(v)
     end
     lines = setmetatable(llines, {__call=function(self)
         local lineNum = 0
