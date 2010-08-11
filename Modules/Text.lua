@@ -441,11 +441,14 @@ function mod:CreateLines()
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
-			if not self.leftProperty then
-				--[[self.leftProp = LibProperty:New(mod, v.name .. " left", v.left)
-				self.rightProp = LibProperty:New(mod, v.name .. " right", v.right)
-				self.prefixProp = LibProperty:New(mod, v.name .. " prefix", v.prefix)
-				self.postfixProp = LibProperty:New(mod, v.name .. " postfix", v.postfix)
+			if not v.leftProp then
+			--[[
+				v.leftProp = LibProperty:New(mod, v.name .. " left", v.left, "", StarTip.db.profile.errorLevel)
+				v.rightProp = LibProperty:New(mod, v.name .. " right", v.right, "", StarTip.db.profile.errorLevel)
+				v.prefixProp = LibProperty:New(mod, v.name .. " prefix", v.prefix, "", StarTip.db.profile.errorLevel)
+				v.postfixProp = LibProperty:New(mod, v.name .. " postfix", v.postfix, "", StarTip.db.profile.errorLevel)
+				v.leftProp:Eval()
+				StarTip:Print(v.leftProp:P2S())
 				]]
 			end
 			if v.enabled and not v.deleted then
@@ -458,12 +461,7 @@ function mod:CreateLines()
                     right = ''
                     left, c = Evaluator.ExecuteCode(mod, v.name, v.left)
                 end
-								
-				if v.marquee and v.width and left then
-					left = makeMarquee(v, left)
-					right = ''
-				end
-				
+												
                 if left and right then 
                     lineNum = lineNum + 1
                     if v.right then
@@ -489,14 +487,17 @@ function mod:CreateLines()
 			end
 			local tmp = v.marquee
 			
-			if v.marquee and not v.marqueeObj then
+			if v.marquee then
+				GameTooltip:AddLine(' ', 1, 1, 1)
+				lineNum = lineNum + 1
 				v.string = v.left
 				if v.marqueeObj then
 					v.marqueeObj:Stop() -- just to be double sure
 					v.marqueeObj:Del()
 				end
-				v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v)
+				v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v, StarTip.db.profile.errorLevel)
 				v.marqueeObj:Start()
+				
 			end
 			
         end

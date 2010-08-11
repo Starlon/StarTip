@@ -74,7 +74,8 @@ local defaults = {
 		unitShow = 1,
 		objectShow = 1,
 		unitFrameShow = 1,
-		otherFrameShow = 1
+		otherFrameShow = 1,
+		errorLevel = 1
 	}
 }
 			
@@ -159,6 +160,15 @@ local options = {
 					set = function(info, v) StarTip.db.profile.otherFrameShow = v end,
 					order = 10				
 				},
+				errorLevel = {
+					name = "Error Level",
+					desc = "StarTip's error level",
+					type = "select",
+					values = {"Quiet", "Normal", "Verbose"},
+					get = function() return StarTip.db.profile.errorLevel end,
+					set = function(info, v) StarTip.db.profile.errorLevel = v end,
+					order = 11
+				}
 			}
 		}
 	}
