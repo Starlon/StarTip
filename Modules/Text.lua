@@ -262,7 +262,7 @@ if classifications[class] then
     lvl = lvl .. classifications[class]
 end
 
---self.del(classifications)
+self.del(classifications)
 
 return lvl
 ]],
@@ -518,7 +518,7 @@ function mod:CreateLines()
 				StarTip.del(cc)
 			end
 
-			if v.marquee and v.lastLine ~= lineNum then				
+			if v.marquee and v.lastLine ~= lineNum and v.enabled then				
 				GameTooltip:AddLine(' ', 1, 1, 1)
 				lineNum = lineNum + 1
 				v.string = v.left

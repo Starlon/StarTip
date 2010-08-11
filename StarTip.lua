@@ -215,7 +215,7 @@ do
 			if (t and type(t) ~= table) or t == nil then break end
 			for k, v in pairs(t) do
 				if type(k) == "table" then
-					StarTip:del(k)
+					StarTip.del(k)
 				end
 				pool[k] = true
 			end
@@ -225,7 +225,9 @@ do
 			t[k] = nil
 		end
 		t.__starref__ = nil
-		pool[t] = true			
+		pool[t] = true		
+		t = nil
+		
 	end
 end
 
