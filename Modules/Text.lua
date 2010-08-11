@@ -18,31 +18,35 @@ local select = _G.select
 local format = _G.format
 local floor = _G.floor
 local tostring = _G.tostring
-mod._G = _G
-mod.UnitExists = _G.UnitExists
-mod.UnitIsPlayer = _G.UnitIsPlayer
-mod.UnitBuff = _G.UnitBuff
-mod.GetSpellInfo = _G.GetSpellInfo
-mod.UnitIsConnected = _G.UnitIsConnected
-mod.UnitIsFeignDeath = _G.UnitIsFeignDeath
-mod.UnitIsGhost = _G.UnitIsGhost
-mod.UnitIsDead = _G.UnitIsDead
-mod.UnitLevel = _G.UnitLevel
-mod.UnitClassification = _G.UnitClassification
-mod.UnitSelectionColor = _G.UnitSelectionColor
-mod.UnitRace = _G.UnitRace
-mod.GetGuildInfo = _G.GetGuildInfo
-mod.UnitName = _G.UnitName
-mod.UnitClass = _G.UnitClass
-mod.UnitHealth = _G.UnitHealth
-mod.UnitHealthMax = _G.UnitHealthMax
-mod.UnitMana = _G.UnitMana
-mod.UnitManaMax = _G.UnitManaMax
-mod.UnitFactionGroup = _G.UnitFactionGroup
-mod.UnitCreatureFamily = _G.UnitCreatureFamily
-mod.UnitCreatureType = _G.UnitCreatureType
-mod.UnitIsUnit = _G.UnitIsUnit
-mod.RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
+local environment = {}
+environment.new = StarTip.new
+environment.newDict = StarTip.newDict
+environment.del = StarTip.del
+environment._G = _G
+environment.UnitExists = _G.UnitExists
+environment.UnitIsPlayer = _G.UnitIsPlayer
+environment.UnitBuff = _G.UnitBuff
+environment.GetSpellInfo = _G.GetSpellInfo
+environment.UnitIsConnected = _G.UnitIsConnected
+environment.UnitIsFeignDeath = _G.UnitIsFeignDeath
+environment.UnitIsGhost = _G.UnitIsGhost
+environment.UnitIsDead = _G.UnitIsDead
+environment.UnitLevel = _G.UnitLevel
+environment.UnitClassification = _G.UnitClassification
+environment.UnitSelectionColor = _G.UnitSelectionColor
+environment.UnitRace = _G.UnitRace
+environment.GetGuildInfo = _G.GetGuildInfo
+environment.UnitName = _G.UnitName
+environment.UnitClass = _G.UnitClass
+environment.UnitHealth = _G.UnitHealth
+environment.UnitHealthMax = _G.UnitHealthMax
+environment.UnitMana = _G.UnitMana
+environment.UnitManaMax = _G.UnitManaMax
+environment.UnitFactionGroup = _G.UnitFactionGroup
+environment.UnitCreatureFamily = _G.UnitCreatureFamily
+environment.UnitCreatureType = _G.UnitCreatureType
+environment.UnitIsUnit = _G.UnitIsUnit
+environment.RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local timer
 local factionList = {}
@@ -65,7 +69,7 @@ local ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALI
 local SCROLL_RIGHT, SCROLL_LEFT = 1, 2
 
 -- Thanks to ckknight for this
-mod.short = function(value)
+environment.short = function(value)
     if value >= 10000000 or value <= -10000000 then
         value = ("%.1fm"):format(value / 1000000)
     elseif value >= 1000000 or value <= -1000000 then
@@ -80,13 +84,13 @@ mod.short = function(value)
     return value
 end
 
-mod.powers = {
+environment.powers = {
     ["WARRIOR"] = "Rage:",
     ["ROGUE"] = "Energy:",
 	["DEATHKNIGHT"] = "Rune Power:"
 }
 
-mod.unitHasAura = function(aura)
+environment.unitHasAura = function(aura)
     local i = 1
     while true do
         local buff = UnitBuff("mouseover", i, true)
@@ -104,19 +108,23 @@ local function updateLines()
     end
     for _, v in ipairs(lines) do
         if v.updating and v.right and self.db.profile[v.db] then
-            local left = StarTip.ExecuteCode(mod, v.name, v.left)
-            local right, c = StarTip.ExecuteCode(mod, v.name, v.right)
-			StarTip.del(c)
+            local left, c = StarTip.ExecuteCode(environment, v.name, v.left)
+            local right, cc = StarTip.ExecuteCode(environment, v.name, v.right)
             if left and right then
                 for i = 1, self.NUM_LINES do
                     if mod.leftLines[i]:GetText() == left then
                         mod.rightLines[i]:SetText(right)
-                        if type(c) == "table" and c.r then
-                            mod.rightLines[i]:SetVertexColor(c.r, c.g, c.b)
+                        if type(cc) == "table" and cc.r then
+                            mod.rightLines[i]:SetVertexColor(cc.r, cc.g, cc.b)
                         end
+						if type(c) == "table" and c.r then
+							mod.leftLines[i]:SetVertexColor(c.r, c.g, c.b)
+						end
                     end
-                end
+                end				
             end
+			StarTip.del(c)
+			StarTip.del(cc)			
         end
     end
 end
@@ -152,6 +160,7 @@ function copy(t)
 	return tmp
 end
 
+--[[
 function del(t)
 	for k, v in pairs(t) do
 		if type(v) == "table" then
@@ -161,6 +170,7 @@ function del(t)
 		StarTip.del(t)
 	end
 end
+]]
 
 local defaults = {profile={titles=true, empty = true, lines = {}}}
 
@@ -252,7 +262,7 @@ if classifications[class] then
     lvl = lvl .. classifications[class]
 end
 
-self.del(classifications)
+--self.del(classifications)
 
 return lvl
 ]],
@@ -415,11 +425,7 @@ function mod:OnInitialize()
 		end
 		self.db.profile.empty = false
 	end]]
-	
-	self.new = StarTip.new
-	self.newDict = StarTip.newDict
-	self.del = StarTip.del
-	
+		
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
@@ -481,11 +487,11 @@ function mod:CreateLines()
 				
 				
                 if v.right then 
-                    right, c = Evaluator.ExecuteCode(mod, v.name, v.right)
-                    left, cc = Evaluator.ExecuteCode(mod, v.name, v.left)
+                    right, c = Evaluator.ExecuteCode(environment, v.name, v.right)
+                    left, cc = Evaluator.ExecuteCode(environment, v.name, v.left)
                 else 
                     right = ''
-                    left, c = Evaluator.ExecuteCode(mod, v.name, v.left)
+                    left, c = Evaluator.ExecuteCode(environment, v.name, v.left)
                 end
 				
                 if left and right then 
@@ -520,7 +526,7 @@ function mod:CreateLines()
 					v.marqueeObj:Stop() -- just to be double sure
 				end
 				if not v.marqueeObj then
-					v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], mod, v, StarTip.db.profile.errorLevel)
+					v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], environment, v, StarTip.db.profile.errorLevel)
 				end				
 				v.marqueeObj:Start()
 				v.lastLine = lineNum
@@ -605,7 +611,7 @@ function mod:RebuildOpts()
                     get = function() return v.left end,
                     set = function(info, val) v.left = val; v.leftDirty = true end,
                     validate = function()
-						local ret, err = StarTip:ExecuteCode("validate", v.left)
+						local ret, err = StarTip.ExecuteCode(environment, "validate", v.left)
 						
 						if not ret then
 							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
@@ -628,7 +634,7 @@ function mod:RebuildOpts()
                     get = function() return v.right end,
                     set = function(info, val) v.right = val; v.rightDirty = true end,
                     validate = function()
-						local ret, err = StarTip:ExecuteCode("validate", v.right)
+						local ret, err = StarTip.ExecuteCode(environment, "validate", v.right)
 						
 						if not ret then
 							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
