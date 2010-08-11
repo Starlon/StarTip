@@ -152,6 +152,16 @@ function copy(t)
 	return tmp
 end
 
+function del(t)
+	for k, v in pairs(t) do
+		if type(v) == "table" then
+			del(v)
+		end
+		t[k] = nil
+		StarTip.del(t)
+	end
+end
+
 local defaults = {profile={titles=true, empty = true, lines = {}}}
 
 local defaultLines={
@@ -367,8 +377,7 @@ return self.unitLocation
 		bold = true,
 		align = 'M',
 		update = 1000,
-		scroll = 1,
-		speed = 500,
+		speed = 100,
 		direction = DIRECTION_LEFT		
 	}
 }
