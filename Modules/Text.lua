@@ -517,10 +517,10 @@ function mod:CreateLines()
 				StarTip.del(c)
 				StarTip.del(cc)
 			end
-
+--[[
 			if v.marquee and v.lastLine ~= lineNum and v.enabled then				
-				GameTooltip:AddLine(' ', 1, 1, 1)
-				lineNum = lineNum + 1
+				--GameTooltip:AddLine(' ', 1, 1, 1)
+				--lineNum = lineNum + 1
 				v.string = v.left
 				if v.marqueeObj then
 					v.marqueeObj:Stop() -- just to be double sure
@@ -531,6 +531,7 @@ function mod:CreateLines()
 				v.marqueeObj:Start()
 				v.lastLine = lineNum
 			end
+]]
         end
         self.NUM_LINES = lineNum
 
@@ -798,9 +799,9 @@ local ff = CreateFrame("Frame")
 function mod:SetUnit()        
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
     
-    self.unitName = getName()
-    self.unitLocation = getLocation()
-    self.unitGuild = getGuild()
+    environment.unitName = getName()
+    environment.unitLocation = getLocation()
+    environment.unitGuild = getGuild()
     
     -- Taken from CowTip
     local lastLine = 2
