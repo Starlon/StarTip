@@ -48,20 +48,5 @@ externals:
     Libs/LibQtip-1.0:
         url: svn://svn.wowace.com/wow/libqtip-1-0/mainline/trunk
 		tag: latest
-	Libs/StarLibProperty-1.0:
-	    url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk/StarLibProperty-1.0
-    Libs/StarLibTimer-1.0:
-        url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk/StarLibTimer-1.0
-		tag: latest
-    LIbs/StarLibEvaluator-1.0:
-		url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk/StarLibEvaluator-1.0
-		tag: latest
-    Libs/StarLibMarquee-1.0:
-	    url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk/StarLibMarquee-1.0
-        tag: latest
-    Libs/StarLibLCD-1.0:
-        url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk/StarLibLCD-1.0
-        tag: latest
-    Libs/StarLibError-1.0:
-        url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk/StarLibError-1.0
-        tag: latest
+	Libs/StarLibs-1.0:
+	    url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk

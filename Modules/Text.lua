@@ -1,3 +1,4 @@
+do return end
 local mod = StarTip:NewModule("Text", "AceTimer-3.0", "AceEvent-3.0")
 mod.name = "Text"
 mod.toggled = true
@@ -5,8 +6,8 @@ assert(LibStub("StarLibEvaluator-1.0", true), "Text module requires StarLibEvalu
 local Evaluator = LibStub("StarLibEvaluator-1.0"):New()
 local LibProperty = LibStub("StarLibProperty-1.0", true)
 assert(LibProperty, "Text module requires StarLibProperty-1.0")
-local LibMarquee = LibStub("StarLibMarquee-1.0", true)
-assert(LibMarquee, "Text module requires StarLibMarquee-1.0")
+local WidgetText = LibStub("StarLibWidgetText-1.0", true)
+assert(WidgetText, "Text module requires StarLibWidgetText-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -526,7 +527,7 @@ function mod:CreateLines()
 					v.marqueeObj:Stop() -- just to be double sure
 				end
 				if not v.marqueeObj then
-					v.marqueeObj = LibMarquee:New(mod.leftLines[lineNum], environment, v, StarTip.db.profile.errorLevel)
+					v.marqueeObj = WidgetText:New(mod.leftLines[lineNum], environment, v, StarTip.db.profile.errorLevel)
 				end				
 				v.marqueeObj:Start()
 				v.lastLine = lineNum
