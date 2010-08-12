@@ -13,7 +13,10 @@
 
 Localization\enUS.lua
 
-Libs\StarLibs-1.0\StarLibs-1.0.lua
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+
+Libs\StarLibs-1.0\StarLibs-1.0.xml
 
 embeds.xml
 

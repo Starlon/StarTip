@@ -1,4 +1,3 @@
-do return end
 local mod = StarTip:NewModule("Text", "AceTimer-3.0", "AceEvent-3.0")
 mod.name = "Text"
 mod.toggled = true
