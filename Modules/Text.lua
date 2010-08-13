@@ -392,6 +392,21 @@ return self.unitLocation
 		update = 1000,
 		speed = 100,
 		direction = DIRECTION_LEFT		
+	},
+	[15] = {
+		name = "Range",
+		left = [[
+local min, max = RangeCheck:GetRange("mouseover")
+if not min then
+    return "No range info"
+elseif not max then
+    return "Target is over " .. min .. " yards"
+else
+    return "Between " .. min .. " and " .. max .. " yards"
+end
+]],
+		updating = true,
+		enabled = true
 	}
 }
 
@@ -488,7 +503,7 @@ function mod:CreateLines()
 				StarTip:Print(v.leftProp:P2S())
 				]]
 			end
-			if v.enabled and not v.deleted then
+			if v.enabled then
 				
                 local left, right, c = '', ''
 				
@@ -660,8 +675,9 @@ function mod:RebuildOpts()
 							v.error = true
 							return false
 						end
-						
+						v.left = str
 						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret or ""))
+						self:CreateLines()
 						return true
 					
 					end,
@@ -676,15 +692,19 @@ function mod:RebuildOpts()
                     get = function() return v.right end,
                     set = function(info, val) v.right = val; v.rightDirty = true end,
                     validate = function(info, str)
-						local ret, err = mod.evaluator.ExecuteCode(environment, "validate", str or "")
+						if str == "" then str = "return ''" end
+						
+						local ret, err = mod.evaluator.ExecuteCode(environment, "validate", str)
 						
 						if not ret then
 							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
 							return false
 						end
 						
+						v.right = str
 						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret or ""))
-					return true
+						self:CreateLines()
+					    return true
 					
 					end,
                     multiline = true,
