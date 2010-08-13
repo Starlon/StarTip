@@ -716,7 +716,10 @@ function mod:RebuildOpts()
                     desc = "Whether this line refreshes while hovering over unit.",
                     type = "toggle",
                     get = function() return v.updating end,
-                    set = function(info, val) v.updating = val end,
+                    set = function(info, val) 
+						v.updating = val 
+						self:CreateLines()
+					end,
                     order = 3
                 },
                 up = {
@@ -775,6 +778,7 @@ function mod:RebuildOpts()
 					get = function() return self.db.profile.lines[i].enabled end,
 					set = function(info, v)
 						self.db.profile.lines[i].enabled = v
+						self:CreateLines()
 					end,
 					order = 7
 				},
