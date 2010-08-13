@@ -516,7 +516,7 @@ function mod:CreateLines()
                     left, c = mod.evaluator.ExecuteCode(environment, v.name, v.left)
                 end
 				
-                if left and right then 
+                if left and right and not v.deleted then 
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ', 1, 1, 1, 1, 1, 1)
