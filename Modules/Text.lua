@@ -512,26 +512,40 @@ function mod:CreateLines()
                         if type(c) == "table" and c.r then
                             mod.leftLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
                         end
+						if v.marquee then
+							v.string = v.left
+							if v.marqueeObj then
+								v.marqueeObj:Stop()
+								v.marqueeObj:Del()
+								v.marqueeObj = nil
+							end
+							v.marqueeObj = WidgetText:New(self, v.name, v, 0, 0, 0, mod.leftLines[lineNum], environment, StarTip.db.profile.errorLevel) 
+							v.marqueeObj:Start()
+							v.lastLine = lineNum
+						end
                     end
                 end
 				StarTip.del(c)
 				StarTip.del(cc)
 			end
---[[
-			if v.marquee and v.lastLine ~= lineNum and v.enabled then				
+
+--[[			if v.marquee and v.enabled then				
 				--GameTooltip:AddLine(' ', 1, 1, 1)
 				--lineNum = lineNum + 1
 				v.string = v.left
 				if v.marqueeObj then
 					v.marqueeObj:Stop() -- just to be double sure
+					v.marqueeObj:Del()
+					v.marqueeObj = nil
 				end
 				if not v.marqueeObj then
-					v.marqueeObj = WidgetText:New(mod.leftLines[lineNum], environment, v, StarTip.db.profile.errorLevel)
+					
+					v.marqueeObj = WidgetText:New(self, v.name, v, 0, 0, 0, mod.leftLines[lineNum], environment, StarTip.db.profile.errorLevel) 
 				end				
 				v.marqueeObj:Start()
 				v.lastLine = lineNum
 			end
-]]
+--]]
         end
         self.NUM_LINES = lineNum
 
