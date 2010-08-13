@@ -2,11 +2,14 @@ local mod = StarTip:NewModule("Text", "AceTimer-3.0", "AceEvent-3.0")
 mod.name = "Text"
 mod.toggled = true
 assert(LibStub("StarLibEvaluator-1.0", true), "Text module requires StarLibEvaluator-1.0")
-local Evaluator = LibStub("StarLibEvaluator-1.0"):New()
 local LibProperty = LibStub("StarLibProperty-1.0", true)
 assert(LibProperty, "Text module requires StarLibProperty-1.0")
 local WidgetText = LibStub("StarLibWidgetText-1.0", true)
 assert(WidgetText, "Text module requires StarLibWidgetText-1.0")
+local LCDText = LibStub("StarLibLCDText-1.0", true)
+assert(LCDText, mod.name .. " requires StarLibLCDText-1.0")
+local LibCore = LibStub("StarLibCore-1.0", true)
+assert(LibCore, mod.name .. " requires StarLibCore-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -431,6 +434,10 @@ function mod:OnInitialize()
     self:RegisterEvent("UPDATE_FACTION")
 	self:RegisterEvent("PLAYER_LOGIN")
     StarTip:SetOptionsDisabled(options, true)
+	
+	self.core = LibCore:New(mod, environment, name, config, "ModuleText", lcd, StarTip.db.profile.errorLevel)
+	self.evaluator = LibStub("StarLibEvaluator-1.0"):New(environment, StarTip.db.profile.errorLevel)
+	
 end
 
 function mod:OnEnable()
@@ -487,11 +494,11 @@ function mod:CreateLines()
 				
 				
                 if v.right then 
-                    right, c = Evaluator.ExecuteCode(environment, v.name, v.right)
-                    left, cc = Evaluator.ExecuteCode(environment, v.name, v.left)
+                    right, c = mod.evaluator.ExecuteCode(environment, v.name, v.right)
+                    left, cc = mod.evaluator.ExecuteCode(environment, v.name, v.left)
                 else 
                     right = ''
-                    left, c = Evaluator.ExecuteCode(environment, v.name, v.left)
+                    left, c = mod.evaluator.ExecuteCode(environment, v.name, v.left)
                 end
 				
                 if left and right then 
@@ -514,12 +521,19 @@ function mod:CreateLines()
                         end
 						if v.marquee then
 							v.string = v.left
+							if v.marqueeObj and v.marqueeObj.visitor and v.marqueeObj.visitor.lcd then
+								v.marqueeObj.visitor.lcd:Del()
+								v.marqueeObj.vistior.lcd = nil
+							end
+							
 							if v.marqueeObj then
 								v.marqueeObj:Stop()
 								v.marqueeObj:Del()
 								v.marqueeObj = nil
 							end
-							v.marqueeObj = WidgetText:New(self, v.name, v, 0, 0, 0, mod.leftLines[lineNum], environment, StarTip.db.profile.errorLevel) 
+							--(visitor, name, config, row, col, layer, fontString, env, errorLevel, callback, data) 
+							v.marqueeObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, mod.leftLines[lineNum], environment, StarTip.db.profile.errorLevel) 
+							v.marqueeObj.visitor.lcd = LCDText:New(mod.core, 1, v.width, 0, 0, 0, 0)							
 							v.marqueeObj:Start()
 							v.lastLine = lineNum
 						end
