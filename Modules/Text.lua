@@ -596,6 +596,17 @@ function mod:PLAYER_LOGIN()
 	mod:CreateLines()
 end
 
+local function copy(t)
+	local new = {}
+	for k, v in pairs(t) do
+		if type(t) == "table" then
+			new[k] = copy(t)
+		else
+			name[k] = v
+		end
+	end
+end
+
 function mod:RebuildOpts()
     options = {
 		add = {
@@ -639,8 +650,10 @@ function mod:RebuildOpts()
                     desc = "Left text code",
                     get = function() return v.left end,
                     set = function(info, val) v.left = val; v.leftDirty = true end,
-                    validate = function()
-						local ret, err = StarTip.ExecuteCode(environment, "validate", v.left)
+                    validate = function(info, str)	
+						StarTip:Print("Validate " .. str)
+						
+						local ret, err = mod.evaluator.ExecuteCode(environment, "validate", str)
 						
 						if not ret then
 							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
@@ -649,7 +662,7 @@ function mod:RebuildOpts()
 						end
 						
 						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret or ""))
-					return true
+						return true
 					
 					end,
                     multiline = true,
@@ -662,8 +675,8 @@ function mod:RebuildOpts()
                     desc = "Right text code",
                     get = function() return v.right end,
                     set = function(info, val) v.right = val; v.rightDirty = true end,
-                    validate = function()
-						local ret, err = StarTip.ExecuteCode(environment, "validate", v.right)
+                    validate = function(info, str)
+						local ret, err = mod.evaluator.ExecuteCode(environment, "validate", str or "")
 						
 						if not ret then
 							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
