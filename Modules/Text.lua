@@ -54,7 +54,6 @@ environment.UnitCreatureType = _G.UnitCreatureType
 environment.UnitIsUnit = _G.UnitIsUnit
 environment.RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local LSM = _G.LibStub("LibSharedMedia-3.0")
-local timer
 local factionList = {}
 local linesToAdd = {}
 local linesToAddR = {}
@@ -65,6 +64,8 @@ local linesToAddRightR = {}
 local linesToAddRightG = {}
 local linesToAddRightB = {}
 local lines = {}
+
+local appearance = StarTip:GetModule("Appearance")
 
 local function errorhandler(err)
     return geterrorhandler()(err)
@@ -105,7 +106,7 @@ environment.unitHasAura = function(aura)
         i = i + 1
     end
 end
-
+--[[
 local function updateLines()
     if not UnitExists("mouseover") then
         mod:CancelTimer(timer)
@@ -134,7 +135,7 @@ local function updateLines()
         end
     end
 end
-
+]]
 --[[
 local newFont, delFont
 do
@@ -511,7 +512,6 @@ function draw()
 				drawn = true
 				fontString:SetText(widget.buffer)
 				fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
-				local appearance = StarTip:GetModule("Appearance")
 		
 				local font = appearance.db.profile.font
 				local fontsList = LSM:List("font")
@@ -572,10 +572,8 @@ function mod:CreateLines()
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
 						
-						if not v.leftObj or not v.lineNum ~= lineNum then
-							if v.leftObj then 
-								v.leftObj:Del() 
-							end
+						if not v.leftObj or v.lineNum ~= lineNum then
+							if v.leftObj then  v.leftObj:Del() end
 							v.string = v.left
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.leftObj.visitor.lcd = self.lcd
@@ -590,51 +588,50 @@ function mod:CreateLines()
 							v.leftObj:Start()
 						end
 					
-						if not v.rightObj or not v.lineNum ~= lineNum then
-							if v.rightObj then
-								v.rightObj:Del()
-							end
+						if not v.rightObj or v.lineNum ~= lineNum then
+							if v.rightObj then v.rightObj:Del() end
 							v.string = v.right
 							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
 							v.rightObj.visitor.lcd = self.lcd
-							if type(c) == "table" and c.r and c.g and c.b then
-								v.rightObj.color.r = (c.r * 255) or 255
-								v.rightObj.color.g = (c.g * 255) or 255
-								v.rightObj.color.b = (c.b * 255) or 255
-								v.rightObj.color.a = (c.a or 1) * 255
-							end
-						
 							v.rightObj:Start()
+							
 						else 
 							v.rightObj:Start()
 							v.rightObj:Update()
 						end
+						if type(c) == "table" and c.r and c.g and c.b then
+							v.rightObj.color.r = (c.r * 255) or 255
+							v.rightObj.color.g = (c.g * 255) or 255
+							v.rightObj.color.b = (c.b * 255) or 255
+							v.rightObj.color.a = (c.a or 1) * 255
+						end
+						
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
 						tinsert(linesToDraw, {v.rightObj, mod.rightLines[lineNum]})
                     else
-						GameTooltip:AddLine(' ', 1, 1, 1)
+						GameTooltip:AddLine(' ')
 							
-						if not v.leftObj or not v.lineNum ~= lineNum then
+						if not v.leftObj or v.lineNum ~= lineNum then
 							if v.leftObj then v.leftObj:Del() end
 							v.string = v.left
 							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
 							tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
 							v.leftObj.visitor.lcd = lcd						
-							if type(c) == "table" and c.r and c.g and c.b then
-								v.leftObj.color.r = c.r * 255 or 255
-								v.leftObj.color.g = c.g * 255 or 255
-								v.leftObj.color.b = c.b * 255 or 255
-								v.leftObj.color.a = (c.a or 1) * 255 or 255
-							end						
 							v.leftObj:Start()
+							v.lineNum = lineNum
 						else
 							v.leftObj:Start()
 							v.leftObj:Update()
 						end
-						v.lineNum = lineNum
+						if type(c) == "table" and c.r and c.g and c.b then
+							v.leftObj.color.r = c.r * 255 or 255
+							v.leftObj.color.g = c.g * 255 or 255
+							v.leftObj.color.b = c.b * 255 or 255
+							v.leftObj.color.a = (c.a or 1) * 255 or 255
+						end						
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
                     end
-					
+					v.lineNum = lineNum
                 end
 				StarTip.del(c)
 				StarTip.del(cc)
@@ -1122,8 +1119,6 @@ function mod:SetUnit()
         linesToAddRightB[i] = nil
     end
     -- End
-    
-    timer = timer or self:ScheduleRepeatingTimer(updateLines, .5)
-    
+        
     GameTooltip:Show()
 end
