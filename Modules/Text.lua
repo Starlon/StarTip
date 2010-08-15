@@ -450,9 +450,13 @@ function mod:OnInitialize()
 	self:RegisterEvent("PLAYER_LOGIN")
     StarTip:SetOptionsDisabled(options, true)
 	
-	self.core = LibCore:New(mod, environment, name, config, "ModuleText", lcd, StarTip.db.profile.errorLevel)
-	self.evaluator = LibStub("StarLibEvaluator-1.0"):New(environment, StarTip.db.profile.errorLevel)
+	-- create our core object. Note that we must provide it with an LCD after it is created.
+	self.core = LibCore:New(mod, environment, name, config, "text", StarTip.db.profile.errorLevel)
+	self.lcd = LCDText:New(self.core, 1, 0, 0, 0, 0, 0)
+	self.core.lcd = self.lcd
 	
+	self.evaluator = LibStub("StarLibEvaluator-1.0"):New(environment, StarTip.db.profile.errorLevel)
+	assert(self.evaluator)
 end
 
 function mod:OnEnable()
@@ -484,6 +488,27 @@ local function makeMarquee(line, text)
 	return text
 end
 
+local function rtrim(text)
+	for i = strlen(text), 1, -1 do
+		if text:sub(i, i) == ' ' then
+			text = text:sub(1, i - 1)
+		else
+			break
+		end
+	end
+	return text
+end
+
+local function updateFontString(widget, fontString)
+	if not UnitExists("mouseover") then return end
+	widget.buffer = rtrim(widget.buffer)
+	fontString:SetText(widget.buffer)
+	fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
+	GameTooltip:Hide()
+	GameTooltip:Show()
+end
+
+
 function mod:CreateLines()
     local llines = {}
     for i, v in ipairs(self.db.profile.lines) do
@@ -492,21 +517,11 @@ function mod:CreateLines()
     lines = setmetatable(llines, {__call=function(self)
         local lineNum = 0
 		GameTooltip:ClearLines()
+		
         for i, v in ipairs(self) do
-			if not v.leftProp then
-			--[[
-				v.leftProp = LibProperty:New(mod, v.name .. " left", v.left, "", StarTip.db.profile.errorLevel)
-				v.rightProp = LibProperty:New(mod, v.name .. " right", v.right, "", StarTip.db.profile.errorLevel)
-				v.prefixProp = LibProperty:New(mod, v.name .. " prefix", v.prefix, "", StarTip.db.profile.errorLevel)
-				v.postfixProp = LibProperty:New(mod, v.name .. " postfix", v.postfix, "", StarTip.db.profile.errorLevel)
-				v.leftProp:Eval()
-				StarTip:Print(v.leftProp:P2S())
-				]]
-			end
 			if v.enabled then
 				
                 local left, right, c = '', ''
-				
 				
                 if v.right then 
                     right, c = mod.evaluator.ExecuteCode(environment, v.name, v.right)
@@ -514,44 +529,71 @@ function mod:CreateLines()
                 else 
                     right = ''
                     left, c = mod.evaluator.ExecuteCode(environment, v.name, v.left)
-                end
+                end 
+
+				if v.updating then
+					v.update = 500
+				end
 				
                 if left and right and not v.deleted then 
                     lineNum = lineNum + 1
                     if v.right then
-						GameTooltip:AddDoubleLine(' ', ' ', 1, 1, 1, 1, 1, 1)
-                        mod.leftLines[lineNum]:SetText(left)
-                        mod.rightLines[lineNum]:SetText(right)
-                        if type(c) == "table" and c.r then
-                            mod.rightLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
-                        end
-						if type(cc) == "table" and cc.r then
-							mod.leftLines[lineNum]:SetVertexColor(cc.r, cc.g, cc.b)
+						GameTooltip:AddDoubleLine(' test', ' ')
+						
+						if v.leftObj then
+							v.leftObj:Del()
+							v.leftObj = nil
 						end
+						if v.rightObj then
+							v.rightObj:Del()
+							v.rightObj = nil
+						end
+						v.string = v.left
+						v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
+						v.leftObj.visitor.lcd = self.lcd
+						if type(c) == "table" and c.r and c.g and c.b then
+						
+							v.leftObj.color.r = c.r * 255 or 255
+							v.leftObj.color.g = c.g * 255 or 255
+							v.leftObj.color.b = c.b * 255 or 255
+							v.leftObj.color.a = (c.a or 1) * 255 or 255
+						end
+						v.leftObj:Start()
+
+						v.string = v.right
+						if v.updating then
+							--v.update = 500
+						end
+						v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 
+						v.rightObj.visitor.lcd = self.lcd
+						if type(cc) == "table" and cc.r and cc.g and cc.b then
+							v.rightObj.color.r = cc.r * 255 or 255
+							v.rightObj.color.g = cc.g * 255 or 255
+							v.rightObj.color.b = cc.b * 255 or 255
+							v.rightObj.color.a = (cc.a or 1) * 255 or 255
+						end
+						
+						v.rightObj:Start()
                     else
 						GameTooltip:AddLine(' ', 1, 1, 1)
-                        mod.leftLines[lineNum]:SetText(left)
-                        if type(c) == "table" and c.r then
-                            mod.leftLines[lineNum]:SetVertexColor(c.r, c.g, c.b)
-                        end
-						if v.marquee then
-							v.string = v.left
-							if v.marqueeObj and v.marqueeObj.visitor and v.marqueeObj.visitor.lcd then
-								v.marqueeObj.visitor.lcd:Del()
-								v.marqueeObj.vistior.lcd = nil
-							end
+
+						v.string = v.left
 							
-							if v.marqueeObj then
-								v.marqueeObj:Stop()
-								v.marqueeObj:Del()
-								v.marqueeObj = nil
-							end
-							--(visitor, name, config, row, col, layer, fontString, env, errorLevel, callback, data) 
-							v.marqueeObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, mod.leftLines[lineNum], environment, StarTip.db.profile.errorLevel) 
-							v.marqueeObj.visitor.lcd = LCDText:New(mod.core, 1, v.width, 0, 0, 0, 0)							
-							v.marqueeObj:Start()
-							v.lastLine = lineNum
+						if v.leftObj then
+							v.leftObj:Stop()
+							v.leftObj:Del()
+							v.leftObj = nil
 						end
+						--(visitor, name, config, row, col, layer, fontString, env, errorLevel, callback, data) 
+						v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
+						v.leftObj.visitor.lcd = lcd						
+						if type(c) == "table" and c.r and c.g and c.b then
+							v.leftObj.color.r = c.r * 255 or 255
+							v.leftObj.color.g = c.g * 255 or 255
+							v.leftObj.color.b = c.b * 255 or 255
+							v.leftObj.color.a = (c.a or 1) * 255 or 255
+						end						
+						v.leftObj:Start()
                     end
                 end
 				StarTip.del(c)
