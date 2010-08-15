@@ -551,7 +551,8 @@ function mod:CreateLines()
 							end
 							v.leftObj:Start()
 						else
-							v.leftObject:Draw()
+							v.leftObj:Start()
+							v.leftObj:Update()
 						end
 					
 						if not rightObj then
@@ -567,7 +568,8 @@ function mod:CreateLines()
 						
 							v.rightObj:Start()
 						else 
-							rightObj:Draw()
+							v.rightObj:Start()
+							v.rightObj:Update()
 						end
                     else
 						GameTooltip:AddLine(' ', 1, 1, 1)
@@ -756,7 +758,7 @@ function mod:RebuildOpts()
                     name = "Updating",
                     desc = "Whether this line refreshes while hovering over unit.",
                     type = "toggle",
-                    get = function() return v.updating end,
+                    get = function() return v.updating and v.update ~= nil end,
                     set = function(info, val) 
 						v.updating = val 
 						self:CreateLines()
