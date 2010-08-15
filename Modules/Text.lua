@@ -538,7 +538,7 @@ function mod:CreateLines()
                 if left and right and not v.deleted then 
                     lineNum = lineNum + 1
                     if v.right then
-						GameTooltip:AddDoubleLine(' test', ' ')
+						GameTooltip:AddDoubleLine(' ', ' ')
 						
 						if v.leftObj then
 							v.leftObj:Del()
@@ -551,12 +551,12 @@ function mod:CreateLines()
 						v.string = v.left
 						v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
 						v.leftObj.visitor.lcd = self.lcd
-						if type(c) == "table" and c.r and c.g and c.b then
+						if type(cc) == "table" and cc.r and cc.g and cc.b then
 						
-							v.leftObj.color.r = c.r * 255 or 255
-							v.leftObj.color.g = c.g * 255 or 255
-							v.leftObj.color.b = c.b * 255 or 255
-							v.leftObj.color.a = (c.a or 1) * 255 or 255
+							v.leftObj.color.r = cc.r * 255 or 255
+							v.leftObj.color.g = cc.g * 255 or 255
+							v.leftObj.color.b = cc.b * 255 or 255
+							v.leftObj.color.a = (cc.a or 1) * 255 or 255
 						end
 						v.leftObj:Start()
 
@@ -566,11 +566,11 @@ function mod:CreateLines()
 						end
 						v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 
 						v.rightObj.visitor.lcd = self.lcd
-						if type(cc) == "table" and cc.r and cc.g and cc.b then
-							v.rightObj.color.r = cc.r * 255 or 255
-							v.rightObj.color.g = cc.g * 255 or 255
-							v.rightObj.color.b = cc.b * 255 or 255
-							v.rightObj.color.a = (cc.a or 1) * 255 or 255
+						if type(c) == "table" and c.r and c.g and c.b then
+							v.rightObj.color.r = c.r * 255 or 255
+							v.rightObj.color.g = c.g * 255 or 255
+							v.rightObj.color.b = c.b * 255 or 255
+							v.rightObj.color.a = (c.a or 1) * 255 or 255
 						end
 						
 						v.rightObj:Start()
@@ -700,8 +700,10 @@ function mod:RebuildOpts()
         options["line" .. i] = {
             name = v.name,
             type = "group",
-            args = {
-                left = {
+            order = i + 5
+        }
+		options["line" .. i].args = {
+	            left = {
                     name = "Left",
                     type = "input",
                     desc = "Left text code",
@@ -851,11 +853,10 @@ function mod:RebuildOpts()
 					end,
 					order = 8
 				},
-            },
-            order = i + 5
-        }
+            }
     end
 end
+
 
 local getName = function()
     if self.db.profile.titles then
