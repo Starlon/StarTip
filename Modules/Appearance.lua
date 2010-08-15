@@ -81,8 +81,8 @@ local options = {
 		desc = "Set the normal font size",
 		type = "input",
 		pattern = "%d",
-		get = function() return mod.db.profile.fontSizeNormal end,
-		set = function(info, v) mod.db.profile.fontSizeNormal = v end,
+		get = function() return tostring(mod.db.profile.fontSizeNormal) end,
+		set = function(info, v) mod.db.profile.fontSizeNormal = tonumber(v) end,
 		order = 6
 	},
 	fontSizeBold = {
@@ -90,8 +90,8 @@ local options = {
 		desc = "Set the bold font size",
 		type = "input",
 		pattern = "%d",
-		get = function() return mod.db.profile.fontSizeBold end,
-		set = function(info, v) mod.db.profile.fontSizeBold = v end,
+		get = function() return tostring(mod.db.profile.fontSizeBold) end,
+		set = function(info, v) mod.db.profile.fontSizeBold = tonumber(v) end,
 		pattern = "%d",
 		order = 7
 	},

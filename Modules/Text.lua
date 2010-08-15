@@ -178,7 +178,7 @@ function del(t)
 end
 ]]
 
-local defaults = {profile={titles=true, empty = true, lines = {}, update = 500}}
+local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 300}}
 
 local defaultLines={
     [1] = {
@@ -470,8 +470,7 @@ local update
 function mod:OnEnable()
         StarTip:SetOptionsDisabled(options, false)
 		self:CreateLines()
-		StarTip:Print(draw)
-		self.timer = LibTimer:New("Text module", self.db.profile.update, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
+		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
 		self.timer:Start()
 end
 
@@ -497,16 +496,13 @@ local function updateFontString(widget, fontString)
 	tinsert(linesToDraw, {widget, fontString})
 end
 
-function draw(self)
-	local draw
+function draw()
 	if not UnitExists("mouseover") then
 		return
 	end
 	for i, v in ipairs(linesToDraw) do
-		draw = true
 		v.i = i
 	end
-	if draw then 
 		for i, table in ipairs(linesToDraw) do
 			local widget = table[1]
 			local fontString = table[2]
@@ -533,9 +529,7 @@ function draw(self)
 					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
 				end
 			end
-			tremove(linesToDraw, i)
 		end
-	end
 	if UnitExists("mouseover") then 
 		GameTooltip:Hide()
 		GameTooltip:Show()
@@ -574,16 +568,8 @@ function mod:CreateLines()
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
 						
-						if v.leftObj then
-							v.leftObj:Del()
-							v.leftObj = nil
-						end
-						if v.rightObj then
-							v.rightObj:Del()
-							v.rightObj = nil
-						end
-						v.string = v.left
 						if not v.leftObj then
+							v.string = v.left
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.leftObj.visitor.lcd = self.lcd
 							if type(cc) == "table" and cc.r and cc.g and cc.b then
@@ -595,10 +581,9 @@ function mod:CreateLines()
 							v.leftObj:Start()
 						else
 							v.leftObj:Start()
-							v.leftObj:Update()
 						end
 					
-						if not rightObj then
+						if not v.rightObj then
 							v.string = v.right
 							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
 							v.rightObj.visitor.lcd = self.lcd
@@ -616,31 +601,26 @@ function mod:CreateLines()
 						end
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
 						tinsert(linesToDraw, {v.rightObj, mod.rightLines[lineNum]})
-						draw()
                     else
 						GameTooltip:AddLine(' ', 1, 1, 1)
-
-						v.string = v.left
 							
-						if v.leftObj then
-							v.leftObj:Stop()
-							v.leftObj:Del()
-							v.leftObj = nil
+						if not v.leftObj then
+							v.string = v.left
+							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
+							tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
+							v.leftObj.visitor.lcd = lcd						
+							if type(c) == "table" and c.r and c.g and c.b then
+								v.leftObj.color.r = c.r * 255 or 255
+								v.leftObj.color.g = c.g * 255 or 255
+								v.leftObj.color.b = c.b * 255 or 255
+								v.leftObj.color.a = (c.a or 1) * 255 or 255
+							end						
+							v.leftObj:Start()
+						else
+							v.leftObj:Start()
+							v.leftObj:Update()
 						end
-						--(visitor, name, config, row, col, layer, fontString, env, errorLevel, callback, data) 
-						v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
-						draw()
-						v.leftObj.visitor.lcd = lcd						
-						if type(c) == "table" and c.r and c.g and c.b then
-							v.leftObj.color.r = c.r * 255 or 255
-							v.leftObj.color.g = c.g * 255 or 255
-							v.leftObj.color.b = c.b * 255 or 255
-							v.leftObj.color.a = (c.a or 1) * 255 or 255
-						end						
-						v.leftObj:Start()
-						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
-						draw()
                     end
 					
                 end
@@ -650,7 +630,7 @@ function mod:CreateLines()
 
         end
         self.NUM_LINES = lineNum
-
+	draw()
     end})
 end
 
@@ -691,6 +671,15 @@ function mod:RebuildOpts()
 			end,
 			order = 5
 		},
+		refreshRate = {
+			name = "Refresh Rate",
+			desc = "The rate at which the tooltip will be refreshed",
+			type = "input",
+			pattern = "%d",
+			get = function() return tostring(self.db.profile.refreshRate) end,
+			set = function(info, v) self.db.profile.refreshRate = tonumber(v) end,
+			order = 6
+		},
 		defaults = {
 			name = "Restore Defaults",
 			desc = "Roll back to defaults.",
@@ -704,7 +693,7 @@ function mod:RebuildOpts()
 				StarTip:RebuildOpts()
 				self:CreateLines()
 			end,
-			order = 6
+			order = 7
 		},
 	}
     for i, v in ipairs(self.db.profile.lines) do
