@@ -10,6 +10,9 @@ local LCDText = LibStub("StarLibLCDText-1.0", true)
 assert(LCDText, mod.name .. " requires StarLibLCDText-1.0")
 local LibCore = LibStub("StarLibCore-1.0", true)
 assert(LibCore, mod.name .. " requires StarLibCore-1.0")
+local LibTimer = LibStub("StarLibTimer-1.0", true)
+assert(LibTimer, mod.name .. " requires StarLibTimer-1.0")
+
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -110,7 +113,7 @@ local function updateLines()
         return
     end
     for _, v in ipairs(lines) do
-        if v.updating and v.right and self.db.profile[v.db] then
+        if v.rightUpdating and v.right and self.db.profile[v.db] then
             local left, c = StarTip.ExecuteCode(environment, v.name, v.left)
             local right, cc = StarTip.ExecuteCode(environment, v.name, v.right)
             if left and right then
@@ -175,7 +178,7 @@ function del(t)
 end
 ]]
 
-local defaults = {profile={titles=true, empty = true, lines = {}}}
+local defaults = {profile={titles=true, empty = true, lines = {}, update = 500}}
 
 local defaultLines={
     [1] = {
@@ -191,7 +194,7 @@ end
 return self.unitName, c
 ]],
         right = nil,
-        updating = false,
+        rightUpdating = false,
 		bold = true,
 		enabled = true
     },
@@ -213,7 +216,7 @@ else
     return "None", self:newDict("r", 1, "g", 1, "b", 1)
 end
 ]],
-        updating = true,
+        rightUpdating = true,
 		enabled = true
     },
     [3] = {
@@ -223,7 +226,7 @@ end
 local guild = self.GetGuildInfo("mouseover")
 if guild then return "<" .. guild .. ">" else return self.unitGuild end
 ]],
-        updating = false,
+        rightUpdating = false,
 		enabled = true
     },
     [4] = {
@@ -232,7 +235,7 @@ if guild then return "<" .. guild .. ">" else return self.unitGuild end
         right = [[
 return select(2, self.GetGuildInfo("mouseover"))
 ]],    
-        updating = false,
+        rightUpdating = false,
 		enabled = true
     },
     [5] = {
@@ -241,7 +244,7 @@ return select(2, self.GetGuildInfo("mouseover"))
         right = [[
 return select(2, self.UnitName("mouseover"))
 ]],
-        updating = false,
+        rightUpdating = false,
 		enabled = true
     },
     [6] = {
@@ -269,7 +272,7 @@ self.del(classifications)
 
 return lvl
 ]],
-        updating = false,
+        rightUpdating = false,
 		enabled = true
     },
     [7] = {
@@ -284,7 +287,7 @@ else
 end
 return race        
 ]],
-        updating = false,
+        rightUpdating = false,
 		enabled = true
     },
     [8] = {
@@ -296,7 +299,7 @@ if class == self.UnitName("mouseover") then return end
 local c = self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
 return class, c
 ]],
-        updating = false,
+        rightUpdating = false,
 		enabled = true
     },
     [9] = {
@@ -305,7 +308,7 @@ return class, c
         right = [[
 return self.UnitFactionGroup("mouseover")
 ]],
-        updating = false,
+        rightUpdating = false,
 		enabled = true
     },
     [10] = {
@@ -326,7 +329,7 @@ elseif self.UnitIsDead("mouseover") then
     return "Dead"
 end
 ]],
-        updating = false,
+        rightUpdating = false,
 		enabled = true
     },
     [11] = {
@@ -342,7 +345,8 @@ elseif maxHealth ~= 0 then
 end
 return value
 ]],
-        updating = true,
+        rightUpdating = true,
+		update = 500,
 		enabled = true
     },
     [12] = {
@@ -356,6 +360,7 @@ end
 
 return (self.powers[class] or "Mana:")
 ]],
+		rightUpdating = false,
         right = [[
 local mana = self.UnitMana("mouseover")
 local maxMana = self.UnitManaMax("mouseover")
@@ -366,8 +371,9 @@ elseif maxMana ~= 0 then
 end
 return value
 ]],
-        updating = true,
-		enabled = true
+        rightUpdating = true,
+		enabled = true,
+		update = 1000
     },
     [13] = {
         name = "Location",
@@ -375,13 +381,13 @@ return value
         right = [[
 return self.unitLocation
 ]],
-        updating = false,
+        rightUpdating = false,
 		enabled = true
     },
 	[14] = {
 		name = "Marquee",
 		left = 'return "StarTip " .. self._G.StarTip.version',
-		updating = true,
+		rightUpdating = true,
 		enabled = false,
 		marquee = true,
 		width = 20,
@@ -405,8 +411,9 @@ else
     return "Between " .. min .. " and " .. max .. " yards"
 end
 ]],
-		updating = true,
-		enabled = true
+		rightUpdating = true,
+		enabled = true,
+		update = 1000
 	}
 }
 
@@ -458,13 +465,19 @@ function mod:OnInitialize()
 	assert(self.evaluator)
 end
 
+local draw
+local update
 function mod:OnEnable()
         StarTip:SetOptionsDisabled(options, false)
 		self:CreateLines()
+		StarTip:Print(draw)
+		self.timer = LibTimer:New("Text module", self.db.profile.update, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
+		self.timer:Start()
 end
 
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
+	self.timer:Stop()
 end
 
 function mod:GetOptions()
@@ -479,35 +492,57 @@ function mod:UPDATE_FACTION()
     end
 end
 
-
-local function makeMarquee(line, text)
-	
-	return text
+local linesToDraw = {}
+local function updateFontString(widget, fontString)
+	tinsert(linesToDraw, {widget, fontString})
 end
 
-local function updateFontString(widget, fontString)
-	widget.buffer = widget.buffer
-	fontString:SetText(widget.buffer)
-	fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
-	local appearance = StarTip:GetModule("Appearance")
+function draw(self)
+	local draw
+	if not UnitExists("mouseover") then
+		return
+	end
+	for i, v in ipairs(linesToDraw) do
+		draw = true
+		v.i = i
+	end
+	if draw then 
+		for i, table in ipairs(linesToDraw) do
+			local widget = table[1]
+			local fontString = table[2]
+			fontString:SetText(widget.buffer)
+			fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
+			local appearance = StarTip:GetModule("Appearance")
 		
-	local font = appearance.db.profile.font
-	local fontsList = LSM:List("font")
-	font = LSM:Fetch("font", fontsList[font])	
+			local font = appearance.db.profile.font
+			local fontsList = LSM:List("font")
+			font = LSM:Fetch("font", fontsList[font])	
 	
-	if widget.bold then		
-		mod.leftLines[i]:SetFont(font, appearance.db.profile.fontSizeBold)
-		mod.rightLines[i]:SetFont(font, appearance.db.profile.fontSizeBold)
-	else
-		mod.leftLines[i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-		mod.rightLines[i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+			if widget.bold then
+				if mod.leftLines and mod.leftLines[widget.i] then
+					mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
+				end
+				if mod.rightLines and mod.rightLines[widget.i] then
+					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
+				end
+			else
+				if mod.leftlines and mod.leftLines[widget.i] then
+					mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+			end
+				if mod.rightLines and mod.rightLines[widget.i] then
+					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+				end
+			end
+			tremove(linesToDraw, i)
+		end
 	end
 	if UnitExists("mouseover") then 
 		GameTooltip:Hide()
 		GameTooltip:Show()
 	end
+	StarTip.del(linesToDraw)
+	linesToDraw = StarTip.new()
 end
-
 
 function mod:CreateLines()
     local llines = {}
@@ -531,11 +566,11 @@ function mod:CreateLines()
                     left, c = mod.evaluator.ExecuteCode(environment, v.name, v.left)
                 end 
 
-				if v.updating then
+				if v.rightUpdating then
 					v.update = 500
 				end
 				
-                if left and left ~= "" and (right ~= "") and not v.deleted then 
+                if left and left ~= "" and right ~= "" and not v.deleted then 
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
@@ -550,7 +585,7 @@ function mod:CreateLines()
 						end
 						v.string = v.left
 						if not v.leftObj then
-							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
+							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.leftObj.visitor.lcd = self.lcd
 							if type(cc) == "table" and cc.r and cc.g and cc.b then
 								v.leftObj.color.r = (c.r * 255) or 255
@@ -566,7 +601,7 @@ function mod:CreateLines()
 					
 						if not rightObj then
 							v.string = v.right
-							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 
+							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
 							v.rightObj.visitor.lcd = self.lcd
 							if type(c) == "table" and c.r and c.g and c.b then
 								v.rightObj.color.r = (c.r * 255) or 255
@@ -580,6 +615,9 @@ function mod:CreateLines()
 							v.rightObj:Start()
 							v.rightObj:Update()
 						end
+						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
+						tinsert(linesToDraw, {v.rightObj, mod.rightLines[lineNum]})
+						draw()
                     else
 						GameTooltip:AddLine(' ', 1, 1, 1)
 
@@ -592,6 +630,8 @@ function mod:CreateLines()
 						end
 						--(visitor, name, config, row, col, layer, fontString, env, errorLevel, callback, data) 
 						v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
+						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
+						draw()
 						v.leftObj.visitor.lcd = lcd						
 						if type(c) == "table" and c.r and c.g and c.b then
 							v.leftObj.color.r = c.r * 255 or 255
@@ -600,7 +640,10 @@ function mod:CreateLines()
 							v.leftObj.color.a = (c.a or 1) * 255 or 255
 						end						
 						v.leftObj:Start()
+						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
+						draw()
                     end
+					
                 end
 				StarTip.del(c)
 				StarTip.del(cc)
@@ -642,7 +685,7 @@ function mod:RebuildOpts()
 			type = "input",
 			set = function(info, v)
 				if v == "" then return end
-				tinsert(self.db.profile.lines, {name = v, left = "", right = "", updating = false})
+				tinsert(self.db.profile.lines, {name = v, left = "", right = "", rightUpdating = false})
 				self:RebuildOpts()
 				StarTip:RebuildOpts()
 				self:CreateLines()
@@ -724,13 +767,13 @@ function mod:RebuildOpts()
 					width = "full",
                     order = 2
                 },
-                updating = {
+                rightUpdating = {
                     name = "Updating",
                     desc = "Whether this line refreshes while hovering over unit.",
                     type = "toggle",
-                    get = function() return v.updating and v.update ~= nil end,
+                    get = function() return v.rightUpdating and v.update ~= nil end,
                     set = function(info, val) 
-						v.updating = val 
+						v.rightUpdating = val 
 						self:CreateLines()
 					end,
                     order = 3
