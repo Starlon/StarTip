@@ -391,7 +391,7 @@ return self.unitLocation
 		align = 'M',
 		update = 1000,
 		speed = 100,
-		direction = DIRECTION_LEFT		
+		direction = DIRECTION_LEFT
 	},
 	[15] = {
 		name = "Range",
@@ -488,19 +488,8 @@ local function makeMarquee(line, text)
 	return text
 end
 
-local function rtrim(text)
-	for i = strlen(text), 1, -1 do
-		if text:sub(i, i) == ' ' then
-			text = text:sub(1, i - 1)
-		else
-			break
-		end
-	end
-	return text
-end
-
 local function updateFontString(widget, fontString)
-	widget.buffer = rtrim(widget.buffer)
+	widget.buffer = widget.buffer
 	fontString:SetText(widget.buffer)
 	fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
 	if UnitExists("mouseover") then 
