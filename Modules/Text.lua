@@ -1,4 +1,4 @@
-local mod = StarTip:NewModule("Text", "AceTimer-3.0", "AceEvent-3.0")
+local mod = StarTip:NewModule("Text", "AceEvent-3.0")
 mod.name = "Text"
 mod.toggled = true
 assert(LibStub("StarLibEvaluator-1.0", true), "Text module requires StarLibEvaluator-1.0")
@@ -12,6 +12,8 @@ local LibCore = LibStub("StarLibCore-1.0", true)
 assert(LibCore, mod.name .. " requires StarLibCore-1.0")
 local LibTimer = LibStub("StarLibTimer-1.0", true)
 assert(LibTimer, mod.name .. " requires StarLibTimer-1.0")
+local LibEvaluator = LibStub("StarLibEvaluator-1.0", true)
+assert(LibEvaluator, mod.name .. " requires StarLibEvaluator-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -179,7 +181,7 @@ function del(t)
 end
 ]]
 
-local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 300}}
+local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500}}
 
 local defaultLines={
     [1] = {
@@ -347,7 +349,7 @@ end
 return value
 ]],
         rightUpdating = true,
-		update = 500,
+		update = 1000,
 		enabled = true
     },
     [12] = {
@@ -397,7 +399,7 @@ return self.unitLocation
 		bold = true,
 		align = 'M',
 		update = 1000,
-		speed = 100,
+		speed = 500,
 		direction = DIRECTION_LEFT
 	},
 	[15] = {
@@ -462,7 +464,7 @@ function mod:OnInitialize()
 	self.lcd = LCDText:New(self.core, 1, 0, 0, 0, 0, 0)
 	self.core.lcd = self.lcd
 	
-	self.evaluator = LibStub("StarLibEvaluator-1.0"):New(environment, StarTip.db.profile.errorLevel)
+	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
 	assert(self.evaluator)
 end
 
@@ -502,9 +504,9 @@ function draw()
 	if not UnitExists("mouseover") then
 		return
 	end
-	for i, v in ipairs(linesToDraw) do
+	--[[for i, v in ipairs(linesToDraw) do
 		v.i = i
-	end
+	end]]
 		for i, table in ipairs(linesToDraw) do
 			local widget = table[1]
 			local fontString = table[2]
@@ -650,6 +652,7 @@ function mod:OnHide()
 			v.rightObj:Stop()
 		end
 	end
+	self.timer:Stop()
 end
 
 local function copy(t)
@@ -1119,4 +1122,6 @@ function mod:SetUnit()
     -- End
         
     GameTooltip:Show()
+	
+	self.timer:Start()
 end
