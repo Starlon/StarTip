@@ -214,7 +214,7 @@ if self.UnitExists("mouseovertarget") then
     local name = self.UnitName("mouseovertarget")
     return name, c
 else
-    return "None", self:newDict("r", 1, "g", 1, "b", 1)
+    return "None", self.newDict("r", 1, "g", 1, "b", 1)
 end
 ]],
         rightUpdating = true,
@@ -577,15 +577,15 @@ function mod:CreateLines()
 							v.string = v.left
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.leftObj.visitor.lcd = self.lcd
-							if type(cc) == "table" and cc.r and cc.g and cc.b then
-								v.leftObj.color.r = (cc.r * 255) or 255
-								v.leftObj.color.g = (cc.g * 255) or 255
-								v.leftObj.color.b = (cc.b * 255) or 255
-								v.leftObj.color.a = (cc.a or 1) * 255
-							end
 							v.leftObj:Start()
 						else
 							v.leftObj:Start()
+						end
+						if type(cc) == "table" and cc.r and cc.g and cc.b then
+							v.leftObj.color.r = (cc.r * 255)
+							v.leftObj.color.g = (cc.g * 255)
+							v.leftObj.color.b = (cc.b * 255)
+							v.leftObj.color.a = (cc.a or 1) * 255
 						end
 					
 						if not v.rightObj or v.lineNum ~= lineNum then
@@ -595,17 +595,13 @@ function mod:CreateLines()
 							v.rightObj.visitor.lcd = self.lcd
 							v.rightObj:Start()
 							
-						else 
-							v.rightObj:Start()
-							v.rightObj:Update()
 						end
 						if type(c) == "table" and c.r and c.g and c.b then
-							v.rightObj.color.r = (c.r * 255) or 255
-							v.rightObj.color.g = (c.g * 255) or 255
-							v.rightObj.color.b = (c.b * 255) or 255
+							v.rightObj.color.r = (c.r * 255)
+							v.rightObj.color.g = (c.g * 255)
+							v.rightObj.color.b = (c.b * 255)
 							v.rightObj.color.a = (c.a or 1) * 255
 						end
-						
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
 						tinsert(linesToDraw, {v.rightObj, mod.rightLines[lineNum]})
                     else
@@ -615,13 +611,9 @@ function mod:CreateLines()
 							if v.leftObj then v.leftObj:Del() end
 							v.string = v.left
 							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
-							tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
 							v.leftObj.visitor.lcd = lcd						
 							v.leftObj:Start()
 							v.lineNum = lineNum
-						else
-							v.leftObj:Start()
-							v.leftObj:Update()
 						end
 						if type(c) == "table" and c.r and c.g and c.b then
 							v.leftObj.color.r = c.r * 255 or 255
@@ -631,6 +623,12 @@ function mod:CreateLines()
 						end						
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
                     end
+					if v.rightObj then 
+						v.rightObj:Start()
+					end
+					if v.leftObj then
+						v.leftObj:Start()
+					end
 					v.lineNum = lineNum
                 end
 				StarTip.del(c)
