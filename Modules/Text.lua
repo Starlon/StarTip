@@ -639,9 +639,11 @@ end
 
 function mod:OnHide()
 	for i, v in ipairs(lines) do
-		if v.marqueeObj then
-			v.marqueeObj:Stop()
-			v.marqueeObj = nil
+		if v.leftObj then
+			v.leftObj:Stop()
+		end
+		if v.rightObj then
+			v.rightObj:Stop()
 		end
 	end
 end
@@ -851,8 +853,119 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
 					end,
-					order = 8
+					order = 100
 				},
+				marquee = {
+					name = "Maruqee Settings",
+					type = "group",
+					args = {
+						prefix = {
+							name = "Prefix",
+							desc = "The prefix for this marquee",
+							type = "input",
+							width = "full",
+							get = function()
+								return v.prefix or WidgetText.defaults.prefix
+							end,
+							set = function(info, val)
+								v.prefix = val
+							end,
+							order = 2
+						},
+						postfix = {
+							name = "Postfix",
+							desc = "The postfix for this marquee",
+							type = "input",
+							width = "full",
+							get = function()
+								return v.postfix or WidgetText.defaults.postfix
+							end,
+							set = function(info, val)
+								v.postfix = v
+							end,
+							order = 3
+						},
+						precision = {
+							name = "Precision",
+							desc = "How precise displayed numbers are",
+							type = "input",
+							pattern = "%d",
+							get = function()
+								return tostring(v.precision or WidgetText.defaults.precision)
+							end,
+							set = function(info, val)
+								v.precision = tonumber(val)
+							end,
+							order = 4
+						},
+						align = {
+							name = "Alignment",
+							desc = "The alignment information",
+							type = "select",
+							values = WidgetText.alignments,
+							get = function()
+								return v.align or WidgetText.defaults.align
+							end,
+							set = function(info, val)
+								v.align = val
+							end,
+							order = 5
+						},
+						update = {
+							name = "Text Update",
+							desc = "How often to update the text",
+							type = "input",
+							pattern = "%d",
+							get = function()
+								return tostring(v.update or WidgetText.defaults.update)
+							end,
+							set = function(info, val)
+								v.update = tonumber(val)
+							end,
+							order = 6
+						},
+						speed = {
+							name = "Scroll Speed",
+							desc = "How fast to scroll the marquee",
+							type = "input",
+							pattern = "%d",
+							get = function()
+								return tostring(v.speed or WidgetText.defaults.speed)
+							end,
+							set = function(info, val)
+								v.speed = tonumber(val)
+							end,
+							order = 7
+						},
+						direction = {
+							name = "Direction",
+							desc = "Which direction to scroll",
+							type = "select",
+							values = WidgetText.directions,
+							get = function()
+								return tostring(v.direction or WidgetText.defaults.direction)
+							end,
+							set = function(info, val)
+								v.direction = tonumber(val)
+							end,
+							order = 8
+						},
+						cols = {
+							name = "Columns",
+							desc = "How wide the marquee is",
+							type = "input",
+							pattern = "%d",
+							get = function()
+								return tostring(v.cols or WidgetText.defaults.cols)
+							end,
+							set = function(info, val)
+								v.cols = tonumber(val)
+							end,
+							order = 9
+						}
+					},
+					order = 8
+				}
             }
     end
 end
