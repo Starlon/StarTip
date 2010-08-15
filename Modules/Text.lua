@@ -557,20 +557,19 @@ function mod:CreateLines()
 			if v.enabled then
 				
                 local left, right, c = '', ''
-				
                 if v.right then 
                     right, c = mod.evaluator.ExecuteCode(environment, v.name, v.right)
                     left, cc = mod.evaluator.ExecuteCode(environment, v.name, v.left)
+					if right == "" then right = "nil" end
                 else 
-                    right = 'nil'
+                    right = ''
                     left, c = mod.evaluator.ExecuteCode(environment, v.name, v.left)
                 end 
 
 				if v.rightUpdating then
 					v.update = 500
 				end
-				
-                if left and left ~= "" and right ~= "" and not v.deleted then 
+                if left and left ~= "" and right ~= "nil" and not v.deleted then 
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
@@ -588,10 +587,10 @@ function mod:CreateLines()
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.leftObj.visitor.lcd = self.lcd
 							if type(cc) == "table" and cc.r and cc.g and cc.b then
-								v.leftObj.color.r = (c.r * 255) or 255
-								v.leftObj.color.g = (c.g * 255) or 255
-								v.leftObj.color.b = (c.b * 255) or 255
-								v.leftObj.color.a = (c.a or 1) * 255
+								v.leftObj.color.r = (cc.r * 255) or 255
+								v.leftObj.color.g = (cc.g * 255) or 255
+								v.leftObj.color.b = (cc.b * 255) or 255
+								v.leftObj.color.a = (cc.a or 1) * 255
 							end
 							v.leftObj:Start()
 						else
@@ -721,7 +720,14 @@ function mod:RebuildOpts()
                     type = "input",
                     desc = "Left text code",
                     get = function() return v.left end,
-                    set = function(info, val) v.left = val; v.leftDirty = true end,
+                    set = function(info, val) 
+						v.left = val 
+						v.leftDirty = true 
+						if val == "" then
+							v.left = nil
+						end
+						self:CreateLines()						
+					end,
                     validate = function(info, str)	
 						StarTip:Print("Validate " .. str)
 						
@@ -732,11 +738,8 @@ function mod:RebuildOpts()
 							v.error = true
 							return false
 						end
-						v.left = str
 						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret or ""))
-						self:CreateLines()
 						return true
-					
 					end,
                     multiline = true,
 					width = "full",
@@ -747,7 +750,14 @@ function mod:RebuildOpts()
                     type = "input",
                     desc = "Right text code",
                     get = function() return v.right end,
-                    set = function(info, val) v.right = val; v.rightDirty = true end,
+                    set = function(info, val) 
+						v.right = val; 
+						v.rightDirty = true 
+						if val == "" then
+							v.right = nil
+						end
+						self:CreateLines()						
+					end,
                     validate = function(info, str)
 						if str == "" then str = "return ''" end
 						local ret, err = mod.evaluator.ExecuteCode(environment, "validate", str)
@@ -757,9 +767,7 @@ function mod:RebuildOpts()
 							return false
 						end
 						
-						v.right = str
 						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret or ""))
-						self:CreateLines()
 					    return true
 					
 					end,
