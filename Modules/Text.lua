@@ -326,7 +326,7 @@ elseif self.UnitIsDead("mouseover") then
     return "Dead"
 end
 ]],
-        updating = true,
+        updating = false,
 		enabled = true
     },
     [11] = {
@@ -375,7 +375,7 @@ return value
         right = [[
 return self.unitLocation
 ]],
-        updating = true,
+        updating = false,
 		enabled = true
     },
 	[14] = {
