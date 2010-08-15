@@ -539,31 +539,36 @@ function mod:CreateLines()
 							v.rightObj = nil
 						end
 						v.string = v.left
-						v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
-						v.leftObj.visitor.lcd = self.lcd
-						if type(cc) == "table" and cc.r and cc.g and cc.b then
+						if not v.leftObj then
+							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
+							v.leftObj.visitor.lcd = self.lcd
+							if type(cc) == "table" and cc.r and cc.g and cc.b then
 						
-							v.leftObj.color.r = cc.r * 255 or 255
-							v.leftObj.color.g = cc.g * 255 or 255
-							v.leftObj.color.b = cc.b * 255 or 255
-							v.leftObj.color.a = (cc.a or 1) * 255 or 255
+								v.leftObj.color.r = cc.r * 255 or 255
+								v.leftObj.color.g = cc.g * 255 or 255
+								v.leftObj.color.b = cc.b * 255 or 255
+								v.leftObj.color.a = (cc.a or 1) * 255 or 255
+							end
+							v.leftObj:Start()
+						else
+							v.leftObject:Draw()
 						end
-						v.leftObj:Start()
-
-						v.string = v.right
-						if v.updating then
-							--v.update = 500
-						end
-						v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 
-						v.rightObj.visitor.lcd = self.lcd
-						if type(c) == "table" and c.r and c.g and c.b then
-							v.rightObj.color.r = c.r * 255 or 255
-							v.rightObj.color.g = c.g * 255 or 255
-							v.rightObj.color.b = c.b * 255 or 255
-							v.rightObj.color.a = (c.a or 1) * 255 or 255
-						end
+					
+						if not rightObj then
+							v.string = v.right
+							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 
+							v.rightObj.visitor.lcd = self.lcd
+							if type(c) == "table" and c.r and c.g and c.b then
+								v.rightObj.color.r = c.r * 255 or 255
+								v.rightObj.color.g = c.g * 255 or 255
+								v.rightObj.color.b = c.b * 255 or 255
+								v.rightObj.color.a = (c.a or 1) * 255 or 255
+							end
 						
-						v.rightObj:Start()
+							v.rightObj:Start()
+						else 
+							rightObj:Draw()
+						end
                     else
 						GameTooltip:AddLine(' ', 1, 1, 1)
 
@@ -899,16 +904,12 @@ function mod:RebuildOpts()
 							name = "Alignment",
 							desc = "The alignment information",
 							type = "select",
-							values = WidgetText.alignments,
+							values = WidgetText.alignmentList,
 							get = function()
-								if v.align then
-									return WidgetText.aligns[v.align]
-								else
-									return WidgetText.defaults.align
-								end
+								return WidgetText.alignmenDict[v.align]
 							end,
 							set = function(info, val)
-								v.align = val
+								v.align = WidgetText.alignmentList[val]
 							end,
 							order = 5
 						},
@@ -942,12 +943,12 @@ function mod:RebuildOpts()
 							name = "Direction",
 							desc = "Which direction to scroll",
 							type = "select",
-							values = WidgetText.directions,
+							values = WidgetText.directionList,
 							get = function()
-								return tostring(v.direction or WidgetText.defaults.direction)
+								return tonumber(WidgetText.directionDict[v.direction]) or WidgetText.defaults.direction
 							end,
 							set = function(info, val)
-								v.direction = tonumber(val)
+								v.direction = WidgetText.directionList[val]
 							end,
 							order = 8
 						},
