@@ -447,7 +447,6 @@ function mod:OnInitialize()
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
-	self:RegisterEvent("PLAYER_LOGIN")
     StarTip:SetOptionsDisabled(options, true)
 	
 	-- create our core object. Note that we must provide it with an LCD after it is created.
@@ -460,13 +459,11 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-    if TalentQuery then TalentQuery.RegisterCallback(self, "TalentQuery_Ready") end
-    
-    StarTip:SetOptionsDisabled(options, false)
+        StarTip:SetOptionsDisabled(options, false)
+		self:CreateLines()
 end
 
 function mod:OnDisable()
-    if TalentQuery then TalentQuery.UnregisterCallback(self, "TalentQuery_Ready") end
     StarTip:SetOptionsDisabled(options, true)
 end
 
@@ -492,6 +489,19 @@ local function updateFontString(widget, fontString)
 	widget.buffer = widget.buffer
 	fontString:SetText(widget.buffer)
 	fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
+	local appearance = StarTip:GetModule("Appearance")
+		
+	local font = appearance.db.profile.font
+	local fontsList = LSM:List("font")
+	font = LSM:Fetch("font", fontsList[font])	
+	
+	if widget.bold then		
+		mod.leftLines[i]:SetFont(font, appearance.db.profile.fontSizeBold)
+		mod.rightLines[i]:SetFont(font, appearance.db.profile.fontSizeBold)
+	else
+		mod.leftLines[i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+		mod.rightLines[i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+	end
 	if UnitExists("mouseover") then 
 		GameTooltip:Hide()
 		GameTooltip:Show()
@@ -517,7 +527,7 @@ function mod:CreateLines()
                     right, c = mod.evaluator.ExecuteCode(environment, v.name, v.right)
                     left, cc = mod.evaluator.ExecuteCode(environment, v.name, v.left)
                 else 
-                    right = ''
+                    right = 'nil'
                     left, c = mod.evaluator.ExecuteCode(environment, v.name, v.left)
                 end 
 
@@ -525,7 +535,7 @@ function mod:CreateLines()
 					v.update = 500
 				end
 				
-                if left and right and not v.deleted then 
+                if left and left ~= "" and (right ~= "") and not v.deleted then 
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
@@ -543,11 +553,10 @@ function mod:CreateLines()
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
 							v.leftObj.visitor.lcd = self.lcd
 							if type(cc) == "table" and cc.r and cc.g and cc.b then
-						
-								v.leftObj.color.r = cc.r * 255 or 255
-								v.leftObj.color.g = cc.g * 255 or 255
-								v.leftObj.color.b = cc.b * 255 or 255
-								v.leftObj.color.a = (cc.a or 1) * 255 or 255
+								v.leftObj.color.r = (c.r * 255) or 255
+								v.leftObj.color.g = (c.g * 255) or 255
+								v.leftObj.color.b = (c.b * 255) or 255
+								v.leftObj.color.a = (c.a or 1) * 255
 							end
 							v.leftObj:Start()
 						else
@@ -560,10 +569,10 @@ function mod:CreateLines()
 							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 
 							v.rightObj.visitor.lcd = self.lcd
 							if type(c) == "table" and c.r and c.g and c.b then
-								v.rightObj.color.r = c.r * 255 or 255
-								v.rightObj.color.g = c.g * 255 or 255
-								v.rightObj.color.b = c.b * 255 or 255
-								v.rightObj.color.a = (c.a or 1) * 255 or 255
+								v.rightObj.color.r = (c.r * 255) or 255
+								v.rightObj.color.g = (c.g * 255) or 255
+								v.rightObj.color.b = (c.b * 255) or 255
+								v.rightObj.color.a = (c.a or 1) * 255
 							end
 						
 							v.rightObj:Start()
@@ -597,41 +606,10 @@ function mod:CreateLines()
 				StarTip.del(cc)
 			end
 
---[[			if v.marquee and v.enabled then				
-				--GameTooltip:AddLine(' ', 1, 1, 1)
-				--lineNum = lineNum + 1
-				v.string = v.left
-				if v.marqueeObj then
-					v.marqueeObj:Stop() -- just to be double sure
-					v.marqueeObj:Del()
-					v.marqueeObj = nil
-				end
-				if not v.marqueeObj then
-					
-					v.marqueeObj = WidgetText:New(self, v.name, v, 0, 0, 0, mod.leftLines[lineNum], environment, StarTip.db.profile.errorLevel) 
-				end				
-				v.marqueeObj:Start()
-				v.lastLine = lineNum
-			end
---]]
         end
         self.NUM_LINES = lineNum
 
     end})
-	for i, v in ipairs(self.db.profile.lines) do
-		local appearance = StarTip:GetModule("Appearance")
-		
-		local font = appearance.db.profile.font
-		local fontsList = LSM:List("font")
-		font = LSM:Fetch("font", fontsList[font])
-		if v.bold then
-			mod.leftLines[i]:SetFont(font, appearance.db.profile.fontSizeBold, "OUTLINE")
-			mod.rightLines[i]:SetFont(font, appearance.db.profile.fontSizeBold, "OUTLINE")
-		else
-			mod.leftLines[i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-			mod.rightLines[i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-		end
-	end
 end
 
 function mod:OnHide()
@@ -643,13 +621,6 @@ function mod:OnHide()
 			v.rightObj:Stop()
 		end
 	end
-end
-
-function mod:PLAYER_LOGIN()
-	for i, v in ipairs(mod.db.profile.lines) do
-		v.marqueeObj = nil
-	end
-	mod:CreateLines()
 end
 
 local function copy(t)

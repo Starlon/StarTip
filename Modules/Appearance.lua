@@ -76,22 +76,25 @@ local options = {
 		set = set,
 		order = 5
 	},
-	--[[fontSizeNormal = {
+	fontSizeNormal = {
 		name = "Normal font size",
 		desc = "Set the normal font size",
 		type = "input",
-		get = function() StarTip:Print("test"); return 1 end,
+		pattern = "%d",
+		get = function() return mod.db.profile.fontSizeNormal end,
+		set = function(info, v) mod.db.profile.fontSizeNormal = v end,
 		order = 6
 	},
 	fontSizeBold = {
 		name = "Bold font size",
 		desc = "Set the bold font size",
 		type = "input",
-		get = get,
-		set = set,
+		pattern = "%d",
+		get = function() return mod.db.profile.fontSizeBold end,
+		set = function(info, v) mod.db.profile.fontSizeBold = v end,
 		pattern = "%d",
 		order = 7
-	},]]
+	},
 	edgeFile = {
 		name = "Tooltip Border",
 		desc = "Set the tooltip's border style",
