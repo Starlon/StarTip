@@ -736,7 +736,6 @@ function mod:RebuildOpts()
                     set = function(info, val) v.right = val; v.rightDirty = true end,
                     validate = function(info, str)
 						if str == "" then str = "return ''" end
-						
 						local ret, err = mod.evaluator.ExecuteCode(environment, "validate", str)
 						
 						if not ret then
@@ -861,6 +860,13 @@ function mod:RebuildOpts()
 							type = "header",
 							order = 1
 						},
+						marquee = {
+							name = "Enabled",
+							desc = "Enable marquee. Note that this just makes marquees use the left line only. Technically all segments on the tooltip are marquee widgets.",
+							type = "toggle",
+							get = function() return v.marquee end,
+							set = function(info, val) v.marquee = val end
+						},
 						prefix = {
 							name = "Prefix",
 							desc = "The prefix for this marquee",
@@ -868,7 +874,7 @@ function mod:RebuildOpts()
 							width = "full",
 							multiline = true,
 							get = function()
-								return v.prefix or WidgetText.defaults.prefix
+								return v.prefix
 							end,
 							set = function(info, val)
 								v.prefix = val
@@ -908,7 +914,7 @@ function mod:RebuildOpts()
 							type = "select",
 							values = WidgetText.alignmentList,
 							get = function()
-								return WidgetText.alignmenDict[v.align]
+								return WidgetText.alignmentDict[v.align]
 							end,
 							set = function(info, val)
 								v.align = WidgetText.alignmentList[val]
