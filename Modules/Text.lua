@@ -500,12 +500,13 @@ local function rtrim(text)
 end
 
 local function updateFontString(widget, fontString)
-	if not UnitExists("mouseover") then return end
 	widget.buffer = rtrim(widget.buffer)
 	fontString:SetText(widget.buffer)
 	fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
-	GameTooltip:Hide()
-	GameTooltip:Show()
+	if UnitExists("mouseover") then 
+		GameTooltip:Hide()
+		GameTooltip:Show()
+	end
 end
 
 
@@ -859,11 +860,17 @@ function mod:RebuildOpts()
 					name = "Maruqee Settings",
 					type = "group",
 					args = {
+						header = {
+							name = "Note that only the left line script is used for marquee text",
+							type = "header",
+							order = 1
+						},
 						prefix = {
 							name = "Prefix",
 							desc = "The prefix for this marquee",
 							type = "input",
 							width = "full",
+							multiline = true,
 							get = function()
 								return v.prefix or WidgetText.defaults.prefix
 							end,
@@ -877,6 +884,7 @@ function mod:RebuildOpts()
 							desc = "The postfix for this marquee",
 							type = "input",
 							width = "full",
+							multiline = true,
 							get = function()
 								return v.postfix or WidgetText.defaults.postfix
 							end,
@@ -904,7 +912,11 @@ function mod:RebuildOpts()
 							type = "select",
 							values = WidgetText.alignments,
 							get = function()
-								return v.align or WidgetText.defaults.align
+								if v.align then
+									return WidgetText.aligns[v.align]
+								else
+									return WidgetText.defaults.align
+								end
 							end,
 							set = function(info, val)
 								v.align = val
