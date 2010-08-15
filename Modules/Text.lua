@@ -568,7 +568,10 @@ function mod:CreateLines()
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
 						
-						if not v.leftObj then
+						if not v.leftObj or not v.lineNum ~= lineNum then
+							if v.leftObj then 
+								v.leftObj:Del() 
+							end
 							v.string = v.left
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.leftObj.visitor.lcd = self.lcd
@@ -583,7 +586,10 @@ function mod:CreateLines()
 							v.leftObj:Start()
 						end
 					
-						if not v.rightObj then
+						if not v.rightObj or not v.lineNum ~= lineNum then
+							if v.rightObj then
+								v.rightObj:Del()
+							end
 							v.string = v.right
 							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
 							v.rightObj.visitor.lcd = self.lcd
@@ -604,7 +610,8 @@ function mod:CreateLines()
                     else
 						GameTooltip:AddLine(' ', 1, 1, 1)
 							
-						if not v.leftObj then
+						if not v.leftObj or not v.lineNum ~= lineNum then
+							if v.leftObj then v.leftObj:Del() end
 							v.string = v.left
 							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
 							tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
@@ -620,6 +627,7 @@ function mod:CreateLines()
 							v.leftObj:Start()
 							v.leftObj:Update()
 						end
+						v.lineNum = lineNum
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
                     end
 					
