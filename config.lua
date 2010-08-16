@@ -1,4 +1,7 @@
 StarTip.config = [[
+ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALIGN_PINGPONG = 1, 2, 3, 4, 5, 6
+SCROLL_RIGHT, SCROLL_LEFT = 1, 2
+
 local foo = 500
 return {
     ["display_startip"] = {
@@ -37,26 +40,32 @@ return {
 		postfix = '',
 		precision = 0xbabe,
 		align = ALIGN_LEFT,
-		update = 0,
-		speed = 0,
-		direction = SCROLL_RIGHT,
 		cols = 5,
-		color = "return 0xffffffff"
+		color = "return 0xffffffff",
+		width = 5,
 	},
 	["widget_name"] = {
 		type = "text",
 		value = "return UnitName('player')",
-		cols = 10
+		cols = 10,
+		align = ALIGN_MARQUEE,
+		update = 500,
+		speed = 100,
+		direction = SCROLL_LEFT,
+		width = 10,
+		dontTrim = true
 	},
 	["widget_class_label"] = {
 		type = "text",
 		value = 'return "Class:"',
-		cols = 7
+		cols = 7,
+		width = 6,
 	},
 	["widget_class"] = {
 		type = "text",
 		value = "return UnitClass('player')",
-		cols = 10
+		cols = 10,
+		width = 10
 	},
 	["widget_icon_blob"] = {
 		["bitmap"] = {

@@ -19,9 +19,9 @@ local defaults = {profile= {cores={}}}
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	
-	self.config = Evaluator.ExecuteCode({}, mod:GetName(), StarTip.config)
+	--self.config = Evaluator.ExecuteCode({}, mod:GetName(), StarTip.config)
 		
-	self.lcd = LibDriverQTip:New(self, "display_startip", self.config, StarTip.db.profile.errorLevel)
+	self.lcd = LibDriverQTip:New(self, "display_startip", StarTip.config, StarTip.db.profile.errorLevel)
 	self.lcd.core:CFGSetup()
 	self.lcd.core:BuildLayouts()
 	
