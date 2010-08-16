@@ -178,7 +178,7 @@ local options = {
 local new, newDict, del
 do
 	local pool = setmetatable({},{__mode='k'})
-	function StarTip.new(self, ...)
+	function StarTip.new(...)
 		local t = next(pool)
 		if t then
 			pool[t] = nil
@@ -193,14 +193,13 @@ do
 		return t
 	end
 	function StarTip.newDict(...)
-		local test
 		local t = next(pool)
 		if t then
 			pool[t] = nil
 		else
 			t = {}			
 		end
-		for i=(test and 2 or 1), select("#", ...), 2 do
+		for i=1, select("#", ...), 2 do
 			t[select(i, ...)] = select(i+1, ...)
 		end
 		t.__starref__ = true
@@ -208,16 +207,14 @@ do
 	end	
 	function StarTip.del(...)
 		local t = select(1, ...)
-		local test
 		if type(t) ~= "table" or not t.__starref__ then return end
-		for i=(test and 2 or 1), select("#", ...) do
+		for i=1, select("#", ...) do
 			local t = select(i, ...)
 			if (t and type(t) ~= table) or t == nil then break end
 			for k, v in pairs(t) do
 				if type(k) == "table" then
 					StarTip.del(k)
 				end
-				pool[k] = true
 			end
 		end
 		local count = 0
@@ -225,9 +222,7 @@ do
 			t[k] = nil
 		end
 		t.__starref__ = nil
-		pool[t] = true		
-		t = nil
-		
+		pool[t] = true				
 	end
 end
 
