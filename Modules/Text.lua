@@ -31,30 +31,6 @@ environment.new = StarTip.new
 environment.newDict = StarTip.newDict
 environment.del = StarTip.del
 environment._G = _G
-environment.UnitExists = _G.UnitExists
-environment.UnitIsPlayer = _G.UnitIsPlayer
-environment.UnitBuff = _G.UnitBuff
-environment.GetSpellInfo = _G.GetSpellInfo
-environment.UnitIsConnected = _G.UnitIsConnected
-environment.UnitIsFeignDeath = _G.UnitIsFeignDeath
-environment.UnitIsGhost = _G.UnitIsGhost
-environment.UnitIsDead = _G.UnitIsDead
-environment.UnitLevel = _G.UnitLevel
-environment.UnitClassification = _G.UnitClassification
-environment.UnitSelectionColor = _G.UnitSelectionColor
-environment.UnitRace = _G.UnitRace
-environment.GetGuildInfo = _G.GetGuildInfo
-environment.UnitName = _G.UnitName
-environment.UnitClass = _G.UnitClass
-environment.UnitHealth = _G.UnitHealth
-environment.UnitHealthMax = _G.UnitHealthMax
-environment.UnitMana = _G.UnitMana
-environment.UnitManaMax = _G.UnitManaMax
-environment.UnitFactionGroup = _G.UnitFactionGroup
-environment.UnitCreatureFamily = _G.UnitCreatureFamily
-environment.UnitCreatureType = _G.UnitCreatureType
-environment.UnitIsUnit = _G.UnitIsUnit
-environment.RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local factionList = {}
 local linesToAdd = {}
@@ -460,7 +436,8 @@ function mod:OnInitialize()
     StarTip:SetOptionsDisabled(options, true)
 	
 	-- create our core object. Note that we must provide it with an LCD after it is created.
-	self.core = LibCore:New(mod, environment, name, config, "text", StarTip.db.profile.errorLevel)
+	
+	self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
 	self.lcd = LCDText:New(self.core, 1, 0, 0, 0, 0, 0)
 	self.core.lcd = self.lcd
 	
@@ -576,8 +553,8 @@ function mod:CreateLines()
 						
 						if not v.leftObj or v.lineNum ~= lineNum then
 							if v.leftObj then  v.leftObj:Del() end
-							v.string = v.left
-							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
+							v.value = v.left
+							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.leftObj.visitor.lcd = self.lcd
 							v.leftObj:Start()
 						else
@@ -592,8 +569,8 @@ function mod:CreateLines()
 					
 						if not v.rightObj or v.lineNum ~= lineNum then
 							if v.rightObj then v.rightObj:Del() end
-							v.string = v.right
-							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
+							v.value = v.right
+							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
 							v.rightObj.visitor.lcd = self.lcd
 							v.rightObj:Start()
 							
@@ -611,8 +588,8 @@ function mod:CreateLines()
 							
 						if not v.leftObj or v.lineNum ~= lineNum then
 							if v.leftObj then v.leftObj:Del() end
-							v.string = v.left
-							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, environment, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
+							v.value = v.left
+							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
 							v.leftObj.visitor.lcd = lcd						
 							v.leftObj:Start()
 							v.lineNum = lineNum
