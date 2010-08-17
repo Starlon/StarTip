@@ -5,7 +5,7 @@ SCROLL_RIGHT, SCROLL_LEFT = 1, 2
 local foo = 500
 return {
     ["display_startip"] = {
-		["driver"] = "startip",
+		["driver"] = "qtip",
 		["layers"] = 3,
 		["background"] = "d9ccf16f",
 		["rows"] = 2,
@@ -25,11 +25,11 @@ return {
 	["layout_startip"] = {
 		["row1"] = {
     		["col1"] = "widget_name_label",
-    		["col10"] = "widget_name"
+    		["col9"] = "widget_name"
         }, 
 		["row2"] = {
     		["col1"] = "widget_class_label", 
-    		["col10"] = "widget_class"
+    		["col9"] = "widget_class"
         }, 
 		["transition"] = "U"
     }, 
@@ -39,27 +39,25 @@ return {
 		prefix = '',
 		postfix = '',
 		precision = 0xbabe,
-		align = ALIGN_LEFT,
-		cols = 5,
-		color = "return 0xffffffff",
-		width = 5,
+		align = ALIGN_RIGHT,
+		cols = 9,
+		color = "return 0xffffffff"
 	},
 	["widget_name"] = {
 		type = "text",
 		value = "return UnitName('player')",
-		cols = 10,
+		cols = 20,
 		align = ALIGN_MARQUEE,
 		update = 500,
 		speed = 100,
 		direction = SCROLL_LEFT,
-		width = 10,
 		dontTrim = true
 	},
 	["widget_class_label"] = {
 		type = "text",
 		value = 'return "Class:"',
-		cols = 7,
-		width = 6,
+		cols = 9,
+		align = ALIGN_RIGHT
 	},
 	["widget_class"] = {
 		type = "text",

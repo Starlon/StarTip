@@ -369,7 +369,7 @@ return self.unitLocation
 		rightUpdating = true,
 		enabled = false,
 		marquee = true,
-		cols = 20,
+		cols = 100,
 		prefix = 'return "---"',
 		postfix = 'return "---"',
 		bold = true,
