@@ -248,7 +248,7 @@ if class == "worldboss" then
 elseif class == "rareelite" then
     lvl = lvl .. "+ Rare"
 elseif class == "elite" then
-    lvl = lvl + "+"
+    lvl = lvl .. "+"
 elseif class == "rare" then
     lvl = lvl .. "rare"
 end
