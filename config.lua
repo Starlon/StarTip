@@ -31,6 +31,14 @@ return {
     		["col1"] = "widget_class_label", 
     		["col9"] = "widget_class"
         }, 
+		["row3"] = {
+			["col1"] = "widget_race_label",
+			["col9"] = "widget_race",
+		},
+		["row4"] = {
+			["col1"] = "widget_level_label",
+			["col9"] = "widget_level",
+		},
 		["transition"] = "U"
     }, 
 	["widget_name_label"] = {
@@ -62,8 +70,29 @@ return {
 	["widget_class"] = {
 		type = "text",
 		value = "return UnitClass('player')",
-		cols = 10,
-		width = 10
+		cols = 10
+	},
+	["widget_race_label"] = {
+		type = "text",
+		value = 'return "Race:"',
+		cols = 9,
+		align = ALIGN_RIGHT
+	},
+	["widget_race"] = {
+		type = "text",
+		value = "return UnitRace('player')",
+		cols = 10
+	},
+	["widget_level_label"] = {
+		type = "text",
+		value = 'return "Level:"',
+		cols = 9,
+		align = ALIGN_RIGHT,
+	},
+	["widget_level"] = {
+		type = "text",
+		value = "return UnitLevel('player')",
+		cols = 10
 	},
 	["widget_icon_blob"] = {
 		["bitmap"] = {
