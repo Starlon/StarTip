@@ -370,12 +370,10 @@ return self.unitLocation
 		enabled = false,
 		marquee = true,
 		cols = 100,
-		prefix = 'return "---"',
-		postfix = 'return "---"',
 		bold = true,
 		align = WidgetText.ALIGN_MARQUEE,
 		update = 1000,
-		speed = 500,
+		speed = 100,
 		direction = DIRECTION_LEFT
 	},
 	[15] = {
