@@ -157,12 +157,16 @@ function del(t)
 end
 ]]
 
-local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500}}
+local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 100}}
 
 local defaultLines={
     [1] = {
         name = "UnitName",
         left = [[
+return self.unitName
+]],
+        right = nil,
+		colorLeft = [[
 local c
 if self.UnitIsPlayer("mouseover") then
     c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
@@ -170,10 +174,8 @@ else
     c = self:new()
     c.r, c.g, c.b = self.UnitSelectionColor("mouseover")
 end
-return self.unitName, c
+return c
 ]],
-        right = nil,
-        rightUpdating = false,
 		bold = true,
 		enabled = true
     },
@@ -182,6 +184,14 @@ return self.unitName, c
         left = 'return "Target:"',
         right = [[		
 if self.UnitExists("mouseovertarget") then
+    local name = self.UnitName("mouseovertarget")
+    return name
+else
+    return "None", self.newDict("r", 1, "g", 1, "b", 1)
+end
+]],
+		colorRight = [[
+if self.UnitExists("mouseovertarget") then
     local c
     if self.UnitIsPlayer("mouseovertarget") then
         c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseovertarget"))]
@@ -189,11 +199,10 @@ if self.UnitExists("mouseovertarget") then
         c = self:new()
         c.r, c.g, c.b = self.UnitSelectionColor("mouseovertarget")
     end
-    local name = self.UnitName("mouseovertarget")
-    return name, c
+    return c
 else
-    return "None", self.newDict("r", 1, "g", 1, "b", 1)
-end
+    return self.newDict("r", 1, "g", 1, "b", 1)
+end		
 ]],
         rightUpdating = true,
 		enabled = true
@@ -205,7 +214,6 @@ end
 local guild = self.GetGuildInfo("mouseover")
 if guild then return "<" .. guild .. ">" else return self.unitGuild end
 ]],
-        rightUpdating = false,
 		enabled = true
     },
     [4] = {
@@ -214,7 +222,6 @@ if guild then return "<" .. guild .. ">" else return self.unitGuild end
         right = [[
 return select(2, self.GetGuildInfo("mouseover"))
 ]],    
-        rightUpdating = false,
 		enabled = true
     },
     [5] = {
@@ -223,7 +230,6 @@ return select(2, self.GetGuildInfo("mouseover"))
         right = [[
 return select(2, self.UnitName("mouseover"))
 ]],
-        rightUpdating = false,
 		enabled = true
     },
     [6] = {
@@ -251,7 +257,6 @@ self.del(classifications)
 
 return lvl
 ]],
-        rightUpdating = false,
 		enabled = true
     },
     [7] = {
@@ -266,7 +271,6 @@ else
 end
 return race        
 ]],
-        rightUpdating = false,
 		enabled = true
     },
     [8] = {
@@ -275,10 +279,12 @@ return race
         right = [[
 local class = self.UnitClass("mouseover")
 if class == self.UnitName("mouseover") then return end
-local c = self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
-return class, c
+return class
 ]],
-        rightUpdating = false,
+		colorRight = [[
+local c = self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
+return c
+		]],
 		enabled = true
     },
     [9] = {
@@ -287,7 +293,6 @@ return class, c
         right = [[
 return self.UnitFactionGroup("mouseover")
 ]],
-        rightUpdating = false,
 		enabled = true
     },
     [10] = {
@@ -308,7 +313,6 @@ elseif self.UnitIsDead("mouseover") then
     return "Dead"
 end
 ]],
-        rightUpdating = false,
 		enabled = true
     },
     [11] = {
@@ -339,7 +343,6 @@ end
 
 return (self.powers[class] or "Mana:")
 ]],
-		rightUpdating = false,
         right = [[
 local mana = self.UnitMana("mouseover")
 local maxMana = self.UnitManaMax("mouseover")
@@ -360,7 +363,6 @@ return value
         right = [[
 return self.unitLocation
 ]],
-        rightUpdating = false,
 		enabled = true
     },
 	[14] = {
@@ -388,7 +390,7 @@ else
     return "Between " .. min .. " and " .. max .. " yards"
 end
 ]],
-		rightUpdating = true,
+		leftUpdating = true,
 		enabled = true,
 		update = 1000
 	}
@@ -531,19 +533,19 @@ function mod:CreateLines()
         for i, v in ipairs(self) do
 			if v.enabled then
 				
-                local left, right, c = '', ''
+                local left, right, c, cc = '', ''
                 if v.right then 
-                    right, c = mod.evaluator.ExecuteCode(environment, v.name, v.right)
-                    left, cc = mod.evaluator.ExecuteCode(environment, v.name, v.left)
+                    right = mod.evaluator.ExecuteCode(environment, v.name, v.right)
+					c = mod.evaluator.ExecuteCode(environment, v.name, v.colorRight)
+                    left = mod.evaluator.ExecuteCode(environment, v.name, v.left)
+					cc = mod.evaluator.ExecuteCode(environment, v.name, v.colorLeft)
 					if right == "" then right = "nil" end
                 else 
                     right = ''
-                    left, c = mod.evaluator.ExecuteCode(environment, v.name, v.left)
+                    left = mod.evaluator.ExecuteCode(environment, v.name, v.left)
+					c = mod.evaluator.ExecuteCode(environment, v.name, v.colorLeft)
                 end 
 
-				if v.rightUpdating then
-					v.update = 500
-				end
                 if left and left ~= "" and right ~= "nil" and not v.deleted then 
                     lineNum = lineNum + 1
                     if v.right then
@@ -552,9 +554,12 @@ function mod:CreateLines()
 						if not v.leftObj or v.lineNum ~= lineNum then
 							if v.leftObj then  v.leftObj:Del() end
 							v.value = v.left
+							local tmp = v.update
+							if not v.leftUpdating then v.update = 0 end
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.leftObj.visitor.lcd = self.lcd
 							v.leftObj:Start()
+							v.update = tmp
 						else
 							v.leftObj:Start()
 						end
@@ -568,10 +573,12 @@ function mod:CreateLines()
 						if not v.rightObj or v.lineNum ~= lineNum then
 							if v.rightObj then v.rightObj:Del() end
 							v.value = v.right
+							local tmp = v.update
+							if not v.rightUpdating then v.update = 0 end
 							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
 							v.rightObj.visitor.lcd = self.lcd
 							v.rightObj:Start()
-							
+							v.update = tmp
 						end
 						if type(c) == "table" and c.r and c.g and c.b then
 							v.rightObj.color.r = (c.r * 255)
@@ -587,10 +594,13 @@ function mod:CreateLines()
 						if not v.leftObj or v.lineNum ~= lineNum then
 							if v.leftObj then v.leftObj:Del() end
 							v.value = v.left
+							local tmp = v.update
+							if not v.leftUpdating then v.update = 0 end
 							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
 							v.leftObj.visitor.lcd = lcd						
 							v.leftObj:Start()
 							v.lineNum = lineNum
+							v.update = tmp
 						end
 						if type(c) == "table" and c.r and c.g and c.b then
 							v.leftObj.color.r = c.r * 255 or 255
@@ -749,16 +759,50 @@ function mod:RebuildOpts()
 					width = "full",
                     order = 2
                 },
+				colorLeft = {
+					name = "Left Color",
+					type = "input",
+					desc = "Color for left segment",
+					get = function() return v.colorLeft end,
+					set = function(info, val)
+						v.colorLeft = val
+					end,
+					multiline = true,
+					width = "full",
+					order = 3
+				},
+				colorRight = {
+					name = "Right Color",
+					type = "input",
+					desc = "Color for right segment",
+					get = function() return v.colorRight end,
+					set = function(info, val)
+						v.colorRight = val
+					end,
+					multiline = true,
+					width = "full",
+					order = 4
+				},
+				leftUpdating = {
+					name = "Left Updating",
+					type = "toggle",
+					get = function() return v.leftUpdating end,
+					set = function(info, val)
+						v.leftUpdating = v
+						self:CreateLines()
+					end,
+					order = 5
+				},
                 rightUpdating = {
                     name = "Updating",
                     desc = "Whether this line refreshes while hovering over unit.",
                     type = "toggle",
-                    get = function() return v.rightUpdating and v.update ~= nil end,
+                    get = function() return v.rightUpdating end,
                     set = function(info, val) 
 						v.rightUpdating = val 
 						self:CreateLines()
 					end,
-                    order = 3
+                    order = 6
                 },
                 up = {
                     name = "Move Up",
@@ -777,7 +821,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
                     end,
-                    order = 4
+                    order = 7
                 },
                 down = {
                     name = "Move Down",
@@ -796,7 +840,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
                     end,
-                    order = 5
+                    order = 8
                 },
 				bold = {
 					name = "Bold",
@@ -807,7 +851,7 @@ function mod:RebuildOpts()
 						self.db.profile.lines[i].bold = v
 						self:CreateLines() 
 					end,
-					order = 6
+					order = 9
 				},
 				enabled = {
 					name = "Enabled",
@@ -818,7 +862,7 @@ function mod:RebuildOpts()
 						self.db.profile.lines[i].enabled = v
 						self:CreateLines()
 					end,
-					order = 7
+					order = 10
 				},
 				delete = {
 					name = "Delete",
