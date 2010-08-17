@@ -369,11 +369,11 @@ return self.unitLocation
 		rightUpdating = true,
 		enabled = false,
 		marquee = true,
-		width = 20,
+		cols = 20,
 		prefix = 'return "---"',
 		postfix = 'return "---"',
 		bold = true,
-		align = 'M',
+		align = WidgetText.ALIGN_MARQUEE,
 		update = 1000,
 		speed = 500,
 		direction = DIRECTION_LEFT
