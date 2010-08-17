@@ -187,7 +187,7 @@ if self.UnitExists("mouseovertarget") then
     local name = self.UnitName("mouseovertarget")
     return name
 else
-    return "None", self.newDict("r", 1, "g", 1, "b", 1)
+    return "None"
 end
 ]],
 		colorRight = [[
@@ -196,12 +196,16 @@ if self.UnitExists("mouseovertarget") then
     if self.UnitIsPlayer("mouseovertarget") then
         c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseovertarget"))]
     else
-        c = self:new()
+        c = self.new()
         c.r, c.g, c.b = self.UnitSelectionColor("mouseovertarget")
     end
     return c
 else
-    return self.newDict("r", 1, "g", 1, "b", 1)
+	c = self.new()
+	c.r = 1
+	c.g = 1
+	c.b = 1
+    return c
 end		
 ]],
         rightUpdating = true,

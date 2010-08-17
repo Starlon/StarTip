@@ -192,6 +192,7 @@ do
 		
 		return t
 	end
+	--[[
 	function StarTip.newDict(...)
 		local t = next(pool)
 		if t then
@@ -204,7 +205,7 @@ do
 		end
 		t.__starref__ = true
 		return t
-	end	
+	end	]]
 	function StarTip.del(...)
 		local t = select(1, ...)
 		if type(t) ~= "table" or not t.__starref__ then return end
