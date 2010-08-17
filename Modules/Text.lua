@@ -322,7 +322,7 @@ end
         left = 'return "Health:"',
         right = [[
 local health, maxHealth = self.UnitHealth("mouseover"), self.UnitHealthMax("mouseover")    
-local value
+local value = "Unknown"
 if maxHealth == 100 then 
     value = health .. "%"
 elseif maxHealth ~= 0 then
@@ -348,6 +348,7 @@ return (self.powers[class] or "Mana:")
         right = [[
 local mana = self.UnitMana("mouseover")
 local maxMana = self.UnitManaMax("mouseover")
+local value = "Unknown"
 if maxMana == 100 then
     value = mana
 elseif maxMana ~= 0 then
@@ -480,9 +481,6 @@ end
 
 function draw()
 	local drawn
-	if not UnitExists("mouseover") then
-		return
-	end
 	--[[for i, v in ipairs(linesToDraw) do
 		v.i = i
 	end]]
@@ -514,7 +512,7 @@ function draw()
 					end
 				end
 			end
-		end
+		end		
 	if UnitExists("mouseover") and drawn then 
 		GameTooltip:Hide()
 		GameTooltip:Show()
@@ -553,7 +551,7 @@ function mod:CreateLines()
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
 						
-						if not v.leftObj or v.lineNum ~= lineNum then
+						if false and not v.leftObj or v.lineNum ~= lineNum then
 							if v.leftObj then  v.leftObj:Del() end
 							v.value = v.left
 							local tmp = v.update
@@ -593,7 +591,7 @@ function mod:CreateLines()
                     else
 						GameTooltip:AddLine(' ')
 							
-						if not v.leftObj or v.lineNum ~= lineNum then
+						if false and not v.leftObj or v.lineNum ~= lineNum then
 							if v.leftObj then v.leftObj:Del() end
 							v.value = v.left
 							local tmp = v.update
