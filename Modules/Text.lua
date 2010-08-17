@@ -680,9 +680,17 @@ function mod:RebuildOpts()
 			desc = "Roll back to defaults.",
 			type = "execute",
 			func = function()
-				self.db.profile.lines = {}
 				for i, v in ipairs(defaultLines) do
-					tinsert(self.db.profile.lines, v)
+					local replaced
+					for j, vv in ipairs(self.db.profile.lines) do
+						if v.name == vv.name then
+							self.db.profile.lines[j] = v
+							replaced = true
+						end
+					end
+					if not replaced then
+						tinsert(self.db.profile.lines, v)
+					end
 				end
 				self:RebuildOpts()
 				StarTip:RebuildOpts()
