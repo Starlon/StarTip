@@ -721,17 +721,7 @@ function mod:RebuildOpts()
 						self:CreateLines()						
 					end,
                     validate = function(info, str)	
-						StarTip:Print("Validate " .. str)
-						
-						local ret, err = mod.evaluator.ExecuteCode(environment, "validate", str)
-						
-						if not ret then
-							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
-							v.error = true
-							return false
-						end
-						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret or ""))
-						return true
+						return mod.evaluator:Validate(environment, str)
 					end,
                     multiline = true,
 					width = "full",
@@ -750,18 +740,8 @@ function mod:RebuildOpts()
 						end
 						self:CreateLines()						
 					end,
-                    validate = function(info, str)
-						if str == "" then str = "return ''" end
-						local ret, err = mod.evaluator.ExecuteCode(environment, "validate", str)
-						
-						if not ret then
-							StarTip:Print(("Code failed to load. Error message: %s"):format(err or ""))
-							return false
-						end
-						
-						StarTip:Print(("Code loaded without error. Return value: %s"):format(ret or ""))
-					    return true
-					
+                    validate = function(info, str)	
+						return mod.evaluator:Validate(environment, str)
 					end,
                     multiline = true,
 					width = "full",
@@ -775,6 +755,9 @@ function mod:RebuildOpts()
 					set = function(info, val)
 						v.colorLeft = val
 					end,
+                    validate = function(info, str)	
+						return mod.evaluator:Validate(environment, str)
+					end,					
 					multiline = true,
 					width = "full",
 					order = 3
@@ -786,6 +769,9 @@ function mod:RebuildOpts()
 					get = function() return v.colorRight end,
 					set = function(info, val)
 						v.colorRight = val
+					end,
+                    validate = function(info, str)	
+						return mod.evaluator:Validate(environment, str)
 					end,
 					multiline = true,
 					width = "full",
