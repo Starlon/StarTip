@@ -235,13 +235,7 @@ return select(2, self.UnitName("mouseover"))
     [6] = {
         name = "Level",
         left = 'return "Level:"',
-        right = [[
-local classifications = self:newDict(
-    "worldboss", "Boss",
-    "rareelite", "+ Rare",
-    "elite", "+",
-    "rare", "Rare")
-            
+        right = [[            
 local lvl = self.UnitLevel("mouseover")    
 local class = self.UnitClassification("mouseover")
     
@@ -249,16 +243,20 @@ if lvl <= 0 then
     lvl = ''
 end
 
-if classifications[class] then
-    lvl = lvl .. classifications[class]
+if class == "worldboss" then 
+    lvl = lvl .. "Boss"
+elseif class == "rareelite" then
+    lvl = lvl .. "+ Rare"
+elseif class == "elite" then
+    lvl = lvl + "+"
+elseif class == "rare" then
+    lvl = lvl .. "rare"
 end
-
-self.del(classifications)
 
 return lvl
 ]],
 		enabled = true
-    },
+    },	
     [7] = {
         name = "Race",
         left = 'return "Race:"',
@@ -543,7 +541,7 @@ function mod:CreateLines()
                 else 
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name, v.left)
-					c = mod.evaluator.ExecuteCode(environment, v.name, v.colorLeft)
+					--c = mod.evaluator.ExecuteCode(environment, v.name, v.colorLeft)
                 end 
 
                 if left and left ~= "" and right ~= "nil" and not v.deleted then 
@@ -707,76 +705,6 @@ function mod:RebuildOpts()
             order = i + 5
         }
 		options["line" .. i].args = {
-	            left = {
-                    name = "Left",
-                    type = "input",
-                    desc = "Left text code",
-                    get = function() return v.left end,
-                    set = function(info, val) 
-						v.left = val 
-						v.leftDirty = true 
-						if val == "" then
-							v.left = nil
-						end
-						self:CreateLines()						
-					end,
-                    validate = function(info, str)	
-						return mod.evaluator:Validate(environment, str)
-					end,
-                    multiline = true,
-					width = "full",
-                    order = 1
-                },
-                right = {
-                    name = "Right",
-                    type = "input",
-                    desc = "Right text code",
-                    get = function() return v.right end,
-                    set = function(info, val) 
-						v.right = val; 
-						v.rightDirty = true 
-						if val == "" then
-							v.right = nil
-						end
-						self:CreateLines()						
-					end,
-                    validate = function(info, str)	
-						return mod.evaluator:Validate(environment, str)
-					end,
-                    multiline = true,
-					width = "full",
-                    order = 2
-                },
-				colorLeft = {
-					name = "Left Color",
-					type = "input",
-					desc = "Color for left segment",
-					get = function() return v.colorLeft end,
-					set = function(info, val)
-						v.colorLeft = val
-					end,
-                    validate = function(info, str)	
-						return mod.evaluator:Validate(environment, str)
-					end,					
-					multiline = true,
-					width = "full",
-					order = 3
-				},
-				colorRight = {
-					name = "Right Color",
-					type = "input",
-					desc = "Color for right segment",
-					get = function() return v.colorRight end,
-					set = function(info, val)
-						v.colorRight = val
-					end,
-                    validate = function(info, str)	
-						return mod.evaluator:Validate(environment, str)
-					end,
-					multiline = true,
-					width = "full",
-					order = 4
-				},
 				leftUpdating = {
 					name = "Left Updating",
 					type = "toggle",
@@ -883,8 +811,79 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
 					end,
-					order = 100
+					order = 11
 				},
+	            left = {
+                    name = "Left",
+                    type = "input",
+                    desc = "Left text code",
+                    get = function() return v.left end,
+                    set = function(info, val) 
+						v.left = val 
+						v.leftDirty = true 
+						if val == "" then
+							v.left = nil
+						end
+						self:CreateLines()						
+					end,
+                    validate = function(info, str)	
+						return mod.evaluator:Validate(environment, str)
+					end,
+                    multiline = true,
+					width = "full",
+                    order = 12
+                },
+                right = {
+                    name = "Right",
+                    type = "input",
+                    desc = "Right text code",
+                    get = function() return v.right end,
+                    set = function(info, val) 
+						v.right = val; 
+						v.rightDirty = true 
+						if val == "" then
+							v.right = nil
+						end
+						self:CreateLines()						
+					end,
+                    validate = function(info, str)	
+						return mod.evaluator:Validate(environment, str)
+					end,
+                    multiline = true,
+					width = "full",
+                    order = 13
+                },
+				colorLeft = {
+					name = "Left Color",
+					type = "input",
+					desc = "Color for left segment",
+					get = function() return v.colorLeft end,
+					set = function(info, val)
+						v.colorLeft = val
+					end,
+                    validate = function(info, str)	
+						return mod.evaluator:Validate(environment, str)
+					end,					
+					multiline = true,
+					width = "full",
+					order = 14
+				},
+				colorRight = {
+					name = "Right Color",
+					type = "input",
+					desc = "Color for right segment",
+					get = function() return v.colorRight end,
+					set = function(info, val)
+						v.colorRight = val
+					end,
+                    validate = function(info, str)	
+						return mod.evaluator:Validate(environment, str)
+					end,
+					multiline = true,
+					width = "full",
+					order = 15
+				},
+				
 				marquee = {
 					name = "Maruqee Settings",
 					type = "group",
