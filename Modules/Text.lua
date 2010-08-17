@@ -541,7 +541,7 @@ function mod:CreateLines()
                 else 
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name, v.left)
-					--c = mod.evaluator.ExecuteCode(environment, v.name, v.colorLeft)
+					c = mod.evaluator.ExecuteCode(environment, v.name, v.colorLeft)
                 end 
 
                 if left and left ~= "" and right ~= "nil" and not v.deleted then 
@@ -705,26 +705,38 @@ function mod:RebuildOpts()
             order = i + 5
         }
 		options["line" .. i].args = {
+				enabled = {
+					name = "Enabled",
+					desc = "Whether to show this line or not",
+					type = "toggle",
+					get = function() return self.db.profile.lines[i].enabled end,
+					set = function(info, v)
+						self.db.profile.lines[i].enabled = v
+						self:CreateLines()
+					end,
+					order = 1
+				},		
 				leftUpdating = {
 					name = "Left Updating",
+					desc = "Whether this segment refreshes",
 					type = "toggle",
 					get = function() return v.leftUpdating end,
 					set = function(info, val)
 						v.leftUpdating = v
 						self:CreateLines()
 					end,
-					order = 5
+					order = 2
 				},
                 rightUpdating = {
-                    name = "Updating",
-                    desc = "Whether this line refreshes while hovering over unit.",
+                    name = "Right Updating",
+                    desc = "Whether this segment refreshes",
                     type = "toggle",
                     get = function() return v.rightUpdating end,
                     set = function(info, val) 
 						v.rightUpdating = val 
 						self:CreateLines()
 					end,
-                    order = 6
+                    order = 3
                 },
                 up = {
                     name = "Move Up",
@@ -743,7 +755,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
                     end,
-                    order = 7
+                    order = 4
                 },
                 down = {
                     name = "Move Down",
@@ -762,7 +774,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
                     end,
-                    order = 8
+                    order = 5
                 },
 				bold = {
 					name = "Bold",
@@ -773,18 +785,7 @@ function mod:RebuildOpts()
 						self.db.profile.lines[i].bold = v
 						self:CreateLines() 
 					end,
-					order = 9
-				},
-				enabled = {
-					name = "Enabled",
-					desc = "Whether to show this line or not",
-					type = "toggle",
-					get = function() return self.db.profile.lines[i].enabled end,
-					set = function(info, v)
-						self.db.profile.lines[i].enabled = v
-						self:CreateLines()
-					end,
-					order = 10
+					order = 6
 				},
 				delete = {
 					name = "Delete",
@@ -811,8 +812,8 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
 					end,
-					order = 11
-				},
+					order = 7
+				},								
 	            left = {
                     name = "Left",
                     type = "input",
@@ -831,7 +832,7 @@ function mod:RebuildOpts()
 					end,
                     multiline = true,
 					width = "full",
-                    order = 12
+                    order = 8
                 },
                 right = {
                     name = "Right",
@@ -851,7 +852,7 @@ function mod:RebuildOpts()
 					end,
                     multiline = true,
 					width = "full",
-                    order = 13
+                    order = 9
                 },
 				colorLeft = {
 					name = "Left Color",
@@ -866,7 +867,7 @@ function mod:RebuildOpts()
 					end,					
 					multiline = true,
 					width = "full",
-					order = 14
+					order = 10
 				},
 				colorRight = {
 					name = "Right Color",
@@ -881,9 +882,8 @@ function mod:RebuildOpts()
 					end,
 					multiline = true,
 					width = "full",
-					order = 15
+					order = 11
 				},
-				
 				marquee = {
 					name = "Maruqee Settings",
 					type = "group",
