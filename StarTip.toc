@@ -21,17 +21,8 @@ Libs\StarLibs-1.0\StarLibs-1.0.xml
 embeds.xml
 
 StarTip.lua
-Modules\Fade.lua
-Modules\Appearance.lua
-Modules\Bars.lua
-Modules\Position.lua
-Modules\PvP.lua
-Modules\RaidIcon.lua
-Modules\Targeting.lua
-Modules\Text.lua
-Modules\DeadlyAnnounce.lua
-Modules\Talents.lua
-Modules\LCDDisplay.lua
+
+modules.xml
 
 config.lua
 

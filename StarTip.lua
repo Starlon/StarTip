@@ -1,4 +1,4 @@
-﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip: @project-version@", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0") 
+﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip: @project-version@", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0") 
 StarTip.version = GetAddOnMetadata("StarTip", "X-StarTip-Version") or ""
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
@@ -246,7 +246,6 @@ end
 StarTip:SetDefaultModuleState(false)
 
 function StarTip:OnInitialize()
-	
 	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
 	
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", options)

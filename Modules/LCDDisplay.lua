@@ -16,14 +16,14 @@ local defaults = {profile= {cores={}}}
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-	
-	self.lcd = LibDriverQTip:New(self, "display_startip", StarTip.config, StarTip.db.profile.errorLevel)
-	self.lcd.core:CFGSetup()
-	self.lcd.core:BuildLayouts()
-	
+		
 end
 
 function mod:OnEnable()
+	self.lcd = LibDriverQTip:New(self, "display_startip", StarTip.config, StarTip.db.profile.errorLevel)
+	self.lcd.core:CFGSetup()
+	self.lcd.core:BuildLayouts()
+
 	self.lcd.core:Start()
 	self.lcd:Show()
 end
@@ -31,6 +31,7 @@ end
 function mod:OnDisable()
 	self.lcd.core:Stop()
 	self.lcd:Hide()
+	self.lcd:Del()
 end
 
 function mod:AddLCD(core)
