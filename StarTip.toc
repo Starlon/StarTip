@@ -8,15 +8,13 @@
 ## X-License: BSD-2.0
 ## X-Credits: ckknight for CowTip and DogTags, haste for oUF
 ## X-StarTip-Version: @project-version@
-## OptionalDeps: Ace3, LibTalentQuery-1.0, LibMobHealth-4.0, DBM-Core, BigWigs
+## OptionalDeps: Ace3, LibTalentQuery-1.0, LibMobHealth-4.0, DBM-Core, BigWigs, StarLibs-1.0
 ## SavedVariables: StarTipDB
 
 Localization\enUS.lua
 
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
-
-Libs\StarLibs-1.0\StarLibs-1.0.xml
 
 embeds.xml
 

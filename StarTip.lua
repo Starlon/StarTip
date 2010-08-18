@@ -192,20 +192,6 @@ do
 		
 		return t
 	end
-	--[[
-	function StarTip.newDict(...)
-		local t = next(pool)
-		if t then
-			pool[t] = nil
-		else
-			t = {}			
-		end
-		for i=1, select("#", ...), 2 do
-			t[select(i, ...)] = select(i+1, ...)
-		end
-		t.__starref__ = true
-		return t
-	end	]]
 	function StarTip.del(...)
 		local t = select(1, ...)
 		if type(t) ~= "table" or not t.__starref__ then return end
