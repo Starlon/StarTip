@@ -24,12 +24,12 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-	self.lcd.core:StartLayout()
+	self.lcd.core:Start()
 	self.lcd:Show()
 end
 
 function mod:OnDisable()
-	self.lcd.core:StopLayout()
+	self.lcd.core:Stop()
 	self.lcd:Hide()
 end
 
