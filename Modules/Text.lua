@@ -303,7 +303,7 @@ return value
 	[14] = {
 		name = "Marquee",
 		left = 'return "StarTip " .. self._G.StarTip.version',
-		rightUpdating = true,
+		leftUpdating = true,
 		enabled = false,
 		marquee = true,
 		cols = 100,
