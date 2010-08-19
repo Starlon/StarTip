@@ -363,7 +363,7 @@ end
 local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     self.cpuperc = cpudiff / totaldiff * 100
-    return timeshort(cpu) .. " (" .. format("%.2f", self.cpuperc)  .. "%)"
+    return timeshort(cpu) .. " (" .. format("%.2f", self.cpuperc)  .. "%)" .. type(self.cpuperc)
 end
 ]],
 		colorRight = [[

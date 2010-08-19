@@ -64,12 +64,12 @@ StarTip.config = {
 	["widget_name"] = {
 		type = "text",
 		value = "return UnitName('player')",
-		cols = 20,
+		cols = 30,
 		align = ALIGN_MARQUEE,
-		update = 500,
-		speed = 100,
+		update = 100000,
+		speed = 300,
 		direction = SCROLL_LEFT,
-		dontTrim = true
+		dontRtrim = true
 	},
 	["widget_class_label"] = {
 		type = "text",
@@ -107,7 +107,8 @@ StarTip.config = {
 	["widget_mem_label"] = {
 		type = "text",
 		value = "return 'Memory:'",
-		cols = 9
+		cols = 9,
+		align = ALIGN_RIGHT
 	},
 	["widget_mem"] = {
 		type = "text",
@@ -117,13 +118,15 @@ if mem then
     self.memperc = memdiff / totaldiff * 100
     return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", self.memperc) .. "%)"
 end]],
-		cols = 10,
-		update = 1000
+		cols = 20,
+		update = 1000,
+		dontRtrim = true
 	},
 	["widget_cpu_label"] = {
 		type = "text",
 		value = "return 'CPU:'",
-		cols = 9
+		cols = 9,
+		align = ALIGN_RIGHT
 	},
 	["widget_cpu"] = {
 		type = "text",
@@ -134,8 +137,9 @@ if cpu then
     return timeshort(cpu) .. " (" .. format("%.2f", self.cpuperc)  .. "%)"
 end
 ]],
-		cols = 10,
-		update = 10000
+		cols = 20,
+		update = 1000,
+		dontRtrim = true
 	},
 	["widget_icon_blob"] = {
 		["bitmap"] = {
