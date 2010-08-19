@@ -333,7 +333,7 @@ end
 		name = "Memory Usage",
 		left = "return 'Memory Usage:'",
 		right = [[
-local mem, percent, diff, total, totaldiff = GetMemUsage("StarTip")
+local mem, percent = GetMemUsage("StarTip")
 if mem then
     return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", percent) .. "%)"
 end
@@ -346,10 +346,9 @@ end
 		desc = "Note that you must turn on CPU profiling",
 		left = 'return "CPU Usage:"',
 		right = [[
-local cpu, percent, diff, total, totaldiff = GetCPUUsage("StarTip")
+local cpu, percent = GetCPUUsage("StarTip")
 if cpu then
-    local usage = diff / totaldiff * 100
-    return format("%.2f", cpu) .. " (" .. format("%.2f", usage)  .. "%)"
+    return format("%.2f", cpu) .. " (" .. format("%.2f", percent)  .. "%)"
 end
 ]],
 		rightUpdating = true,
