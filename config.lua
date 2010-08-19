@@ -1,16 +1,17 @@
-StarTip.config = [[
 
-ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALIGN_PINGPONG = 1, 2, 3, 4, 5, 6
-SCROLL_RIGHT, SCROLL_LEFT = 1, 2
+
+local ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALIGN_PINGPONG = 1, 2, 3, 4, 5, 6
+local SCROLL_RIGHT, SCROLL_LEFT = 1, 2
 
 local foo = 500
-return {
+
+StarTip.config = {
     ["display_startip"] = {
 		["driver"] = "qtip",
 		["layers"] = 3,
 		["background"] = "d9ccf16f",
-		["rows"] = 2,
-		["cols"] = 20,
+		["rows"] = 6,
+		["cols"] = 40,
 		["layout-timeout"] = 0,
 		["update"] = 25,
 		["widget0"] = "widget_key_up",
@@ -39,6 +40,14 @@ return {
 		["row4"] = {
 			["col1"] = "widget_level_label",
 			["col9"] = "widget_level",
+		},
+		["row5"] = {
+			["col1"] = "widget_mem_label",
+			["col9"] = "widget_mem"
+		},
+		["row6"] = {
+			["col1"] = "widget_cpu_label",
+			["col9"] = "widget_cpu"
 		},
 		["transition"] = "U"
     }, 
@@ -94,6 +103,39 @@ return {
 		type = "text",
 		value = "return UnitLevel('player')",
 		cols = 10
+	},
+	["widget_mem_label"] = {
+		type = "text",
+		value = "return 'Memory:'",
+		cols = 9
+	},
+	["widget_mem"] = {
+		type = "text",
+		value = [[
+local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+if mem then
+    self.memperc = memdiff / totaldiff * 100
+    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", self.memperc) .. "%)"
+end]],
+		cols = 10,
+		update = 1000
+	},
+	["widget_cpu_label"] = {
+		type = "text",
+		value = "return 'CPU:'",
+		cols = 9
+	},
+	["widget_cpu"] = {
+		type = "text",
+		value = [[
+local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+if cpu then
+    self.cpuperc = cpudiff / totaldiff * 100
+    return timeshort(cpu) .. " (" .. format("%.2f", self.cpuperc)  .. "%)"
+end
+]],
+		cols = 10,
+		update = 10000
 	},
 	["widget_icon_blob"] = {
 		["bitmap"] = {
@@ -236,4 +278,3 @@ return {
 		["type"] = "text"
     } 
 }
-]]
