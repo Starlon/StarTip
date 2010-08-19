@@ -371,8 +371,6 @@ if type(self.cpuperc) == "number" then
     local c = new()
     if self.cpuperc > 50 then
         c.r, c.g, c.b = 1, 0, 0
-    elseif self.cpuperc < 0 then
-        c.r, c.g, c.b = 0, 0, 1
     else
         c.r, c.g, c.b = 0, 1, 0
     end
