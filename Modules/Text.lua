@@ -480,39 +480,32 @@ local function updateFontString(widget, fontString)
 end
 
 function draw()
-	local drawn
-	--[[for i, v in ipairs(linesToDraw) do
-		v.i = i
-	end]]
-		for i, table in ipairs(linesToDraw) do
-			local widget = table[1]
-			local fontString = table[2]
-			if widget.changed then
-				drawn = true
-				fontString:SetText(widget.buffer)
-				fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
+	for i, table in ipairs(linesToDraw) do
+		local widget = table[1]
+		local fontString = table[2]
+		fontString:SetText(widget.buffer)
+		fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
 		
-				local font = appearance.db.profile.font
-				local fontsList = LSM:List("font")
-				font = LSM:Fetch("font", fontsList[font])	
+		local font = appearance.db.profile.font
+		local fontsList = LSM:List("font")
+		font = LSM:Fetch("font", fontsList[font])	
 	
-				if widget.bold then
-					if mod.leftLines and mod.leftLines[widget.i] then
-						mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
-					end
-					if mod.rightLines and mod.rightLines[widget.i] then
-						mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
-					end
-				else
-					if mod.leftlines and mod.leftLines[widget.i] then
-						mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-				end
-					if mod.rightLines and mod.rightLines[widget.i] then
-						mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-					end
-				end
+		if widget.bold then
+			if mod.leftLines and mod.leftLines[widget.i] then
+				mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
 			end
-		end		
+			if mod.rightLines and mod.rightLines[widget.i] then
+				mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
+			end
+		else
+			if mod.leftlines and mod.leftLines[widget.i] then
+				mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+		end
+			if mod.rightLines and mod.rightLines[widget.i] then
+				mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+			end
+		end
+	end		
 	if UnitExists("mouseover") and drawn then 
 		GameTooltip:Hide()
 		GameTooltip:Show()
