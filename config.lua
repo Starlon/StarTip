@@ -27,27 +27,27 @@ StarTip.config = {
 	["layout_startip"] = {
 		["row1"] = {
     		["col1"] = "widget_name_label",
-    		["col9"] = "widget_name"
+    		["col10"] = "widget_name"
         }, 
 		["row2"] = {
     		["col1"] = "widget_class_label", 
-    		["col9"] = "widget_class"
+    		["col10"] = "widget_class"
         }, 
 		["row3"] = {
 			["col1"] = "widget_race_label",
-			["col9"] = "widget_race",
+			["col10"] = "widget_race",
 		},
 		["row4"] = {
 			["col1"] = "widget_level_label",
-			["col9"] = "widget_level",
+			["col10"] = "widget_level",
 		},
 		["row5"] = {
 			["col1"] = "widget_mem_label",
-			["col9"] = "widget_mem"
+			["col10"] = "widget_mem"
 		},
 		["row6"] = {
 			["col1"] = "widget_cpu_label",
-			["col9"] = "widget_cpu"
+			["col10"] = "widget_cpu"
 		},
 		["transition"] = "U"
     }, 
@@ -64,7 +64,7 @@ StarTip.config = {
 	["widget_name"] = {
 		type = "text",
 		value = "return UnitName('player')",
-		cols = 30,
+		cols = 40,
 		align = ALIGN_MARQUEE,
 		update = 100000,
 		speed = 300,

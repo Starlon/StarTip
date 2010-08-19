@@ -118,14 +118,7 @@ return c
     [2] = {
         name = "Target",
         left = 'return "Target:"',
-        right = [[
-if self.UnitExists("mouseovertarget") then
-    local name = self.UnitName("mouseovertarget")
-    return name
-else
-    return "None"
-end
-]],
+        right = 'return UnitName("mouseovertarget") or "None"',
 		colorRight = [[
 if self.UnitExists("mouseovertarget") then
     local c
@@ -151,8 +144,7 @@ end
         name = "Guild",
         left = 'return "Guild:"',
         right = [[
-local guild = self.GetGuildInfo("mouseover")
-if guild then return "<" .. guild .. ">" else return self.unitGuild end
+if guild then return "<" .. GetGuildInfo("mouseover") .. ">" else return self.unitGuild end
 ]],
 		enabled = true
     },
@@ -201,13 +193,7 @@ return lvl
         name = "Race",
         left = 'return "Race:"',
         right = [[
-local race
-if self.UnitIsPlayer("mouseover") then
-    race = self.UnitRace("mouseover")
-else
-    race = self.UnitCreatureFamily("mouseover") or self.UnitCreatureType("mouseover")
-end
-return race
+return (UnitIsPlayer("mouseover") and UnitRace("mouseover")) or UnitCreatureFamily("mouseover") or UnitCreatureType("mouseover")
 ]],
 		enabled = true
     },
@@ -215,9 +201,8 @@ return race
         name = "Class",
         left = 'return "Class:"',
         right = [[
-local class = self.UnitClass("mouseover")
-if class == self.UnitName("mouseover") then return end
-return class
+if UnitClass("mouseover") == UnitName("mouseover") then return end
+return UnitClass("mouseover")
 ]],
 		colorRight = [[
 return self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
@@ -335,7 +320,7 @@ end
 		right = [[
 local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
-    self.memperc = memdiff / totaldiff * 100
+    self.memperc = memdiff / (totaldiff ~= 0 and totaldiff or 1) * 100
     return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", self.memperc) .. "%)"
 end
 ]],
@@ -362,7 +347,7 @@ end
 		right = [[
 local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
-    self.cpuperc = cpudiff / totaldiff * 100
+    self.cpuperc = cpudiff / (totaldiff ~= 0 and totaldiff or 1) * 100;
     return timeshort(cpu) .. " (" .. format("%.2f", self.cpuperc)  .. "%)"
 end
 ]],
@@ -429,7 +414,7 @@ function mod:OnInitialize()
 	-- create our core object. Note that we must provide it with an LCD after it is created.
 	
 	self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
-	self.lcd = LCDText:New(self.core, 1, 0, 0, 0, 0, 0)
+	self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
 	self.core.lcd = self.lcd
 	
 	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
@@ -510,6 +495,7 @@ function draw()
 		GameTooltip:Hide()
 		GameTooltip:Show()
 	end
+	StarTip.del(c)
 	StarTip.del(linesToDraw)
 	linesToDraw = StarTip.new()
 end
@@ -541,18 +527,14 @@ function mod:CreateLines()
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
 						
-						if false and not v.leftObj or v.lineNum ~= lineNum then
+						if not v.leftObj or v.lineNum ~= lineNum then
 							if v.leftObj then  v.leftObj:Del() end
 							v.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
 							v.color = v.colorLeft
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
-							v.leftObj.visitor.lcd = self.lcd
-							v.leftObj:Start()
 							v.update = tmp
-						else
-							v.leftObj:Start()
 						end
 					
 						if not v.rightObj or v.lineNum ~= lineNum then
@@ -562,8 +544,6 @@ function mod:CreateLines()
 							if not v.rightUpdating then v.update = 0 end
 							v.color = v.colorRight
 							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
-							v.rightObj.visitor.lcd = self.lcd
-							v.rightObj:Start()
 							v.update = tmp
 						end
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
@@ -577,9 +557,7 @@ function mod:CreateLines()
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
 							v.color = v.colorLeft
-							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
-							v.leftObj.visitor.lcd = lcd						
-							v.leftObj:Start()
+							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 				
 							v.lineNum = lineNum
 							v.update = tmp
 						end
