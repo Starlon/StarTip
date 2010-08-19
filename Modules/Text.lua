@@ -508,7 +508,7 @@ function draw()
 			end
 		end
 	end		
-	if UnitExists("mouseover") and drawn then 
+	if UnitExists("mouseover") then 
 		GameTooltip:Hide()
 		GameTooltip:Show()
 	end
