@@ -118,7 +118,7 @@ return c
     [2] = {
         name = "Target",
         left = 'return "Target:"',
-        right = [[		
+        right = [[
 if self.UnitExists("mouseovertarget") then
     local name = self.UnitName("mouseovertarget")
     return name
@@ -349,7 +349,7 @@ end
 local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     percent = cpudiff / totaldiff * 100
-    return format("%.2f", cpu) .. " (" .. format("%.2f", percent)  .. "%)"
+    return timeshort(cpu) .. " (" .. format("%.2f", percent)  .. "%)"
 end
 ]],
 		rightUpdating = true,
