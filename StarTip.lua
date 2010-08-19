@@ -180,17 +180,19 @@ do
 	local pool = setmetatable({},{__mode='k'})
 	function StarTip.new(...)
 		local t = next(pool)
+		local newtbl
 		if t then
 			pool[t] = nil
 			for i=1, select("#", ...) do
 				t[i] = select(i, ...)
 			end
 		else
+			newtbl = true
 			t = {...}
 		end
 		t.__starref__ = true
 		
-		return t
+		return t, newtbl
 	end
 	function StarTip.del(...)
 		local t = select(1, ...)
