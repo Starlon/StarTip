@@ -333,9 +333,23 @@ end
 		name = "Memory Usage",
 		left = "return 'Memory Usage:'",
 		right = [[
-local mem, percent = GetMemUsage("StarTip")
+local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
-    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", percent) .. "%)"
+    self.memperc = memdiff / totaldiff * 100
+    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", self.memperc) .. "%)"
+end
+]],
+		colorRight = [[
+if type(self.memperc) == "number" then
+    local c = new()
+    if self.memperc > 50 then
+        c.r, c.g, c.b = 1, 0, 0
+    elseif self.memperc < 0 then
+        c.r, c.g, c.b = 0, 0, 1
+    else
+        c.r, c.g, c.b = 0, 1, 0
+    end
+    return c
 end
 ]],
 		rightUpdating = true,
@@ -348,10 +362,24 @@ end
 		right = [[
 local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
-    percent = cpudiff / totaldiff * 100
-    return timeshort(cpu) .. " (" .. format("%.2f", percent)  .. "%)"
+    self.cpuperc = cpudiff / totaldiff * 100
+    return timeshort(cpu) .. " (" .. format("%.2f", self.cpuperc)  .. "%)"
 end
 ]],
+		colorRight = [[
+if type(self.cpuperc) == "number" then
+    local c = new()
+    if self.cpuperc > 50 then
+        c.r, c.g, c.b = 1, 0, 0
+    elseif self.cpuperc < 0 then
+        c.r, c.g, c.b = 0, 0, 1
+    else
+        c.r, c.g, c.b = 0, 1, 0
+    end
+    return c
+end
+]],
+
 		rightUpdating = true,
 		update = 1000
 	}
@@ -367,11 +395,15 @@ function mod:OnInitialize()
 			if v.name == vv.name then
 				if v.left ~= vv.left and not vv.leftDirty then
 					vv.left = v.left
-					v.leftDirty = nil
 				end
 				if v.right ~= vv.right and not vv.rightDirty then
 					vv.right = v.right
-					v.rightDirty = nil
+				end
+				if v.colorLeft ~= vv.colorLeft and not v.colorLeftDirty then
+					vv.colorLeft = v.colorLeft
+				end
+				if v.colorRight ~= vv.colorRight and not v.colorRightDirty then
+					vv.colorRight = v.colorRight
 				end
 				v.tagged = true
 			end
@@ -442,7 +474,18 @@ function draw()
 		local widget = table[1]
 		local fontString = table[2]
 		fontString:SetText(widget.buffer)
-		fontString:SetVertexColor(widget.color.r / 255, widget.color.g / 255, widget.color.b / 255, widget.color.a / 255)
+		
+		local c
+		
+		if widget.color.script then
+			c = mod.evaluator.ExecuteCode(environment, widget.widget.name, widget.color.script)
+		end
+		
+		if type(c) == "table" then
+			fontString:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
+		else
+			fontString:SetVertexColor(1, 1, 1, 1)
+		end
 		
 		local font = appearance.db.profile.font
 		local fontsList = LSM:List("font")
@@ -487,14 +530,11 @@ function mod:CreateLines()
                 local left, right, c, cc = '', ''
                 if v.right then 
                     right = mod.evaluator.ExecuteCode(environment, v.name, v.right)
-					c = mod.evaluator.ExecuteCode(environment, v.name, v.colorRight)
                     left = mod.evaluator.ExecuteCode(environment, v.name, v.left)
-					cc = mod.evaluator.ExecuteCode(environment, v.name, v.colorLeft)
 					if right == "" then right = "nil" end
                 else 
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name, v.left)
-					c = mod.evaluator.ExecuteCode(environment, v.name, v.colorLeft)
                 end 
 
                 if left and left ~= "" and right ~= "nil" and not v.deleted then 
@@ -507,6 +547,7 @@ function mod:CreateLines()
 							v.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
+							v.color = v.colorLeft
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.leftObj.visitor.lcd = self.lcd
 							v.leftObj:Start()
@@ -514,28 +555,17 @@ function mod:CreateLines()
 						else
 							v.leftObj:Start()
 						end
-						if type(cc) == "table" and cc.r and cc.g and cc.b then
-							v.leftObj.color.r = (cc.r * 255)
-							v.leftObj.color.g = (cc.g * 255)
-							v.leftObj.color.b = (cc.b * 255)
-							v.leftObj.color.a = (cc.a or 1) * 255
-						end
 					
 						if not v.rightObj or v.lineNum ~= lineNum then
 							if v.rightObj then v.rightObj:Del() end
 							v.value = v.right
 							local tmp = v.update
 							if not v.rightUpdating then v.update = 0 end
+							v.color = v.colorRight
 							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
 							v.rightObj.visitor.lcd = self.lcd
 							v.rightObj:Start()
 							v.update = tmp
-						end
-						if type(c) == "table" and c.r and c.g and c.b then
-							v.rightObj.color.r = (c.r * 255)
-							v.rightObj.color.g = (c.g * 255)
-							v.rightObj.color.b = (c.b * 255)
-							v.rightObj.color.a = (c.a or 1) * 255
 						end
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
 						tinsert(linesToDraw, {v.rightObj, mod.rightLines[lineNum]})
@@ -547,18 +577,13 @@ function mod:CreateLines()
 							v.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
+							v.color = v.colorLeft
 							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 
 							v.leftObj.visitor.lcd = lcd						
 							v.leftObj:Start()
 							v.lineNum = lineNum
 							v.update = tmp
 						end
-						if type(c) == "table" and c.r and c.g and c.b then
-							v.leftObj.color.r = c.r * 255 or 255
-							v.leftObj.color.g = c.g * 255 or 255
-							v.leftObj.color.b = c.b * 255 or 255
-							v.leftObj.color.a = (c.a or 1) * 255 or 255
-						end						
 						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
                     end
 					if v.rightObj then 
@@ -820,6 +845,7 @@ function mod:RebuildOpts()
 					get = function() return v.colorLeft end,
 					set = function(info, val)
 						v.colorLeft = val
+						v.colorLeftDirty = true
 						self:CreateLines()
 					end,
                     validate = function(info, str)	
@@ -836,6 +862,7 @@ function mod:RebuildOpts()
 					get = function() return v.colorRight end,
 					set = function(info, val)
 						v.colorRight = val
+						v.colorRightDirty = true
 						self:CreateLines()
 					end,
                     validate = function(info, str)	
