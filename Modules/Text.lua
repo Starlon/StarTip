@@ -53,22 +53,6 @@ local ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALI
 
 local SCROLL_RIGHT, SCROLL_LEFT = 1, 2
 
--- Thanks to ckknight for this
-environment.short = function(value)
-    if value >= 10000000 or value <= -10000000 then
-        value = ("%.1fm"):format(value / 1000000)
-    elseif value >= 1000000 or value <= -1000000 then
-        value = ("%.2fm"):format(value / 1000000)
-    elseif value >= 100000 or value <= -100000 then
-        value = ("%.0fk"):format(value / 1000)
-    elseif value >= 10000 or value <= -10000 then
-        value = ("%.1fk"):format(value / 1000)
-    else
-        value = tostring(floor(value+0.5))
-    end
-    return value
-end
-
 environment.powers = {
     ["WARRIOR"] = "Rage:",
     ["ROGUE"] = "Energy:",
@@ -84,54 +68,6 @@ environment.unitHasAura = function(aura)
         i = i + 1
     end
 end
---[[
-local function updateLines()
-    if not UnitExists("mouseover") then
-        mod:CancelTimer(timer)
-        timer = nil
-        return
-    end
-    for _, v in ipairs(lines) do
-        if v.rightUpdating and v.right and self.db.profile[v.db] then
-            local left, c = StarTip.ExecuteCode(environment, v.name, v.left)
-            local right, cc = StarTip.ExecuteCode(environment, v.name, v.right)
-            if left and right then
-                for i = 1, self.NUM_LINES do
-                    if mod.leftLines[i]:GetText() == left then
-                        mod.rightLines[i]:SetText(right)
-                        if type(cc) == "table" and cc.r then
-                            mod.rightLines[i]:SetVertexColor(cc.r, cc.g, cc.b)
-                        end
-						if type(c) == "table" and c.r then
-							mod.leftLines[i]:SetVertexColor(c.r, c.g, c.b)
-						end
-                    end
-                end				
-            end
-			StarTip.del(c)
-			StarTip.del(cc)			
-        end
-    end
-end
-]]
---[[
-local newFont, delFont
-do
-	local pool = setmetatable({},{__mode='k'})
-	newFont = function(key) 
-		local t = next(pool)
-		if not t then
-			t = CreateFont(key)
-			t:CopyFontObject(GameTooltipText)			
-		end
-		pool[t] = nil
-		return t
-	end
-	delFont = function(tbl)
-		pool[tbl] = true
-	end
-end
-]]
 
 function copy(t)
 	local tmp = StarTip.new()
@@ -239,15 +175,15 @@ return select(2, self.UnitName("mouseover"))
     [6] = {
         name = "Level",
         left = 'return "Level:"',
-        right = [[            
-local lvl = self.UnitLevel("mouseover")    
+        right = [[
+local lvl = self.UnitLevel("mouseover")
 local class = self.UnitClassification("mouseover")
-    
-if lvl <= 0 then 
+
+if lvl <= 0 then
     lvl = ''
 end
 
-if class == "worldboss" then 
+if class == "worldboss" then
     lvl = lvl .. "Boss"
 elseif class == "rareelite" then
     lvl = lvl .. "+ Rare"
@@ -267,11 +203,11 @@ return lvl
         right = [[
 local race
 if self.UnitIsPlayer("mouseover") then
-    race = self.UnitRace("mouseover");
+    race = self.UnitRace("mouseover")
 else
     race = self.UnitCreatureFamily("mouseover") or self.UnitCreatureType("mouseover")
 end
-return race        
+return race
 ]],
 		enabled = true
     },
@@ -284,9 +220,8 @@ if class == self.UnitName("mouseover") then return end
 return class
 ]],
 		colorRight = [[
-local c = self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
-return c
-		]],
+return self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
+]],
 		enabled = true
     },
     [9] = {
@@ -321,9 +256,9 @@ end
         name = "Health",
         left = 'return "Health:"',
         right = [[
-local health, maxHealth = self.UnitHealth("mouseover"), self.UnitHealthMax("mouseover")    
+local health, maxHealth = self.UnitHealth("mouseover"), self.UnitHealthMax("mouseover")
 local value = "Unknown"
-if maxHealth == 100 then 
+if maxHealth == 100 then
     value = health .. "%"
 elseif maxHealth ~= 0 then
     value = format("%s/%s (%d%%)", self.short(health), self.short(maxHealth), health/maxHealth*100)
@@ -337,7 +272,6 @@ return value
     [12] = {
         name = "Mana",
         left = [[
-            
 local class = select(2, self.UnitClass("mouseover"))
 if not self.UnitIsPlayer("mouseover") then
 	class = "MAGE"
@@ -363,9 +297,7 @@ return value
     [13] = {
         name = "Location",
         left = 'return "Location:"',
-        right = [[
-return self.unitLocation
-]],
+        right = "return self.unitLocation",
 		enabled = true
     },
 	[14] = {
@@ -399,29 +331,26 @@ end
 	},
 	[16] = {
 		name = "Memory Usage",
-		left = [[
-return "Memory Usage:"
-		]],
+		left = "return 'Memory Usage:'",
 		right = [[
 local mem, percent, diff, total, totaldiff = GetMemUsage("StarTip")
 if mem then
-    return format("%.2f", mem) .. " (" .. format("%.2f", percent) .. "%)"
-end		
+    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", percent) .. "%)"
+end
 ]],
 		rightUpdating = true,
 		update = 1000
 	},
 	[17] = {
 		name = "CPU Usage",
-		left = [[
-return "CPU Usage:"		
-		]],
+		desc = "Note that you must turn on CPU profiling",
+		left = 'return "CPU Usage:"',
 		right = [[
 local cpu, percent, diff, total, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     local usage = diff / totaldiff * 100
     return format("%.2f", cpu) .. " (" .. format("%.2f", usage)  .. "%)"
-end		
+end
 ]],
 		rightUpdating = true,
 		update = 1000
@@ -738,7 +667,7 @@ function mod:RebuildOpts()
 						v.enabled = val
 						self:CreateLines()
 					end,
-					order = 1
+					order = 2
 				},		
 				leftUpdating = {
 					name = "Left Updating",
@@ -752,7 +681,7 @@ function mod:RebuildOpts()
 							v.update = 500
 						end						
 					end,
-					order = 2
+					order = 3
 				},
                 rightUpdating = {
                     name = "Right Updating",
@@ -766,7 +695,7 @@ function mod:RebuildOpts()
 							v.update = 500
 						end						
 					end,
-                    order = 3
+                    order = 4
                 },
                 up = {
                     name = "Move Up",
@@ -785,7 +714,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
                     end,
-                    order = 4
+                    order = 5
                 },
                 down = {
                     name = "Move Down",
@@ -804,7 +733,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
                     end,
-                    order = 5
+                    order = 6
                 },
 				bold = {
 					name = "Bold",
@@ -815,7 +744,7 @@ function mod:RebuildOpts()
 						self.db.profile.lines[i].bold = v
 						self:CreateLines() 
 					end,
-					order = 6
+					order = 7
 				},
 				delete = {
 					name = "Delete",
@@ -842,7 +771,7 @@ function mod:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
 					end,
-					order = 7
+					order = 8
 				},								
 	            left = {
                     name = "Left",
@@ -862,7 +791,7 @@ function mod:RebuildOpts()
 					end,
                     multiline = true,
 					width = "full",
-                    order = 8
+                    order = 9
                 },
                 right = {
                     name = "Right",
@@ -882,7 +811,7 @@ function mod:RebuildOpts()
 					end,
                     multiline = true,
 					width = "full",
-                    order = 9
+                    order = 10
                 },
 				colorLeft = {
 					name = "Left Color",
@@ -898,7 +827,7 @@ function mod:RebuildOpts()
 					end,					
 					multiline = true,
 					width = "full",
-					order = 10
+					order = 11
 				},
 				colorRight = {
 					name = "Right Color",
@@ -914,7 +843,7 @@ function mod:RebuildOpts()
 					end,
 					multiline = true,
 					width = "full",
-					order = 11
+					order = 12
 				},
 				marquee = {
 					name = "Maruqee Settings",
@@ -1050,9 +979,17 @@ function mod:RebuildOpts()
 							order = 9
 						}
 					},
-					order = 8
+					order = 9
 				}
-            }
+        }
+		if v.desc then
+			options["line" .. i].args.desc = {
+				name = v.desc,
+				type = "header",
+				order = 1
+			}
+			
+		end
     end
 end
 
