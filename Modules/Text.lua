@@ -396,6 +396,35 @@ end
 		leftUpdating = true,
 		enabled = true,
 		update = 1000
+	},
+	[16] = {
+		name = "Memory Usage",
+		left = [[
+return "Memory Usage:"
+		]],
+		right = [[
+local mem, percent, diff, total, totaldiff = GetMemUsage("StarTip")
+if mem then
+    return format("%.2f", mem) .. " (" .. format("%.2f", percent) .. "%)"
+end		
+]],
+		rightUpdating = true,
+		update = 1000
+	},
+	[17] = {
+		name = "CPU Usage",
+		left = [[
+return "CPU Usage:"		
+		]],
+		right = [[
+local cpu, percent, diff, total, totaldiff = GetCPUUsage("StarTip")
+if cpu then
+    local usage = diff / totaldiff * 100
+    return format("%.2f", cpu) .. " (" .. format("%.2f", usage)  .. "%)"
+end		
+]],
+		rightUpdating = true,
+		update = 1000
 	}
 }
 
@@ -705,8 +734,8 @@ function mod:RebuildOpts()
 					desc = "Whether to show this line or not",
 					type = "toggle",
 					get = function() return self.db.profile.lines[i].enabled end,
-					set = function(info, v)
-						self.db.profile.lines[i].enabled = v
+					set = function(info, val)
+						v.enabled = val
 						self:CreateLines()
 					end,
 					order = 1
@@ -717,8 +746,11 @@ function mod:RebuildOpts()
 					type = "toggle",
 					get = function() return v.leftUpdating end,
 					set = function(info, val)
-						v.leftUpdating = v
+						v.leftUpdating = val
 						self:CreateLines()
+						if v.update == 0 then
+							v.update = 500
+						end						
 					end,
 					order = 2
 				},
@@ -730,6 +762,9 @@ function mod:RebuildOpts()
                     set = function(info, val) 
 						v.rightUpdating = val 
 						self:CreateLines()
+						if v.update == 0 then
+							v.update = 500
+						end						
 					end,
                     order = 3
                 },
@@ -856,6 +891,7 @@ function mod:RebuildOpts()
 					get = function() return v.colorLeft end,
 					set = function(info, val)
 						v.colorLeft = val
+						self:CreateLines()
 					end,
                     validate = function(info, str)	
 						return mod.evaluator:Validate(environment, str)
@@ -871,6 +907,7 @@ function mod:RebuildOpts()
 					get = function() return v.colorRight end,
 					set = function(info, val)
 						v.colorRight = val
+						self:CreateLines()
 					end,
                     validate = function(info, str)	
 						return mod.evaluator:Validate(environment, str)
@@ -893,7 +930,10 @@ function mod:RebuildOpts()
 							desc = "Enable marquee. Note that this just makes marquees use the left line only. Technically all segments on the tooltip are marquee widgets.",
 							type = "toggle",
 							get = function() return v.marquee end,
-							set = function(info, val) v.marquee = val end
+							set = function(info, val) 
+								v.marquee = val 
+								self:CreateLines()
+							end
 						},
 						prefix = {
 							name = "Prefix",
@@ -906,6 +946,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.prefix = val
+								self:CreateLines()
 							end,
 							order = 2
 						},
@@ -920,6 +961,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.postfix = v
+								self:CreateLines()
 							end,
 							order = 3
 						},
@@ -933,6 +975,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.precision = tonumber(val)
+								self:CreateLines()
 							end,
 							order = 4
 						},
@@ -946,6 +989,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.align = WidgetText.alignmentList[val]
+								self:CreateLines()
 							end,
 							order = 5
 						},
@@ -959,6 +1003,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.update = tonumber(val)
+								self:CreateLines()
 							end,
 							order = 6
 						},
@@ -972,6 +1017,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.speed = tonumber(val)
+								self:CreateLines()
 							end,
 							order = 7
 						},
@@ -985,6 +1031,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.direction = WidgetText.directionList[val]
+								self:CreateLines()
 							end,
 							order = 8
 						},
@@ -998,6 +1045,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.cols = tonumber(val)
+								self:CreateLines()
 							end,
 							order = 9
 						}
