@@ -399,10 +399,10 @@ function mod:OnInitialize()
 				if v.right ~= vv.right and not vv.rightDirty then
 					vv.right = v.right
 				end
-				if v.colorLeft ~= vv.colorLeft and not v.colorLeftDirty then
+				if v.colorLeft ~= vv.colorLeft and not vv.colorLeftDirty then
 					vv.colorLeft = v.colorLeft
 				end
-				if v.colorRight ~= vv.colorRight and not v.colorRightDirty then
+				if v.colorRight ~= vv.colorRight and not vv.colorRightDirty then
 					vv.colorRight = v.colorRight
 				end
 				v.tagged = true
@@ -483,6 +483,7 @@ function draw()
 		
 		if type(c) == "table" then
 			fontString:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
+			StarTip.del(c)
 		else
 			fontString:SetVertexColor(1, 1, 1, 1)
 		end
@@ -594,8 +595,6 @@ function mod:CreateLines()
 					end
 					v.lineNum = lineNum
                 end
-				StarTip.del(c)
-				StarTip.del(cc)
 			end
 
         end
