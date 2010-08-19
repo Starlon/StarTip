@@ -346,8 +346,9 @@ end
 		desc = "Note that you must turn on CPU profiling",
 		left = 'return "CPU Usage:"',
 		right = [[
-local cpu, percent = GetCPUUsage("StarTip")
+local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
+    percent = cpudiff / totaldiff * 100
     return format("%.2f", cpu) .. " (" .. format("%.2f", percent)  .. "%)"
 end
 ]],
