@@ -107,7 +107,7 @@ local c
 if self.UnitIsPlayer("mouseover") then
     c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
 else
-    c = self:new()
+	if not c then c = new() end
     c.r, c.g, c.b = self.UnitSelectionColor("mouseover")
 end
 return c
@@ -121,11 +121,10 @@ return c
         right = 'return UnitName("mouseovertarget") or "None"',
 		colorRight = [[
 if self.UnitExists("mouseovertarget") then
-    local c
     if self.UnitIsPlayer("mouseovertarget") then
         c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseovertarget"))]
     else
-        c = self.new()
+        if not c then c = self.new() end
         c.r, c.g, c.b = self.UnitSelectionColor("mouseovertarget")
     end
     return c
@@ -144,6 +143,7 @@ end
         name = "Guild",
         left = 'return "Guild:"',
         right = [[
+guild = GetGuildInfo("mouseover")
 if guild then return "<" .. GetGuildInfo("mouseover") .. ">" else return self.unitGuild end
 ]],
 		enabled = true
@@ -168,8 +168,8 @@ return select(2, self.UnitName("mouseover"))
         name = "Level",
         left = 'return "Level:"',
         right = [[
-local lvl = self.UnitLevel("mouseover")
-local class = self.UnitClassification("mouseover")
+lvl = self.UnitLevel("mouseover")
+class = self.UnitClassification("mouseover")
 
 if lvl <= 0 then
     lvl = ''
@@ -241,8 +241,8 @@ end
         name = "Health",
         left = 'return "Health:"',
         right = [[
-local health, maxHealth = self.UnitHealth("mouseover"), self.UnitHealthMax("mouseover")
-local value = "Unknown"
+health, maxHealth = self.UnitHealth("mouseover"), self.UnitHealthMax("mouseover")
+value = "Unknown"
 if maxHealth == 100 then
     value = health .. "%"
 elseif maxHealth ~= 0 then
@@ -257,7 +257,7 @@ return value
     [12] = {
         name = "Mana",
         left = [[
-local class = select(2, self.UnitClass("mouseover"))
+class = select(2, self.UnitClass("mouseover"))
 if not self.UnitIsPlayer("mouseover") then
 	class = "MAGE"
 end
@@ -265,9 +265,9 @@ end
 return (self.powers[class] or "Mana:")
 ]],
         right = [[
-local mana = self.UnitMana("mouseover")
-local maxMana = self.UnitManaMax("mouseover")
-local value = "Unknown"
+mana = self.UnitMana("mouseover")
+maxMana = self.UnitManaMax("mouseover")
+value = "Unknown"
 if maxMana == 100 then
     value = mana
 elseif maxMana ~= 0 then
@@ -318,15 +318,16 @@ end
 		name = "Memory Usage",
 		left = "return 'Memory Usage:'",
 		right = [[
-local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
+    if totaldiff == 0 then totaldiff = 1 end
     self.memperc = memdiff / (totaldiff ~= 0 and totaldiff or 1) * 100
     return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", self.memperc) .. "%)"
 end
 ]],
 		colorRight = [[
 if type(self.memperc) == "number" then
-    local c = new()
+    if not c then c = new() end
     if self.memperc > 50 then
         c.r, c.g, c.b = 1, 0, 0
     elseif self.memperc < 0 then
@@ -345,15 +346,16 @@ end
 		desc = "Note that you must turn on CPU profiling",
 		left = 'return "CPU Usage:"',
 		right = [[
-local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
-    self.cpuperc = cpudiff / (totaldiff ~= 0 and totaldiff or 1) * 100;
+    if totaldiff == 0 then totaldiff = 1 end
+    self.cpuperc = cpudiff / totaldiff * 100;
     return timeshort(cpu) .. " (" .. format("%.2f", self.cpuperc)  .. "%)"
 end
 ]],
 		colorRight = [[
 if type(self.cpuperc) == "number" then
-    local c = new()
+    if not c then c = new() end
     if self.cpuperc > 50 then
         c.r, c.g, c.b = 1, 0, 0
     else
@@ -452,52 +454,51 @@ local function updateFontString(widget, fontString)
 	tinsert(linesToDraw, {widget, fontString})
 end
 
-function draw()
-	for i, table in ipairs(linesToDraw) do
-		local widget = table[1]
-		local fontString = table[2]
-		fontString:SetText(widget.buffer)
+do
+	local fontsList = LSM:List("font")
+	local c, widget, fontString
+	function draw()
+		for i, table in ipairs(linesToDraw) do
+			c = nil	
+			widget = table[1]
+			fontString = table[2]
+			fontString:SetText(widget.buffer)
+				
+			if widget.color.script then
+				c = mod.evaluator.ExecuteCode(environment, widget.widget.name, widget.color.script)
+			end
 		
-		local c
+			if type(c) == "table" then
+				fontString:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
+			else
+				fontString:SetVertexColor(1, 1, 1, 1)
+			end
 		
-		if widget.color.script then
-			c = mod.evaluator.ExecuteCode(environment, widget.widget.name, widget.color.script)
-		end
-		
-		if type(c) == "table" then
-			fontString:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
-			StarTip.del(c)
-		else
-			fontString:SetVertexColor(1, 1, 1, 1)
-		end
-		
-		local font = appearance.db.profile.font
-		local fontsList = LSM:List("font")
-		font = LSM:Fetch("font", fontsList[font])	
+			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])	
 	
-		if widget.bold then
-			if mod.leftLines and mod.leftLines[widget.i] then
-				mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
+			if widget.bold then
+				if mod.leftLines and mod.leftLines[widget.i] then
+					mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
+				end
+				if mod.rightLines and mod.rightLines[widget.i] then
+					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
+				end
+			else
+				if mod.leftlines and mod.leftLines[widget.i] then
+					mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
 			end
-			if mod.rightLines and mod.rightLines[widget.i] then
-				mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
+				if mod.rightLines and mod.rightLines[widget.i] then
+					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+				end
 			end
-		else
-			if mod.leftlines and mod.leftLines[widget.i] then
-				mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
+		end		
+		if UnitExists("mouseover") then 
+			GameTooltip:Hide()
+			GameTooltip:Show()
 		end
-			if mod.rightLines and mod.rightLines[widget.i] then
-				mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-			end
-		end
-	end		
-	if UnitExists("mouseover") then 
-		GameTooltip:Hide()
-		GameTooltip:Show()
+		StarTip.del(linesToDraw)
+		linesToDraw = StarTip.new()
 	end
-	StarTip.del(c)
-	StarTip.del(linesToDraw)
-	linesToDraw = StarTip.new()
 end
 
 function mod:CreateLines()
@@ -528,7 +529,7 @@ function mod:CreateLines()
 						GameTooltip:AddDoubleLine(' ', ' ')
 						
 						if not v.leftObj or v.lineNum ~= lineNum then
-							if v.leftObj then  v.leftObj:Del() end
+							if v.leftObj then v.leftObj:Del() end
 							v.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
