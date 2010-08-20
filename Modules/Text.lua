@@ -440,8 +440,10 @@ function mod:UPDATE_FACTION()
 end
 
 local linesToDraw = {}
+local tbl
 local function updateFontString(widget, fontString)
-	tinsert(linesToDraw, {widget, fontString})
+	tbl = StarTip.new(widget, fontString)
+	tinsert(linesToDraw, tbl)
 end
 
 do
@@ -455,7 +457,7 @@ do
 			fontString:SetText(widget.buffer)
 				
 			if widget.color.script then
-				c = mod.evaluator.ExecuteCode(environment, widget.widget.name, widget.color.script)
+				c = mod.evaluator.ExecuteCode(environment, widget.widget.name .. ".color.script", widget.color.script)
 			end
 		
 			if type(c) == "table" then

@@ -189,10 +189,6 @@ do
 			newtbl = true
 			t = {...}
 		end
-		local count = 0
-		for k, v in pairs(pool) do
-			count = count + 1
-		end
 		t.__starref__ = true
 		return t, newtbl
 	end
