@@ -183,6 +183,9 @@ do
 		local newtbl
 		if t then
 			pool[t] = nil
+			for k, v in pairs(t) do
+				t[k] = nil
+			end
 			for i=1, select("#", ...) do
 				t[i] = select(i, ...)
 			end	
@@ -204,10 +207,6 @@ do
 			local t = select(i, ...)
 			if type(t) ~= table or t == nil then break end
 			StarTip.del(t)
-		end
-		for k, v in pairs(t) do
-			if type(v) == "table" then StarTip.del(v) end
-			t[k] = nil
 		end
 		t.__starref__ = nil
 		pool[t] = true	

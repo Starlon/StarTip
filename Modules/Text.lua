@@ -30,6 +30,7 @@ local environment = {}
 environment.new = StarTip.new
 environment.newDict = StarTip.newDict
 environment.del = StarTip.del
+environment.c = {}
 environment._G = _G
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local factionList = {}
@@ -450,11 +451,11 @@ do
 	local fontsList = LSM:List("font")
 	local c, widget, fontString
 	function draw()
-		for i, table in ipairs(linesToDraw) do
+		for k, table in pairs(linesToDraw) do
 			c = nil	
 			widget = table[1]
 			fontString = table[2]
-			if not fontString or not widget then break end -- why are these nil sometimes?
+			if not fontString or not widget then StarTip:Print("nil is bug", "fontString = ", fontString, ", widget = ", widget) break end
 			fontString:SetText(widget.buffer)
 				
 			if widget.color.script then
@@ -486,11 +487,9 @@ do
 					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
 				end
 			end
-		end		
-		for k, v in pairs(linesToDraw) do
-			StarTip.del(v)
+			StarTip.del(table)			
 			linesToDraw[k] = nil
-		end
+		end		
 		if UnitExists("mouseover") then 
 			GameTooltip:Hide()
 			GameTooltip:Show()
