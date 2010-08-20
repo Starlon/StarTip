@@ -92,11 +92,9 @@ return unitName
 ]],
         right = nil,
 		colorLeft = [[
-local c
 if UnitIsPlayer("mouseover") then
     c = RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
 else
-	if not c then c = new() end
     c.r, c.g, c.b = UnitSelectionColor("mouseover")
 end
 return c
@@ -113,12 +111,10 @@ if UnitExists("mouseovertarget") then
     if UnitIsPlayer("mouseovertarget") then
         c = RAID_CLASS_COLORS[select(2, UnitClass("mouseovertarget"))]
     else
-        if not c then c = new() end
         c.r, c.g, c.b = UnitSelectionColor("mouseovertarget")
     end
     return c
 else
-	if not c then c = new() end
 	c.r = 1
 	c.g = 1
 	c.b = 1
@@ -288,6 +284,60 @@ return value
 		direction = DIRECTION_LEFT
 	},
 	[15] = {
+		name = "Memory Usage",
+		left = "return 'Memory Usage:'",
+		right = [[
+mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+if mem then
+    if totaldiff == 0 then totaldiff = 1 end
+    memperc = (memdiff / totaldiff * 100)
+    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", memperc) .. "%)"
+end
+]],
+		colorRight = [[
+if type(memperc) == "number" then
+    if memperc > 50 then
+        c.r, c.g, c.b = 1, 0, 0
+    elseif memperc <= 0 then
+        c.r, c.g, c.b = 0, 0, 1
+    else
+        c.r, c.g, c.b = 0, 1, 0
+    end
+    return c
+end
+]],
+		rightUpdating = true,
+		update = 1000
+	},
+	[16] = {
+		name = "CPU Usage",
+		desc = "Note that you must turn on CPU profiling",
+		left = 'return "CPU Usage:"',
+		right = [[
+cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+if cpu then
+    if totaldiff == 0 then totaldiff = 1 end
+    cpuperc = cpudiff / totaldiff * 100;
+    return timeshort(cpu) .. " (" .. format("%.2f", cpuperc)  .. "%)"
+end
+]],
+		colorRight = [[
+if type(cpuperc) == "number" then
+    if cpuperc > 50 then
+        c.r, c.g, c.b = 1, 0, 0
+    elseif cpuperc == 0 then
+	    c.r, c.g, c.b = 0, 0, 1
+    else
+        c.r, c.g, c.b = 0, 1, 0
+    end
+    return c
+end
+]],
+
+		rightUpdating = true,
+		update = 1000
+	},
+	[17] = {
 		name = "Range",
 		left = [[
 local min, max = RangeCheck:GetRange("mouseover")
@@ -302,63 +352,7 @@ end
 		leftUpdating = true,
 		enabled = true,
 		update = 1000
-	},
-	[16] = {
-		name = "Memory Usage",
-		left = "return 'Memory Usage:'",
-		right = [[
-mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
-if mem then
-    if totaldiff == 0 then totaldiff = 1 end
-    memperc = (memdiff / totaldiff * 100)
-    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", memperc) .. "%)"
-end
-]],
-		colorRight = [[
-if type(memperc) == "number" then
-    if not c then c = new() end
-    if memperc > 50 then
-        c.r, c.g, c.b = 1, 0, 0
-    elseif memperc <= 0 then
-        c.r, c.g, c.b = 0, 0, 1
-    else
-        c.r, c.g, c.b = 0, 1, 0
-    end
-    return c
-end
-]],
-		rightUpdating = true,
-		update = 1000
-	},
-	[17] = {
-		name = "CPU Usage",
-		desc = "Note that you must turn on CPU profiling",
-		left = 'return "CPU Usage:"',
-		right = [[
-cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
-if cpu then
-    if totaldiff == 0 then totaldiff = 1 end
-    cpuperc = cpudiff / totaldiff * 100;
-    return timeshort(cpu) .. " (" .. format("%.2f", cpuperc)  .. "%)"
-end
-]],
-		colorRight = [[
-if type(cpuperc) == "number" then
-    if not c then c = new() end
-    if cpuperc > 50 then
-        c.r, c.g, c.b = 1, 0, 0
-    elseif cpuperc == 0 then
-	    c.r, c.g, c.b = 0, 0, 1
-    else
-        c.r, c.g, c.b = 0, 1, 0
-    end
-    return c
-end
-]],
-
-		rightUpdating = true,
-		update = 1000
-	}
+	},	
 }
 
 local options = {}
@@ -440,37 +434,37 @@ function mod:UPDATE_FACTION()
     end
 end
 
-local linesToDraw = {}
+local fontStringsToDraw = {}
 local tbl
 local function updateFontString(widget, fontString)
 	tbl = StarTip.new(widget, fontString)
-	linesToDraw[tbl] = true
+	fontStringsToDraw[tbl] = true
 end
 
 do
 	local fontsList = LSM:List("font")
 	local c, widget, fontString
 	function draw()
-		for table in pairs(linesToDraw) do
+		for table in pairs(fontStringsToDraw) do
 			c = nil	
 			widget = table[1]
 			fontString = table[2]
 			if not fontString or not widget then StarTip:Print("nil is bug", "fontString = ", fontString, ", widget = ", widget) break end
 			fontString:SetText(widget.buffer)
 				
-			if widget.color.script then
+			if widget.color then
 				c = mod.evaluator.ExecuteCode(environment, widget.widget.name .. ".color.script", widget.color.script)
+			else
+				StarTip:Print("color nil -- please report this", widget.widget and widget.widget.name)
 			end
 		
 			if type(c) == "table" then
 				fontString:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
-			elseif type(c) == "string" and c == "" then
+			elseif type(c) == "string" and c == "" and widget.color and widget.color.script then
 				StarTip:Print(widget.widget.name .. ": Expected color table, got empty string. It's likely your code is returning nil.")
 			else
 				fontString:SetVertexColor(1, 1, 1, 1)
 			end
-			
-			StarTip.del(c)
 			
 			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])	
 	
@@ -490,10 +484,11 @@ do
 				end
 			end
 		end		
-		for table in pairs(linesToDraw) do
+		for table in pairs(fontStringsToDraw) do
 			StarTip.del(table)			
-			linesToDraw[table] = nil
+			--fontStringsToDraw[table] = nil
 		end
+		table.wipe(fontStringsToDraw)
 		if UnitExists("mouseover") then 
 			GameTooltip:Hide()
 			GameTooltip:Show()
@@ -549,9 +544,9 @@ function mod:CreateLines()
 							v.update = tmp
 						end
 						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
-						linesToDraw[tbl] = true
+						fontStringsToDraw[tbl] = true
 						tbl = StarTip.new(v.rightObj, mod.rightLines[lineNum])
-						linesToDraw[tbl] = true
+						fontStringsToDraw[tbl] = true
                     else
 						GameTooltip:AddLine(' ')
 							
@@ -566,7 +561,7 @@ function mod:CreateLines()
 							v.update = tmp
 						end
 						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
-						linesToDraw[tbl] = true
+						fontStringsToDraw[tbl] = true
                     end
 					if v.rightObj then 
 						v.rightObj:Start()
@@ -587,12 +582,14 @@ end
 function mod:OnHide()
 	for i, v in ipairs(lines) do
 		if v.leftObj then
-			v.leftObj:Del()
-			v.leftObj = nil
+			v.leftObj:Stop()
+			--v.leftObj:Del()
+			--v.leftObj = nil
 		end
 		if v.rightObj then
-			v.rightObj:Del()
-			v.rightObj = nil
+			v.rightObj:Stop()
+			--v.rightObj:Del()
+			--v.rightObj = nil
 		end
 	end
 	self.timer:Stop()
