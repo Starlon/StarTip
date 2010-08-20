@@ -460,11 +460,12 @@ do
 				
 			if widget.color.script then
 				c = mod.evaluator.ExecuteCode(environment, widget.widget.name .. ".color.script", widget.color.script)
-				StarTip:Print(widget.widget.name, type(c), environment.memperc)
 			end
 		
 			if type(c) == "table" then
 				fontString:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
+			elseif type(c) == "string" and c == "" then
+				StarTip:Print(widget.widget.name .. ": Expected color table, got empty string. It's likely your code is returning nil.")
 			else
 				fontString:SetVertexColor(1, 1, 1, 1)
 			end
