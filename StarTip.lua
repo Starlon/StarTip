@@ -177,6 +177,7 @@ local options = {
 
 do
 	local pool = setmetatable({},{__mode='k'})
+	local newCount, delCount = 0, 0
 	function StarTip.new(...)
 		local t = next(pool)
 		local newtbl
@@ -186,10 +187,12 @@ do
 				t[i] = select(i, ...)
 			end	
 		else
+			--StarTip:Print("new table " .. GetTime(), "new " .. newCount, "del " .. delCount)
 			newtbl = true
 			t = {...}
 		end
 		t.__starref__ = true
+		newCount = newCount + 1
 		return t, newtbl
 	end
 	function StarTip.del(...)
@@ -208,6 +211,7 @@ do
 		end
 		t.__starref__ = nil
 		pool[t] = true	
+		delCount = delCount + 1
 	end
 end
 

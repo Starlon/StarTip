@@ -117,7 +117,7 @@ if self.UnitExists("mouseovertarget") then
     end
     return c
 else
-	c = self.new()
+	if not c then c = self.new() end
 	c.r = 1
 	c.g = 1
 	c.b = 1
@@ -465,7 +465,9 @@ do
 			else
 				fontString:SetVertexColor(1, 1, 1, 1)
 			end
-		
+			
+			StarTip.del(c)
+			
 			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])	
 	
 			if widget.bold then
