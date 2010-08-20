@@ -454,6 +454,7 @@ do
 			c = nil	
 			widget = table[1]
 			fontString = table[2]
+			if not fontString or not widget then break end -- why are these nil sometimes?
 			fontString:SetText(widget.buffer)
 				
 			if widget.color.script then
@@ -486,9 +487,9 @@ do
 				end
 			end
 		end		
-		for i, v in ipairs(linesToDraw) do
+		for k, v in pairs(linesToDraw) do
 			StarTip.del(v)
-			tremove(linesToDraw, i)
+			linesToDraw[k] = nil
 		end
 		if UnitExists("mouseover") then 
 			GameTooltip:Hide()
