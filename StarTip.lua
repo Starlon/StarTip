@@ -190,10 +190,10 @@ do
 				t[i] = select(i, ...)
 			end	
 		else
-			--StarTip:Print("new table " .. GetTime(), "new " .. newCount, "del " .. delCount)
 			newtbl = true
 			t = {...}
 		end
+		--StarTip:Print("new/recycled table " .. GetTime(), "new " .. newCount, "del " .. delCount)		
 		t.__starref__ = true
 		newCount = newCount + 1
 		return t, newtbl
