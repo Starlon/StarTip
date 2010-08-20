@@ -310,7 +310,7 @@ end
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
-    self.memperc = memdiff / (totaldiff ~= 0 and totaldiff or 1) * 100
+    self.memperc = memdiff / totaldiff * 100
     return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", self.memperc) .. "%)"
 end
 ]],

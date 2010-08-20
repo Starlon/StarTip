@@ -115,10 +115,11 @@ StarTip.config = {
 		value = [[
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
-	if totaldiff == 0 then totaldiff = 1 end
+    if totaldiff == 0 then totaldiff = 1 end
     self.memperc = memdiff / totaldiff * 100
-    return memshort(mem) .. " (" .. format("%.2f", self.memperc) .. "%)"
-end]],
+    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", self.memperc) .. "%)"
+end
+]],
 		cols = 20,
 		update = 1000,
 		dontRtrim = true
