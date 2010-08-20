@@ -291,7 +291,7 @@ mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
     memperc = (memdiff / totaldiff * 100)
-    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", memperc) .. "%)"
+    return memshort(mem) .. " (" .. format("%.2f", memperc) .. "%)"
 end
 ]],
 		colorRight = [[
@@ -302,7 +302,7 @@ if type(memperc) == "number" then
         c.r, c.g, c.b = 0, 0, 1
     else
         c.r, c.g, c.b = 0, 1, 0
-    end
+	end
     return c
 end
 ]],
