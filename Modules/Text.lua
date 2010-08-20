@@ -583,10 +583,12 @@ end
 function mod:OnHide()
 	for i, v in ipairs(lines) do
 		if v.leftObj then
-			v.leftObj:Stop()
+			v.leftObj:Del()
+			v.leftObj = nil
 		end
 		if v.rightObj then
-			v.rightObj:Stop()
+			v.rightObj:Del()
+			v.rightObj = nil
 		end
 	end
 	self.timer:Stop()

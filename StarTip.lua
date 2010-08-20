@@ -183,9 +183,7 @@ do
 		local newtbl
 		if t then
 			pool[t] = nil
-			for k, v in pairs(t) do
-				t[k] = nil
-			end
+			table.wipe(t)
 			for i=1, select("#", ...) do
 				t[i] = select(i, ...)
 			end	
