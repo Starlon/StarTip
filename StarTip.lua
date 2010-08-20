@@ -175,7 +175,6 @@ local options = {
 	}
 }
 
-local new, newDict, del
 do
 	local pool = setmetatable({},{__mode='k'})
 	function StarTip.new(...)
@@ -185,33 +184,34 @@ do
 			pool[t] = nil
 			for i=1, select("#", ...) do
 				t[i] = select(i, ...)
-			end
+			end	
 		else
 			newtbl = true
 			t = {...}
 		end
+		local count = 0
+		for k, v in pairs(pool) do
+			count = count + 1
+		end
 		t.__starref__ = true
-		
 		return t, newtbl
 	end
 	function StarTip.del(...)
 		local t = select(1, ...)
+		
 		if type(t) ~= "table" or not t.__starref__ then return end
-		for i=1, select("#", ...) do
+		
+		for i=2, select("#", ...) do
 			local t = select(i, ...)
-			if (t and type(t) ~= table) or t == nil then break end
-			for k, v in pairs(t) do
-				if type(k) == "table" then
-					StarTip.del(k)
-				end
-			end
+			if type(t) ~= table or t == nil then break end
+			StarTip.del(t)
 		end
-		local count = 0
 		for k, v in pairs(t) do
+			if type(v) == "table" then StarTip.del(v) end
 			t[k] = nil
 		end
 		t.__starref__ = nil
-		pool[t] = true				
+		pool[t] = true	
 	end
 end
 

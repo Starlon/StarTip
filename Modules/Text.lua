@@ -70,7 +70,7 @@ environment.unitHasAura = function(aura)
 end
 
 function copy(t)
-	local tmp = StarTip.new()
+	local tmp = {} --StarTip.new()
 	for k, v in pairs(t) do
 		if type(v) == "table" then
 			v = copy(v)
@@ -80,18 +80,6 @@ function copy(t)
 	
 	return tmp
 end
-
---[[
-function del(t)
-	for k, v in pairs(t) do
-		if type(v) == "table" then
-			del(v)
-		end
-		t[k] = nil
-		StarTip.del(t)
-	end
-end
-]]
 
 local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 100}}
 
@@ -330,7 +318,7 @@ if type(self.memperc) == "number" then
     if not c then c = new() end
     if self.memperc > 50 then
         c.r, c.g, c.b = 1, 0, 0
-    elseif self.memperc < 0 then
+    elseif self.memperc <= 0 then
         c.r, c.g, c.b = 0, 0, 1
     else
         c.r, c.g, c.b = 0, 1, 0
@@ -358,6 +346,8 @@ if type(self.cpuperc) == "number" then
     if not c then c = new() end
     if self.cpuperc > 50 then
         c.r, c.g, c.b = 1, 0, 0
+    elseif self.cpuperc == 0 then
+	    c.r, c.g, c.b = 0, 0, 1
     else
         c.r, c.g, c.b = 0, 1, 0
     end
@@ -492,15 +482,18 @@ do
 				end
 			end
 		end		
+		for i, v in ipairs(linesToDraw) do
+			StarTip.del(v)
+			tremove(linesToDraw, i)
+		end
 		if UnitExists("mouseover") then 
 			GameTooltip:Hide()
 			GameTooltip:Show()
 		end
-		StarTip.del(linesToDraw)
-		linesToDraw = StarTip.new()
 	end
 end
 
+local tbl
 function mod:CreateLines()
     local llines = {}
     for i, v in ipairs(self.db.profile.lines) do
@@ -515,12 +508,12 @@ function mod:CreateLines()
 				
                 local left, right, c, cc = '', ''
                 if v.right then 
-                    right = mod.evaluator.ExecuteCode(environment, v.name, v.right)
-                    left = mod.evaluator.ExecuteCode(environment, v.name, v.left)
+                    right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
+                    left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
                 else 
                     right = ''
-                    left = mod.evaluator.ExecuteCode(environment, v.name, v.left)
+                    left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end 
 
                 if left and left ~= "" and right ~= "nil" and not v.deleted then 
@@ -547,12 +540,14 @@ function mod:CreateLines()
 							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
 							v.update = tmp
 						end
-						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
-						tinsert(linesToDraw, {v.rightObj, mod.rightLines[lineNum]})
+						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
+						tinsert(linesToDraw, tbl)
+						tbl = StarTip.new(v.rightObj, mod.rightLines[lineNum])
+						tinsert(linesToDraw, tbl)
                     else
 						GameTooltip:AddLine(' ')
 							
-						if false and not v.leftObj or v.lineNum ~= lineNum then
+						if not v.leftObj or v.lineNum ~= lineNum then
 							if v.leftObj then v.leftObj:Del() end
 							v.value = v.left
 							local tmp = v.update
@@ -562,7 +557,8 @@ function mod:CreateLines()
 							v.lineNum = lineNum
 							v.update = tmp
 						end
-						tinsert(linesToDraw, {v.leftObj, mod.leftLines[lineNum]})
+						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
+						tinsert(linesToDraw, tbl)
                     end
 					if v.rightObj then 
 						v.rightObj:Start()
@@ -571,7 +567,7 @@ function mod:CreateLines()
 						v.leftObj:Start()
 					end
 					v.lineNum = lineNum
-                end
+				end
 			end
 
         end
