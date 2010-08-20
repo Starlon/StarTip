@@ -93,7 +93,10 @@ return unitName
         right = nil,
 		colorLeft = [[
 if UnitIsPlayer("mouseover") then
-    c = RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
+	local _, class = UnitClass("mouseover")
+    c.r = RAID_CLASS_COLORS[class].r
+	c.g = RAID_CLASS_COLORS[class].g
+	c.b = RAID_CLASS_COLORS[class].b
 else
     c.r, c.g, c.b = UnitSelectionColor("mouseover")
 end
@@ -109,17 +112,19 @@ return c
 		colorRight = [[
 if UnitExists("mouseovertarget") then
     if UnitIsPlayer("mouseovertarget") then
-        c = RAID_CLASS_COLORS[select(2, UnitClass("mouseovertarget"))]
+		local _, class = UnitClass("mouseovertarget")
+        c.r = RAID_CLASS_COLORS[class].r
+		c.g = RAID_CLASS_COLORS[class].g
+		c.b = RAID_CLASS_COLORS[class].b
     else
         c.r, c.g, c.b = UnitSelectionColor("mouseovertarget")
     end
-    return c
 else
 	c.r = 1
 	c.g = 1
 	c.b = 1
-    return c
-end		
+end	
+return c	
 ]],
         rightUpdating = true,
 		enabled = true
@@ -190,7 +195,13 @@ if UnitClass("mouseover") == UnitName("mouseover") then return end
 return UnitClass("mouseover")
 ]],
 		colorRight = [[
-return UnitIsPlayer("mouseover") and RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
+if UnitIsPlayer("mouseover") then
+    local _, class = UnitClass("mouseover")
+    c.r = RAID_CLASS_COLORS[class].r
+    c.g = RAID_CLASS_COLORS[class].g
+    c.b = RAID_CLASS_COLORS[class].b
+    return c
+end
 ]],
 		enabled = true
     },
@@ -452,7 +463,7 @@ do
 			if not fontString or not widget then StarTip:Print("nil is bug", "fontString = ", fontString, ", widget = ", widget) break end
 			fontString:SetText(widget.buffer)
 				
-			if widget.color then
+			if true then
 				c = mod.evaluator.ExecuteCode(environment, widget.widget.name .. ".color.script", widget.color.script)
 			else
 				StarTip:Print("color nil -- please report this", widget.widget and widget.widget.name)
