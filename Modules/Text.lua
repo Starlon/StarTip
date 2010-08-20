@@ -88,16 +88,16 @@ local defaultLines={
     [1] = {
         name = "UnitName",
         left = [[
-return self.unitName
+return unitName
 ]],
         right = nil,
 		colorLeft = [[
 local c
-if self.UnitIsPlayer("mouseover") then
-    c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
+if UnitIsPlayer("mouseover") then
+    c = RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
 else
 	if not c then c = new() end
-    c.r, c.g, c.b = self.UnitSelectionColor("mouseover")
+    c.r, c.g, c.b = UnitSelectionColor("mouseover")
 end
 return c
 ]],
@@ -109,16 +109,16 @@ return c
         left = 'return "Target:"',
         right = 'return UnitName("mouseovertarget") or "None"',
 		colorRight = [[
-if self.UnitExists("mouseovertarget") then
-    if self.UnitIsPlayer("mouseovertarget") then
-        c = self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseovertarget"))]
+if UnitExists("mouseovertarget") then
+    if UnitIsPlayer("mouseovertarget") then
+        c = RAID_CLASS_COLORS[select(2, UnitClass("mouseovertarget"))]
     else
-        if not c then c = self.new() end
-        c.r, c.g, c.b = self.UnitSelectionColor("mouseovertarget")
+        if not c then c = new() end
+        c.r, c.g, c.b = UnitSelectionColor("mouseovertarget")
     end
     return c
 else
-	if not c then c = self.new() end
+	if not c then c = new() end
 	c.r = 1
 	c.g = 1
 	c.b = 1
@@ -133,7 +133,7 @@ end
         left = 'return "Guild:"',
         right = [[
 guild = GetGuildInfo("mouseover")
-if guild then return "<" .. GetGuildInfo("mouseover") .. ">" else return self.unitGuild end
+if guild then return "<" .. GetGuildInfo("mouseover") .. ">" else return unitGuild end
 ]],
 		enabled = true
     },
@@ -141,7 +141,7 @@ if guild then return "<" .. GetGuildInfo("mouseover") .. ">" else return self.un
         name = "Rank",
         left = 'return "Rank:"',
         right = [[
-return select(2, self.GetGuildInfo("mouseover"))
+return select(2, GetGuildInfo("mouseover"))
 ]],    
 		enabled = true
     },
@@ -149,7 +149,7 @@ return select(2, self.GetGuildInfo("mouseover"))
         name = "Realm",
         left = 'return "Realm:"',
         right = [[
-return select(2, self.UnitName("mouseover"))
+return select(2, UnitName("mouseover"))
 ]],
 		enabled = true
     },
@@ -157,8 +157,8 @@ return select(2, self.UnitName("mouseover"))
         name = "Level",
         left = 'return "Level:"',
         right = [[
-lvl = self.UnitLevel("mouseover")
-class = self.UnitClassification("mouseover")
+lvl = UnitLevel("mouseover")
+class = UnitClassification("mouseover")
 
 if lvl <= 0 then
     lvl = ''
@@ -194,7 +194,7 @@ if UnitClass("mouseover") == UnitName("mouseover") then return end
 return UnitClass("mouseover")
 ]],
 		colorRight = [[
-return self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.UnitClass("mouseover"))]
+return UnitIsPlayer("mouseover") and RAID_CLASS_COLORS[select(2, UnitClass("mouseover"))]
 ]],
 		enabled = true
     },
@@ -202,7 +202,7 @@ return self.UnitIsPlayer("mouseover") and self.RAID_CLASS_COLORS[select(2, self.
         name = "Faction",
         left = 'return "Faction:"',
         right = [[
-return self.UnitFactionGroup("mouseover")
+return UnitFactionGroup("mouseover")
 ]],
 		enabled = true
     },
@@ -210,17 +210,17 @@ return self.UnitFactionGroup("mouseover")
         name = "Status",
         left = 'return "Status:"',
         right = [[
-if not self.UnitIsConnected("mouseover") then
+if not UnitIsConnected("mouseover") then
     return "Offline"
-elseif self.unitHasAura(self.GetSpellInfo(19752)) then
+elseif unitHasAura(GetSpellInfo(19752)) then
     return "Divine Intervention"
-elseif self.UnitIsFeignDeath("mouseover") then
+elseif UnitIsFeignDeath("mouseover") then
     return "Feigned Death"
-elseif self.UnitIsGhost("mouseover") then
+elseif UnitIsGhost("mouseover") then
     return "Ghost"
-elseif self.UnitIsDead("mouseover") and  self.unitHasAura(self.GetSpellInfo(20707)) then
+elseif UnitIsDead("mouseover") and  self.unitHasAura(self.GetSpellInfo(20707)) then
     return "Soulstoned"
-elseif self.UnitIsDead("mouseover") then
+elseif UnitIsDead("mouseover") then
     return "Dead"
 end
 ]],
@@ -230,12 +230,12 @@ end
         name = "Health",
         left = 'return "Health:"',
         right = [[
-health, maxHealth = self.UnitHealth("mouseover"), self.UnitHealthMax("mouseover")
+health, maxHealth = UnitHealth("mouseover"), UnitHealthMax("mouseover")
 value = "Unknown"
 if maxHealth == 100 then
     value = health .. "%"
 elseif maxHealth ~= 0 then
-    value = format("%s/%s (%d%%)", self.short(health), self.short(maxHealth), health/maxHealth*100)
+    value = format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100)
 end
 return value
 ]],
@@ -246,21 +246,21 @@ return value
     [12] = {
         name = "Mana",
         left = [[
-class = select(2, self.UnitClass("mouseover"))
-if not self.UnitIsPlayer("mouseover") then
+class = select(2, UnitClass("mouseover"))
+if not UnitIsPlayer("mouseover") then
 	class = "MAGE"
 end
 
-return (self.powers[class] or "Mana:")
+return (powers[class] or "Mana:")
 ]],
         right = [[
-mana = self.UnitMana("mouseover")
-maxMana = self.UnitManaMax("mouseover")
+mana = UnitMana("mouseover")
+maxMana = UnitManaMax("mouseover")
 value = "Unknown"
 if maxMana == 100 then
     value = mana
 elseif maxMana ~= 0 then
-    value = format("%s/%s (%d%%)", self.short(mana), self.short(maxMana), mana/maxMana*100)
+    value = format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100)
 end
 return value
 ]],
@@ -271,12 +271,12 @@ return value
     [13] = {
         name = "Location",
         left = 'return "Location:"',
-        right = "return self.unitLocation",
+        right = "return unitLocation",
 		enabled = true
     },
 	[14] = {
 		name = "Marquee",
-		left = 'return "StarTip " .. self._G.StarTip.version',
+		left = 'return "StarTip " .. _G.StarTip.version',
 		leftUpdating = true,
 		enabled = false,
 		marquee = true,
@@ -310,16 +310,16 @@ end
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
-    self.memperc = memdiff / totaldiff * 100
-    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", self.memperc) .. "%)"
+    memperc = (memdiff / totaldiff * 100)
+    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", memperc) .. "%)"
 end
 ]],
 		colorRight = [[
-if type(self.memperc) == "number" then
+if type(memperc) == "number" then
     if not c then c = new() end
-    if self.memperc > 50 then
+    if memperc > 50 then
         c.r, c.g, c.b = 1, 0, 0
-    elseif self.memperc <= 0 then
+    elseif memperc <= 0 then
         c.r, c.g, c.b = 0, 0, 1
     else
         c.r, c.g, c.b = 0, 1, 0
@@ -338,16 +338,16 @@ end
 cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     if totaldiff == 0 then totaldiff = 1 end
-    self.cpuperc = cpudiff / totaldiff * 100;
-    return timeshort(cpu) .. " (" .. format("%.2f", self.cpuperc)  .. "%)"
+    cpuperc = cpudiff / totaldiff * 100;
+    return timeshort(cpu) .. " (" .. format("%.2f", cpuperc)  .. "%)"
 end
 ]],
 		colorRight = [[
-if type(self.cpuperc) == "number" then
+if type(cpuperc) == "number" then
     if not c then c = new() end
-    if self.cpuperc > 50 then
+    if cpuperc > 50 then
         c.r, c.g, c.b = 1, 0, 0
-    elseif self.cpuperc == 0 then
+    elseif cpuperc == 0 then
 	    c.r, c.g, c.b = 0, 0, 1
     else
         c.r, c.g, c.b = 0, 1, 0
@@ -444,14 +444,14 @@ local linesToDraw = {}
 local tbl
 local function updateFontString(widget, fontString)
 	tbl = StarTip.new(widget, fontString)
-	tinsert(linesToDraw, tbl)
+	linesToDraw[tbl] = true
 end
 
 do
 	local fontsList = LSM:List("font")
 	local c, widget, fontString
 	function draw()
-		for k, table in pairs(linesToDraw) do
+		for table in pairs(linesToDraw) do
 			c = nil	
 			widget = table[1]
 			fontString = table[2]
@@ -460,6 +460,7 @@ do
 				
 			if widget.color.script then
 				c = mod.evaluator.ExecuteCode(environment, widget.widget.name .. ".color.script", widget.color.script)
+				StarTip:Print(widget.widget.name, type(c), environment.memperc)
 			end
 		
 			if type(c) == "table" then
@@ -487,9 +488,11 @@ do
 					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
 				end
 			end
-			StarTip.del(table)			
-			linesToDraw[k] = nil
 		end		
+		for table in pairs(linesToDraw) do
+			StarTip.del(table)			
+			linesToDraw[table] = nil
+		end
 		if UnitExists("mouseover") then 
 			GameTooltip:Hide()
 			GameTooltip:Show()
@@ -545,9 +548,9 @@ function mod:CreateLines()
 							v.update = tmp
 						end
 						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
-						tinsert(linesToDraw, tbl)
+						linesToDraw[tbl] = true
 						tbl = StarTip.new(v.rightObj, mod.rightLines[lineNum])
-						tinsert(linesToDraw, tbl)
+						linesToDraw[tbl] = true
                     else
 						GameTooltip:AddLine(' ')
 							
@@ -562,7 +565,7 @@ function mod:CreateLines()
 							v.update = tmp
 						end
 						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
-						tinsert(linesToDraw, tbl)
+						linesToDraw[tbl] = true
                     end
 					if v.rightObj then 
 						v.rightObj:Start()

@@ -116,8 +116,8 @@ StarTip.config = {
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
-    self.memperc = memdiff / totaldiff * 100
-    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", self.memperc) .. "%)"
+    memperc = memdiff / totaldiff * 100
+    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", memperc) .. "%)"
 end
 ]],
 		cols = 20,
@@ -136,8 +136,8 @@ end
 cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     if totaldiff == 0 then totaldiff = 1 end
-    self.cpuperc = cpudiff / totaldiff * 100
-    return timeshort(cpu) .. " (" .. format("%.2f", self.cpuperc)  .. "%)"
+    cpuperc = cpudiff / totaldiff * 100
+    return timeshort(cpu) .. " (" .. format("%.2f", cpuperc)  .. "%)"
 end
 ]],
 		cols = 20,
