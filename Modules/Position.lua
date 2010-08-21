@@ -272,7 +272,7 @@ end
 
 local currentOwner
 local currentThis
-local f = CreateFrame("Frame")
+local delayFrame = CreateFrame("Frame")
 local function delayAnchor()
 	local this = currentThis
 	local owner = currentOwner
@@ -291,15 +291,13 @@ local function delayAnchor()
 		if updateFrame:GetScript("OnUpdate") then updateFrame:SetScript("OnUpdate", nil) end
 		this:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
 	end
+	delayFrame:SetScript("OnUpdate", nil)
 end
 
 function mod:GameTooltip_SetDefaultAnchor(this, owner)
-	if owner == currentOwner and this == currentThis and owner ~= UIParent then
-		return
-	end	
 	currentOwner = owner
 	currentThis = this
-	f:SetScript("OnUpdate", delayAnchor)
+	delayFrame:SetScript("OnUpdate", delayAnchor)
 end
 
 function mod:REGEN_DISABLED()
@@ -312,5 +310,5 @@ mod.REGEN_ENABLED = mod.REGEN_DISABLED
 
 function mod:OnHide()
 	updateFrame:SetScript("OnUpdate", nil)
-	f:SetScript("OnUpdate", nil)
+	delayFrame:SetScript("OnUpdate", nil)
 end

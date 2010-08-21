@@ -505,6 +505,9 @@ do
 		end
 		table.wipe(fontStringsToDraw)
 		if UnitExists("mouseover") then
+			if GetMouseFocus() == UIParent then
+				GameTooltip:Hide()
+			end
 			GameTooltip:Show()
 		end
 	end
