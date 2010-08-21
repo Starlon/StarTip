@@ -288,7 +288,7 @@ return value
 		name = "Marquee",
 		left = 'return "StarTip " .. _G.StarTip.version',
 		leftUpdating = true,
-		enabled = true,
+		enabled = false,
 		marquee = true,
 		cols = 30,
 		bold = true,
