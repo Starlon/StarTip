@@ -127,6 +127,7 @@ end
 return c	
 ]],
         rightUpdating = true,
+		update = 1000,
 		enabled = true
     },
     [3] = {
@@ -144,7 +145,7 @@ if guild then return "<" .. GetGuildInfo("mouseover") .. ">" else return unitGui
         right = [[
 return select(2, GetGuildInfo("mouseover"))
 ]],    
-		enabled = true
+		enabled = true,
     },
     [5] = {
         name = "Realm",
@@ -177,7 +178,8 @@ end
 
 return lvl
 ]],
-		enabled = true
+		enabled = true,
+		unitFrameFunky = true
     },	
     [7] = {
         name = "Race",
@@ -185,7 +187,7 @@ return lvl
         right = [[
 return (UnitIsPlayer("mouseover") and UnitRace("mouseover")) or UnitCreatureFamily("mouseover") or UnitCreatureType("mouseover")
 ]],
-		enabled = true
+		enabled = true,
     },
     [8] = {
         name = "Class",
@@ -195,15 +197,16 @@ if UnitClass("mouseover") == UnitName("mouseover") then return end
 return UnitClass("mouseover")
 ]],
 		colorRight = [[
+c.r, c.g, c.b = 1, 1, 1
 if UnitIsPlayer("mouseover") then
     local _, class = UnitClass("mouseover")
     c.r = RAID_CLASS_COLORS[class].r
     c.g = RAID_CLASS_COLORS[class].g
     c.b = RAID_CLASS_COLORS[class].b
-    return c
 end
+return c
 ]],
-		enabled = true
+		enabled = true,
     },
     [9] = {
         name = "Faction",
@@ -211,7 +214,7 @@ end
         right = [[
 return UnitFactionGroup("mouseover")
 ]],
-		enabled = true
+		enabled = true,
     },
     [10] = {
         name = "Status",
@@ -225,13 +228,13 @@ elseif UnitIsFeignDeath("mouseover") then
     return "Feigned Death"
 elseif UnitIsGhost("mouseover") then
     return "Ghost"
-elseif UnitIsDead("mouseover") and  self.unitHasAura(self.GetSpellInfo(20707)) then
+elseif UnitIsDead("mouseover") and  unitHasAura(self.GetSpellInfo(20707)) then
     return "Soulstoned"
 elseif UnitIsDead("mouseover") then
     return "Dead"
 end
 ]],
-		enabled = true
+		enabled = true,
     },
     [11] = {
         name = "Health",
@@ -285,14 +288,15 @@ return value
 		name = "Marquee",
 		left = 'return "StarTip " .. _G.StarTip.version',
 		leftUpdating = true,
-		enabled = false,
+		enabled = true,
 		marquee = true,
-		cols = 100,
+		cols = 30,
 		bold = true,
 		align = WidgetText.ALIGN_MARQUEE,
 		update = 1000,
 		speed = 100,
-		direction = DIRECTION_LEFT
+		direction = WidgetText.SCROLL_LEFT,
+		dontRtrim = true
 	},
 	[15] = {
 		name = "Memory Usage",
@@ -306,6 +310,7 @@ if mem then
 end
 ]],
 		colorRight = [[
+c.r, c.g, c.b = 1, 1, 1
 if type(memperc) == "number" then
     if memperc > 50 then
         c.r, c.g, c.b = 1, 0, 0
@@ -314,8 +319,8 @@ if type(memperc) == "number" then
     else
         c.r, c.g, c.b = 0, 1, 0
 	end
-    return c
 end
+return c
 ]],
 		rightUpdating = true,
 		update = 1000
@@ -333,6 +338,7 @@ if cpu then
 end
 ]],
 		colorRight = [[
+c.r, c.g, c.b = 1, 1, 1
 if type(cpuperc) == "number" then
     if cpuperc > 50 then
         c.r, c.g, c.b = 1, 0, 0
@@ -341,8 +347,8 @@ if type(cpuperc) == "number" then
     else
         c.r, c.g, c.b = 0, 1, 0
     end
-    return c
 end
+return c
 ]],
 
 		rightUpdating = true,
@@ -362,7 +368,6 @@ end
 ]],
 		leftUpdating = true,
 		enabled = true,
-		cols=100,
 		update = 1000
 	},	
 }
@@ -375,17 +380,10 @@ function mod:OnInitialize()
 	for i, v in ipairs(defaultLines) do
 		for j, vv in ipairs(self.db.profile.lines) do
 			if v.name == vv.name then
-				if v.left ~= vv.left and not vv.leftDirty then
-					vv.left = v.left
-				end
-				if v.right ~= vv.right and not vv.rightDirty then
-					vv.right = v.right
-				end
-				if v.colorLeft ~= vv.colorLeft and not vv.colorLeftDirty then
-					vv.colorLeft = v.colorLeft
-				end
-				if v.colorRight ~= vv.colorRight and not vv.colorRightDirty then
-					vv.colorRight = v.colorRight
+				for k, val in pairs(v) do
+					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
+						vv[k] = v[k]
+					end
 				end
 				v.tagged = true
 			end
@@ -417,21 +415,27 @@ function mod:OnInitialize()
 	self.core.lcd = self.lcd
 	
 	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
-	assert(self.evaluator)
+	
+end
+
+local function unitFrameFunkyFunction()
+	lines(true)
 end
 
 local draw
 local update
 function mod:OnEnable()
-        StarTip:SetOptionsDisabled(options, false)
-		self:CreateLines()
-		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
-		self.timer:Start()
+	StarTip:SetOptionsDisabled(options, false)
+	self:CreateLines()
+	self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
+	self.timer:Start()
+	self.unitFrameFunkyTimer = LibTimer:New("Funky unit frames timer", 100, false, unitFrameFunkyFunction, nil, StarTip.db.profile.errorLevel)
 end
 
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
-	self.timer:Stop()
+	self.timer:Del()
+	self.unitFrameFunkyTimer:Del()
 end
 
 function mod:GetOptions()
@@ -498,12 +502,10 @@ do
 		end		
 		for table in pairs(fontStringsToDraw) do
 			StarTip.del(table)			
-			--fontStringsToDraw[table] = nil
 		end
 		table.wipe(fontStringsToDraw)
-		if UnitExists("mouseover") then 
-			--GameTooltip:Hide()
-			--GameTooltip:Show()
+		if UnitExists("mouseover") then
+			GameTooltip:Show()
 		end
 	end
 end
@@ -519,7 +521,7 @@ function mod:CreateLines()
 		GameTooltip:ClearLines()
 		
         for i, v in ipairs(self) do
-			if v.enabled then
+			if v.enabled and not v.deleted then
 				
                 local left, right, c, cc = '', ''
                 if v.right then 
@@ -531,7 +533,7 @@ function mod:CreateLines()
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end 
 
-                if left and left ~= "" and right ~= "nil" and not v.deleted then 
+                if left and left ~= "" and right ~= "nil" or (GetMouseFocus() ~= UIParent and v.unitFrameFunky and unitFrameFunky) then 
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
@@ -586,8 +588,9 @@ function mod:CreateLines()
 			end
 
         end
-        self.NUM_LINES = lineNum
+        mod.NUM_LINES = lineNum
 	draw()
+	GameTooltip:Show()	
     end})
 end
 
@@ -681,6 +684,7 @@ function mod:RebuildOpts()
 					get = function() return self.db.profile.lines[i].enabled end,
 					set = function(info, val)
 						v.enabled = val
+						v.enabledDirty = true
 						self:CreateLines()
 					end,
 					order = 2
@@ -692,10 +696,11 @@ function mod:RebuildOpts()
 					get = function() return v.leftUpdating end,
 					set = function(info, val)
 						v.leftUpdating = val
-						self:CreateLines()
 						if v.update == 0 then
 							v.update = 500
-						end						
+						end					
+						v.leftUpdatingDirty = true
+						self:CreateLines()						
 					end,
 					order = 3
 				},
@@ -706,10 +711,11 @@ function mod:RebuildOpts()
                     get = function() return v.rightUpdating end,
                     set = function(info, val) 
 						v.rightUpdating = val 
-						self:CreateLines()
 						if v.update == 0 then
 							v.update = 500
 						end						
+						v.rightUpdatingDirty = true
+						self:CreateLines()						
 					end,
                     order = 4
                 },
@@ -756,8 +762,9 @@ function mod:RebuildOpts()
 					desc = "Whether to bold this line or not",
 					type = "toggle",
 					get = function() return self.db.profile.lines[i].bold end,
-					set = function(info, v) 
-						self.db.profile.lines[i].bold = v
+					set = function(info, val) 
+						v.bold = val
+						v.boldDirty = true
 						self:CreateLines() 
 					end,
 					order = 7
@@ -879,6 +886,7 @@ function mod:RebuildOpts()
 							get = function() return v.marquee end,
 							set = function(info, val) 
 								v.marquee = val 
+								v.marqueeDirty = true
 								self:CreateLines()
 							end
 						},
@@ -893,6 +901,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.prefix = val
+								v.prefixDirty = true
 								self:CreateLines()
 							end,
 							order = 2
@@ -908,6 +917,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.postfix = v
+								v.postfixDirty = true
 								self:CreateLines()
 							end,
 							order = 3
@@ -922,6 +932,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.precision = tonumber(val)
+								v.precisionDirty = true
 								self:CreateLines()
 							end,
 							order = 4
@@ -936,6 +947,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.align = WidgetText.alignmentList[val]
+								v.alignDirty = true
 								self:CreateLines()
 							end,
 							order = 5
@@ -950,6 +962,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.update = tonumber(val)
+								v.updateDirty = true
 								self:CreateLines()
 							end,
 							order = 6
@@ -964,6 +977,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.speed = tonumber(val)
+								v.speedDirty = true
 								self:CreateLines()
 							end,
 							order = 7
@@ -978,6 +992,7 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.direction = WidgetText.directionList[val]
+								v.directionDirty = true
 								self:CreateLines()
 							end,
 							order = 8
@@ -992,9 +1007,24 @@ function mod:RebuildOpts()
 							end,
 							set = function(info, val)
 								v.cols = tonumber(val)
+								v.colsDirty = true
 								self:CreateLines()
 							end,
 							order = 9
+						},
+						dontRtrim = {
+							name = "Don't right trim",
+							desc = "Prevent trimming white space to the right of text",
+							type = "toggle",
+							get = function()
+								return v.dontRtrim or WidgetText.defaults.dontRtrim
+							end,
+							set = function(info, val)
+								v.dontRtrim = val
+								v.dontRtrimDirty = true
+								self:CreateLines()
+							end,
+							order = 10
 						}
 					},
 					order = 9
@@ -1108,8 +1138,6 @@ function mod:SetUnit()
     end
     -- End
     
-    GameTooltip:ClearLines()
-
     lines()
     
     -- Another part taken from CowTip
@@ -1130,6 +1158,7 @@ function mod:SetUnit()
         linesToAddRightB[i] = nil
     end
     -- End
-        
+
 	self.timer:Start()
+	self.unitFrameFunkyTimer:Start()
 end

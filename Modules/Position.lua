@@ -1,5 +1,5 @@
 local mod = StarTip:NewModule("Position", "AceEvent-3.0", "AceHook-3.0")
-mod.name = "Positioning and Hiding"
+mod.name = "Positioning"
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
