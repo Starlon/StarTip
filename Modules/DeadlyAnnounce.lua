@@ -1,4 +1,5 @@
 --if not DBM and not BigWigs then return end
+do return end
 local mod = StarTip:NewModule("DeadlyAnnounce")
 mod.name = "DeadlyAnnounce"
 mod.toggled = true
