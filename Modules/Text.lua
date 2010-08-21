@@ -362,6 +362,7 @@ end
 ]],
 		leftUpdating = true,
 		enabled = true,
+		cols=100,
 		update = 1000
 	},	
 }
@@ -501,8 +502,8 @@ do
 		end
 		table.wipe(fontStringsToDraw)
 		if UnitExists("mouseover") then 
-			GameTooltip:Hide()
-			GameTooltip:Show()
+			--GameTooltip:Hide()
+			--GameTooltip:Show()
 		end
 	end
 end
@@ -1130,7 +1131,5 @@ function mod:SetUnit()
     end
     -- End
         
-    GameTooltip:Show()
-	
 	self.timer:Start()
 end
