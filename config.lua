@@ -7,47 +7,47 @@ local foo = 500
 
 StarTip.config = {
     ["display_startip"] = {
-		["driver"] = "qtip",
+		["enabled"] = true,
+		["driver"] = "QTip",
 		["layers"] = 3,
 		["background"] = "d9ccf16f",
 		["rows"] = 6,
 		["cols"] = 30,
-		["layout-timeout"] = 0,
+		["layout_timeout"] = 0,
 		["update"] = 25,
-		["widget0"] = "widget_key_up",
-		["widget1"] = "widget_key_down",
-		["transition-speed"] = 50,
-		["refresh-rate"] = 25,
-		["layout0"] = "layout_startip"
+		["widgets"] = {"widget_key_up", "widget_key_down"},
+		["transition_speed"] = 50,
+		["refresh_rate"] = 25,
+		["layouts"] = {"layout_startip"}
     },
 	["layout_blank"] = {
 		["keyless"] = 1,
 		["layout-timeout"] = 0
     },
 	["layout_startip"] = {
-		["row1"] = {
-    		["col1"] = "widget_name_label",
-    		["col10"] = "widget_name"
+		[1] = { -- row
+    		[1] = "widget_name_label", -- column
+    		[10] = "widget_name"
         }, 
-		["row2"] = {
-    		["col1"] = "widget_class_label", 
-    		["col10"] = "widget_class"
+		[2] = {
+    		[1] = "widget_class_label", 
+    		[10] = "widget_class"
         }, 
-		["row3"] = {
-			["col1"] = "widget_race_label",
-			["col10"] = "widget_race",
+		[3] = {
+			[1] = "widget_race_label",
+			[10] = "widget_race",
 		},
-		["row4"] = {
-			["col1"] = "widget_level_label",
-			["col10"] = "widget_level",
+		[4] = {
+			[1] = "widget_level_label",
+			[10] = "widget_level",
 		},
-		["row5"] = {
-			["col1"] = "widget_mem_label",
-			["col10"] = "widget_mem"
+		[5] = {
+			[1] = "widget_mem_label",
+			[10] = "widget_mem"
 		},
-		["row6"] = {
-			["col1"] = "widget_cpu_label",
-			["col10"] = "widget_cpu"
+		[6] = {
+			[1] = "widget_cpu_label",
+			[10] = "widget_cpu"
 		},
 		["transition"] = "U"
     }, 

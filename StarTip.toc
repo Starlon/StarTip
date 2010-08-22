@@ -20,7 +20,8 @@ embeds.xml
 
 StarTip.lua
 
+config.lua
+
 modules.xml
 
-config.lua
 
