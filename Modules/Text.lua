@@ -469,7 +469,8 @@ do
 			fontString:SetText(widget.buffer)
 				
 			if true then
-				c = mod.evaluator.ExecuteCode(environment, widget.widget.name .. ".color.script", widget.color.script)
+				widget.color:Eval()
+				c = widget.color.result --mod.evaluator.ExecuteCode(environment, widget.widget.name .. ".color.script", widget.color.script)
 			else
 				StarTip:Print("color nil -- please report this", widget.widget and widget.widget.name)
 			end
