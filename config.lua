@@ -127,7 +127,7 @@ end
 		expression = [[
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
-    if totaldiff == 0 then totaldiff = 1 end
+    if totaldiff == 0 then return 0 end
     return memdiff / totaldiff * 100
 end
 ]],
@@ -158,7 +158,7 @@ end
 		expression = [[
 cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
-    if totaldiff == 0 then totaldiff = 1 end
+    if totaldiff == 0 then return 0 end
     return cpudiff / totaldiff * 100		
 end
 ]],
