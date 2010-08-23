@@ -419,7 +419,9 @@ function mod:OnInitialize()
 end
 
 local function unitFrameFunkyFunction()
-	lines(true)
+	if UnitExists("mouseover") then
+		lines(true)
+	end
 end
 
 local draw
@@ -594,7 +596,6 @@ function mod:CreateLines()
         end
         mod.NUM_LINES = lineNum
 	draw()
-	GameTooltip:Show()	
     end})
 end
 
