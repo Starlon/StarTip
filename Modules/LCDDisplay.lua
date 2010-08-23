@@ -7,6 +7,7 @@ local LibCore = LibStub("StarLibCore-1.0")
 local LibLCDText = LibStub("StarLibLCDText-1.0")
 local LibDriverQTip = LibStub("StarLibDriverQTip-1.0")
 local WidgetText = LibStub("StarLibWidgetText-1.0")
+local WidgetBar = LibStub("StarLibWidgetBar-1.0")
 local LayoutOptions = LibStub("StarLibLayoutOptions-1.0")
 
 local _G = _G

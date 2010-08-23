@@ -43,19 +43,19 @@ StarTip.config = {
 		},
 		[5] = {
 			[1] = "widget_mem_label",
-			[10] = "widget_mem"
+			[10] = "widget_mem",
+			[20] = "widget_mem_bar"
 		},
 		[6] = {
 			[1] = "widget_cpu_label",
-			[10] = "widget_cpu"
+			[10] = "widget_cpu",
+			[20] = "widget_cpu_bar"
 		},
 		["transition"] = "U"
     }, 
 	["widget_name_label"] = {
 		type = "text",
 		value = 'return "Name:"',
-		prefix = '',
-		postfix = '',
 		precision = 0xbabe,
 		align = ALIGN_RIGHT,
 		cols = 9,
@@ -113,16 +113,27 @@ StarTip.config = {
 	["widget_mem"] = {
 		type = "text",
 		value = [[
+mem = GetMemUsage("StarTip")
+if mem then
+    return memshort(tonumber(format("%.2f", mem)))
+end
+]],
+		cols = 10,
+		update = 1000,
+		dontRtrim = true
+	},
+	["widget_mem_bar"] = {
+		type = "bar",
+		expression = [[
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
-    memperc = memdiff / totaldiff * 100
-    return memshort(tonumber(format("%.2f", mem))) .. " (" .. format("%.2f", memperc) .. "%)"
+    return memdiff / totaldiff * 100
 end
 ]],
-		cols = 20,
-		update = 1000,
-		dontRtrim = true
+		min = "return 0",
+		max = "return 100",
+		length = 10
 	},
 	["widget_cpu_label"] = {
 		type = "text",
@@ -133,16 +144,27 @@ end
 	["widget_cpu"] = {
 		type = "text",
 		value = [[
+cpu = GetCPUUsage("StarTip")
+if cpu then
+    return timeshort(cpu)
+end
+]],
+		cols = 10,
+		update = 1000,
+		dontRtrim = true
+	},
+	["widget_cpu_bar"] = {
+		type = "bar",
+		expression = [[
 cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     if totaldiff == 0 then totaldiff = 1 end
-    cpuperc = cpudiff / totaldiff * 100
-    return timeshort(cpu) .. " (" .. format("%.2f", cpuperc)  .. "%)"
+    return cpudiff / totaldiff * 100		
 end
 ]],
-		cols = 20,
-		update = 1000,
-		dontRtrim = true
+		min = "return 0",
+		max = "return 100",
+		length = 10
 	},
 	["widget_icon_blob"] = {
 		["bitmap"] = {
