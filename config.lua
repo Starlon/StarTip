@@ -13,7 +13,8 @@ StarTip.config = {
 		["background"] = "d9ccf16f",
 		["rows"] = 6,
 		["cols"] = 30,
-		["layout_timeout"] = 0,
+		["transition_timeout"] = 500,
+		["timeout"] = 500,
 		["update"] = 25,
 		["widgets"] = {"widget_key_up", "widget_key_down"},
 		["transition_speed"] = 50,
@@ -53,12 +54,15 @@ StarTip.config = {
 			[10] = "widget_cpu",
 			[20] = "widget_cpu_bar"
 		},
-		["transition"] = "U"
+		["transition"] = 1,
+		["timeout"] = 5000
     }, 
 	["layout_histogram"] = {
 		[1] = {
 			[1] = "widget_mem_histogram"
-		}
+		},
+		["transition"] = 2,
+		["timeout"] = 5000
 	},
 	["widget_name_label"] = {
 		type = "text",
