@@ -71,7 +71,6 @@ local blankOptions = {
 
 function mod:RebuildOpts()
 	options = copy(blankOptions)
-	StarTip:Print("rebuild opts")
 	options.displays.args.add = {
 		name = "Add Display",
 		type = "input",

@@ -27,9 +27,9 @@ StarTip.config = {
     },
 	["layout_startip"] = {
 		[1] = { -- row
-    		--[1] = "widget_name_label", -- column
+    		[1] = "widget_name_label", -- column
     		[10] = "widget_name"
-        }, --[[
+        }, 
 		[2] = {
     		[1] = "widget_class_label", 
     		[10] = "widget_class"
@@ -51,7 +51,7 @@ StarTip.config = {
 			[1] = "widget_cpu_label",
 			[10] = "widget_cpu",
 			[20] = "widget_cpu_bar"
-		},]]
+		},
 		["transition"] = 1,
 		["timeout"] = 5000
     }, 
