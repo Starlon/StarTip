@@ -18,7 +18,7 @@ StarTip.config = {
 		["widgets"] = {"widget_key_up", "widget_key_down"},
 		["transition_speed"] = 50,
 		["refresh_rate"] = 25,
-		["layouts"] = {"layout_startip"}
+		["layouts"] = {"layout_histogram", "layout_startip"}
     },
 	["layout_blank"] = {
 		["keyless"] = 1,
@@ -53,6 +53,11 @@ StarTip.config = {
 		},
 		["transition"] = "U"
     }, 
+	["layout_histogram"] = {
+		[1] = {
+			[1] = "widget_mem_histogram"
+		}
+	},
 	["widget_name_label"] = {
 		type = "text",
 		value = 'return "Name:"',
@@ -135,6 +140,20 @@ end
 		max = "return 100",
 		length = 10
 	},
+	["widget_mem_histogram"] = {
+		type = "histogram",
+		expression = [[
+mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+if mem then
+    if totaldiff == 0 then return 0 end
+    return memdiff / totaldiff * 100
+end
+]],
+		min = "return 0",
+		max = "return 100",
+		width = 30,
+		height = 6
+	},	
 	["widget_cpu_label"] = {
 		type = "text",
 		value = "return 'CPU:'",
@@ -165,6 +184,20 @@ end
 		min = "return 0",
 		max = "return 100",
 		length = 10
+	},
+	["widget_cpu_histogram"] = {
+		type = "histogram",
+		expression = [[
+cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+if cpu then
+    if totaldiff == 0 then return 0 end
+    return cpudiff / totaldiff * 100		
+end		
+]],
+		min = "return 0",
+		max = "return 100",
+		width = 30,
+		height = 6
 	},
 	["widget_icon_blob"] = {
 		["bitmap"] = {

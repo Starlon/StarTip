@@ -8,6 +8,7 @@ local LibLCDText = LibStub("StarLibLCDText-1.0")
 local LibDriverQTip = LibStub("StarLibDriverQTip-1.0")
 local WidgetText = LibStub("StarLibWidgetText-1.0")
 local WidgetBar = LibStub("StarLibWidgetBar-1.0")
+local WidgetHistogram = LibStub("StarLibWidgetHistogram-1.0")
 local LayoutOptions = LibStub("StarLibLayoutOptions-1.0")
 
 local _G = _G
@@ -258,7 +259,7 @@ function mod:RebuildOpts()
 				options.widgets.args.bar.args[k:gsub(" ", "_")] = {
 					name = k,
 					type = "group",
-					args = {}, --WidgetBar:GetOptions(StarTip, v, k)},
+					args = WidgetBar:GetOptions(StarTip, v, k),
 					order = 1
 				}						
 				options.widgets.args.bar.args[k:gsub(" ", "_")].args.delete = {
@@ -274,7 +275,7 @@ function mod:RebuildOpts()
 				options.widgets.args.histogram.args[k:gsub(" ", "_")] = {
 					name = k,
 					type = "group",
-					args = {}, --WidgetHistogram:GetOptions(StarTip, v, k)},
+					args = WidgetHistogram:GetOptions(StarTip, v, k),
 					order = 1
 				}						
 				options.widgets.args.histogram.args[k:gsub(" ", "_")].args.delete = {
