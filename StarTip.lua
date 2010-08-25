@@ -167,7 +167,7 @@ local options = {
 					type = "select",
 					values = LibStub("StarLibError-1.0").defaultTexts,
 					get = function() return StarTip.db.profile.errorLevel end,
-					set = function(info, v) StarTip.db.profile.errorLevel = v end,
+					set = function(info, v) StarTip.db.profile.errorLevel = v; StarTip:Print("Note that changing error verbosity requires a UI reload.") end,
 					order = 11
 				}
 			}

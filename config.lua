@@ -14,12 +14,10 @@ StarTip.config = {
 		["rows"] = 6,
 		["cols"] = 30,
 		["transition_timeout"] = 500,
-		["timeout"] = 500,
-		["update"] = 25,
-		["widgets"] = {"widget_key_up", "widget_key_down"},
+		["timeout"] = 5000,
 		["transition_speed"] = 50,
-		["refresh_rate"] = 25,
-		["layouts"] = {"layout_histogram", "layout_startip"},
+		["widgets"] = {"widget_key_up", "widget_key_down"},
+		["layouts"] = {"layout_startip", "layout_histogram"},
 		["font"] = {normal="Interface\\AddOns\\startip\\Fonts\\ttf-bitstream-vera-1.10\\VeraMo.ttf", bold="Interface\\AddOns\\startip\\Fonts\\ttf-bitstream-vera-1.10\\VeraMoBd.ttf", size=12},
 		--["font"] = {file = GameTooltipText:GetFont(), size = 12}
     },
@@ -29,9 +27,9 @@ StarTip.config = {
     },
 	["layout_startip"] = {
 		[1] = { -- row
-    		[1] = "widget_name_label", -- column
+    		--[1] = "widget_name_label", -- column
     		[10] = "widget_name"
-        }, 
+        }, --[[
 		[2] = {
     		[1] = "widget_class_label", 
     		[10] = "widget_class"
@@ -53,7 +51,7 @@ StarTip.config = {
 			[1] = "widget_cpu_label",
 			[10] = "widget_cpu",
 			[20] = "widget_cpu_bar"
-		},
+		},]]
 		["transition"] = 1,
 		["timeout"] = 5000
     }, 
@@ -75,9 +73,9 @@ StarTip.config = {
 	["widget_name"] = {
 		type = "text",
 		value = "return UnitName('player')",
-		cols = 40,
+		cols = 20,
 		align = ALIGN_MARQUEE,
-		update = 100000,
+		update = 1000,
 		speed = 300,
 		direction = SCROLL_LEFT,
 		dontRtrim = true
