@@ -18,7 +18,7 @@ StarTip.config = {
 		["widgets"] = {"widget_key_up", "widget_key_down"},
 		["transition_speed"] = 50,
 		["refresh_rate"] = 25,
-		["layouts"] = {"layout_startip", "layout_histogram"},
+		["layouts"] = {"layout_histogram", "layout_startip"},
 		["font"] = {normal="Interface\\AddOns\\startip\\Fonts\\ttf-bitstream-vera-1.10\\VeraMo.ttf", bold="Interface\\AddOns\\startip\\Fonts\\ttf-bitstream-vera-1.10\\VeraMoBd.ttf", size=12},
 		--["font"] = {file = GameTooltipText:GetFont(), size = 12}
     },
