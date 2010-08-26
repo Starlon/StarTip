@@ -56,8 +56,15 @@ StarTip.config = {
 		["timeout"] = 5000
     }, 
 	["layout_histogram"] = {
-		[1] = {
-			[1] = "widget_mem_histogram"
+		["layer2"] = {
+			[1] = {
+				[1] = "widget_mem_histogram"
+			},
+		},
+		["layer1"] = {
+			[3] = {
+				[1] = "widget_mem_perc"
+			}
 		},
 		["transition"] = 2,
 		["timeout"] = 5000
@@ -131,6 +138,22 @@ end
 		update = 1000,
 		dontRtrim = true
 	},
+	["widget_mem_perc"] = {
+		type = "text",
+		value = [[
+mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+if mem then
+    if totaldiff == 0 then totaldiff = 1 end
+    return format("%.2f", memdiff / totaldiff * 100) .. "%"
+end		
+]],
+		align = ALIGN_PINGPONG,
+		direction = SCROLL_RIGHT,
+		cols = 30,
+		update = 500,
+		speed = 100,
+		dontRtrim = true
+	},
 	["widget_mem_bar"] = {
 		type = "bar",
 		expression = [[
@@ -156,7 +179,8 @@ end
 		min = "return 0",
 		max = "return 100",
 		width = 30,
-		height = 6
+		height = 6,
+		layer = 1
 	},	
 	["widget_cpu_label"] = {
 		type = "text",
