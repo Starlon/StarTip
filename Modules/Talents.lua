@@ -87,7 +87,7 @@ function mod:TalentQuery_Ready(e, name, realm)
 		spec[nameRealm] = {[4]=NONE}
 		local highPoints = {}
 		local specNames = {}
-		local group = GetActiveTalentGroup(true)
+		local group = GetActiveTalentGroup(isnotplayer)
 		for tab = 1, GetNumTalentTabs(isnotplayer) do
 			local treename, _, pointsspent = GetTalentTabInfo(tab, isnotplayer, nil, group)
 			highPoints[tab] = pointsspent
@@ -124,8 +124,8 @@ local updateTalents = function()
 		return 
 	end
 	if expired then
-		TalentQuery:NotifyInspect("player")
-		TalentQuery.frame:Hide()
+		--TalentQuery:NotifyInspect("player")
+		--TalentQuery.frame:Hide()
 		TalentQuery:Query("mouseover")
 		expireTimer = self:ScheduleTimer(expireQuery, EXPIRE_TIME)	
 		expired = nil
@@ -241,7 +241,7 @@ function mod:SetUnit()
 	if UnitIsUnit("mouseover", "player") then
 		self:TalentQuery_Ready(_, UnitName("player"))
 	else
-		TalentQuery:NotifyInspect("mouseover")
+		--TalentQuery:NotifyInspect("mouseover")
 		TalentQuery:Query("mouseover")
 		talentTimer = talentTimer or self:ScheduleRepeatingTimer(updateTalents, 0)
 		if expireTimer then
