@@ -82,7 +82,7 @@ function copy(t)
 	return tmp
 end
 
-local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 100}}
+local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500}}
 
 local defaultLines={
     [1] = {
@@ -430,7 +430,6 @@ function mod:OnEnable()
 	StarTip:SetOptionsDisabled(options, false)
 	self:CreateLines()
 	self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
-	self.timer:Start()
 	self.unitFrameFunkyTimer = LibTimer:New("Funky unit frames timer", 100, false, unitFrameFunkyFunction, nil, StarTip.db.profile.errorLevel)
 end
 
@@ -525,7 +524,6 @@ function mod:CreateLines()
     lines = setmetatable(llines, {__call=function(self)
         local lineNum = 0
 		GameTooltip:ClearLines()
-		
         for i, v in ipairs(self) do
 			if v.enabled and not v.deleted then
 				
@@ -1093,7 +1091,7 @@ local getGuild = function()
 end
 
 local ff = CreateFrame("Frame")
-function mod:SetUnit()        
+function mod:SetUnit()
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
     
     environment.unitName = getName()
@@ -1165,5 +1163,8 @@ function mod:SetUnit()
     -- End
 
 	self.timer:Start()
-	self.unitFrameFunkyTimer:Start()
+	
+	if GetMouseFocus() ~= UIParent then
+		self.unitFrameFunkyTimer:Start()
+	end
 end

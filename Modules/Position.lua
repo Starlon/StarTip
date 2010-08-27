@@ -221,7 +221,9 @@ local currentAnchor
 local xoffset, yoffset
 local positionTooltip = function()
 	local x, y = GetCursorPosition()
+	
 	local effScale = GameTooltip:GetEffectiveScale()
+	
 	if x ~= oldX or y ~= oldY then
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", (x + xoffset) / effScale, (y + yoffset) / effScale)

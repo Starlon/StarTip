@@ -142,7 +142,7 @@ function mod:SetUnit()
 	updateBars()
 	if self.db.profile.showHP then self.hpBar:Show() end
 	if self.db.profile.showMP then self.mpBar:Show() end
-	timer = timer or self:ScheduleRepeatingTimer(updateBars, .5)
+	--timer = timer or self:ScheduleRepeatingTimer(updateBars, .5)
 end
 
 function mod:SetItem()
@@ -202,18 +202,19 @@ function mod:UpdateHealth()
 
 	local color
 	if self.db.profile.useGradient then
-		color = {}
+		color = StarTip.new()
 		color.r, color.g, color.b = colorGradient(min/max)
 	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
 		color = health[1]
 	elseif UnitIsPlayer(unit) then 
 		color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
 	else
-		color = {}
+		color = StarTip.new()
 		color.r, color.g, color.b = UnitSelectionColor(unit)
 	end
 	if not color then color = health[0] end
 	self.hpBar:SetStatusBarColor(color.r, color.g, color.b)
+	StarTip.del(color)
 end
 
 function mod:UpdateMana()

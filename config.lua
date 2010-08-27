@@ -13,11 +13,10 @@ StarTip.config = {
 		["background"] = "d9ccf16f",
 		["rows"] = 6,
 		["cols"] = 30,
-		["transition_timeout"] = 500,
 		["timeout"] = 5000,
 		["transition_speed"] = 50,
 		["widgets"] = {"widget_key_up", "widget_key_down"},
-		["layouts"] = {"layout_startip", "layout_histogram"},
+		["layouts"] = {"layout_histogram", "layout_startip"},
 		["font"] = {normal="Interface\\AddOns\\startip\\Fonts\\ttf-bitstream-vera-1.10\\VeraMo.ttf", bold="Interface\\AddOns\\startip\\Fonts\\ttf-bitstream-vera-1.10\\VeraMoBd.ttf", size=12},
 		--["font"] = {file = GameTooltipText:GetFont(), size = 12}
     },
@@ -140,7 +139,7 @@ end
 	},
 	["widget_mem_perc"] = {
 		type = "text",
-		value = [[
+		value = [[		
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
@@ -150,8 +149,8 @@ end
 		align = ALIGN_PINGPONG,
 		direction = SCROLL_RIGHT,
 		cols = 30,
-		update = 500,
-		speed = 100,
+		update = 1000,
+		speed = 50,
 		dontRtrim = true
 	},
 	["widget_mem_bar"] = {
