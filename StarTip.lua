@@ -176,7 +176,7 @@ local options = {
 }
 
 do
-	local pool = {}--setmetatable({},{__mode='k'})
+	local pool = setmetatable({},{__mode='k'})
 	local newCount, delCount = 0, 0
 	function StarTip.new(...)
 		local t = next(pool)
@@ -192,7 +192,7 @@ do
 			t = {...}
 		end
 		if newtbl then
-			--StarTip:Print("new/recycled table " .. GetTime(), "new " .. newCount, "del " .. delCount, newtbl)		
+			StarTip:Print("new/recycled table " .. GetTime(), "new " .. newCount, "del " .. delCount)		
 		end
 		t.__starref__ = true
 		newCount = newCount + 1
