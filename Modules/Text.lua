@@ -577,8 +577,8 @@ function mod:CreateLines()
 							if not v.leftUpdating then v.update = 0 end
 							v.color = v.colorLeft
 							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 				
-							v.lineNum = lineNum
 							v.update = tmp
+							v.lineNum = lineNum
 						end
 						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
 						fontStringsToDraw[tbl] = true

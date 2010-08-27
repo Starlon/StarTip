@@ -203,7 +203,6 @@ function mod:RebuildOpts()
 						name = "Delete",
 						type = "execute",
 						func = function()
-							StarTip:Print("delete")
 							self.db.profile.config[k] = nil
 							StarTip:RebuildOpts()
 						end,
