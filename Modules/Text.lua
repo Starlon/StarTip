@@ -871,7 +871,7 @@ function mod:RebuildOpts()
 					order = 12
 				},
 				marquee = {
-					name = "Maruqee Settings",
+					name = "Enhanced Settings",
 					type = "group",
 					args = {
 						header = {
@@ -943,10 +943,10 @@ function mod:RebuildOpts()
 							type = "select",
 							values = WidgetText.alignmentList,
 							get = function()
-								return WidgetText.alignmentDict[v.align]
+								return v.align
 							end,
 							set = function(info, val)
-								v.align = WidgetText.alignmentList[val]
+								v.align = val
 								v.alignDirty = true
 								self:CreateLines()
 							end,
@@ -954,7 +954,7 @@ function mod:RebuildOpts()
 						},
 						update = {
 							name = "Text Update",
-							desc = "How often to update the text",
+							desc = "How often to update the text. Use this option if you want your line to update.",
 							type = "input",
 							pattern = "%d",
 							get = function()
@@ -988,10 +988,10 @@ function mod:RebuildOpts()
 							type = "select",
 							values = WidgetText.directionList,
 							get = function()
-								return tonumber(WidgetText.directionDict[v.direction]) or WidgetText.defaults.direction
+								return v.direction or WidgetText.defaults.direction
 							end,
 							set = function(info, val)
-								v.direction = WidgetText.directionList[val]
+								v.direction = val
 								v.directionDirty = true
 								self:CreateLines()
 							end,

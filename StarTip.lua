@@ -290,6 +290,7 @@ end
 function StarTip:RebuildOpts()
 	for k, v in self:IterateModules() do
 		local t = {}
+		if type(v.RebuildOpts) == "function" then v:RebuildOpts() end
 		options.args.modules.args[v:GetName()] = {
 			name = v.name,
 			type = "group",
