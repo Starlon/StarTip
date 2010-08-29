@@ -192,7 +192,7 @@ do
 			t = {...}
 		end
 		if newtbl then
-			StarTip:Print("new/recycled table " .. GetTime(), "new " .. newCount, "del " .. delCount)		
+			--StarTip:Print("new table " .. GetTime(), "new " .. newCount, "del " .. delCount)		
 		end
 		t.__starref__ = true
 		newCount = newCount + 1
