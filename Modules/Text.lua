@@ -531,12 +531,13 @@ function mod:CreateLines()
                 if v.right then 
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+					if right == "" then right = "nil" end
                 else 
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end 
 
-                if left and left ~= "" or (GetMouseFocus() ~= UIParent and v.unitFrameFunky and unitFrameFunky) then 
+                if left and left ~= "" and right ~= "nil" or (GetMouseFocus() ~= UIParent and v.unitFrameFunky and unitFrameFunky) then 
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
