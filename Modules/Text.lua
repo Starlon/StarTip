@@ -429,13 +429,15 @@ local update
 function mod:OnEnable()
 	StarTip:SetOptionsDisabled(options, false)
 	self:CreateLines()
-	self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
+	if self.db.profile.refreshRate > 0 then
+		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
+	end
 	self.unitFrameFunkyTimer = LibTimer:New("Funky unit frames timer", 100, false, unitFrameFunkyFunction, nil, StarTip.db.profile.errorLevel)
 end
 
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
-	self.timer:Del()
+	if self.timer then self.timer:Del() end
 	self.unitFrameFunkyTimer:Del()
 end
 
@@ -645,7 +647,11 @@ function mod:RebuildOpts()
 			type = "input",
 			pattern = "%d",
 			get = function() return tostring(self.db.profile.refreshRate) end,
-			set = function(info, v) self.db.profile.refreshRate = tonumber(v) end,
+			set = function(info, v) 
+				self.db.profile.refreshRate = tonumber(v)
+				self:OnDisable()
+				self:OnEnable()
+			end,
 			order = 6
 		},
 		defaults = {
@@ -1160,7 +1166,7 @@ function mod:SetUnit()
     end
     -- End
 
-	self.timer:Start()
+	if self.timer then self.timer:Start() end
 	
 	if GetMouseFocus() ~= UIParent then
 		self.unitFrameFunkyTimer:Start()
