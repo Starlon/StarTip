@@ -1,4 +1,4 @@
-local mod = StarTip:NewModule("Text", "AceEvent-3.0")
+﻿local mod = StarTip:NewModule("Text", "AceEvent-3.0")
 mod.name = "Text"
 mod.toggled = true
 assert(LibStub("StarLibEvaluator-1.0", true), "Text module requires StarLibEvaluator-1.0")
@@ -531,13 +531,12 @@ function mod:CreateLines()
                 if v.right then 
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
-					if right == "" then right = "nil" end
                 else 
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end 
 
-                if left and left ~= "" and right ~= "nil" or (GetMouseFocus() ~= UIParent and v.unitFrameFunky and unitFrameFunky) then 
+                if left and left ~= "" or (GetMouseFocus() ~= UIParent and v.unitFrameFunky and unitFrameFunky) then 
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
@@ -632,7 +631,7 @@ function mod:RebuildOpts()
 			type = "input",
 			set = function(info, v)
 				if v == "" then return end
-				tinsert(self.db.profile.lines, {name = v, left = "", right = "", rightUpdating = false})
+				tinsert(self.db.profile.lines, {name = v, left = "", right = "", rightUpdating = false, enabled = true})
 				self:RebuildOpts()
 				StarTip:RebuildOpts()
 				self:CreateLines()
@@ -792,8 +791,6 @@ function mod:RebuildOpts()
 						else
 							table.remove(self.db.profile.lines, i)
 						end
-						
-						self:RebuildOpts()
 						StarTip:RebuildOpts()
 						self:CreateLines()
 					end,
