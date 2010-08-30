@@ -13,10 +13,10 @@ StarTip.config = {
 		["background"] = "d9ccf16f",
 		["rows"] = 6,
 		["cols"] = 30,
-		["timeout"] = 5000,
+		["timeout"] = 7000,
 		["transition_speed"] = 50,
 		["widgets"] = {"widget_key_up", "widget_key_down"},
-		["layouts"] = {"layout_histogram", "layout_startip"},
+		["layouts"] = {"layout_startip", "layout_histogram"},
 		["font"] = {normal="Interface\\AddOns\\startip\\Fonts\\ttf-bitstream-vera-1.10\\VeraMo.ttf", bold="Interface\\AddOns\\startip\\Fonts\\ttf-bitstream-vera-1.10\\VeraMoBd.ttf", size=12},
 		--["font"] = {file = GameTooltipText:GetFont(), size = 12}
     },
@@ -28,7 +28,7 @@ StarTip.config = {
 		[1] = { -- row
     		[1] = "widget_name_label", -- column
     		[10] = "widget_name"
-        }, 
+        },
 		[2] = {
     		[1] = "widget_class_label", 
     		[10] = "widget_class"
@@ -78,11 +78,11 @@ StarTip.config = {
 	},
 	["widget_name"] = {
 		type = "text",
-		value = "return UnitName('player')",
+		value = "return '--' .. select(1, UnitName('player')) .. '--'",
 		cols = 20,
-		align = ALIGN_MARQUEE,
+		align = ALIGN_PINGPONG,
 		update = 1000,
-		speed = 300,
+		speed = 100,
 		direction = SCROLL_LEFT,
 		dontRtrim = true
 	},
@@ -143,14 +143,14 @@ end
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
-    return format("%.2f", memdiff / totaldiff * 100) .. "%"
+    return '--------' .. format("%.2f", memdiff / totaldiff * 100) .. "%" .. "-------"
 end		
 ]],
 		align = ALIGN_PINGPONG,
 		direction = SCROLL_RIGHT,
 		cols = 30,
 		update = 1000,
-		speed = 50,
+		speed = 100,
 		dontRtrim = true
 	},
 	["widget_mem_bar"] = {

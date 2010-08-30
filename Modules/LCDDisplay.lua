@@ -345,9 +345,6 @@ function mod:StartDisplays()
 		if k:match("^display_") then
 			if v.driver == "QTip" then
 				local display = LibDriverQTip:New(self, k, self.db.profile.config, StarTip.db.profile.errorLevel) 
-				display.core:CFGSetup()
-				display.core:BuildLayouts()
-				display.core:Start()
 				display:Show()
 				tinsert(displays, display)
 			end
