@@ -550,6 +550,10 @@ function mod:CreateLines()
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
 							v.color = v.colorLeft
+							if mod.db.profile.refreshRate == 0 then
+								v.update = 0
+								v.scroll = 0
+							end
 							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							v.update = tmp
 						end
@@ -560,6 +564,10 @@ function mod:CreateLines()
 							local tmp = v.update
 							if not v.rightUpdating then v.update = 0 end
 							v.color = v.colorRight
+							if mod.db.profile.refreshRate == 0 then
+								v.update = 0
+								v.scroll = 0
+							end							
 							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
 							v.update = tmp
 						end
@@ -576,6 +584,10 @@ function mod:CreateLines()
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
 							v.color = v.colorLeft
+							if mod.db.profile.refreshRate == 0 then
+								v.update = 0
+								v.scroll = 0
+							end							
 							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 				
 							v.update = tmp
 							v.lineNum = lineNum
@@ -583,10 +595,20 @@ function mod:CreateLines()
 						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
 						fontStringsToDraw[tbl] = true
                     end
-					if v.rightObj then 
+					if v.rightObj then
+						if mod.db.profile.refreshRate == 0 then
+							v.rightObj.update = 0
+							v.rightObj.speed = 0
+							v.rightObj:Init()
+						end
 						v.rightObj:Start()
 					end
 					if v.leftObj then
+						if mod.db.profile.refreshRate == 0 then
+							v.leftObj.update = 0
+							v.leftObj.speed = 0
+							v.leftObj:Init()
+						end
 						v.leftObj:Start()
 					end
 					v.lineNum = lineNum
@@ -601,14 +623,16 @@ end
 
 function mod:OnHide()
 	for i, v in ipairs(lines) do
-		if v.leftObj and not (v.leftObj.update or v.leftObj.update == 0) then
+		if v.leftObj then
 			v.leftObj:Stop()
 		end
 		if v.rightObj then
 			v.rightObj:Stop()
 		end
 	end
-	self.timer:Stop()
+	if self.timer then
+		self.timer:Stop()
+	end
 end
 
 local function copy(t)
