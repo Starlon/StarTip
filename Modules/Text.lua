@@ -14,6 +14,8 @@ local LibTimer = LibStub("StarLibTimer-1.0", true)
 assert(LibTimer, mod.name .. " requires StarLibTimer-1.0")
 local LibEvaluator = LibStub("StarLibEvaluator-1.0", true)
 assert(LibEvaluator, mod.name .. " requires StarLibEvaluator-1.0")
+local UnitStats = LibStub("StarLibPluginUnitStats-1.0", true)
+assert(UnitStats, mod.name .. " requires StarLibPluginUnitStats-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -415,6 +417,8 @@ function mod:OnInitialize()
 	self.core.lcd = self.lcd
 	
 	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
+	
+	UnitStats:New()
 	
 end
 
@@ -1068,60 +1072,12 @@ function mod:RebuildOpts()
     end
 end
 
-
-local getName = function()
-    if self.db.profile.titles then
-        local name = self.leftLines[1]:GetText()
-        if UnitIsPlayer("mouseover") and name:find(" %- ") then
-            name = name:sub(1, name:find(" %- "))
-        end
-        return name
-    else
-        return UnitName("mouseover")
-    end
-end
-
--- Taken from LibDogTag-Unit-3.0
-local LEVEL_start = "^" .. (type(LEVEL) == "string" and LEVEL or "Level")
-local getLocation = function()
-    if UnitIsVisible("mouseover") or not UnitIsConnected("mouseover") then
-        return nil
-    end
-    
-    local left_2 = self.leftLines[2]:GetText()
-    local left_3 = self.leftLines[3]:GetText()
-    if not left_2 or not left_3 then
-        return nil
-    end
-    local hasGuild = not left_2:find(LEVEL_start)
-    local factionText = not hasGuild and left_3 or self.leftLines[4]:GetText()
-    if factionText == PVP then
-        factionText = nil
-    end
-    local hasFaction = factionText and not UnitPlayerControlled("mouseover") and not UnitIsPlayer("mouseover") and (UnitFactionGroup("mouseover") or factionList[factionText])
-    if hasGuild and hasFaction then
-        return self.leftLines[5]:GetText()
-    elseif hasGuild or hasFaction then
-        return self.leftLines[4]:GetText()
-    else
-        return left_3
-    end
-end
-
-local getGuild = function()
-    local left_2 = self.leftLines[2]:GetText()
-    if left_2:find(LEVEL_start) then return nil end
-    return "<" .. left_2 .. ">"
-end
-
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
     
-    environment.unitName = getName()
-    environment.unitLocation = getLocation()
-    environment.unitGuild = getGuild()
-    
+	environment.unitName, environment.unitGuild, environment.unitLocation = UnitStats:GetUnitStats("mouseover")
+	
     -- Taken from CowTip
     local lastLine = 2
     local text2 = self.leftLines[2]:GetText()
