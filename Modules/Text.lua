@@ -290,7 +290,7 @@ return value
 		leftUpdating = true,
 		enabled = false,
 		marquee = true,
-		cols = 30,
+		cols = 40,
 		bold = true,
 		align = WidgetText.ALIGN_MARQUEE,
 		update = 1000,
@@ -468,12 +468,12 @@ do
 			c = nil	
 			widget = table[1]
 			fontString = table[2]
-			if not fontString or not widget then StarTip:Print("nil is bug", "fontString = ", fontString, ", widget = ", widget) break end
+			if not fontString or not widget then break end
 			fontString:SetText(widget.buffer)
 				
 			if true then
 				widget.color:Eval()
-				c = widget.color.result --mod.evaluator.ExecuteCode(environment, widget.widget.name .. ".color.script", widget.color.script)
+				c = widget.color.result
 			else
 				StarTip:Print("color nil -- please report this", widget.widget and widget.widget.name)
 			end
@@ -601,15 +601,11 @@ end
 
 function mod:OnHide()
 	for i, v in ipairs(lines) do
-		if v.leftObj then
+		if v.leftObj and not (v.leftObj.update or v.leftObj.update == 0) then
 			v.leftObj:Stop()
-			--v.leftObj:Del()
-			--v.leftObj = nil
 		end
 		if v.rightObj then
 			v.rightObj:Stop()
-			--v.rightObj:Del()
-			--v.rightObj = nil
 		end
 	end
 	self.timer:Stop()
