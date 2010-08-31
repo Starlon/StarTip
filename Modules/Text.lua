@@ -549,7 +549,7 @@ function mod:CreateLines()
 						GameTooltip:AddDoubleLine(' ', ' ')
 						
 						if not v.leftObj or v.lineNum ~= lineNum then
-							if v.leftObj then v.leftObj:Del() end
+							--if v.leftObj then v.leftObj:Del() end
 							v.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
@@ -558,12 +558,16 @@ function mod:CreateLines()
 								v.update = 0
 								v.scroll = 0
 							end
-							v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
+							if v.leftObj then
+								v.leftObj.data = mod.leftLines[lineNum]
+							else
+								v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
+							end
 							v.update = tmp
 						end
 					
 						if not v.rightObj or v.lineNum ~= lineNum then
-							if v.rightObj then v.rightObj:Del() end
+							--if v.rightObj then v.rightObj:Del() end
 							v.value = v.right
 							local tmp = v.update
 							if not v.rightUpdating then v.update = 0 end
@@ -571,8 +575,12 @@ function mod:CreateLines()
 							if mod.db.profile.refreshRate == 0 then
 								v.update = 0
 								v.scroll = 0
-							end							
-							v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
+							end
+							if v.rightObj then
+								v.rightObj.data = mod.rightLines[lineNum]
+							else
+								v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
+							end
 							v.update = tmp
 						end
 						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
@@ -583,7 +591,7 @@ function mod:CreateLines()
 						GameTooltip:AddLine(' ')
 							
 						if not v.leftObj or v.lineNum ~= lineNum then
-							if v.leftObj then v.leftObj:Del() end
+							--if v.leftObj then v.leftObj:Del() end
 							v.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
@@ -592,7 +600,11 @@ function mod:CreateLines()
 								v.update = 0
 								v.scroll = 0
 							end							
-							v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 				
+							if v.leftObj then
+								v.leftObj.data = mod.leftLines[lineNum]
+							else
+								v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 				
+							end
 							v.update = tmp
 							v.lineNum = lineNum
 						end
