@@ -230,7 +230,7 @@ elseif UnitIsFeignDeath("mouseover") then
     return "Feigned Death"
 elseif UnitIsGhost("mouseover") then
     return "Ghost"
-elseif UnitIsDead("mouseover") and  unitHasAura(self.GetSpellInfo(20707)) then
+elseif UnitIsDead("mouseover") and  unitHasAura(GetSpellInfo(20707)) then
     return "Soulstoned"
 elseif UnitIsDead("mouseover") then
     return "Dead"
