@@ -77,10 +77,10 @@ function copy(t)
 	for k, v in pairs(t) do
 		if type(v) == "table" then
 			v = copy(v)
-		end	
+		end
 		tmp[k] = v
 	end
-	
+
 	return tmp
 end
 
@@ -125,8 +125,8 @@ else
 	c.r = 1
 	c.g = 1
 	c.b = 1
-end	
-return c	
+end
+return c
 ]],
         rightUpdating = true,
 		update = 1000,
@@ -146,7 +146,7 @@ if guild then return "<" .. GetGuildInfo("mouseover") .. ">" else return unitGui
         left = 'return "Rank:"',
         right = [[
 return select(2, GetGuildInfo("mouseover"))
-]],    
+]],
 		enabled = true,
     },
     [5] = {
@@ -182,7 +182,7 @@ return lvl
 ]],
 		enabled = true,
 		unitFrameFunky = true
-    },	
+    },
     [7] = {
         name = "Race",
         left = 'return "Race:"',
@@ -371,14 +371,14 @@ end
 		leftUpdating = true,
 		enabled = true,
 		update = 1000
-	},	
+	},
 }
 
 local options = {}
 
-function mod:OnInitialize()    
+function mod:OnInitialize()
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-	
+
 	for i, v in ipairs(defaultLines) do
 		for j, vv in ipairs(self.db.profile.lines) do
 			if v.name == vv.name then
@@ -391,36 +391,36 @@ function mod:OnInitialize()
 			end
 		end
 	end
-	
+
 	for i, v in ipairs(defaultLines) do
 		if not v.tagged and not v.deleted then
 			tinsert(self.db.profile.lines, v)
 		end
 	end
-	
+
 	--[[if self.db.profile.empty then
 		for i, v in ipairs(defaultLines) do
 			tinsert(self.db.profile.lines, v)
 		end
 		self.db.profile.empty = false
 	end]]
-		
+
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
     StarTip:SetOptionsDisabled(options, true)
-	
+
 	-- create our core object. Note that we must provide it with an LCD after it is created.
-	
+
 	self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
 	if ResourceServer then ResourceServer:New(environment) end
 	self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
 	self.core.lcd = self.lcd
-	
+
 	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
-	
+
 	UnitStats:New()
-	
+
 end
 
 local function unitFrameFunkyFunction()
@@ -470,19 +470,19 @@ do
 	local c, widget, fontString
 	function draw()
 		for table in pairs(fontStringsToDraw) do
-			c = nil	
+			c = nil
 			widget = table[1]
 			fontString = table[2]
 			if not fontString or not widget then break end
 			fontString:SetText(widget.buffer)
-				
+
 			if true then
 				widget.color:Eval()
 				c = widget.color.result
 			else
 				StarTip:Print("color nil -- please report this", widget.widget and widget.widget.name)
 			end
-		
+
 			if type(c) == "table" then
 				fontString:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
 			elseif type(c) == "string" and c == "" and widget.color and widget.color.script then
@@ -490,9 +490,9 @@ do
 			else
 				fontString:SetVertexColor(1, 1, 1, 1)
 			end
-			
-			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])	
-	
+
+			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
+
 			if widget.bold then
 				if mod.leftLines and mod.leftLines[widget.i] then
 					mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
@@ -508,9 +508,9 @@ do
 					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
 				end
 			end
-		end		
+		end
 		for table in pairs(fontStringsToDraw) do
-			StarTip.del(table)			
+			StarTip.del(table)
 		end
 		table.wipe(fontStringsToDraw)
 		if UnitExists("mouseover") then
@@ -533,22 +533,22 @@ function mod:CreateLines()
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
 			if v.enabled and not v.deleted then
-				
+
                 local left, right, c, cc = '', ''
-                if v.right then 
+                if v.right then
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
-                else 
+                else
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
-                end 
+                end
 
-                if left and left ~= "" and right ~= "nil" or (GetMouseFocus() ~= UIParent and v.unitFrameFunky and unitFrameFunky) then 
+                if left and left ~= "" and right ~= "nil" or (GetMouseFocus() ~= UIParent and v.unitFrameFunky and unitFrameFunky) then
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
-						
+
 						if not v.leftObj or v.lineNum ~= lineNum then
 							--if v.leftObj then v.leftObj:Del() end
 							v.value = v.left
@@ -566,7 +566,7 @@ function mod:CreateLines()
 							end
 							v.update = tmp
 						end
-					
+
 						if not v.rightObj or v.lineNum ~= lineNum then
 							--if v.rightObj then v.rightObj:Del() end
 							v.value = v.right
@@ -580,7 +580,7 @@ function mod:CreateLines()
 							if v.rightObj then
 								v.rightObj.data = mod.rightLines[lineNum]
 							else
-								v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum]) 					
+								v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum])
 							end
 							v.update = tmp
 						end
@@ -590,7 +590,7 @@ function mod:CreateLines()
 						fontStringsToDraw[tbl] = true
                     else
 						GameTooltip:AddLine(' ')
-							
+
 						if not v.leftObj or v.lineNum ~= lineNum then
 							--if v.leftObj then v.leftObj:Del() end
 							v.value = v.left
@@ -600,11 +600,11 @@ function mod:CreateLines()
 							if mod.db.profile.refreshRate == 0 then
 								v.update = 0
 								v.scroll = 0
-							end							
+							end
 							if v.leftObj then
 								v.leftObj.data = mod.leftLines[lineNum]
 							else
-								v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum]) 				
+								v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							end
 							v.update = tmp
 							v.lineNum = lineNum
@@ -684,7 +684,7 @@ function mod:RebuildOpts()
 			type = "input",
 			pattern = "%d",
 			get = function() return tostring(self.db.profile.refreshRate) end,
-			set = function(info, v) 
+			set = function(info, v)
 				self.db.profile.refreshRate = tonumber(v)
 				self:OnDisable()
 				self:OnEnable()
@@ -734,7 +734,7 @@ function mod:RebuildOpts()
 						self:CreateLines()
 					end,
 					order = 2
-				},		
+				},
 				leftUpdating = {
 					name = "Left Updating",
 					desc = "Whether this segment refreshes",
@@ -744,9 +744,9 @@ function mod:RebuildOpts()
 						v.leftUpdating = val
 						if v.update == 0 then
 							v.update = 500
-						end					
+						end
 						v.leftUpdatingDirty = true
-						self:CreateLines()						
+						self:CreateLines()
 					end,
 					order = 3
 				},
@@ -755,13 +755,13 @@ function mod:RebuildOpts()
                     desc = "Whether this segment refreshes",
                     type = "toggle",
                     get = function() return v.rightUpdating end,
-                    set = function(info, val) 
-						v.rightUpdating = val 
+                    set = function(info, val)
+						v.rightUpdating = val
 						if v.update == 0 then
 							v.update = 500
-						end						
+						end
 						v.rightUpdatingDirty = true
-						self:CreateLines()						
+						self:CreateLines()
 					end,
                     order = 4
                 },
@@ -808,10 +808,10 @@ function mod:RebuildOpts()
 					desc = "Whether to bold this line or not",
 					type = "toggle",
 					get = function() return self.db.profile.lines[i].bold end,
-					set = function(info, val) 
+					set = function(info, val)
 						v.bold = val
 						v.boldDirty = true
-						self:CreateLines() 
+						self:CreateLines()
 					end,
 					order = 7
 				},
@@ -821,15 +821,15 @@ function mod:RebuildOpts()
 					type = "execute",
 					func = function()
 						local deleted
-						
+
 						for j, vv in ipairs(defaultLines) do
 							if vv.name == v.name then
 								deleted = true
 							else
-								
+
 							end
 						end
-						
+
 						if deleted then
 							v.deleted = true
 						else
@@ -839,21 +839,21 @@ function mod:RebuildOpts()
 						self:CreateLines()
 					end,
 					order = 8
-				},								
+				},
 	            left = {
                     name = "Left",
                     type = "input",
                     desc = "Left text code",
                     get = function() return v.left end,
-                    set = function(info, val) 
-						v.left = val 
-						v.leftDirty = true 
+                    set = function(info, val)
+						v.left = val
+						v.leftDirty = true
 						if val == "" then
 							v.left = nil
 						end
-						self:CreateLines()						
+						self:CreateLines()
 					end,
-                    validate = function(info, str)	
+                    validate = function(info, str)
 						return mod.evaluator:Validate(environment, str)
 					end,
                     multiline = true,
@@ -865,15 +865,15 @@ function mod:RebuildOpts()
                     type = "input",
                     desc = "Right text code",
                     get = function() return v.right end,
-                    set = function(info, val) 
-						v.right = val; 
-						v.rightDirty = true 
+                    set = function(info, val)
+						v.right = val;
+						v.rightDirty = true
 						if val == "" then
 							v.right = nil
 						end
-						self:CreateLines()						
+						self:CreateLines()
 					end,
-                    validate = function(info, str)	
+                    validate = function(info, str)
 						return mod.evaluator:Validate(environment, str)
 					end,
                     multiline = true,
@@ -890,9 +890,9 @@ function mod:RebuildOpts()
 						v.colorLeftDirty = true
 						self:CreateLines()
 					end,
-                    validate = function(info, str)	
+                    validate = function(info, str)
 						return mod.evaluator:Validate(environment, str)
-					end,					
+					end,
 					multiline = true,
 					width = "full",
 					order = 11
@@ -907,7 +907,7 @@ function mod:RebuildOpts()
 						v.colorRightDirty = true
 						self:CreateLines()
 					end,
-                    validate = function(info, str)	
+                    validate = function(info, str)
 						return mod.evaluator:Validate(environment, str)
 					end,
 					multiline = true,
@@ -928,8 +928,8 @@ function mod:RebuildOpts()
 							desc = "Enable marquee. Note that this just makes marquees use the left line only. Technically all segments on the tooltip are marquee widgets.",
 							type = "toggle",
 							get = function() return v.marquee end,
-							set = function(info, val) 
-								v.marquee = val 
+							set = function(info, val)
+								v.marquee = val
 								v.marqueeDirty = true
 								self:CreateLines()
 							end
@@ -1080,7 +1080,7 @@ function mod:RebuildOpts()
 				type = "header",
 				order = 1
 			}
-			
+
 		end
     end
 end
@@ -1088,13 +1088,13 @@ end
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
-    
+
 	environment.unitName, environment.unitGuild, environment.unitLocation = UnitStats:GetUnitStats("mouseover")
-	
+
     -- Taken from CowTip
     local lastLine = 2
     local text2 = self.leftLines[2]:GetText()
-    
+
     if not text2 then
         lastLine = lastLine - 1
     elseif not text2:find("^"..LEVEL) then
@@ -1114,7 +1114,7 @@ function mod:SetUnit()
     end
 
     lastLine = lastLine + 1
-    
+
     for i = lastLine, GameTooltip:NumLines() do
         local left = self.leftLines[i]
         local j = i - lastLine + 1
@@ -1133,9 +1133,9 @@ function mod:SetUnit()
         end
     end
     -- End
-    
+
     lines()
-    
+
     -- Another part taken from CowTip
     for i, left in ipairs(linesToAdd) do
         local right = linesToAddRight[i]
@@ -1156,7 +1156,7 @@ function mod:SetUnit()
     -- End
 
 	if self.timer then self.timer:Start() end
-	
+
 	if GetMouseFocus() ~= UIParent then
 		self.unitFrameFunkyTimer:Start()
 	end
