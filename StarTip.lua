@@ -5,9 +5,65 @@ local LSM = _G.LibStub("LibSharedMedia-3.0")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
+local LibCore = LibStub("StarLibCore-1.0", true)
+assert(LibCore, MAJOR .. " requires StarLibCore-1.0")
+local LibTimer = LibStub("StarLibTimer-1.0", true)
+assert(LibTimer, MAJOR .. " requires StarLibTimer-1.0")
+local LibError = LibStub("StarLibError-1.0", true)
+assert(LibError, MAJOR .. " requires StarLibError-1.0")
+local LibCFG = LibStub("StarLibCFG-1.0", true)
+assert(LibCFG, MAJOR .. " requires StarLibCFG-1.0")
+local WidgetText = LibStub("StarLibWidgetText-1.0", true)
+assert(WidgetText, MAJOR .. " requires StarLibWidgetText-1.0")
+local WidgetBar = LibStub("StarLibWidgetBar-1.0", true)
+assert(WidgetBar, MAJOR .. " requires StarLibWidgetBar-1.0")
+local WidgetIcon = LibStub("StarLibWidgetIcon-1.0", true)
+--assert(WidgetIcon, MAJOR .. " requires StarLibWidgetIcon-1.0")
+local WidgetHistogram = LibStub("StarLibWidgetHistogram-1.0", true)
+assert(WidgetHistogram, MAJOR .. " requires StarLibWidgetHistogram-1.0")
+local WidgetBignums = LibStub("StarLibWidgetBignums-1.0", true)
+--assert(WidgetBignums, MAJOR .. " requires StarLibWidgetBignums-1.0")
+local WidgetKey = LibStub("StarLibWidgetKey-1.0", true)
+--assert(WidgetKey, MAJOR .. " requires StarLibWidgetKey-1.0")
+local WidgetTimer = LibStub("StarLibWidgetTimer-1.0", true)
+assert(WidgetTimer, MAJOR .. " requires StarLibWidgetTimer-1.0")
+local WidgetScript = LibStub("StarLibWidgetScript-1.0", true)
+--assert(WidgetScript, MAJOR .. " requires StarLibWidgetScript-1.0")
+local Evaluator = LibStub("StarLibEvaluator-1.0", true)
+assert(Evaluator, MAJOR .. " requires StarLibEvaluator-1.0")
+local PluginWidgetText = LibStub("StarLibWidgetTextPlugin-1.0", true)
+assert(PluginWidgetText, MAJOR .. " requires StarLibWidgetTextPlugin-1.0")
+local PluginRangeCheck = LibStub("StarLibPluginRangeCheck-1.0", true)
+assert(PluginRangeCheck, MAJOR .. " requires StarLibRangeCheck-1.0")
+local PluginUnit = LibStub("StarLibPluginUnit-1.0", true)
+assert(PluginUnit, MAJOR .. " requires StarLibPluginUnit-1.0")
+local PluginBit = LibStub("StarLibPluginBit-1.0", true)
+assert(PluginBit, MAJOR .. " requires StarLibPluginBit-1.0")
+local PluginLua = LibStub("StarLibPluginLua-1.0", true)
+assert(PluginLua, MAJOR .. " requires StarLibPluginLua-1.0")
+local PluginMath = LibStub("StarLibPluginMath-1.0", true)
+assert(PluginMath, MAJOR .. " requires StarLibPluginMath-1.0")
+local PluginString = LibStub("StarLibPluginString-1.0", true)
+assert(PluginString, MAJOR .. " requires StarLibPluginString-1.0")
+local PluginTable = LibStub("StarLibPluginTable-1.0", true)
+assert(PluginTable, MAJOR .. " requires StarLibPluginTable-1.0")
+local PluginResourceTools = LibStub("StarLibPluginResourceTools-1.0", true)
+assert(PluginResourceTools, MAJOR .. " requires StarLibPluginResourceTools-1.0")
+local PluginCharacterStats = LibStub("StarLibPluginCharacterStats-1.0", true)
+assert(PluginCharacterStats, MAJOR .. " requires StarLibPluginCharacterStats-1.0")
+local PluginLocation = LibStub("StarLibPluginLocation-1.0", true)
+assert(PluginLocation, MAJOR .. " requires StarLibPluginLocation-1.0")
+local PluginUnitStats = LibStub("StarLibPluginUnitStats-1.0", true)
+assert(PluginUnitStats, MAJOR .. " requires StarLibPluginUnitStats-1.0")
+local PluginDBM = LibStub("StarLibPluginDBM-1.0", true)
+local PluginLinq = LibStub("StarLibPluginLinq-1.0", true)
+assert(PluginLinq, MAJOR .. " requires StarLibPluginLinq-1.0")
+
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local ipairs, pairs = _G.ipairs, _G.pairs
+local timers = {}
+local widgets = {}
 
 local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("StarTip", {
 	type = "data source",
@@ -93,6 +149,39 @@ local options = {
 			desc = "Modules",
 			type = "group",
 			args = {}
+		},
+		timers = {
+			name = "Timers",
+			desc = "Timers",
+			type = "group",
+			args = {
+				add = {
+					name = "Add Timer",
+					desc = "Add a timer widget",
+					type = "input",
+					set = function(info, v)
+						tinsert(timers, v)
+						StarTip:RebuildOptsions()
+						StarTip:OnDisable()
+						StarTip:OnEnable()
+						StarTip:SetupTimers()						
+					end, 
+					order = 1
+				},
+				reset = {
+					name = "Restore Defaults",
+					desc = "Use this to restore the defaults",
+					type = "execute",
+					func = function()
+						StarTip.db.profile.timers = nil
+						StarTip:RebuildOpts()
+						StarTip:OnDisable()
+						StarTip:OnEnable()						
+						StarTip:SetupTimers()						
+					end,
+					order = 2
+				}
+			}
 		},
 		settings = {
 			name = "Settings",
@@ -214,6 +303,27 @@ do
 	end
 end
 
+local environment = {}
+StarTip.environment = environment
+environment.new = StarTip.new
+environment.newDict = StarTip.newDict
+environment.del = StarTip.del
+environment._G = _G
+
+PluginRangeCheck:New(environment)
+PluginUnit:New(environment)
+PluginWidgetText:New(environment)
+PluginBit:New(environment)
+PluginLua:New(environment)
+PluginMath:New(environment)
+PluginString:New(environment)
+PluginTable:New(environment)
+PluginResourceTools:New(environment)
+PluginLocation:New(environment)
+PluginUnitStats:New(environment)
+if PluginDBM then PluginDBM:New(environment) end
+--PluginLinq:New(environment)
+
 local function errorhandler(err)
     return geterrorhandler()(err)
 end
@@ -232,6 +342,26 @@ end
 
 StarTip:SetDefaultModuleState(false)
 
+local defaultTimers = {
+	["widget_resources_timer"] = {
+        type = "timer",
+		update = 0,
+		repeating = true,
+		expression = [[
+if ResourceServer then self.timer:Stop() return end
+UpdateMem()
+UpdateCPU()
+if not StarLibs then
+    cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+    mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+else
+    mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarLibs-1.0")
+    cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarLibs-1.0")
+end
+]]
+	},	
+}
+
 function StarTip:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
 	
@@ -248,8 +378,25 @@ function StarTip:OnInitialize()
 		self.rightLines[i] = _G["GameTooltipTextRight" .. i]
 	end
 	
+	self:SetupTimers()
+	
 	GameTooltip:Show()
 	GameTooltip:Hide()
+end
+
+function StarTip:SetupTimers()
+	if not self.db.profile.timers then
+		self.db.profile.timers = {}
+		for k, v in pairs(defaultTimers) do
+			self.db.profile.timers[k] = v
+		end
+	else
+		for k, v in pairs(defaultTimers) do
+			if not self.db.profile.timers[k].dirty then
+				self.db.profile.timers[k] = copy(defaultTimers[k])
+			end
+		end
+	end
 end
 
 function StarTip:OnEnable()
@@ -271,7 +418,17 @@ function StarTip:OnEnable()
 			v:Enable()
 		end
 	end
-		
+
+	if #widgets == 0 then
+		for k, v in pairs(self.db.profile.timers) do
+			tinsert(widgets, WidgetTimer:New(self, "StarTip.timer." .. k, v, self.db.profile.errorLevel))
+		end
+	end
+	
+	for i, v in ipairs(widgets) do
+		v:Start()
+	end
+	
 	self:RebuildOpts()
 	
 	self:RegisterEvent("MODIFIER_STATE_CHANGED")
@@ -285,6 +442,17 @@ function StarTip:OnDisable()
 	self:Unhook(GameTooltip, "OnHide")
 	self:Unhook(GameTooltip, "OnShow")
 	self:UnRegisterEvent("MODIFIER_STATE_CHANGED")
+	for k,v in self:IterateModules() do
+		if (self.db.profile.modules[k]  == nil and not v.defaultOff) or self.db.profile.modules[k] then
+			v:Disable()
+		end
+	end
+	
+	for i, v in ipairs(widgets) do
+		v:Stop()
+		v:Del()
+	end
+	table.wipe(widgets)
 end
 
 function StarTip:RebuildOpts()
@@ -335,6 +503,13 @@ function StarTip:RebuildOpts()
 		end
 		options.args.modules.args[v:GetName()].args = t
 	end	
+	for k, v in pairs(self.db.profile.timers) do
+		options.args.timers.args[k:gsub(" ", "_")] = {
+			name = k,
+			type = "group",
+		}
+		options.args.timers.args[k:gsub(" ", "_")].args = WidgetTimer:GetOptions(self, v)
+	end
 end
 
 function StarTip:OpenConfig()

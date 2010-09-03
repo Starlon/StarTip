@@ -334,7 +334,7 @@ return c
 		right = [[
 cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
-    if totaldiff == 0 then totaldiff = 1 end
+    if totaldiff == 0 then totaldiff = 100 end
     cpuperc = cpudiff / totaldiff * 100;
     return timeshort(cpu) .. " (" .. format("%.2f", cpuperc)  .. "%)"
 end
