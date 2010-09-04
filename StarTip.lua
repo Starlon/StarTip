@@ -132,7 +132,7 @@ local defaults = {
 		objectShow = 1,
 		unitFrameShow = 1,
 		otherFrameShow = 1,
-		errorLevel = 2
+		errorLevel = 1
 	}
 }
 			
@@ -173,11 +173,11 @@ local options = {
 					desc = "Use this to restore the defaults",
 					type = "execute",
 					func = function()
-						StarTip.db.profile.timers = nil
+						StarTip.db.profile.timers = nil						
+						StarTip:SetupTimers()											
 						StarTip:RebuildOpts()
 						StarTip:OnDisable()
 						StarTip:OnEnable()						
-						StarTip:SetupTimers()						
 					end,
 					order = 2
 				}
@@ -349,15 +349,7 @@ local defaultTimers = {
 		repeating = true,
 		expression = [[
 if ResourceServer then self.timer:Stop() return end
-UpdateMem()
-UpdateCPU()
-if not StarLibs then
-    cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
-    mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
-else
-    mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarLibs-1.0")
-    cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarLibs-1.0")
-end
+Update()
 ]]
 	},	
 }
@@ -377,9 +369,7 @@ function StarTip:OnInitialize()
 		self.leftLines[i] = _G["GameTooltipTextLeft" .. i]
 		self.rightLines[i] = _G["GameTooltipTextRight" .. i]
 	end
-	
-	self:SetupTimers()
-	
+		
 	GameTooltip:Show()
 	GameTooltip:Hide()
 end
@@ -389,12 +379,6 @@ function StarTip:SetupTimers()
 		self.db.profile.timers = {}
 		for k, v in pairs(defaultTimers) do
 			self.db.profile.timers[k] = v
-		end
-	else
-		for k, v in pairs(defaultTimers) do
-			if not self.db.profile.timers[k].dirty then
-				self.db.profile.timers[k] = copy(defaultTimers[k])
-			end
 		end
 	end
 end
@@ -419,15 +403,7 @@ function StarTip:OnEnable()
 		end
 	end
 
-	if #widgets == 0 then
-		for k, v in pairs(self.db.profile.timers) do
-			tinsert(widgets, WidgetTimer:New(self, "StarTip.timer." .. k, v, self.db.profile.errorLevel))
-		end
-	end
-	
-	for i, v in ipairs(widgets) do
-		v:Start()
-	end
+	self:RestartTimers()
 	
 	self:RebuildOpts()
 	
@@ -441,18 +417,30 @@ function StarTip:OnDisable()
 	self:Unhook(GameTooltip, "OnTooltipSetSpell")
 	self:Unhook(GameTooltip, "OnHide")
 	self:Unhook(GameTooltip, "OnShow")
-	self:UnRegisterEvent("MODIFIER_STATE_CHANGED")
+	self:Unhook(GameTooltip, "Show")
+	self:UnregisterEvent("MODIFIER_STATE_CHANGED")
 	for k,v in self:IterateModules() do
 		if (self.db.profile.modules[k]  == nil and not v.defaultOff) or self.db.profile.modules[k] then
 			v:Disable()
 		end
 	end
-	
 	for i, v in ipairs(widgets) do
-		v:Stop()
 		v:Del()
 	end
 	table.wipe(widgets)
+end
+
+function StarTip:RestartTimers()
+	self:SetupTimers()
+	for i, v in ipairs(widgets) do
+		v:Del()
+	end
+	table.wipe(widgets)
+	for k, v in pairs(self.db.profile.timers) do
+		tinsert(widgets, WidgetTimer:New(self, "StarTip.timer." .. k, v, self.db.profile.errorLevel))
+		StarTip:Print("Timer start")
+		widgets[#widgets]:Start()
+	end
 end
 
 function StarTip:RebuildOpts()
@@ -502,7 +490,7 @@ function StarTip:RebuildOpts()
 			}
 		end
 		options.args.modules.args[v:GetName()].args = t
-	end	
+	end
 	for k, v in pairs(self.db.profile.timers) do
 		options.args.timers.args[k:gsub(" ", "_")] = {
 			name = k,
