@@ -419,7 +419,7 @@ function mod:OnInitialize()
 
 	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
 
-	UnitStats:New()
+	--UnitStats:New()
 
 end
 
