@@ -181,7 +181,7 @@ end
 return lvl
 ]],
 		enabled = true,
-		unitFrameFunky = true
+		unitFrameBug = true
     },
     [7] = {
         name = "Race",
@@ -423,7 +423,7 @@ function mod:OnInitialize()
 
 end
 
-local function unitFrameFunkyFunction()
+local function unitFrameBugFunction()
 	if UnitExists("mouseover") then
 		lines(true)
 	end
@@ -437,13 +437,13 @@ function mod:OnEnable()
 	if self.db.profile.refreshRate > 0 then
 		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
 	end
-	self.unitFrameFunkyTimer = LibTimer:New("Funky unit frames timer", 100, false, unitFrameFunkyFunction, nil, StarTip.db.profile.errorLevel)
+	self.unitFrameBugTimer = LibTimer:New("Funky unit frames timer", 100, false, unitFrameBugFunction, nil, StarTip.db.profile.errorLevel)
 end
 
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
 	if self.timer then self.timer:Del() end
-	self.unitFrameFunkyTimer:Del()
+	self.unitFrameBugTimer:Del()
 end
 
 function mod:GetOptions()
@@ -535,20 +535,20 @@ function mod:CreateLines()
     lines = setmetatable(llines, {__call=function(self)
         local lineNum = 0
 		GameTooltip:ClearLines()
-        for i, v in ipairs(self) do
-		
+        for i, v in ipairs(self) do			
 			if v.enabled and not v.deleted then
                 local left, right, c, cc = '', ''
-                if v.right then
+                if v.right and v.right ~= "" then
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
+					
                 else
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end
 
-                if left and left ~= "" and right ~= "nil" or (GetMouseFocus() ~= UIParent and v.unitFrameFunky and unitFrameFunky) then
+                if left and left ~= "" and right ~= "nil" or (GetMouseFocus() ~= UIParent and v.unitFrameBug and unitFrameBug) then
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ')
@@ -659,12 +659,13 @@ end
 local function copy(t)
 	local new = {}
 	for k, v in pairs(t) do
-		if type(t) == "table" then
-			new[k] = copy(t)
+		if type(v) == "table" then
+			new[k] = copy(v)
 		else
-			name[k] = v
+			new[k] = v
 		end
 	end
+	return new
 end
 
 function mod:RebuildOpts()
@@ -700,19 +701,25 @@ function mod:RebuildOpts()
 			desc = "Roll back to defaults.",
 			type = "execute",
 			func = function()
-				for i, v in ipairs(defaultLines) do
-					local replaced
-					for j, vv in ipairs(self.db.profile.lines) do
+				local replace = {}
+				for i, v in ipairs(self.db.profile.lines) do
+					local insert = true
+					for j, vv in ipairs(defaultLines) do
 						if v.name == vv.name then
-							self.db.profile.lines[j] = v
-							replaced = true
+							insert = false
 						end
 					end
-					if not replaced then
-						tinsert(self.db.profile.lines, v)
+					if insert then
+						tinsert(replace, v)
 					end
 				end
-				self:RebuildOpts()
+				table.wipe(self.db.profile.lines)
+				for i, v in ipairs(defaultLines) do
+					tinsert(self.db.profile.lines, copy(v))
+				end
+				for i, v in ipairs(replace) do
+					tinsert(self.db.profile.lines, copy(v))
+				end
 				StarTip:RebuildOpts()
 				self:CreateLines()
 			end,
@@ -1152,6 +1159,6 @@ function mod:SetUnit()
 	if self.timer then self.timer:Start() end
 
 	if GetMouseFocus() ~= UIParent then
-		self.unitFrameFunkyTimer:Start()
+		self.unitFrameBugTimer:Start()
 	end
 end
