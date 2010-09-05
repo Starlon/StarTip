@@ -72,17 +72,18 @@ environment.unitHasAura = function(aura)
     end
 end
 
-function copy(t)
-	local tmp = {} --StarTip.new()
-	for k, v in pairs(t) do
+local function copy(src, dst)
+	if type(src) ~= "table" then return nil end
+	if type(dst) ~= "table" then dst = StarTip.new() end
+	for k, v in pairs(src) do
 		if type(v) == "table" then
 			v = copy(v)
 		end
-		tmp[k] = v
+		dst[k] = v
 	end
-
-	return tmp
+	return dst
 end
+
 
 local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500}}
 
@@ -419,8 +420,6 @@ function mod:OnInitialize()
 
 	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
 
-	--UnitStats:New()
-
 end
 
 local function unitFrameBugFunction()
@@ -470,7 +469,7 @@ do
 	local c, widget, fontString
 	function draw()
 		for table in pairs(fontStringsToDraw) do
-			c = nil
+			c = false
 			widget = table[1]
 			fontString = table[2]
 			if not fontString or not widget then break end
@@ -530,6 +529,7 @@ function mod:CreateLines()
 		if not v.deleted then
 			j = j + 1
 			llines[j] = copy(v)
+			llines[j].config = copy(v)
 		end
     end
     lines = setmetatable(llines, {__call=function(self)
@@ -555,36 +555,36 @@ function mod:CreateLines()
 
 						if not v.leftObj or v.lineNum ~= lineNum then
 							--if v.leftObj then v.leftObj:Del() end
-							v.value = v.left
+							v.config.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
-							v.color = v.colorLeft
+							v.config.color = v.colorLeft
 							if mod.db.profile.refreshRate == 0 then
-								v.update = 0
-								v.scroll = 0
+								v.config.update = 0
+								v.config.scroll = 0
 							end
 							if v.leftObj then
 								v.leftObj.data = mod.leftLines[lineNum]
 							else
-								v.leftObj = WidgetText:New(mod.core, v.name .. "left", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
+								v.leftObj = WidgetText:New(mod.core, v.name .. "left", v.config, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							end
 							v.update = tmp
 						end
 
 						if not v.rightObj or v.lineNum ~= lineNum then
 							--if v.rightObj then v.rightObj:Del() end
-							v.value = v.right
+							v.config.value = v.right
 							local tmp = v.update
 							if not v.rightUpdating then v.update = 0 end
-							v.color = v.colorRight
+							v.config.color = v.colorRight
 							if mod.db.profile.refreshRate == 0 then
-								v.update = 0
-								v.scroll = 0
+								v.config.update = 0
+								v.config.scroll = 0
 							end
 							if v.rightObj then
 								v.rightObj.data = mod.rightLines[lineNum]
 							else
-								v.rightObj = WidgetText:New(mod.core, v.name .. "right", v, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum])
+								v.rightObj = WidgetText:New(mod.core, v.name .. "right", v.config, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum])
 							end
 							v.update = tmp
 						end
@@ -597,18 +597,18 @@ function mod:CreateLines()
 
 						if not v.leftObj or v.lineNum ~= lineNum then
 							--if v.leftObj then v.leftObj:Del() end
-							v.value = v.left
+							v.config.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
-							v.color = v.colorLeft
+							v.config.color = v.colorLeft
 							if mod.db.profile.refreshRate == 0 then
-								v.update = 0
-								v.scroll = 0
+								v.config.update = 0
+								v.config.scroll = 0
 							end
 							if v.leftObj then
 								v.leftObj.data = mod.leftLines[lineNum]
 							else
-								v.leftObj = WidgetText:New(mod.core, v.name, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
+								v.leftObj = WidgetText:New(mod.core, v.name, v.config, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
 							end
 							v.update = tmp
 							v.lineNum = lineNum
@@ -637,7 +637,8 @@ function mod:CreateLines()
 			end
 
         end
-        mod.NUM_LINES = lineNum
+        --mod.NUM_LINES = lineNum
+	mod:RefixEndLines()
 	draw()
     end})
 end
@@ -1116,6 +1117,14 @@ function mod:SetUnit()
 
     lastLine = lastLine + 1
 
+	wipe(linesToAdd)
+	wipe(linesToAddR)
+	wipe(linesToAddG)
+	wipe(linesToAddB)
+	wipe(linesToAddRight)
+	wipe(linesToAddRightR)
+	wipe(linesToAddRightG)
+	wipe(linesToAddRightB)
     for i = lastLine, GameTooltip:NumLines() do
         local left = self.leftLines[i]
         local j = i - lastLine + 1
@@ -1136,7 +1145,17 @@ function mod:SetUnit()
     -- End
 
     lines()
+	
+	if self.db.profile.refreshRate > 0 and self.timer then 
+		self.timer:Start() 
+	end
 
+	if GetMouseFocus() ~= UIParent and self.unitFrameBugTimer then
+		self.unitFrameBugTimer:Start()
+	end
+end
+
+function mod:RefixEndLines()
     -- Another part taken from CowTip
     for i, left in ipairs(linesToAdd) do
         local right = linesToAddRight[i]
@@ -1145,20 +1164,6 @@ function mod:SetUnit()
         else
             GameTooltip:AddLine(left, linesToAddR[i], linesToAddG[i], linesToAddB[i], true)
         end
-        linesToAdd[i] = nil
-        linesToAddR[i] = nil
-        linesToAddG[i] = nil
-        linesToAddB[i] = nil
-        linesToAddRight[i] = nil
-        linesToAddRightR[i] = nil
-        linesToAddRightG[i] = nil
-        linesToAddRightB[i] = nil
     end
     -- End
-
-	if self.timer then self.timer:Start() end
-
-	if GetMouseFocus() ~= UIParent then
-		self.unitFrameBugTimer:Start()
-	end
 end
