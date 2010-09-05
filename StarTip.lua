@@ -438,7 +438,6 @@ function StarTip:RestartTimers()
 	table.wipe(widgets)
 	for k, v in pairs(self.db.profile.timers) do
 		tinsert(widgets, WidgetTimer:New(self, "StarTip.timer." .. k, v, self.db.profile.errorLevel))
-		StarTip:Print("Timer start")
 		widgets[#widgets]:Start()
 	end
 end

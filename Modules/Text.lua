@@ -525,15 +525,19 @@ end
 local tbl
 function mod:CreateLines()
     local llines = {}
+	local j = 0
     for i, v in ipairs(self.db.profile.lines) do
-        llines[i] = copy(v)
+		if not v.deleted then
+			j = j + 1
+			llines[j] = copy(v)
+		end
     end
     lines = setmetatable(llines, {__call=function(self)
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
+		
 			if v.enabled and not v.deleted then
-
                 local left, right, c, cc = '', ''
                 if v.right then
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
@@ -716,364 +720,354 @@ function mod:RebuildOpts()
 		},
 	}
     for i, v in ipairs(self.db.profile.lines) do
-		if type(v) ~= "table" or v.deleted then break end
-        options["line" .. i] = {
-            name = v.name,
-            type = "group",
-            order = i + 5
-        }
-		options["line" .. i].args = {
-				enabled = {
-					name = "Enabled",
-					desc = "Whether to show this line or not",
-					type = "toggle",
-					get = function() return self.db.profile.lines[i].enabled end,
-					set = function(info, val)
-						v.enabled = val
-						v.enabledDirty = true
-						self:CreateLines()
-					end,
-					order = 2
-				},
-				leftUpdating = {
-					name = "Left Updating",
-					desc = "Whether this segment refreshes",
-					type = "toggle",
-					get = function() return v.leftUpdating end,
-					set = function(info, val)
-						v.leftUpdating = val
-						if v.update == 0 then
-							v.update = 500
-						end
-						v.leftUpdatingDirty = true
-						self:CreateLines()
-					end,
-					order = 3
-				},
-                rightUpdating = {
-                    name = "Right Updating",
-                    desc = "Whether this segment refreshes",
-                    type = "toggle",
-                    get = function() return v.rightUpdating end,
-                    set = function(info, val)
-						v.rightUpdating = val
-						if v.update == 0 then
-							v.update = 500
-						end
-						v.rightUpdatingDirty = true
-						self:CreateLines()
-					end,
-                    order = 4
-                },
-                up = {
-                    name = "Move Up",
-                    desc = "Move this line up by one",
-                    type = "execute",
-                    func = function()
-                        if i == 1 then return end
-                        local tmp = self.db.profile.lines[i - 1]
-						if not v.left then v.left = "" end
-						if not v.right then v.right = "" end
-						if not tmp.left then tmp.left = "" end
-						if not tmp.right then tmp.right = "" end
-                        self.db.profile.lines[i - 1] = v
-                        self.db.profile.lines[i] = tmp
-                        self:RebuildOpts()
-						StarTip:RebuildOpts()
-						self:CreateLines()
-                    end,
-                    order = 5
-                },
-                down = {
-                    name = "Move Down",
-                    desc = "Move this line down by one",
-                    type = "execute",
-                    func = function()
-                        if i == #self.db.profile.lines then return end
-                        local tmp = self.db.profile.lines[i + 1]
-						if not v.left then v.left = "" end
-						if not v.right then v.right = "" end
-						if not tmp.left then tmp.left = "" end
-						if not tmp.right then tmp.right = "" end
-                        self.db.profile.lines[i + 1] = v
-                        self.db.profile.lines[i] = tmp
-                        self:RebuildOpts()
-						StarTip:RebuildOpts()
-						self:CreateLines()
-                    end,
-                    order = 6
-                },
-				bold = {
-					name = "Bold",
-					desc = "Whether to bold this line or not",
-					type = "toggle",
-					get = function() return self.db.profile.lines[i].bold end,
-					set = function(info, val)
-						v.bold = val
-						v.boldDirty = true
-						self:CreateLines()
-					end,
-					order = 7
-				},
-				delete = {
-					name = "Delete",
-					desc = "Delete this line",
-					type = "execute",
-					func = function()
-						local deleted
-
-						for j, vv in ipairs(defaultLines) do
-							if vv.name == v.name then
-								deleted = true
-							else
-
-							end
-						end
-
-						if deleted then
-							v.deleted = true
-						else
-							table.remove(self.db.profile.lines, i)
-						end
-						StarTip:RebuildOpts()
-						self:CreateLines()
-					end,
-					order = 8
-				},
-	            left = {
-                    name = "Left",
-                    type = "input",
-                    desc = "Left text code",
-                    get = function() return v.left end,
-                    set = function(info, val)
-						v.left = val
-						v.leftDirty = true
-						if val == "" then
-							v.left = nil
-						end
-						self:CreateLines()
-					end,
-                    validate = function(info, str)
-						return mod.evaluator:Validate(environment, str)
-					end,
-                    multiline = true,
-					width = "full",
-                    order = 9
-                },
-                right = {
-                    name = "Right",
-                    type = "input",
-                    desc = "Right text code",
-                    get = function() return v.right end,
-                    set = function(info, val)
-						v.right = val;
-						v.rightDirty = true
-						if val == "" then
-							v.right = nil
-						end
-						self:CreateLines()
-					end,
-                    validate = function(info, str)
-						return mod.evaluator:Validate(environment, str)
-					end,
-                    multiline = true,
-					width = "full",
-                    order = 10
-                },
-				colorLeft = {
-					name = "Left Color",
-					type = "input",
-					desc = "Color for left segment",
-					get = function() return v.colorLeft end,
-					set = function(info, val)
-						v.colorLeft = val
-						v.colorLeftDirty = true
-						self:CreateLines()
-					end,
-                    validate = function(info, str)
-						return mod.evaluator:Validate(environment, str)
-					end,
-					multiline = true,
-					width = "full",
-					order = 11
-				},
-				colorRight = {
-					name = "Right Color",
-					type = "input",
-					desc = "Color for right segment",
-					get = function() return v.colorRight end,
-					set = function(info, val)
-						v.colorRight = val
-						v.colorRightDirty = true
-						self:CreateLines()
-					end,
-                    validate = function(info, str)
-						return mod.evaluator:Validate(environment, str)
-					end,
-					multiline = true,
-					width = "full",
-					order = 12
-				},
-				marquee = {
-					name = "Enhanced Settings",
-					type = "group",
-					args = {
-						header = {
-							name = "Note that only the left line script is used for marquee text",
-							type = "header",
-							order = 1
-						},
-						marquee = {
-							name = "Enabled",
-							desc = "Enable marquee. Note that this just makes marquees use the left line only. Technically all segments on the tooltip are marquee widgets.",
-							type = "toggle",
-							get = function() return v.marquee end,
-							set = function(info, val)
-								v.marquee = val
-								v.marqueeDirty = true
-								self:CreateLines()
-							end
-						},
-						prefix = {
-							name = "Prefix",
-							desc = "The prefix for this marquee",
-							type = "input",
-							width = "full",
-							multiline = true,
-							get = function()
-								return v.prefix
-							end,
-							set = function(info, val)
-								v.prefix = val
-								v.prefixDirty = true
-								self:CreateLines()
-							end,
-							order = 2
-						},
-						postfix = {
-							name = "Postfix",
-							desc = "The postfix for this marquee",
-							type = "input",
-							width = "full",
-							multiline = true,
-							get = function()
-								return v.postfix or WidgetText.defaults.postfix
-							end,
-							set = function(info, val)
-								v.postfix = v
-								v.postfixDirty = true
-								self:CreateLines()
-							end,
-							order = 3
-						},
-						precision = {
-							name = "Precision",
-							desc = "How precise displayed numbers are",
-							type = "input",
-							pattern = "%d",
-							get = function()
-								return tostring(v.precision or WidgetText.defaults.precision)
-							end,
-							set = function(info, val)
-								v.precision = tonumber(val)
-								v.precisionDirty = true
-								self:CreateLines()
-							end,
-							order = 4
-						},
-						align = {
-							name = "Alignment",
-							desc = "The alignment information",
-							type = "select",
-							values = WidgetText.alignmentList,
-							get = function()
-								return v.align
-							end,
-							set = function(info, val)
-								v.align = val
-								v.alignDirty = true
-								self:CreateLines()
-							end,
-							order = 5
-						},
-						update = {
-							name = "Text Update",
-							desc = "How often to update the text. Use this option if you want your line to update.",
-							type = "input",
-							pattern = "%d",
-							get = function()
-								return tostring(v.update or WidgetText.defaults.update)
-							end,
-							set = function(info, val)
-								v.update = tonumber(val)
-								v.updateDirty = true
-								self:CreateLines()
-							end,
-							order = 6
-						},
-						speed = {
-							name = "Scroll Speed",
-							desc = "How fast to scroll the marquee",
-							type = "input",
-							pattern = "%d",
-							get = function()
-								return tostring(v.speed or WidgetText.defaults.speed)
-							end,
-							set = function(info, val)
-								v.speed = tonumber(val)
-								v.speedDirty = true
-								self:CreateLines()
-							end,
-							order = 7
-						},
-						direction = {
-							name = "Direction",
-							desc = "Which direction to scroll",
-							type = "select",
-							values = WidgetText.directionList,
-							get = function()
-								return v.direction or WidgetText.defaults.direction
-							end,
-							set = function(info, val)
-								v.direction = val
-								v.directionDirty = true
-								self:CreateLines()
-							end,
-							order = 8
-						},
-						cols = {
-							name = "Columns",
-							desc = "How wide the marquee is",
-							type = "input",
-							pattern = "%d",
-							get = function()
-								return tostring(v.cols or WidgetText.defaults.cols)
-							end,
-							set = function(info, val)
-								v.cols = tonumber(val)
-								v.colsDirty = true
-								self:CreateLines()
-							end,
-							order = 9
-						},
-						dontRtrim = {
-							name = "Don't right trim",
-							desc = "Prevent trimming white space to the right of text",
-							type = "toggle",
-							get = function()
-								return v.dontRtrim or WidgetText.defaults.dontRtrim
-							end,
-							set = function(info, val)
-								v.dontRtrim = val
-								v.dontRtrimDirty = true
-								self:CreateLines()
-							end,
-							order = 10
-						}
+		if type(v) == "table" and not v.deleted then
+			options["line" .. i] = {
+				name = v.name,
+				type = "group",
+				order = i + 5
+			}
+			options["line" .. i].args = {
+					enabled = {
+						name = "Enabled",
+						desc = "Whether to show this line or not",
+						type = "toggle",
+						get = function() return self.db.profile.lines[i].enabled end,
+						set = function(info, val)
+							v.enabled = val
+							v.enabledDirty = true
+							self:CreateLines()
+						end,
+						order = 2
 					},
-					order = 9
-				}
-        }
+					leftUpdating = {
+						name = "Left Updating",
+						desc = "Whether this segment refreshes",
+						type = "toggle",
+						get = function() return v.leftUpdating end,
+						set = function(info, val)
+							v.leftUpdating = val
+							if v.update == 0 then
+								v.update = 500
+							end
+							v.leftUpdatingDirty = true
+							self:CreateLines()
+						end,
+						order = 3
+					},
+					rightUpdating = {
+						name = "Right Updating",
+						desc = "Whether this segment refreshes",
+						type = "toggle",
+						get = function() return v.rightUpdating end,
+						set = function(info, val)
+							v.rightUpdating = val
+							if v.update == 0 then
+								v.update = 500
+							end
+							v.rightUpdatingDirty = true
+							self:CreateLines()
+						end,
+						order = 4
+					},
+					up = {
+						name = "Move Up",
+						desc = "Move this line up by one",
+						type = "execute",
+						func = function()
+							if i == 1 then return end
+							local tmp = self.db.profile.lines[i - 1]
+							if not v.left then v.left = "" end
+							if not v.right then v.right = "" end
+							if not tmp.left then tmp.left = "" end
+							if not tmp.right then tmp.right = "" end
+							self.db.profile.lines[i - 1] = v
+							self.db.profile.lines[i] = tmp
+							self:RebuildOpts()
+							StarTip:RebuildOpts()
+							self:CreateLines()
+						end,
+						order = 5
+					},
+					down = {
+						name = "Move Down",
+						desc = "Move this line down by one",
+						type = "execute",
+						func = function()
+							if i == #self.db.profile.lines then return end
+							local tmp = self.db.profile.lines[i + 1]
+							if not v.left then v.left = "" end
+							if not v.right then v.right = "" end
+							if not tmp.left then tmp.left = "" end
+							if not tmp.right then tmp.right = "" end
+							self.db.profile.lines[i + 1] = v
+							self.db.profile.lines[i] = tmp
+							self:RebuildOpts()
+							StarTip:RebuildOpts()
+							self:CreateLines()
+						end,
+						order = 6
+					},
+					bold = {
+						name = "Bold",
+						desc = "Whether to bold this line or not",
+						type = "toggle",
+						get = function() return self.db.profile.lines[i].bold end,
+						set = function(info, val)
+							v.bold = val
+							v.boldDirty = true
+							self:CreateLines()
+						end,
+						order = 7
+					},
+					delete = {
+						name = "Delete",
+						desc = "Delete this line",
+						type = "execute",
+						func = function()
+							local name = v.name
+							table.wipe(self.db.profile.lines[i])			
+							v.name = name
+							v.deleted = true
+							StarTip:RebuildOpts()
+							self:CreateLines()
+						end,
+						order = 8
+					},
+					left = {
+						name = "Left",
+						type = "input",
+						desc = "Left text code",
+						get = function() return v.left end,
+						set = function(info, val)
+							v.left = val
+							v.leftDirty = true
+							if val == "" then
+								v.left = nil
+							end
+							self:CreateLines()
+						end,
+						validate = function(info, str)
+							return mod.evaluator:Validate(environment, str)
+						end,
+						multiline = true,
+						width = "full",
+						order = 9
+					},
+					right = {
+						name = "Right",
+						type = "input",
+						desc = "Right text code",
+						get = function() return v.right end,
+						set = function(info, val)
+							v.right = val;
+							v.rightDirty = true
+							if val == "" then
+								v.right = nil
+							end
+							self:CreateLines()
+						end,
+						validate = function(info, str)
+							return mod.evaluator:Validate(environment, str)
+						end,
+						multiline = true,
+						width = "full",
+						order = 10
+					},
+					colorLeft = {
+						name = "Left Color",
+						type = "input",
+						desc = "Color for left segment",
+						get = function() return v.colorLeft end,
+						set = function(info, val)
+							v.colorLeft = val
+							v.colorLeftDirty = true
+							self:CreateLines()
+						end,
+						validate = function(info, str)
+							return mod.evaluator:Validate(environment, str)
+						end,
+						multiline = true,
+						width = "full",
+						order = 11
+					},
+					colorRight = {
+						name = "Right Color",
+						type = "input",
+						desc = "Color for right segment",
+						get = function() return v.colorRight end,
+						set = function(info, val)
+							v.colorRight = val
+							v.colorRightDirty = true
+							self:CreateLines()
+						end,
+						validate = function(info, str)
+							return mod.evaluator:Validate(environment, str)
+						end,
+						multiline = true,
+						width = "full",
+						order = 12
+					},
+					marquee = {
+						name = "Enhanced Settings",
+						type = "group",
+						args = {
+							header = {
+								name = "Note that only the left line script is used for marquee text",
+								type = "header",
+								order = 1
+							},
+							marquee = {
+								name = "Enabled",
+								desc = "Enable marquee. Note that this just makes marquees use the left line only. Technically all segments on the tooltip are marquee widgets.",
+								type = "toggle",
+								get = function() return v.marquee end,
+								set = function(info, val)
+									v.marquee = val
+									v.marqueeDirty = true
+									self:CreateLines()
+								end
+							},
+							prefix = {
+								name = "Prefix",
+								desc = "The prefix for this marquee",
+								type = "input",
+								width = "full",
+								multiline = true,
+								get = function()
+									return v.prefix
+								end,
+								set = function(info, val)
+									v.prefix = val
+									v.prefixDirty = true
+									self:CreateLines()
+								end,
+								order = 2
+							},
+							postfix = {
+								name = "Postfix",
+								desc = "The postfix for this marquee",
+								type = "input",
+								width = "full",
+								multiline = true,
+								get = function()
+									return v.postfix or WidgetText.defaults.postfix
+								end,
+								set = function(info, val)
+									v.postfix = v
+									v.postfixDirty = true
+									self:CreateLines()
+								end,
+								order = 3
+							},
+							precision = {
+								name = "Precision",
+								desc = "How precise displayed numbers are",
+								type = "input",
+								pattern = "%d",
+								get = function()
+									return tostring(v.precision or WidgetText.defaults.precision)
+								end,
+								set = function(info, val)
+									v.precision = tonumber(val)
+									v.precisionDirty = true
+									self:CreateLines()
+								end,
+								order = 4
+							},
+							align = {
+								name = "Alignment",
+								desc = "The alignment information",
+								type = "select",
+								values = WidgetText.alignmentList,
+								get = function()
+									return v.align
+								end,
+								set = function(info, val)
+									v.align = val
+									v.alignDirty = true
+									self:CreateLines()
+								end,
+								order = 5
+							},
+							update = {
+								name = "Text Update",
+								desc = "How often to update the text. Use this option if you want your line to update.",
+								type = "input",
+								pattern = "%d",
+								get = function()
+									return tostring(v.update or WidgetText.defaults.update)
+								end,
+								set = function(info, val)
+									v.update = tonumber(val)
+									v.updateDirty = true
+									self:CreateLines()
+								end,
+								order = 6
+							},
+							speed = {
+								name = "Scroll Speed",
+								desc = "How fast to scroll the marquee",
+								type = "input",
+								pattern = "%d",
+								get = function()
+									return tostring(v.speed or WidgetText.defaults.speed)
+								end,
+								set = function(info, val)
+									v.speed = tonumber(val)
+									v.speedDirty = true
+									self:CreateLines()
+								end,
+								order = 7
+							},
+							direction = {
+								name = "Direction",
+								desc = "Which direction to scroll",
+								type = "select",
+								values = WidgetText.directionList,
+								get = function()
+									return v.direction or WidgetText.defaults.direction
+								end,
+								set = function(info, val)
+									v.direction = val
+									v.directionDirty = true
+									self:CreateLines()
+								end,
+								order = 8
+							},
+							cols = {
+								name = "Columns",
+								desc = "How wide the marquee is",
+								type = "input",
+								pattern = "%d",
+								get = function()
+									return tostring(v.cols or WidgetText.defaults.cols)
+								end,
+								set = function(info, val)
+									v.cols = tonumber(val)
+									v.colsDirty = true
+									self:CreateLines()
+								end,
+								order = 9
+							},
+							dontRtrim = {
+								name = "Don't right trim",
+								desc = "Prevent trimming white space to the right of text",
+								type = "toggle",
+								get = function()
+									return v.dontRtrim or WidgetText.defaults.dontRtrim
+								end,
+								set = function(info, val)
+									v.dontRtrim = val
+									v.dontRtrimDirty = true
+									self:CreateLines()
+								end,
+								order = 10
+							}
+						},
+						order = 9
+					}
+			}
+		end
 		if v.desc then
 			options["line" .. i].args.desc = {
 				name = v.desc,
@@ -1089,8 +1083,8 @@ local ff = CreateFrame("Frame")
 function mod:SetUnit()
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 
-	environment.unitName, environment.unitGuild, environment.unitLocation = UnitStats:GetUnitStats("mouseover")
-
+	environment.unitName, environment.unitGuild, environment.unitLocation = UnitStats.GetUnitStats("mouseover")
+	
     -- Taken from CowTip
     local lastLine = 2
     local text2 = self.leftLines[2]:GetText()
