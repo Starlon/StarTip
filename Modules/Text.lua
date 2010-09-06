@@ -16,6 +16,8 @@ local LibEvaluator = LibStub("StarLibEvaluator-1.0", true)
 assert(LibEvaluator, mod.name .. " requires StarLibEvaluator-1.0")
 local UnitStats = LibStub("StarLibPluginUnitStats-1.0", true)
 assert(UnitStats, mod.name .. " requires StarLibPluginUnitStats-1.0")
+local RGBA = LibStub("StarLibRGBA-1.0")
+local gradient = RGBA:RedThroughBlue()
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -34,6 +36,7 @@ environment.newDict = StarTip.newDict
 environment.del = StarTip.del
 environment.c = {}
 environment._G = _G
+environment.gradient = gradient
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local factionList = {}
 local linesToAdd = {}
@@ -315,13 +318,14 @@ end
 		colorRight = [[
 c.r, c.g, c.b = 1, 1, 1
 if type(memperc) == "number" then
-    if memperc > 50 then
-        c.r, c.g, c.b = 1, 0, 0
-    elseif memperc <= 0 then
-        c.r, c.g, c.b = 0, 0, 1
-    else
-        c.r, c.g, c.b = 0, 1, 0
-	end
+    local num = floor(memperc + 0.5)
+    if num < 1 then num = 1 end
+    if num > 100 then num = 100 end
+    if gradient[num] then
+        c.r = gradient[num][1]
+        c.g = gradient[num][2]
+        c.b = gradient[num][3]
+    end
 end
 return c
 ]],
@@ -343,12 +347,13 @@ end
 		colorRight = [[
 c.r, c.g, c.b = 1, 1, 1
 if type(cpuperc) == "number" then
-    if cpuperc > 50 then
-        c.r, c.g, c.b = 1, 0, 0
-    elseif cpuperc == 0 then
-	    c.r, c.g, c.b = 0, 0, 1
-    else
-        c.r, c.g, c.b = 0, 1, 0
+    local num = floor(cpuperc + 0.5)
+    if num < 1 then num = 1 end
+    if num > 100 then num = 100 end
+    if gradient[num] then
+        c.r = gradient[num][1]
+        c.g = gradient[num][2]
+        c.b = gradient[num][3]
     end
 end
 return c
@@ -535,14 +540,14 @@ function mod:CreateLines()
     lines = setmetatable(llines, {__call=function(self)
         local lineNum = 0
 		GameTooltip:ClearLines()
-        for i, v in ipairs(self) do			
+        for i, v in ipairs(self) do
 			if v.enabled and not v.deleted then
                 local left, right, c, cc = '', ''
                 if v.right and v.right ~= "" then
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
-					
+
                 else
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
@@ -833,7 +838,7 @@ function mod:RebuildOpts()
 						type = "execute",
 						func = function()
 							local name = v.name
-							table.wipe(self.db.profile.lines[i])			
+							table.wipe(self.db.profile.lines[i])
 							v.name = name
 							v.deleted = true
 							StarTip:RebuildOpts()
@@ -1092,7 +1097,7 @@ function mod:SetUnit()
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 
 	environment.unitName, environment.unitGuild, environment.unitLocation = UnitStats.GetUnitStats("mouseover")
-	
+
     -- Taken from CowTip
     local lastLine = 2
     local text2 = self.leftLines[2]:GetText()
@@ -1145,9 +1150,9 @@ function mod:SetUnit()
     -- End
 
     lines()
-	
-	if self.db.profile.refreshRate > 0 and self.timer then 
-		self.timer:Start() 
+
+	if self.db.profile.refreshRate > 0 and self.timer then
+		self.timer:Start()
 	end
 
 	if GetMouseFocus() ~= UIParent and self.unitFrameBugTimer then
