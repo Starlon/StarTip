@@ -363,6 +363,11 @@ function StarTip:OnInitialize()
 	self:RegisterChatCommand("startip", "OpenConfig")
 	AceConfigDialog:AddToBlizOptions("StarTip")
 	LibDBIcon:Register("StarTipLDB", LDB, self.db.profile.minimap)
+
+	if not options.args.Profiles then
+ 		options.args.Profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+		self.lastConfig = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("StarTip", "Profiles", "StarTip", "Profiles")
+	end
 	
 	self.leftLines = {}
 	self.rightLines = {}
