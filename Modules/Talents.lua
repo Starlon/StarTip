@@ -169,8 +169,8 @@ local updateTalents = function()
 		if not right:IsShown() then
 			right:Show()
 		end
-		left:SetTextColor(1, 1, 1)
-		right:SetTextColor(1, 1, 1)
+		left:SetTextColor(text.db.profile.color.r, text.db.profile.color.g, text.db.profile.color.b)
+		right:SetTextColor(text.db.profile.color.r, text.db.profile.color.g, text.db.profile.color.b)
 		
 		for i=1, #linesToAdd do
 			local left = mod.leftLines[i + lineNum]

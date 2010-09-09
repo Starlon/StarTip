@@ -16,8 +16,6 @@ local LibEvaluator = LibStub("StarLibEvaluator-1.0", true)
 assert(LibEvaluator, mod.name .. " requires StarLibEvaluator-1.0")
 local UnitStats = LibStub("StarLibPluginUnitStats-1.0", true)
 assert(UnitStats, mod.name .. " requires StarLibPluginUnitStats-1.0")
-local RGBA = LibStub("StarLibRGBA-1.0")
-local gradient = RGBA:RedThroughBlue()
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -117,7 +115,8 @@ else
 	b = 1
 end
 local name = UnitName("mouseovertarget")
-return Colorize(name or "None", r, g, b)
+if name == select(1, UnitName("player")) then name = "(YOU)" end
+return name and Colorize(name, r, g, b) or "None"
 ]],
         rightUpdating = true,
 		update = 1000,
@@ -298,7 +297,7 @@ if mem then
     local num = floor(memperc + 0.5)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
-	local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
     return Colorize(format("%s (%.2f%%)", memshort(mem), memperc), r, g, b)
 end
 ]],
@@ -317,7 +316,7 @@ if cpu then
     local num = floor(cpuperc + 0.5)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
-	local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
     return Colorize(format("%s (%.2f%%)", timeshort(cpu), cpuperc), r, g, b)
 end
 ]],
@@ -667,7 +666,7 @@ function mod:RebuildOpts()
 				self.db.profile.color.b = b
 			end,
 			order = 7
-		},		
+		},
 		defaults = {
 			name = "Restore Defaults",
 			desc = "Roll back to defaults.",
