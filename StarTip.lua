@@ -312,6 +312,7 @@ environment.newDict = StarTip.newDict
 environment.del = StarTip.del
 environment._G = _G
 
+--[[
 PluginRangeCheck:New(environment)
 PluginUnit:New(environment)
 PluginWidgetText:New(environment)
@@ -325,6 +326,7 @@ PluginLocation:New(environment)
 PluginUnitStats:New(environment)
 if PluginDBM then PluginDBM:New(environment) end
 --PluginLinq:New(environment)
+--]]
 
 local function errorhandler(err)
     return geterrorhandler()(err)

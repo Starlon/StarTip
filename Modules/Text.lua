@@ -30,12 +30,7 @@ local select = _G.select
 local format = _G.format
 local floor = _G.floor
 local tostring = _G.tostring
-local environment = {}
-environment.new = StarTip.new
-environment.newDict = StarTip.newDict
-environment.del = StarTip.del
-environment._G = _G
-environment.gradient = gradient
+local environment = StarTip.environment
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local factionList = {}
 local linesToAdd = {}
@@ -87,7 +82,7 @@ local function copy(src, dst)
 end
 
 
-local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500}}
+local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500, color = {r = 1, g = 1, b = 1}}}
 
 local defaultLines={
     [1] = {
@@ -438,29 +433,13 @@ end
 
 do
 	local fontsList = LSM:List("font")
-	local c, widget, fontString
+	local widget, fontString
 	function draw()
 		for table in pairs(fontStringsToDraw) do
-			c = false
 			widget = table[1]
 			fontString = table[2]
 			if not fontString or not widget then break end
 			fontString:SetText(widget.buffer)
-
-			if true then
-				widget.color:Eval()
-				c = widget.color.result
-			else
-				StarTip:Print("color nil -- please report this", widget.widget and widget.widget.name)
-			end
-
-			if type(c) == "table" then
-				fontString:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
-			elseif type(c) == "string" and c == "" and widget.color and widget.color.script then
-				StarTip:Print(widget.widget.name .. ": Expected color table, got empty string. It's likely your code is returning nil.")
-			else
-				fontString:SetVertexColor(1, 1, 1, 1)
-			end
 
 			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
 
@@ -523,7 +502,7 @@ function mod:CreateLines()
                 if left and left ~= "" and right ~= "nil" or (GetMouseFocus() ~= UIParent and v.unitFrameBug and unitFrameBug) then
                     lineNum = lineNum + 1
                     if v.right then
-						GameTooltip:AddDoubleLine(' ', ' ')
+						GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
 
 						if not v.leftObj or v.lineNum ~= lineNum then
 							--if v.leftObj then v.leftObj:Del() end
@@ -565,7 +544,7 @@ function mod:CreateLines()
 						tbl = StarTip.new(v.rightObj, mod.rightLines[lineNum])
 						fontStringsToDraw[tbl] = true
                     else
-						GameTooltip:AddLine(' ')
+						GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
 
 						if not v.leftObj or v.lineNum ~= lineNum then
 							--if v.leftObj then v.leftObj:Del() end
@@ -677,6 +656,18 @@ function mod:RebuildOpts()
 			end,
 			order = 6
 		},
+		color = {
+			name = "Default Color",
+			desc = "The default color for tooltip lines",
+			type = "color",
+			get = function() return self.db.profile.color.r, self.db.profile.color.g, self.db.profile.color.b end,
+			set = function(info, r, g, b)
+				self.db.profile.color.r = r
+				self.db.profile.color.g = g
+				self.db.profile.color.b = b
+			end,
+			order = 7
+		},		
 		defaults = {
 			name = "Restore Defaults",
 			desc = "Roll back to defaults.",
@@ -704,7 +695,7 @@ function mod:RebuildOpts()
 				StarTip:RebuildOpts()
 				self:CreateLines()
 			end,
-			order = 7
+			order = 8
 		},
 	}
     for i, v in ipairs(self.db.profile.lines) do
