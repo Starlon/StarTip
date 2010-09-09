@@ -34,7 +34,6 @@ local environment = {}
 environment.new = StarTip.new
 environment.newDict = StarTip.newDict
 environment.del = StarTip.del
-environment.c = {}
 environment._G = _G
 environment.gradient = gradient
 local LSM = _G.LibStub("LibSharedMedia-3.0")
@@ -94,43 +93,36 @@ local defaultLines={
     [1] = {
         name = "UnitName",
         left = [[
-return unitName
+local r, g, b
+if UnitIsPlayer("mouseover") then
+    r, g, b = ClassColor("mouseover")
+else
+    r, g, b = UnitSelectionColor("mouseover")
+end
+return Colorize(unitName, r, g, b)
 ]],
         right = nil,
-		colorLeft = [[
-if UnitIsPlayer("mouseover") then
-	local _, class = UnitClass("mouseover")
-    c.r = RAID_CLASS_COLORS[class].r
-	c.g = RAID_CLASS_COLORS[class].g
-	c.b = RAID_CLASS_COLORS[class].b
-else
-    c.r, c.g, c.b = UnitSelectionColor("mouseover")
-end
-return c
-]],
 		bold = true,
 		enabled = true
     },
     [2] = {
         name = "Target",
         left = 'return "Target:"',
-        right = 'return UnitName("mouseovertarget") or "None"',
-		colorRight = [[
+        right = [[
+local r, g, b
 if UnitExists("mouseovertarget") then
     if UnitIsPlayer("mouseovertarget") then
-		local _, class = UnitClass("mouseovertarget")
-        c.r = RAID_CLASS_COLORS[class].r
-		c.g = RAID_CLASS_COLORS[class].g
-		c.b = RAID_CLASS_COLORS[class].b
+		r, g, b = ClassColor("mouseovertarget")
     else
-        c.r, c.g, c.b = UnitSelectionColor("mouseovertarget")
+        r, g, b = UnitSelectionColor("mouseovertarget")
     end
 else
-	c.r = 1
-	c.g = 1
-	c.b = 1
+	r = 1
+	g = 1
+	b = 1
 end
-return c
+local name = UnitName("mouseovertarget")
+return Colorize(name or "None", r, g, b)
 ]],
         rightUpdating = true,
 		update = 1000,
@@ -200,17 +192,13 @@ return (UnitIsPlayer("mouseover") and UnitRace("mouseover")) or UnitCreatureFami
         left = 'return "Class:"',
         right = [[
 if UnitClass("mouseover") == UnitName("mouseover") then return end
-return UnitClass("mouseover")
-]],
-		colorRight = [[
-c.r, c.g, c.b = 1, 1, 1
+local r, g, b
 if UnitIsPlayer("mouseover") then
-    local _, class = UnitClass("mouseover")
-    c.r = RAID_CLASS_COLORS[class].r
-    c.g = RAID_CLASS_COLORS[class].g
-    c.b = RAID_CLASS_COLORS[class].b
+    r, g, b = ClassColor("mouseover")
+else
+    r, g, b = 1, 1, 1
 end
-return c
+return Colorize(UnitClass("mouseover"), r, g, b)
 ]],
 		enabled = true,
     },
@@ -308,26 +296,16 @@ return value
 		name = "Memory Usage",
 		left = "return 'Memory Usage:'",
 		right = [[
-mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
     memperc = (memdiff / totaldiff * 100)
-    return memshort(mem) .. " (" .. format("%.2f", memperc) .. "%)"
-end
-]],
-		colorRight = [[
-c.r, c.g, c.b = 1, 1, 1
-if type(memperc) == "number" then
     local num = floor(memperc + 0.5)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
-    if gradient[num] then
-        c.r = gradient[num][1]
-        c.g = gradient[num][2]
-        c.b = gradient[num][3]
-    end
+	local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    return Colorize(format("%s (%.2f%%)", memshort(mem), memperc), r, g, b)
 end
-return c
 ]],
 		rightUpdating = true,
 		update = 1000
@@ -337,28 +315,17 @@ return c
 		desc = "Note that you must turn on CPU profiling",
 		left = 'return "CPU Usage:"',
 		right = [[
-cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     if totaldiff == 0 then totaldiff = 100 end
     cpuperc = cpudiff / totaldiff * 100;
-    return timeshort(cpu) .. " (" .. format("%.2f", cpuperc)  .. "%)"
-end
-]],
-		colorRight = [[
-c.r, c.g, c.b = 1, 1, 1
-if type(cpuperc) == "number" then
     local num = floor(cpuperc + 0.5)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
-    if gradient[num] then
-        c.r = gradient[num][1]
-        c.g = gradient[num][2]
-        c.b = gradient[num][3]
-    end
+	local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    return Colorize(format("%s (%.2f%%)", timeshort(cpu), cpuperc), r, g, b)
 end
-return c
 ]],
-
 		rightUpdating = true,
 		update = 1000
 	},
@@ -674,6 +641,14 @@ local function copy(t)
 	return new
 end
 
+local function escape(text)
+	return text:replace("|","||")
+end
+
+local function unescape(text)
+	return text:replace("||", "|")
+end
+
 function mod:RebuildOpts()
     options = {
 		add = {
@@ -846,13 +821,18 @@ function mod:RebuildOpts()
 						end,
 						order = 8
 					},
+					linesHeader = {
+						name = "Lines",
+						type = "header",
+						order = 9
+					},
 					left = {
 						name = "Left",
 						type = "input",
 						desc = "Left text code",
-						get = function() return v.left end,
+						get = function() return escape(v.left or "") end,
 						set = function(info, val)
-							v.left = val
+							v.left = unescape(val)
 							v.leftDirty = true
 							if val == "" then
 								v.left = nil
@@ -864,15 +844,15 @@ function mod:RebuildOpts()
 						end,
 						multiline = true,
 						width = "full",
-						order = 9
+						order = 10
 					},
 					right = {
 						name = "Right",
 						type = "input",
 						desc = "Right text code",
-						get = function() return v.right end,
+						get = function() return escape(v.right or "") end,
 						set = function(info, val)
-							v.right = val;
+							v.right = unescape(val);
 							v.rightDirty = true
 							if val == "" then
 								v.right = nil
@@ -884,8 +864,9 @@ function mod:RebuildOpts()
 						end,
 						multiline = true,
 						width = "full",
-						order = 10
+						order = 11
 					},
+					--[[
 					colorLeft = {
 						name = "Left Color",
 						type = "input",
@@ -901,7 +882,7 @@ function mod:RebuildOpts()
 						end,
 						multiline = true,
 						width = "full",
-						order = 11
+						order = 12
 					},
 					colorRight = {
 						name = "Right Color",
@@ -918,8 +899,8 @@ function mod:RebuildOpts()
 						end,
 						multiline = true,
 						width = "full",
-						order = 12
-					},
+						order = 13
+					},]]
 					marquee = {
 						name = "Enhanced Settings",
 						type = "group",
