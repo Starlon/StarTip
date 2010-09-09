@@ -348,6 +348,8 @@ function mod:OnInitialize()
 
 	for i, v in ipairs(defaultLines) do
 		for j, vv in ipairs(self.db.profile.lines) do
+			vv.colorLeft = nil
+			vv.colorRight = nil
 			if v.name == vv.name then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
@@ -508,7 +510,6 @@ function mod:CreateLines()
 							v.config.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
-							v.config.color = v.colorLeft
 							if mod.db.profile.refreshRate == 0 then
 								v.config.update = 0
 								v.config.scroll = 0
@@ -526,7 +527,6 @@ function mod:CreateLines()
 							v.config.value = v.right
 							local tmp = v.update
 							if not v.rightUpdating then v.update = 0 end
-							v.config.color = v.colorRight
 							if mod.db.profile.refreshRate == 0 then
 								v.config.update = 0
 								v.config.scroll = 0
@@ -550,7 +550,6 @@ function mod:CreateLines()
 							v.config.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
-							v.config.color = v.colorLeft
 							if mod.db.profile.refreshRate == 0 then
 								v.config.update = 0
 								v.config.scroll = 0
