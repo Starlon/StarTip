@@ -266,7 +266,7 @@ function mod:RebuildOpts()
 	local defaults = WidgetBar.defaults
 	
 	for k, db in pairs(self.db.profile.bars) do
-		options.bars.args[k] = {
+		options.bars.args[k:gsub(" ", "_")] = {
 			name = k,
 			type="group",
 			order = 6,
