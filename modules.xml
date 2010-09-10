@@ -3,13 +3,13 @@
 
 <Script file = "Modules\Fade.lua"/>
 <Script file = "Modules\Appearance.lua"/>
-<Script file = "Modules\Bars.lua"/>
 <Script file = "Modules\Position.lua"/>
 <Script file = "Modules\PvP.lua"/>
 <Script file = "Modules\RaidIcon.lua"/>
 <Script file = "Modules\Targeting.lua"/>
 <Script file = "Modules\DeadlyAnnounce.lua"/>
 <Script file = "Modules\Text.lua"/>
+<Script file = "Modules\Bars.lua"/>
 <Script file = "Modules\Talents.lua"/>
 
 <!--<Script file = "Modules\LCDDisplay.lua"/>-->
