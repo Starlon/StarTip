@@ -161,7 +161,7 @@ local updateTalents = function()
 		end
 				
 		GameTooltip:AddDoubleLine(' ', ' ')
-		
+				
 		local left = mod.leftLines[lineNum]
 		local right = mod.rightLines[lineNum]
 		left:SetText("Talents:")

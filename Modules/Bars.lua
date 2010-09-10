@@ -138,46 +138,81 @@ end
 
 local textureDict = {}
 
+function mod:CreateBars()
+	createBars()
+end
+
+local new, del
+do
+	local pool = {}
+	function new()
+		local bar = next(pool)
+		
+		if bar then
+			pool[bar] = nil
+		else
+			bar = CreateFrame("StatusBar", nil, GameTooltip)
+		end
+		
+		return bar
+	end
+	function del(bar)
+		pool[bar] = true
+	end
+end
+
 function createBars()
 	if type(mod.bars) ~= "table" then mod.bars = {} end
 	for k, v in pairs(mod.bars) do
 		v[1]:Del()
+		v[2]:Hide()
+		del(v[2])
 	end
 	wipe(mod.bars)
+	local appearance = StarTip:GetModule("Appearance")	
 	for k, v in pairs(self.db.profile.bars) do
-		local bar = CreateFrame("StatusBar", nil, GameTooltip)
+		local bar = new()
 		local widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar) 
 		bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 		bar:ClearAllPoints()
-		if v.point then
-			bar:SetPoint(unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}))
+		local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
+		arg4 = (arg4 or 0)
+		arg5 = (arg5 or 0)
+		bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
+		if type(v.width) == "number" then
+			bar:SetWidth(v.width)
+		else
+			bar:SetPoint("LEFT", GameTooltip, "LEFT")
+			bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
 		end
-		bar:SetPoint("LEFT", GameTooltip, "LEFT")
-		bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
 		bar:SetHeight(v.height)
 		bar:SetMinMaxValues(0, 100)
-		bar:Hide()
+		bar:Show()
 		widget.bar1 = true
 		tinsert(mod.bars, {widget, bar})
 		
 		if v.expression2 then
-			bar = CreateFrame("StatusBar", nil, GameTooltip)
+			bar = new()
 			widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar)
 			bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
 			bar:ClearAllPoints()
-			if v.point then
-				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
-				arg4 = (arg4 or v.row or 0)
-				if v.top then
-					arg5 = arg5 or v.col or 0 - (v.height or 12)
-				else
-					arg5 = arg5 or v.col or 0 + (v.height or 12)
-				end
-				bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
+			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
+			arg4 = (arg4 or 0)
+			if v.top then
+				arg5 = (arg5 or 0) - (v.height or 12)
+			else
+				arg5 = (arg5 or 0) + (v.height or 12)
 			end
-			bar:SetPoint("LEFT", GameTooltip, "LEFT")
-			bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
+			bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
+			if type(v.width) == "number" then
+				bar:SetWidth(v.width)
+			else
+				bar:SetPoint("LEFT", GameTooltip, "LEFT")
+				bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
+			end
 			bar:SetHeight(v.height)
+			bar:SetMinMaxValues(0, 100)
+			bar:Show()
 			tinsert(mod.bars, {widget, bar})
 		end
 	end
@@ -185,8 +220,6 @@ end
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-		
-	self.db.profile.bars = {}
 	
 	if not self.db.profile.bars then
 		self.db.profile.bars = {}
@@ -199,7 +232,9 @@ function mod:OnInitialize()
 	end
 	
 	self.core = LibCore:New(mod, StarTip.environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)		
-		
+	
+	self.offset = 0	
+	
 	StarTip:SetOptionsDisabled(options, true)
 
 end
@@ -236,6 +271,8 @@ end
 
 function mod:SetUnit()
 	GameTooltipStatusBar:Hide()
+	self.offset = 0
+	createBars()
 	for i, bar in pairs(self.bars) do
 		bar[1]:Start()
 		bar[2]:Show()

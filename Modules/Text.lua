@@ -369,19 +369,10 @@ function mod:OnInitialize()
 		end
 	end
 
-	--[[if self.db.profile.empty then
-		for i, v in ipairs(defaultLines) do
-			tinsert(self.db.profile.lines, v)
-		end
-		self.db.profile.empty = false
-	end]]
-
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
     StarTip:SetOptionsDisabled(options, true)
-
-	-- create our core object. Note that we must provide it with an LCD after it is created.
 
 	--self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
 	self.core = StarTip.core
