@@ -30,30 +30,7 @@ local function copy(tbl)
 end
 
 local defaultWidgets = {
-	["Health Histogram"] = {
-		type = "histogram",
-		expression = [[
-if not UnitExists("mouseover") then return random(100) end
-return UnitHealth("mouseover")
-]],
-		min = "return 0",
-		max = "return UnitHealthMax('mouseover')",
-		color1 = [[
-if not UnitExists("mouseover") or not self then return 100 end
-if self.visitor and self.visitor.visitor and self.visitor.visitor.db and self.visitor.visitor.db.profile.classColors then
-    return ClassColor("mouseover")
-else
-    local min, max = UnitHealth("mouseover"), UnitHealthMax("mouseover")
-    return HPColor(min, max)
-end
-]],
-		height = 20,
-		width = 10,
-		layer = 1,
-		point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, -12},
-		texture1 = LSM:GetDefault("statushistogram"),
-	},
-	["widget_random_histogram"] = {
+	["widget_mem_histogram"] = {
 		type = "histogram",
 		expression = [[
 do return random(100) end
@@ -66,12 +43,14 @@ end
 ]],
 		min = "return 0",
 		max = "return 100",
+		enabled = true,
 		reversed = true,
 		char = "0",
-		width = 5,
+		width = 10,
 		height = 50,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12},
-		layer = 1
+		layer = 1,
+		update = 500
 	},
 }
 
@@ -92,8 +71,9 @@ local options = {
 				min = "return 0",
 				max = "return 100",
 				height = 6,
+				enabled = true,
 				point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
-				texture = LSM:GetDefault("statushistogram"),
+				texture = LSM:GetDefault("statusbar"),
 				expression = ""
 			}
 			StarTip:RebuildOpts()
@@ -127,7 +107,7 @@ function updateHistogram(widget, hist)
 	local r, g, b = 0, 0, 1
 	
 	if widget.color.is_valid then
-		r, g, b = widget.color2.res1, widget.color2.res2, widget.color2.res3
+		r, g, b = widget.color.res1, widget.color.res2, widget.color.res3
 	end
 	
 	if type(r) == "number" then
@@ -172,37 +152,38 @@ function createHistograms()
 	wipe(mod.histograms)
 	local appearance = StarTip:GetModule("Appearance")	
 	for k, v in pairs(self.db.profile.histograms) do
-		for i = 0, v.width - 1 do
-			local histogram = new()
-			local widget = WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram, histogram) 
-			histogram:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
-			histogram:ClearAllPoints()
-			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
-			if v.width > 100 then
-				arg4 = (arg4 or 0) + i * (v.width / 100)
-			else
-				arg4 = (arg4 or 0) + i * (v.width or 6)
-			end
-			arg5 = (arg5 or 0)
-			histogram:SetPoint(arg1, arg2, arg3, arg4, arg5)
-			if v.width then
-				if (v.width > 100) then
-					histogram:SetWidth(v.width / 100)
+		if v.enabled then
+			for i = 0, v.width - 1 do
+				local histogram = new()
+				local widget = WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram, histogram) 
+				histogram:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
+				histogram:ClearAllPoints()
+				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
+				if v.width > 100 then
+					arg4 = (arg4 or 0) + i * (v.width / 100)
 				else
-					histogram:SetWidth(v.width or 6)
+					arg4 = (arg4 or 0) + i * (v.width or 6)
 				end
-			else
-				histogram:SetPoint("TOPLEFT", GameTooltip, "TOPLEFT")
-				histogram:SetPoint("BOTTOMLEFT", GameTooltip, "BOTTOMLEFT")
+				arg5 = (arg5 or 0)
+				histogram:SetPoint(arg1, arg2, arg3, arg4, arg5)
+				if v.width then
+					if (v.width > 100) then
+						histogram:SetWidth(v.width / 100)
+					else
+						histogram:SetWidth(v.width or 6)
+					end
+				else
+					histogram:SetPoint("TOPLEFT", GameTooltip, "TOPLEFT")
+					histogram:SetPoint("BOTTOMLEFT", GameTooltip, "BOTTOMLEFT")
+				end
+				histogram:SetHeight(v.height)
+				histogram:SetMinMaxValues(0, 100)
+				histogram:SetOrientation("VERTICAL")
+				histogram:Show()
+				tinsert(mod.histograms, {widget, histogram})
 			end
-			histogram:SetHeight(v.height)
-			histogram:SetMinMaxValues(0, 100)
-			histogram:SetOrientation("VERTICAL")
-			histogram:Show()
-			tinsert(mod.histograms, {widget, histogram})
 		end
 	end
-	
 end
 
 function mod:OnInitialize()
@@ -363,34 +344,20 @@ function mod:RebuildOpts()
 					set = function(info, v) db.style = v; createHistograms() end,
 					order = 5
 				},]]
-				texture1 = {
-					name = "Texture #1",
-					desc = "The histogram's first texture",
+				texture = {
+					name = "Texture",
+					desc = "The histogram's texture",
 					type = "select",
-					values = LSM:List("statushistogram"),
+					values = LSM:List("statusbar"),
 					get = function()
-						return StarTip:GetLSMIndexByName("statushistogram", db.texture1 or "Blizzard")
+						return StarTip:GetLSMIndexByName("statusbar", db.texture or "Blizzard")
 					end,
 					set = function(info, v)
-						db.texture1 = LSM:List("statushistogram")[v]
+						db.texture = LSM:List("statusbar")[v]
 						db[k.."Dirty"] = true						
 						createHistograms()
 					end,
 					order = 4
-				},
-				texture2 = {
-					name = "Texture #2",
-					desc = "The histogram's second texture",
-					type = "select",
-					values = LSM:List("statushistogram"),
-					get = function()
-						return db.texture2 or db.texture1 or "Blizzard" 
-					end,
-					set = function(info, v) 
-						db.texture2 = LSM:List("statushistogram")[v] 
-						db[k.."Dirty"] = true						
-						createHistograms() end,
-					order = 5
 				},
 				point = {
 					name = "Anchor Points",
@@ -403,18 +370,6 @@ function mod:RebuildOpts()
 						createHistograms() 
 					end,
 					order = 6
-				},
-				top = {
-					name = "First is Top",
-					desc = "Toggle whether to place the first histogram on top",
-					type = "toggle",
-					get = function() return db.top end,
-					set = function(info, v) 
-						db.top = v; 
-						db[k.."Dirty"] = true						
-						createHistograms() 
-					end,
-					order = 7
 				},
 				expression = {
 					name = "Histogram expression",
@@ -429,20 +384,6 @@ function mod:RebuildOpts()
 						createHistograms() 
 					end,
 					order = 8
-				},
-				expression2 = {
-					name = "Histogram second expression",
-					desc = "Enter the histogram's second expression",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.expression2 end,
-					set = function(info, v) 
-						db.expression2 = v ; 
-						db[k.."Dirty"] = true
-						createHistograms()
-					end,
-					order = 9
 				},
 				min = {
 					name = "Histogram min expression",
@@ -473,33 +414,19 @@ function mod:RebuildOpts()
 					end,
 					order = 11
 				},
-				color1 = {
-					name = "First histogram color script",
-					desc = "Enter the histogram's first color script",
+				color = {
+					name = "Histogram color script",
+					desc = "Enter the histogram's color script",
 					type = "input",
 					multiline = true,
 					width = "full",
-					get = function() return db.color1 end,
+					get = function() return db.color end,
 					set = function(info, v) 
-						db.color1 = v; 
+						db.color = v; 
 						db[k.."Dirty"] = true
 					createHistograms() end,
 					order = 12
 				},
-				color2 = {
-					name = "Second histogram color script",
-					desc = "Enter the histogram's second color script",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.color2 end,
-					set = function(info, v) 
-						db.color2 = v; 
-						db[k.."Dirty"] = true
-						createHistograms() 
-					end,
-					order = 13
-				}	
 			}
 		}
 	end

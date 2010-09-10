@@ -51,6 +51,7 @@ end
 		height = 6,
 		point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
 		texture1 = LSM:GetDefault("statusbar"),
+		enabled = true
 	},
 	["Mana Bar"] = {
 		type = "bar",
@@ -66,7 +67,8 @@ return PowerColor(nil, "mouseover")
 ]],
 		height = 6,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT"},
-		texture1 = LSM:GetDefault("statusbar")
+		texture1 = LSM:GetDefault("statusbar"),
+		enabled = true
 	},
 	
 
@@ -171,38 +173,14 @@ function createBars()
 	wipe(mod.bars)
 	local appearance = StarTip:GetModule("Appearance")	
 	for k, v in pairs(self.db.profile.bars) do
-		local bar = new()
-		local widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar) 
-		bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
-		bar:ClearAllPoints()
-		local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
-		arg4 = (arg4 or 0)
-		arg5 = (arg5 or 0)
-		bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
-		if type(v.width) == "number" then
-			bar:SetWidth(v.width)
-		else
-			bar:SetPoint("LEFT", GameTooltip, "LEFT")
-			bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
-		end
-		bar:SetHeight(v.height)
-		bar:SetMinMaxValues(0, 100)
-		bar:Show()
-		widget.bar1 = true
-		tinsert(mod.bars, {widget, bar})
-		
-		if v.expression2 then
-			bar = new()
-			widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar)
-			bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
+		if v.enabled then
+			local bar = new()
+			local widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+			bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 			bar:ClearAllPoints()
 			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
 			arg4 = (arg4 or 0)
-			if v.top then
-				arg5 = (arg5 or 0) - (v.height or 12)
-			else
-				arg5 = (arg5 or 0) + (v.height or 12)
-			end
+			arg5 = (arg5 or 0)
 			bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 			if type(v.width) == "number" then
 				bar:SetWidth(v.width)
@@ -213,7 +191,33 @@ function createBars()
 			bar:SetHeight(v.height)
 			bar:SetMinMaxValues(0, 100)
 			bar:Show()
+			widget.bar1 = true
 			tinsert(mod.bars, {widget, bar})
+			
+			if v.expression2 then
+				bar = new()
+				widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar)
+				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
+				bar:ClearAllPoints()
+				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
+				arg4 = (arg4 or 0)
+				if v.top then
+					arg5 = (arg5 or 0) - (v.height or 12)
+				else
+					arg5 = (arg5 or 0) + (v.height or 12)
+				end
+				bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
+				if type(v.width) == "number" then
+					bar:SetWidth(v.width)
+				else
+					bar:SetPoint("LEFT", GameTooltip, "LEFT")
+					bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
+				end
+				bar:SetHeight(v.height)
+				bar:SetMinMaxValues(0, 100)
+				bar:Show()
+				tinsert(mod.bars, {widget, bar})
+			end
 		end
 	end
 end
@@ -225,8 +229,8 @@ function mod:OnInitialize()
 		self.db.profile.bars = {}
 	end
 	
-	for i, v in ipairs(defaultWidgets) do
-		for j, vv in ipairs(self.db.profile.bars) do
+	for k, v in pairs(defaultWidgets) do
+		for kk, vv in pairs(self.db.profile.bars) do
 			if v.name == vv.name then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
@@ -238,9 +242,9 @@ function mod:OnInitialize()
 		end
 	end
 
-	for i, v in ipairs(defaultWidgets) do
+	for k, v in pairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
-			tinsert(self.db.profile.bars, v)
+			self.db.profile.bars[k] = v
 		end
 	end
 	
