@@ -229,11 +229,12 @@ end
         left = 'return "Health:"',
         right = [[
 health, maxHealth = UnitHealth("mouseover"), UnitHealthMax("mouseover")
+r, g, b = HPColor(health, maxHealth)
 value = "Unknown"
 if maxHealth == 100 then
-    value = health .. "%"
+    value = Colorize(health .. "%", r, g, b)
 elseif maxHealth ~= 0 then
-    value = format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100)
+    value = Colorize(format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100), r, g, b)
 end
 return value
 ]],
@@ -254,11 +255,12 @@ return (powers[class] or "Mana:")
         right = [[
 mana = UnitMana("mouseover")
 maxMana = UnitManaMax("mouseover")
+r, g, b = PowerColor(nil, "mouseover")
 value = "Unknown"
 if maxMana == 100 then
-    value = mana
+    value = Colorize(tostring(mana), r, g, b)
 elseif maxMana ~= 0 then
-    value = format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100)
+    value = Colorize(format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100), r, g, b)
 end
 return value
 ]],
