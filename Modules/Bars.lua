@@ -49,8 +49,8 @@ else
 end
 ]],
 		height = 6,
-		points = {"BOTTOMLEFT", GameTooltip, "TOPLEFT"},
-		texture = LSM:GetDefault("statusbar"),
+		point = {"BOTTOMLEFT", GameTooltip, "TOPLEFT"},
+		texture1 = LSM:GetDefault("statusbar"),
 	},
 	["Mana Bar"] = {
 		type = "bar",
@@ -65,8 +65,8 @@ if not UnitExists("mouseover") then return end
 return PowerColor(nil, "mouseover")
 ]],
 		height = 6,
-		points = {"TOPLEFT", GameTooltip, "BOTTOMLEFT"},
-		texture = LSM:GetDefault("statusbar"),
+		point = {"TOPLEFT", GameTooltip, "BOTTOMLEFT"},
+		texture1 = LSM:GetDefault("statusbar")
 	},
 	
 
@@ -110,12 +110,18 @@ function updateBar(widget, bar)
 	
 	if not widget.color1 then return end
 	
-	local r, g, b = widget.color1.res1, widget.color1.res2, widget.color1.res3
+	local r, g, b = 0, 0, 1
+	
+	if widget.bar1 then
+		r, g, b = widget.color1.res1, widget.color1.res2, widget.color1.res3
+	elseif widget.color2.is_valid then
+		r, g, b = widget.color2.res1, widget.color2.res2, widget.color2.res3
+	end
 	
 	if type(r) == "number" then
 		bar:SetStatusBarColor(r, g, b)
 	else
-		bar:Hide()
+		--bar:Hide()
 	end
 end
 
@@ -123,22 +129,47 @@ local textureDict = {}
 
 function createBars()
 	if type(mod.bars) ~= "table" then mod.bars = {} end
+	for k, v in pairs(mod.bars) do
+		v[1]:Del()
+	end
 	wipe(mod.bars)
 	for k, v in pairs(self.db.profile.bars) do
 		local bar = CreateFrame("StatusBar", nil, GameTooltip)
 		local widget = WidgetBar:New(mod.core, k, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateBar, bar) 
-		bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
+		bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 		bar:ClearAllPoints()
-		if v.points then
-			bar:SetPoint(unpack(v.points)) --"TOPLEFT", GameTooltip, "BOTTOMLEFT") --unpack(v.points))
+		if v.point then
+			bar:SetPoint(unpack(v.point)) --"TOPLEFT", GameTooltip, "BOTTOMLEFT") --unpack(v.point))
 		end
 		bar:SetPoint("LEFT", GameTooltip, "LEFT")
 		bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
 		bar:SetHeight(v.height)
 		bar:SetMinMaxValues(0, 100)
 		bar:Hide()
-		
+		widget.bar1 = true
 		tinsert(mod.bars, {widget, bar})
+		
+		if v.expression2 then
+			StarTip:Print("yes")
+			bar = CreateFrame("StatusBar", nil, GameTooltip)
+			widget = WidgetBar:New(mod.core, k, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar)
+			bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
+			bar:ClearAllPoints()
+			if v.point then
+				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
+				arg4 = (arg4 or v.row or 0)
+				if v.top then
+					arg5 = arg5 or v.col or 0 + v.height or 12
+				else
+					arg5 = arg5 or v.col or 0 - v.height or 12
+				end
+				bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
+			end
+			bar:SetPoint("LEFT", GameTooltip, "LEFT")
+			bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
+			bar:SetHeight(v.height)
+			tinsert(mod.bars, {widget, bar})
+		end
 	end
 end
 
@@ -160,13 +191,6 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-	local top, bottom = 0, 0
-	if self.db.profile.showHP then
-		top = 5
-	end
-	if self.db.profile.showMP then
-		bottom = -5
-	end
 	for k, bar in pairs(self.bars) do
 		bar[2]:Hide()
 	end
@@ -176,6 +200,10 @@ function mod:OnEnable()
 end
 
 function mod:OnDisable()
+	for k, bar in pairs(self.bars) do
+		bar[1]:Del()
+		bar[2]:Hide()
+	end
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
 end
@@ -188,11 +216,6 @@ end
 
 function mod:GetOptions()
 	return options
-end
-
-local function updateBars()
-	if self.db.profile.showHP then self:UpdateHealth() end
-	if self.db.profile.showMP then self:UpdateMana() end
 end
 
 function mod:SetUnit()
@@ -282,27 +305,40 @@ function mod:RebuildOpts()
 					set = function(info, v) db.style = v; createBars() end,
 					order = 5
 				},]]
-				texture = {
-					name = "Texture",
-					desc = "The bar's texture",
+				texture1 = {
+					name = "Texture #1",
+					desc = "The bar's first texture",
 					type = "select",
 					values = LSM:List("statusbar"),
 					get = function()
-						return StarTip:GetLSMIndexByName("statusbar", db.texture or "Blizzard")
+						return StarTip:GetLSMIndexByName("statusbar", db.texture1 or "Blizzard")
 					end,
 					set = function(info, v)
-						db.texture = LSM:List("statusbar")[v]
+						db.texture1 = LSM:List("statusbar")[v]
 						createBars()
 					end,
 					order = 4
 				},
-				points = {
+				texture2 = {
+					name = "Texture #2",
+					desc = "The bar's second texture",
+					type = "select",
+					values = LSM:List("statusbar"),
+					get = function()
+						return db.texture2 or db.texture1 or "Blizzard" 
+					end,
+					set = function(info, v) 
+						db.texture2 = LSM:List("statusbar")[v] 
+						createBars() end,
+					order = 5
+				},
+				point = {
 					name = "Anchor Points",
 					desc = "This bar's anchor point. These arguments are passed to bar:SetPoint()",
 					type = "input",
 					get = function() return db.point end,
-					set = function(info, v) db.point = v end,
-					order = 5
+					set = function(info, v) db.point = v; createBars() end,
+					order = 6
 				},
 				expression = {
 					name = "Bar expression",
@@ -312,9 +348,9 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.expression end,
 					set = function(info, v) db.expression = v; createBars() end,
-					order = 6
+					order = 7
 				},
-				--[[expression2 = {
+				expression2 = {
 					name = "Bar second expression",
 					desc = "Enter the bar's second expression",
 					type = "input",
@@ -322,8 +358,8 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.expression2 end,
 					set = function(info, v) db.expression2 = v ; createBars()end,
-					order = 7
-				},]]
+					order = 8
+				},
 				min = {
 					name = "Bar min expression",
 					desc = "Enter the bar's minimum expression",
@@ -332,7 +368,7 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.min end,
 					set = function(info, v) db.min = v; createBars() end,
-					order = 8
+					order = 9
 				
 				},
 				max = {
@@ -343,7 +379,7 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.max end,
 					set = function(info, v) db.max = v; createBars() end,
-					order = 9
+					order = 10
 				},
 				color1 = {
 					name = "First bar color script",
@@ -353,9 +389,8 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.color1 end,
 					set = function(info, v) db.color1 = v; createBars() end,
-					order = 10
+					order = 11
 				},
-				--[[
 				color2 = {
 					name = "Second bar color script",
 					desc = "Enter the bar's second color script",
@@ -364,8 +399,8 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.color2 end,
 					set = function(info, v) db.color2 = v; createBars() end,
-					order = 10
-				}]]					
+					order = 12
+				}					
 				
 			}--WidgetBar:GetOptions(StarTip, v)
 		}
