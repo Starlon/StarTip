@@ -223,7 +223,7 @@ function mod:OnInitialize()
 
 	for k, v in pairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
-			self.db.profile.histograms[k] = v
+			self.db.profile.histograms[k] = copy(v)
 		end
 	end
 	
