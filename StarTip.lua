@@ -379,6 +379,7 @@ function StarTip:OnInitialize()
 		self.rightLines[i] = _G["GameTooltipTextRight" .. i]
 	end
 		
+	self.core = LibCore:New(StarTip, environment, "StarTip", {["StarTip"] = {}}, "text", self.db.profile.errorLevel)		
 	GameTooltip:Show()
 	GameTooltip:Hide()
 end

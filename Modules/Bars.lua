@@ -11,103 +11,128 @@ local UnitSelectionColor = _G.UnitSelectionColor
 local UnitClass = _G.UnitClass
 local self = mod
 local timer
-local LSM = _G.LibStub("LibSharedMedia-3.0")
+local LSM = LibStub("LibSharedMedia-3.0")
+local WidgetBar = LibStub("StarLibWidgetBar-1.0")
+local LibCore = LibStub("StarLibCore-1.0")
+
+
+local createBars
+local widgets = {}
+
+local function copy(tbl)
+	local newTbl = {}
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			v = copy(v)
+		end
+		newTbl[k] = v
+	end
+	return newTbl
+end
+
+local defaultWidgets = {
+	["Health Bar"] = {
+		type = "bar",
+		expression = [[
+if not UnitExists("mouseover") then return end
+return UnitHealth("mouseover")
+]],
+		min = "return 0",
+		max = "return UnitHealthMax('mouseover')",
+		color1 = [[
+if not UnitExists("mouseover") then return end
+if self.visitor.visitor.db.profile.classColors then
+    return ClassColor("mouseover")
+else
+    local min, max = UnitHealth("mouseover"), UnitHealthMax("mouseover")
+    return HPColor(min, max)
+end
+]],
+		height = 6,
+		points = {"BOTTOMLEFT", GameTooltip, "TOPLEFT"},
+		texture = StarTip:GetLSMIndexByName("statusbar", LSM:GetDefault("statusbar")),
+	},
+	["Mana Bar"] = {
+		type = "bar",
+		expression = [[
+if not UnitExists("mouseover") then return end
+return UnitMana("mouseover")
+]],
+		min = "return 0",
+		max = "return UnitManaMax('mouseover')",
+		color1 = [[
+if not UnitExists("mouseover") then return end
+return PowerColor(nil, "mouseover")
+]],
+		height = 6,
+		points = {"TOPLEFT", GameTooltip, "BOTTOMLEFT"},
+		texture = StarTip:GetLSMIndexByName("statusbar", LSM:GetDefault("statusbar")),
+	},
+	
+
+}
 
 local defaults = {
 	profile = {
-		showHP = true,
-		showMP = true,
-		hpTexture = StarTip:GetLSMIndexByName("statusbar", LSM:GetDefault("statusbar")),
-		mpTexture = StarTip:GetLSMIndexByName("statusbar", LSM:GetDefault("statusbar")),
-		useGradient = false,
+		classColors = true,
 	}
 }
 
 local options = {
-	hpBar = {
-		name = "HP Bar",
+	bars = {
+		name = "Bars",
 		type = "group",
-		args = {
-			show = {
-				name = "Show",
-				desc = "Toggle showing the HP bar",
-				type = "toggle",
-				get = function() return self.db.profile.showHP end,
-				set = function(info, v) self.db.profile.showHP = v end,
-				order = 1
-			},
-			useGradient = {
-				name = "Use Gradient",
-				desc = "Set whether to use a gradient based on unit health",
-				type = "toggle",
-				get = function() return self.db.profile.useGradient end,
-				set = function(info, v) self.db.profile.useGradient = v end,
-				order = 3
-			},
-			texture = {
-				name = "Texture",
-				desc = "Change the status bar's texture",
-				type = "select",
-				values = LSM:List("statusbar"),
-				get = function() return self.db.profile.hpTexture end,
-				set = function(info, v) 
-					self.db.profile.hpTexture = v 
-					self.hpBar:SetStatusBarTexture(LSM:Fetch("statusbar", LSM:List("statusbar")[v]))
-				end,
-				order = 2
-			},
-		}
-	},
-	mpBar = {
-		name = "MP Bar",
-		type = "group",
-		args = {
-			show = {
-				name = "Show",
-				desc = "Toggle showing the MP bar",
-			type = "toggle",
-				get = function() return self.db.profile.showMP end,
-				set = function(info, v) self.db.profile.showMP = v end,
-				order = 1
-			},
-			texture = {
-				name = "Texture",
-				desc = "Change the status bar's texture",
-				type = "select",
-				values = LSM:List("statusbar"),
-				get = function() return self.db.profile.mpTexture end,
-				set = function(info, v) 
-					self.db.profile.mpTexture = v 
-					self.mpBar:SetStatusBarTexture(LSM:Fetch("statusbar", LSM:List("statusbar")[v]))
-				end,
-				order = 2
-			}
-		}
+		args = {}
 	}
 }
 
+function updateBar(widget, bar)
+	bar:SetValue(widget.val1 * 100)
+	
+	if not widget.color1 then return end
+	
+	local r, g, b = widget.color1.res1, widget.color1.res2, widget.color1.res3
+	
+	if type(r) == "number" then
+		bar:SetStatusBarColor(r, g, b)
+	else
+		bar:Hide()
+	end
+end
+
+function createBars()
+	if type(mod.bars) ~= "table" then mod.bars = {} end
+	wipe(mod.bars)
+	for k, v in pairs(self.db.profile.bars) do
+		local bar = CreateFrame("StatusBar", nil, GameTooltip)
+		local widget = WidgetBar:New(mod.core, k, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+		bar:SetStatusBarTexture(LSM:Fetch("statusbar", LSM:List("statusbar")[v.texture]))
+		bar:ClearAllPoints()
+		if v.points then
+			bar:SetPoint(unpack(v.points)) --"TOPLEFT", GameTooltip, "BOTTOMLEFT") --unpack(v.points))
+		end
+		bar:SetPoint("LEFT", GameTooltip, "LEFT")
+		bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
+		bar:SetHeight(v.height)
+		bar:SetMinMaxValues(0, 100)
+		bar:Hide()
+		tinsert(mod.bars, {widget, bar})
+	end
+end
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	
-	local hpBar = CreateFrame("StatusBar", nil, GameTooltip)
-	hpBar:SetStatusBarTexture(LSM:Fetch("statusbar", LSM:List("statusbar")[self.db.profile.hpTexture]))
-	hpBar:SetPoint("BOTTOMLEFT", GameTooltip, "TOPLEFT")
-	hpBar:SetPoint("LEFT", GameTooltip, "LEFT")
-	hpBar:SetPoint("RIGHT", GameTooltip, "RIGHT")
-	hpBar:SetHeight(5)
-	hpBar:Hide()
-	self.hpBar = hpBar
+	self.db.profile.bars = nil
 	
-	local mpBar = CreateFrame("StatusBar", nil, GameTooltip)
-	mpBar:SetStatusBarTexture(LSM:Fetch("statusbar", LSM:List("statusbar")[self.db.profile.mpTexture]))
-	mpBar:SetPoint("TOPLEFT", GameTooltip, "BOTTOMLEFT")
-	mpBar:SetPoint("LEFT")
-	mpBar:SetPoint("RIGHT")	
-	mpBar:SetHeight(5)
-	mpBar:Hide()
-	self.mpBar = mpBar
-	
+	if not self.db.profile.bars then
+		self.db.profile.bars = copy(defaultWidgets)
+	end
+
+	self.core = LibCore:New(mod, StarTip.environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)		
+
+	createBars()
+		
 	StarTip:SetOptionsDisabled(options, true)
 end
 
@@ -119,6 +144,10 @@ function mod:OnEnable()
 	if self.db.profile.showMP then
 		bottom = -5
 	end
+	for k, bar in pairs(self.bars) do
+		bar[2]:Hide()
+	end
+	createBars()
 	GameTooltip:SetClampRectInsets(0, 0, top, bottom)
 	StarTip:SetOptionsDisabled(options, false)
 end
@@ -126,6 +155,12 @@ end
 function mod:OnDisable()
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
+end
+
+function mod:RebuildOpts()
+	for k, v in ipairs(self.db.profile.bars) do
+		options.bars.args[k] = WidgetBar:GetOptions(v)
+	end
 end
 
 function mod:GetOptions()
@@ -139,20 +174,27 @@ end
 
 function mod:SetUnit()
 	GameTooltipStatusBar:Hide()
-	updateBars()
-	if self.db.profile.showHP then self.hpBar:Show() end
-	if self.db.profile.showMP then self.mpBar:Show() end
+	for i, bar in pairs(self.bars) do
+		bar[1]:Start()
+		bar[2]:Show()
+	end
+	--if self.db.profile.showHP then self.hpBar:Show() end
+	--if self.db.profile.showMP then self.mpBar:Show() end
 	--timer = timer or self:ScheduleRepeatingTimer(updateBars, .5)
 end
 
 function mod:SetItem()
-	self.hpBar:Hide()
-	self.mpBar:Hide()
+	for i, bar in pairs(self.bars) do
+		bar[1]:Stop()
+		bar[2]:Hide()
+	end
 end
 
 function mod:SetSpell()
-	self.hpBar:Hide()
-	self.mpBar:Hide()
+	for i, bar in pairs(self.bars) do
+		bar[1]:Stop()
+		bar[2]:Hide()
+	end
 end
 
 function mod:OnHide()
@@ -160,8 +202,10 @@ function mod:OnHide()
 		self:CancelTimer(timer)
 		timer = nil
 	end
-	self.hpBar:Hide()
-	self.mpBar:Hide()
+	for i, bar in pairs(self.bars) do
+		bar[1]:Stop()
+		bar[2]:Hide()
+	end
 end
 
 local function colorGradient(perc)
@@ -170,6 +214,116 @@ local function colorGradient(perc)
     else
         return 2 - perc*2, 1, 0
     end
+end
+
+function mod:RebuildOpts()
+	local defaults = WidgetBar.defaults
+	for k, db in pairs(self.db.profile.bars) do
+		options.bars.args[k] = {
+			name = k,
+			type="group",
+			args={
+				height = {
+					name = "Bar height",
+					desc = "Enter the bar's height",
+					type = "input",
+					pattern = "%d",
+					get = function() return tostring(db.height or defaults.height) end,
+					set = function(info, v) db.height = tonumber(v); createBars() end,
+					order = 2
+				},
+				update = {
+					name = "Bar update rate",
+					desc = "Enter the bar's refresh rate",
+					type = "input",
+					pattern = "%d",
+					get = function() return tostring(db.update or defaults.update) end,
+					set = function(info, v) db.update = tonumber(v); createBars() end,
+					order = 3
+				},
+				--[[direction = {
+					name = "Bar direction",
+					type = "select",
+					values = WidgetBar.directionList,
+					get = function() return db.direction or defaults.direction end,
+					set = function(info, v) db.direction = v; createBars() end,
+					order = 4
+				},
+				style = {
+					name = "Bar Style",
+					type = "select",
+					values = WidgetBar.styleList,
+					get = function() return db.style or defaults.style end,
+					set = function(info, v) db.style = v; createBars() end,
+					order = 5
+				},]]
+				expression = {
+					name = "Bar expression",
+					desc = "Enter the bar's first expression",
+					type = "input",
+					multiline = true,
+					width = "full",
+					get = function() return db.expression end,
+					set = function(info, v) db.expression = v; createBars() end,
+					order = 6
+				},
+				--[[expression2 = {
+					name = "Bar second expression",
+					desc = "Enter the bar's second expression",
+					type = "input",
+					multiline = true,
+					width = "full",
+					get = function() return db.expression2 end,
+					set = function(info, v) db.expression2 = v ; createBars()end,
+					order = 7
+				},]]
+				min = {
+					name = "Bar min expression",
+					desc = "Enter the bar's minimum expression",
+					type = "input",
+					multiline = true,
+					width = "full",
+					get = function() return db.min end,
+					set = function(info, v) db.min = v; createBars() end,
+					order = 8
+				
+				},
+				max = {
+					name = "Bar max expression",
+					desc = "Enter the bar's maximum expression",
+					type = "input",
+					multiline = true,
+					width = "full",
+					get = function() return db.max end,
+					set = function(info, v) db.max = v; createBars() end,
+					order = 9
+				},
+				color1 = {
+					name = "First bar color script",
+					desc = "Enter the bar's first color script",
+					type = "input",
+					multiline = true,
+					width = "full",
+					get = function() return db.color1 end,
+					set = function(info, v) db.color1 = v; createBars() end,
+					order = 10
+				},
+				--[[
+				color2 = {
+					name = "Second bar color script",
+					desc = "Enter the bar's second color script",
+					type = "input",
+					multiline = true,
+					width = "full",
+					get = function() return db.color2 end,
+					set = function(info, v) db.color2 = v; createBars() end,
+					order = 10
+				}]]	
+				
+				
+			}--WidgetBar:GetOptions(StarTip, v)
+		}
+	end
 end
 
 -- Colors, snagged from oUF
@@ -192,7 +346,33 @@ local happiness = {
 	[3] = {r = 0, g = 1, b = 0}, -- colors.. | happy
 }
 
+--[[
+function mod:UpdateBar()
+	local unit = "mouseover"
+	if not UnitExists(unit) then return end
+	local min, max = UnitHealth(unit), UnitHealthMax(unit)
+	self.hpBar:SetMinMaxValues(0, max)
+	self.hpBar:SetValue(min)
+
+	local color
+	if self.db.profile.useGradient then
+		color = StarTip.new()
+		color.r, color.g, color.b = colorGradient(min/max)
+	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
+		color = health[1]
+	elseif UnitIsPlayer(unit) then 
+		color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
+	else
+		color = StarTip.new()
+		color.r, color.g, color.b = UnitSelectionColor(unit)
+	end
+	if not color then color = health[0] end
+	self.hpBar:SetStatusBarColor(color.r, color.g, color.b)
+	StarTip.del(color)
+end
+]]
 -- Logic snagged from oUF 
+--[[
 function mod:UpdateHealth()
 	local unit = "mouseover"
 	if not UnitExists(unit) then return end
@@ -227,3 +407,4 @@ function mod:UpdateMana()
 	local color = power[UnitPowerType(unit)]
 	self.mpBar:SetStatusBarColor(color.r, color.g, color.b)
 end
+]]

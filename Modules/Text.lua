@@ -383,10 +383,11 @@ function mod:OnInitialize()
 
 	-- create our core object. Note that we must provide it with an LCD after it is created.
 
-	self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
+	--self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
+	self.core = StarTip.core
 	if ResourceServer then ResourceServer:New(environment) end
-	self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
-	self.core.lcd = self.lcd
+	--self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
+	--self.core.lcd = self.lcd
 
 	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
 
