@@ -92,7 +92,7 @@ if UnitIsPlayer("mouseover") then
 else
     r, g, b = UnitSelectionColor("mouseover")
 end
-return Colorize(unitName, r, g, b)
+return GetColorCode(unitName, r, g, b)
 ]],
         right = nil,
 		bold = true,
@@ -116,7 +116,7 @@ else
 end
 local name = UnitName("mouseovertarget")
 if name == select(1, UnitName("player")) then name = "(YOU)" end
-return name and Colorize(name, r, g, b) or "None"
+return name and GetColorCode(name, r, g, b) or "None"
 ]],
         rightUpdating = true,
 		update = 1000,
@@ -192,7 +192,7 @@ if UnitIsPlayer("mouseover") then
 else
     r, g, b = 1, 1, 1
 end
-return Colorize(UnitClass("mouseover"), r, g, b)
+return GetColorCode(UnitClass("mouseover"), r, g, b)
 ]],
 		enabled = true,
     },
@@ -232,9 +232,9 @@ health, maxHealth = UnitHealth("mouseover"), UnitHealthMax("mouseover")
 r, g, b = HPColor(health, maxHealth)
 value = "Unknown"
 if maxHealth == 100 then
-    value = Colorize(health .. "%", r, g, b)
+    value = GetColorCode(health .. "%", r, g, b)
 elseif maxHealth ~= 0 then
-    value = Colorize(format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100), r, g, b)
+    value = GetColorCode(format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100), r, g, b)
 end
 return value
 ]],
@@ -258,9 +258,9 @@ maxMana = UnitManaMax("mouseover")
 r, g, b = PowerColor(nil, "mouseover")
 value = "Unknown"
 if maxMana == 100 then
-    value = Colorize(tostring(mana), r, g, b)
+    value = GetColorCode(tostring(mana), r, g, b)
 elseif maxMana ~= 0 then
-    value = Colorize(format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100), r, g, b)
+    value = GetColorCode(format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100), r, g, b)
 end
 return value
 ]],
@@ -300,7 +300,7 @@ if mem then
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
-    return Colorize(format("%s (%.2f%%)", memshort(mem), memperc), r, g, b)
+    return GetColorCode(format("%s (%.2f%%)", memshort(mem), memperc), r, g, b)
 end
 ]],
 		rightUpdating = true,
@@ -319,7 +319,7 @@ if cpu then
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
-    return Colorize(format("%s (%.2f%%)", timeshort(cpu), cpuperc), r, g, b)
+    return GetColorCode(format("%s (%.2f%%)", timeshort(cpu), cpuperc), r, g, b)
 end
 ]],
 		rightUpdating = true,
