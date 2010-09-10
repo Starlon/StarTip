@@ -49,7 +49,7 @@ else
 end
 ]],
 		height = 6,
-		point = {"BOTTOMLEFT", GameTooltip, "TOPLEFT"},
+		point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
 		texture1 = LSM:GetDefault("statusbar"),
 	},
 	["Mana Bar"] = {
@@ -65,7 +65,7 @@ if not UnitExists("mouseover") then return end
 return PowerColor(nil, "mouseover")
 ]],
 		height = 6,
-		point = {"TOPLEFT", GameTooltip, "BOTTOMLEFT"},
+		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT"},
 		texture1 = LSM:GetDefault("statusbar")
 	},
 	
@@ -89,7 +89,7 @@ local options = {
 				min = "return 0",
 				max = "return 100",
 				height = 6,
-				point = {"BOTTOMLEFT", GameTooltip, "TOPLEFT"},
+				point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
 				texture = LSM:GetDefault("statusbar"),
 				expression = ""
 			}
@@ -97,6 +97,17 @@ local options = {
 			createBars()
 		end,
 		order = 5
+	},
+	defaults = {
+		name = "Restore Defaults",
+		desc = "Restore Defaults",
+		type = "execute",
+		func = function() 
+			mod.db.profile.bars = copy(defaultWidgets); 
+			StarTip:RebuildOpts() 
+			StarTip:Print("Bug: You'll have to reload your UI to see the change in the bars list. I'm not sure why.")
+		end,
+		order = 6
 	},
 	bars = {
 		name = "Bars",
@@ -135,11 +146,11 @@ function createBars()
 	wipe(mod.bars)
 	for k, v in pairs(self.db.profile.bars) do
 		local bar = CreateFrame("StatusBar", nil, GameTooltip)
-		local widget = WidgetBar:New(mod.core, k, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+		local widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar) 
 		bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 		bar:ClearAllPoints()
 		if v.point then
-			bar:SetPoint(unpack(v.point)) --"TOPLEFT", GameTooltip, "BOTTOMLEFT") --unpack(v.point))
+			bar:SetPoint(unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}))
 		end
 		bar:SetPoint("LEFT", GameTooltip, "LEFT")
 		bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
@@ -150,9 +161,8 @@ function createBars()
 		tinsert(mod.bars, {widget, bar})
 		
 		if v.expression2 then
-			StarTip:Print("yes")
 			bar = CreateFrame("StatusBar", nil, GameTooltip)
-			widget = WidgetBar:New(mod.core, k, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar)
+			widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar)
 			bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
 			bar:ClearAllPoints()
 			if v.point then
@@ -175,22 +185,28 @@ end
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-	
-	self.db.profile.bars = nil
+		
+	self.db.profile.bars = {}
 	
 	if not self.db.profile.bars then
-		self.db.profile.bars = copy(defaultWidgets)
+		self.db.profile.bars = {}
 	end
-
+	
+	for k, v in pairs(defaultWidgets) do
+		if not self.db.profile.bars[k] then
+			self.db.profile.bars[k] = copy(v)
+		end
+	end
+	
 	self.core = LibCore:New(mod, StarTip.environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)		
-
-	createBars()
 		
 	StarTip:SetOptionsDisabled(options, true)
 
 end
 
 function mod:OnEnable()
+	if not self.bars then self.bars = {} end
+	
 	for k, bar in pairs(self.bars) do
 		bar[2]:Hide()
 	end
@@ -208,11 +224,11 @@ function mod:OnDisable()
 	StarTip:SetOptionsDisabled(options, true)
 end
 
-function mod:RebuildOpts()
+--[[function mod:RebuildOpts()
 	for k, v in ipairs(self.db.profile.bars) do
 		options.bars.args[k] = WidgetBar:GetOptions(v)
 	end
-end
+end]]
 
 function mod:GetOptions()
 	return options
@@ -224,9 +240,6 @@ function mod:SetUnit()
 		bar[1]:Start()
 		bar[2]:Show()
 	end
-	--if self.db.profile.showHP then self.hpBar:Show() end
-	--if self.db.profile.showMP then self.mpBar:Show() end
-	--timer = timer or self:ScheduleRepeatingTimer(updateBars, .5)
 end
 
 function mod:SetItem()
