@@ -40,7 +40,7 @@ return UnitHealth("mouseover")
 		min = "return 0",
 		max = "return UnitHealthMax('mouseover')",
 		color1 = [[
-if not UnitExists("mouseover") then return end
+if not UnitExists("mouseover") or not self then return end
 if self.visitor.visitor.db.profile.classColors then
     return ClassColor("mouseover")
 else
@@ -79,11 +79,30 @@ local defaults = {
 }
 
 local options = {
+	add = {
+		name = "Add Bar",
+		desc = "Add a bar",
+		type = "input",
+		set = function(info, v)
+			mod.db.profile.bars[v] = {
+				type = "bar",
+				min = "return 0",
+				max = "return 100",
+				height = 6,
+				point = {"BOTTOMLEFT", GameTooltip, "TOPLEFT"},
+				texture = LSM:GetDefault("statusbar"),
+				expression = ""
+			}
+			StarTip:RebuildOpts()
+			createBars()
+		end,
+		order = 5
+	},
 	bars = {
 		name = "Bars",
 		type = "group",
 		args = {}
-	}
+	},
 }
 
 function updateBar(widget, bar)
@@ -138,9 +157,6 @@ function mod:OnInitialize()
 		
 	StarTip:SetOptionsDisabled(options, true)
 
-	for i, texture in ipairs(LSM:List("statusbar")) do
-		textureDict[LSM:Fetch("statusbar", i)] = i
-	end
 end
 
 function mod:OnEnable()
@@ -155,7 +171,7 @@ function mod:OnEnable()
 		bar[2]:Hide()
 	end
 	createBars()
-	GameTooltip:SetClampRectInsets(0, 0, top, bottom)
+	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 end
 
@@ -225,10 +241,12 @@ end
 
 function mod:RebuildOpts()
 	local defaults = WidgetBar.defaults
+	
 	for k, db in pairs(self.db.profile.bars) do
 		options.bars.args[k] = {
 			name = k,
 			type="group",
+			order = 6,
 			args={
 				height = {
 					name = "Bar height",
@@ -277,7 +295,15 @@ function mod:RebuildOpts()
 						createBars()
 					end,
 					order = 4
-				},				
+				},
+				points = {
+					name = "Anchor Points",
+					desc = "This bar's anchor point",
+					type = "input",
+					get = function() return db.point end,
+					set = function(info, v) db.point = v end,
+					order = 5
+				},
 				expression = {
 					name = "Bar expression",
 					desc = "Enter the bar's first expression",
