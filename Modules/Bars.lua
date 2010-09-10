@@ -298,7 +298,7 @@ function mod:RebuildOpts()
 				},
 				points = {
 					name = "Anchor Points",
-					desc = "This bar's anchor point",
+					desc = "This bar's anchor point. These arguments are passed to bar:SetPoint()",
 					type = "input",
 					get = function() return db.point end,
 					set = function(info, v) db.point = v end,
