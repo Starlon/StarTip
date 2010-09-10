@@ -50,7 +50,7 @@ end
 ]],
 		height = 6,
 		points = {"BOTTOMLEFT", GameTooltip, "TOPLEFT"},
-		texture = StarTip:GetLSMIndexByName("statusbar", LSM:GetDefault("statusbar")),
+		texture = LSM:GetDefault("statusbar"),
 	},
 	["Mana Bar"] = {
 		type = "bar",
@@ -66,7 +66,7 @@ return PowerColor(nil, "mouseover")
 ]],
 		height = 6,
 		points = {"TOPLEFT", GameTooltip, "BOTTOMLEFT"},
-		texture = StarTip:GetLSMIndexByName("statusbar", LSM:GetDefault("statusbar")),
+		texture = LSM:GetDefault("statusbar"),
 	},
 	
 
@@ -100,13 +100,15 @@ function updateBar(widget, bar)
 	end
 end
 
+local textureDict = {}
+
 function createBars()
 	if type(mod.bars) ~= "table" then mod.bars = {} end
 	wipe(mod.bars)
 	for k, v in pairs(self.db.profile.bars) do
 		local bar = CreateFrame("StatusBar", nil, GameTooltip)
 		local widget = WidgetBar:New(mod.core, k, v, 0, 0, 0, StarTip.db.profile.errorLevel, updateBar, bar) 
-		bar:SetStatusBarTexture(LSM:Fetch("statusbar", LSM:List("statusbar")[v.texture]))
+		bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
 		bar:ClearAllPoints()
 		if v.points then
 			bar:SetPoint(unpack(v.points)) --"TOPLEFT", GameTooltip, "BOTTOMLEFT") --unpack(v.points))
@@ -116,6 +118,7 @@ function createBars()
 		bar:SetHeight(v.height)
 		bar:SetMinMaxValues(0, 100)
 		bar:Hide()
+		
 		tinsert(mod.bars, {widget, bar})
 	end
 end
@@ -134,6 +137,10 @@ function mod:OnInitialize()
 	createBars()
 		
 	StarTip:SetOptionsDisabled(options, true)
+
+	for i, texture in ipairs(LSM:List("statusbar")) do
+		textureDict[LSM:Fetch("statusbar", i)] = i
+	end
 end
 
 function mod:OnEnable()
@@ -257,6 +264,20 @@ function mod:RebuildOpts()
 					set = function(info, v) db.style = v; createBars() end,
 					order = 5
 				},]]
+				texture = {
+					name = "Texture",
+					desc = "The bar's texture",
+					type = "select",
+					values = LSM:List("statusbar"),
+					get = function()
+						return StarTip:GetLSMIndexByName("statusbar", db.texture or "Blizzard")
+					end,
+					set = function(info, v)
+						db.texture = LSM:List("statusbar")[v]
+						createBars()
+					end,
+					order = 4
+				},				
 				expression = {
 					name = "Bar expression",
 					desc = "Enter the bar's first expression",
@@ -318,8 +339,7 @@ function mod:RebuildOpts()
 					get = function() return db.color2 end,
 					set = function(info, v) db.color2 = v; createBars() end,
 					order = 10
-				}]]	
-				
+				}]]					
 				
 			}--WidgetBar:GetOptions(StarTip, v)
 		}
