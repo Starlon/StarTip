@@ -159,9 +159,9 @@ function createBars()
 				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
 				arg4 = (arg4 or v.row or 0)
 				if v.top then
-					arg5 = arg5 or v.col or 0 + v.height or 12
+					arg5 = arg5 or v.col or 0 - (v.height or 12)
 				else
-					arg5 = arg5 or v.col or 0 - v.height or 12
+					arg5 = arg5 or v.col or 0 + (v.height or 12)
 				end
 				bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 			end
@@ -340,6 +340,14 @@ function mod:RebuildOpts()
 					set = function(info, v) db.point = v; createBars() end,
 					order = 6
 				},
+				top = {
+					name = "First is Top",
+					desc = "Toggle whether to place the first bar on top",
+					type = "toggle",
+					get = function() return db.top end,
+					set = function(info, v) db.top = v; createBars() end,
+					order = 7
+				},
 				expression = {
 					name = "Bar expression",
 					desc = "Enter the bar's first expression",
@@ -348,7 +356,7 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.expression end,
 					set = function(info, v) db.expression = v; createBars() end,
-					order = 7
+					order = 8
 				},
 				expression2 = {
 					name = "Bar second expression",
@@ -358,7 +366,7 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.expression2 end,
 					set = function(info, v) db.expression2 = v ; createBars()end,
-					order = 8
+					order = 9
 				},
 				min = {
 					name = "Bar min expression",
@@ -368,7 +376,7 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.min end,
 					set = function(info, v) db.min = v; createBars() end,
-					order = 9
+					order = 10
 				
 				},
 				max = {
@@ -379,7 +387,7 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.max end,
 					set = function(info, v) db.max = v; createBars() end,
-					order = 10
+					order = 11
 				},
 				color1 = {
 					name = "First bar color script",
@@ -389,7 +397,7 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.color1 end,
 					set = function(info, v) db.color1 = v; createBars() end,
-					order = 11
+					order = 12
 				},
 				color2 = {
 					name = "Second bar color script",
@@ -399,10 +407,9 @@ function mod:RebuildOpts()
 					width = "full",
 					get = function() return db.color2 end,
 					set = function(info, v) db.color2 = v; createBars() end,
-					order = 12
-				}					
-				
-			}--WidgetBar:GetOptions(StarTip, v)
+					order = 13
+				}	
+			}
 		}
 	end
 end
