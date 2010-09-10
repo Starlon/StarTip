@@ -469,7 +469,7 @@ function StarTip:RebuildOpts()
 				type = "header",
 				order = 3
 			}
-			if v:GetName() == "Bars" then
+			if v.childGroup then
 				options.args.modules.args[v:GetName()].childGroups = "tab"
 			end
 		else

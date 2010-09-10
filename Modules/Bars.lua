@@ -1,6 +1,7 @@
 local mod = StarTip:NewModule("Bars", "AceTimer-3.0")
 mod.name = "Bars"
 mod.toggled = true
+mod.childGroup = true
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip

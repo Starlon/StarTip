@@ -1,6 +1,7 @@
 local mod = StarTip:NewModule("Histograms", "AceTimer-3.0")
 mod.name = "Histograms"
 mod.toggled = true
+mod.childGroup = true
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip
@@ -41,9 +42,23 @@ if mem then
     return memdiff / totaldiff * 100
 end
 ]],
+		color = [[
+local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+if mem then
+    if totaldiff == 0 then totaldiff = 1 end
+    memperc = (memdiff / totaldiff * 100)
+	do return ColorGradient(memperc) end
+    local num = floor(memperc + 0.5)
+    if num < 1 then num = 1 end
+    if num > 100 then num = 100 end
+    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    return r, g, b
+end
+
+]],
 		min = "return 0",
 		max = "return 100",
-		enabled = true,
+		enabled = false,
 		reversed = true,
 		char = "0",
 		width = 10,
@@ -302,6 +317,14 @@ function mod:RebuildOpts()
 			type="group",
 			order = 6,
 			args={
+				enabled = {
+					name = "Enable",
+					desc = "Toggle whether this histogram is enabled or not",
+					type = "toggle",
+					get = function() return db.enabled end,
+					set = function(info, v) db.enabled = v end,
+					order = 1
+				},
 				height = {
 					name = "Histogram height",
 					desc = "Enter the histogram's height",
@@ -363,6 +386,7 @@ function mod:RebuildOpts()
 					name = "Anchor Points",
 					desc = "This histogram's anchor point. These arguments are passed to histogram:SetPoint()",
 					type = "input",
+					width = "full",
 					get = function() return db.point end,
 					set = function(info, v) 
 						db.point = v; 
