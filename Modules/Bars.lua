@@ -225,9 +225,22 @@ function mod:OnInitialize()
 		self.db.profile.bars = {}
 	end
 	
-	for k, v in pairs(defaultWidgets) do
-		if not self.db.profile.bars[k] then
-			self.db.profile.bars[k] = copy(v)
+	for i, v in ipairs(defaultWidgets) do
+		for j, vv in ipairs(self.db.profile.bars) do
+			if v.name == vv.name then
+				for k, val in pairs(v) do
+					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
+						vv[k] = v[k]
+					end
+				end
+				v.tagged = true
+			end
+		end
+	end
+
+	for i, v in ipairs(defaultWidgets) do
+		if not v.tagged and not v.deleted then
+			tinsert(self.db.profile.bars, v)
 		end
 	end
 	
@@ -327,7 +340,11 @@ function mod:RebuildOpts()
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(db.height or defaults.height) end,
-					set = function(info, v) db.height = tonumber(v); createBars() end,
+					set = function(info, v) 
+						db.height = tonumber(v); 
+						db[k.."Dirty"] = true
+						createBars();  
+					end,
 					order = 2
 				},
 				update = {
@@ -336,7 +353,11 @@ function mod:RebuildOpts()
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(db.update or defaults.update) end,
-					set = function(info, v) db.update = tonumber(v); createBars() end,
+					set = function(info, v) 
+						db.update = tonumber(v); 
+						db[k.."Dirty"] = true						
+						createBars() 
+					end,
 					order = 3
 				},
 				--[[direction = {
@@ -365,6 +386,7 @@ function mod:RebuildOpts()
 					end,
 					set = function(info, v)
 						db.texture1 = LSM:List("statusbar")[v]
+						db[k.."Dirty"] = true						
 						createBars()
 					end,
 					order = 4
@@ -379,6 +401,7 @@ function mod:RebuildOpts()
 					end,
 					set = function(info, v) 
 						db.texture2 = LSM:List("statusbar")[v] 
+						db[k.."Dirty"] = true						
 						createBars() end,
 					order = 5
 				},
@@ -387,7 +410,11 @@ function mod:RebuildOpts()
 					desc = "This bar's anchor point. These arguments are passed to bar:SetPoint()",
 					type = "input",
 					get = function() return db.point end,
-					set = function(info, v) db.point = v; createBars() end,
+					set = function(info, v) 
+						db.point = v; 
+						db[k.."Dirty"] = true						
+						createBars() 
+					end,
 					order = 6
 				},
 				top = {
@@ -395,7 +422,11 @@ function mod:RebuildOpts()
 					desc = "Toggle whether to place the first bar on top",
 					type = "toggle",
 					get = function() return db.top end,
-					set = function(info, v) db.top = v; createBars() end,
+					set = function(info, v) 
+						db.top = v; 
+						db[k.."Dirty"] = true						
+						createBars() 
+					end,
 					order = 7
 				},
 				expression = {
@@ -405,7 +436,11 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.expression end,
-					set = function(info, v) db.expression = v; createBars() end,
+					set = function(info, v) 
+						db.expression = v; 
+						db[k.."Dirty"] = true
+						createBars() 
+					end,
 					order = 8
 				},
 				expression2 = {
@@ -415,7 +450,11 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.expression2 end,
-					set = function(info, v) db.expression2 = v ; createBars()end,
+					set = function(info, v) 
+						db.expression2 = v ; 
+						db[k.."Dirty"] = true
+						createBars()
+					end,
 					order = 9
 				},
 				min = {
@@ -425,7 +464,11 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.min end,
-					set = function(info, v) db.min = v; createBars() end,
+					set = function(info, v) 
+						db.min = v; 
+						db[k.."Dirty"] = true
+						createBars() 
+					end,
 					order = 10
 				
 				},
@@ -436,7 +479,11 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.max end,
-					set = function(info, v) db.max = v; createBars() end,
+					set = function(info, v) 
+						db.max = v; 
+						db[k.."Dirty"] = true
+						createBars() 
+					end,
 					order = 11
 				},
 				color1 = {
@@ -446,7 +493,10 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.color1 end,
-					set = function(info, v) db.color1 = v; createBars() end,
+					set = function(info, v) 
+						db.color1 = v; 
+						db[k.."Dirty"] = true
+					createBars() end,
 					order = 12
 				},
 				color2 = {
@@ -456,7 +506,11 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.color2 end,
-					set = function(info, v) db.color2 = v; createBars() end,
+					set = function(info, v) 
+						db.color2 = v; 
+						db[k.."Dirty"] = true
+						createBars() 
+					end,
 					order = 13
 				}	
 			}
