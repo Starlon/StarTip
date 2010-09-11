@@ -215,11 +215,10 @@ function createHistograms()
 			del(widget.bars[i])
 		end
 	end
-	wipe(mod.histograms)
 	local appearance = StarTip:GetModule("Appearance")	
 	for k, v in pairs(self.db.profile.histograms) do
 		if v.enabled then
-			local widget = (mod.histograms[i] and mod.histograms[i][1]) or WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
+			local widget = mod.histograms[k] or WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
 			for i = 0, v.width - 1 do				
 				local bar = new()
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
@@ -250,7 +249,7 @@ function createHistograms()
 				tinsert(widget.bars, bar)
 			end
 			if not mod.histograms then mod.histograms = {} end
-			tinsert(mod.histograms, widget)
+			mod.histograms[k] = widget
 		end
 	end
 end
@@ -330,7 +329,7 @@ function mod:SetUnit()
 end
 
 function mod:SetItem()
-	for i, widget in pairs(self.histograms) do
+	for k, widget in pairs(self.histograms) do
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Hide()
 		end
@@ -339,7 +338,7 @@ function mod:SetItem()
 end
 
 function mod:SetSpell()
-	for i, widget in pairs(self.histograms) do
+	for k, widget in pairs(self.histograms) do
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Hide()
 		end
@@ -352,7 +351,7 @@ function mod:OnHide()
 		self:CancelTimer(timer)
 		timer = nil
 	end
-	for i, widget in pairs(self.histograms) do
+	for k, widget in pairs(self.histograms) do
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Hide()
 		end
