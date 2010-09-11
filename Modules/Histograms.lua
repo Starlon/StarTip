@@ -165,21 +165,22 @@ local options = {
 	},
 }
 
-function updateHistogram(widget, hist)
-	hist:SetValue(widget.val * 100)
+function updateHistogram(widget)
+	StarTip:Print("bleh")
+	for i, hist in ipairs(widget.histograms) do
 	
-	if not widget.color then return end
-	
+		hist:SetValue(widget.history[i] * 100)
+		
+		if not widget.color then return end
+	end	
 	local r, g, b = 0, 0, 1
-	
+		
 	if widget.color.is_valid then
 		r, g, b = widget.color.res1, widget.color.res2, widget.color.res3
 	end
 	
-	if type(r) == "number" then
-		hist:SetStatusBarColor(r, g, b)
-	else
-		histogram:Hide()
+	for i = 1, #widget.history do
+		widget.histograms[i]:SetStatusBarColor(r, g, b)
 	end
 end
 
@@ -210,18 +211,20 @@ end
 
 function createHistograms()
 	if type(mod.histograms) ~= "table" then mod.histograms = {} end
-	for k, v in pairs(mod.histograms) do
-		v[1]:Del()
-		v[2]:Hide()
-		del(v[2])
+	for k, widget in pairs(mod.histograms) do
+		--v[1]:Del()
+		for i = 1, widget.width or WidgetHistogram.defaults.width do
+			widget.histograms[i]:Hide()
+			del(widget.histograms[i])
+		end
 	end
 	wipe(mod.histograms)
 	local appearance = StarTip:GetModule("Appearance")	
 	for k, v in pairs(self.db.profile.histograms) do
 		if v.enabled then
-			for i = 0, v.width - 1 do
+			local widget = (mod.histograms[i] and mod.histograms[i][1]) or WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
+			for i = 0, v.width - 1 do				
 				local histogram = new()
-				local widget = WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram, histogram) 
 				histogram:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
 				histogram:ClearAllPoints()
 				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
@@ -246,8 +249,11 @@ function createHistograms()
 				histogram:SetMinMaxValues(0, 100)
 				histogram:SetOrientation("VERTICAL")
 				histogram:Show()
-				tinsert(mod.histograms, {widget, histogram})
+				if not widget.histograms then widget.histograms = {} end
+				tinsert(widget.histograms, histogram)
 			end
+			if not mod.histograms then mod.histograms = {} end
+			tinsert(mod.histograms, widget)
 		end
 	end
 end
@@ -320,23 +326,29 @@ function mod:SetUnit()
 	GameTooltipStatusBar:Hide()
 	self.offset = 0
 	createHistograms()
-	for i, histogram in pairs(self.histograms) do
-		histogram[1]:Start()
-		histogram[2]:Show()
+	for i, widget in pairs(self.histograms) do
+		for i = 1, widget.width or WidgetHistogram.defaults.width do
+			widget.histograms[i]:Show()			
+		end
+		widget:Start()
 	end
 end
 
 function mod:SetItem()
-	for i, histogram in pairs(self.histograms) do
-		histogram[1]:Stop()
-		histogram[2]:Hide()
+	for i, widget in pairs(self.histograms) do
+		for i = 1, widget.width or WidgetHistogram.defaults.width do
+			widget.histograms[i]:Hide()
+		end
+		widget:Stop()
 	end
 end
 
 function mod:SetSpell()
-	for i, histogram in pairs(self.histograms) do
-		histogram[1]:Stop()
-		histogram[2]:Hide()
+	for i, widget in pairs(self.histograms) do
+		for i = 1, widget.width or WidgetHistogram.defaults.width do
+			widget.histograms[i]:Hide()
+		end
+		widget:Stop()
 	end
 end
 
@@ -345,9 +357,11 @@ function mod:OnHide()
 		self:CancelTimer(timer)
 		timer = nil
 	end
-	for i, histogram in pairs(self.histograms) do
-		histogram[1]:Stop()
-		histogram[2]:Hide()
+	for i, widget in pairs(self.histograms) do
+		for i = 1, widget.width or WidgetHistogram.defaults.width do
+			widget.histograms[i]:Hide()
+		end
+		widget:Stop()
 	end
 end
 
