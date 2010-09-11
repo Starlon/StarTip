@@ -146,6 +146,7 @@ local options = {
 				point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -50},
 				texture = LSM:GetDefault("statusbar"),
 				expression = "return random(100)",
+				color = "return 0, 0, 1"
 			}
 			StarTip:RebuildOpts()
 			createHistograms()
