@@ -8,7 +8,7 @@ local self = mod
 
 local defaults = {
 	profile = {
-		unitFrames = 1,
+		unitFrames = 2,
 		otherFrames = 1,
 		units = 2,
 		objects = 2,

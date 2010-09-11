@@ -41,6 +41,8 @@ local linesToAddRightG = {}
 local linesToAddRightB = {}
 local lines = {}
 
+local unit
+
 local appearance = StarTip:GetModule("Appearance")
 
 local function errorhandler(err)
@@ -87,12 +89,12 @@ local defaultLines={
         name = "UnitName",
         left = [[
 local r, g, b
-if UnitIsPlayer("mouseover") then
-    r, g, b = ClassColor("mouseover")
+if UnitIsPlayer(unit) then
+    r, g, b = ClassColor(unit)
 else
-    r, g, b = UnitSelectionColor("mouseover")
+    r, g, b = UnitSelectionColor(unit)
 end
-return GetColorCode(unitName, r, g, b)
+return GetColorCode(UnitName(unit), r, g, b)
 ]],
         right = nil,
 		bold = true,
@@ -103,19 +105,20 @@ return GetColorCode(unitName, r, g, b)
         left = 'return "Target:"',
         right = [[
 local r, g, b
-if UnitExists("mouseovertarget") then
-    if UnitIsPlayer("mouseovertarget") then
-		r, g, b = ClassColor("mouseovertarget")
+local unit = unit .. "target"
+if UnitExists(unit) then
+    if UnitIsPlayer(unit) then
+		r, g, b = ClassColor(unit)
     else
-        r, g, b = UnitSelectionColor("mouseovertarget")
+        r, g, b = UnitSelectionColor(unit)
     end
 else
 	r = 1
 	g = 1
 	b = 1
 end
-local name = UnitName("mouseovertarget")
-if name == select(1, UnitName("player")) then name = "(YOU)" end
+local name = UnitName(unit)
+if name == select(1, UnitName("player")) then name = "<<YOU>>" end
 return name and GetColorCode(name, r, g, b) or "None"
 ]],
         rightUpdating = true,
@@ -126,8 +129,8 @@ return name and GetColorCode(name, r, g, b) or "None"
         name = "Guild",
         left = 'return "Guild:"',
         right = [[
-guild = GetGuildInfo("mouseover")
-if guild then return "<" .. GetGuildInfo("mouseover") .. ">" else return unitGuild end
+guild = GetGuildInfo(unit)
+if guild then return "<" .. GetGuildInfo(unit) .. ">" else return unitGuild end
 ]],
 		enabled = true
     },
@@ -135,7 +138,7 @@ if guild then return "<" .. GetGuildInfo("mouseover") .. ">" else return unitGui
         name = "Rank",
         left = 'return "Rank:"',
         right = [[
-return select(2, GetGuildInfo("mouseover"))
+return select(2, GetGuildInfo(unit))
 ]],
 		enabled = true,
     },
@@ -143,7 +146,7 @@ return select(2, GetGuildInfo("mouseover"))
         name = "Realm",
         left = 'return "Realm:"',
         right = [[
-return select(2, UnitName("mouseover"))
+return select(2, UnitName(unit))
 ]],
 		enabled = true
     },
@@ -151,8 +154,8 @@ return select(2, UnitName("mouseover"))
         name = "Level",
         left = 'return "Level:"',
         right = [[
-lvl = UnitLevel("mouseover")
-class = UnitClassification("mouseover")
+lvl = UnitLevel(unit)
+class = UnitClassification(unit)
 
 if lvl <= 0 then
     lvl = ''
@@ -171,13 +174,13 @@ end
 return lvl
 ]],
 		enabled = true,
-		unitFrameBug = true
+		unitTimer = true
     },
     [7] = {
         name = "Race",
         left = 'return "Race:"',
         right = [[
-return (UnitIsPlayer("mouseover") and UnitRace("mouseover")) or UnitCreatureFamily("mouseover") or UnitCreatureType("mouseover")
+return (UnitIsPlayer(unit) and UnitRace(unit)) or UnitCreatureFamily(unit) or UnitCreatureType(unit)
 ]],
 		enabled = true,
     },
@@ -185,14 +188,14 @@ return (UnitIsPlayer("mouseover") and UnitRace("mouseover")) or UnitCreatureFami
         name = "Class",
         left = 'return "Class:"',
         right = [[
-if UnitClass("mouseover") == UnitName("mouseover") then return end
+if UnitClass(unit) == UnitName(unit) then return end
 local r, g, b
-if UnitIsPlayer("mouseover") then
-    r, g, b = ClassColor("mouseover")
+if UnitIsPlayer(unit) then
+    r, g, b = ClassColor(unit)
 else
     r, g, b = 1, 1, 1
 end
-return GetColorCode(UnitClass("mouseover"), r, g, b)
+return GetColorCode(UnitClass(unit), r, g, b)
 ]],
 		enabled = true,
     },
@@ -200,7 +203,7 @@ return GetColorCode(UnitClass("mouseover"), r, g, b)
         name = "Faction",
         left = 'return "Faction:"',
         right = [[
-return UnitFactionGroup("mouseover")
+return UnitFactionGroup(unit)
 ]],
 		enabled = true,
     },
@@ -208,17 +211,17 @@ return UnitFactionGroup("mouseover")
         name = "Status",
         left = 'return "Status:"',
         right = [[
-if not UnitIsConnected("mouseover") then
+if not UnitIsConnected(unit) then
     return "Offline"
 elseif unitHasAura(GetSpellInfo(19752)) then
     return "Divine Intervention"
-elseif UnitIsFeignDeath("mouseover") then
+elseif UnitIsFeignDeath(unit) then
     return "Feigned Death"
-elseif UnitIsGhost("mouseover") then
+elseif UnitIsGhost(unit) then
     return "Ghost"
-elseif UnitIsDead("mouseover") and  unitHasAura(GetSpellInfo(20707)) then
+elseif UnitIsDead(unit) and  unitHasAura(GetSpellInfo(20707)) then
     return "Soulstoned"
-elseif UnitIsDead("mouseover") then
+elseif UnitIsDead(unit) then
     return "Dead"
 end
 ]],
@@ -228,7 +231,7 @@ end
         name = "Health",
         left = 'return "Health:"',
         right = [[
-health, maxHealth = UnitHealth("mouseover"), UnitHealthMax("mouseover")
+health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
 r, g, b = HPColor(health, maxHealth)
 value = "Unknown"
 if maxHealth == 100 then
@@ -245,17 +248,17 @@ return value
     [12] = {
         name = "Mana",
         left = [[
-class = select(2, UnitClass("mouseover"))
-if not UnitIsPlayer("mouseover") then
+class = select(2, UnitClass(unit))
+if not UnitIsPlayer(unit) then
 	class = "MAGE"
 end
 
 return (powers[class] or "Mana:")
 ]],
         right = [[
-mana = UnitMana("mouseover")
-maxMana = UnitManaMax("mouseover")
-r, g, b = PowerColor(nil, "mouseover")
+mana = UnitMana(unit)
+maxMana = UnitManaMax(unit)
+r, g, b = PowerColor(nil, unit)
 value = "Unknown"
 if maxMana == 100 then
     value = GetColorCode(tostring(mana), r, g, b)
@@ -328,7 +331,7 @@ end
 	[17] = {
 		name = "Range",
 		left = [[
-local min, max = RangeCheck:GetRange("mouseover")
+local min, max = RangeCheck:GetRange(unit)
 if not min then
     return "No range info"
 elseif not max then
@@ -384,10 +387,8 @@ function mod:OnInitialize()
 
 end
 
-local function unitFrameBugFunction()
-	if UnitExists("mouseover") then
-		lines(true)
-	end
+local function unitTimerFunction()
+	lines(true)
 end
 
 local draw
@@ -398,13 +399,13 @@ function mod:OnEnable()
 	if self.db.profile.refreshRate > 0 then
 		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
 	end
-	self.unitFrameBugTimer = LibTimer:New("Funky unit frames timer", 100, false, unitFrameBugFunction, nil, StarTip.db.profile.errorLevel)
+	self.unitTimer = LibTimer:New("Funky unit frames timer", 100, false, unitTimerFunction, nil, StarTip.db.profile.errorLevel)
 end
 
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
 	if self.timer then self.timer:Del() end
-	self.unitFrameBugTimer:Del()
+	self.unitTimer:Del()
 end
 
 function mod:GetOptions()
@@ -458,12 +459,6 @@ do
 			StarTip.del(table)
 		end
 		table.wipe(fontStringsToDraw)
-		if UnitExists("mouseover") then
-			if GetMouseFocus() == UIParent then
-				GameTooltip:Hide()
-			end
-			GameTooltip:Show()
-		end
 	end
 end
 
@@ -478,13 +473,28 @@ function mod:CreateLines()
 			llines[j].config = copy(v)
 		end
     end
-    lines = setmetatable(llines, {__call=function(self)
+    lines = setmetatable(llines, {__call=function(self, unitTimer)
+		environment.unit = "mouseover"
+		if UnitInRaid("player") then
+			local txt = ''
+			for i=1, GetNumRaidMembers() do
+				StarTip:Print(unit)
+				if UnitGUID(unit) == UnitGUID("raid" .. i) then
+					environment.unit = "raid" .. i
+				end
+			end
+			if txt ~= '' then
+				GameTooltip:AddLine("Targeting: " .. txt, .5, .5, 1, 1)
+			end
+		end
+		
+
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
 			if v.enabled and not v.deleted then
                 local left, right, c, cc = '', ''
-                if v.right and v.right ~= "" then
+                if v.right and v.right ~= "" then					
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
@@ -494,7 +504,7 @@ function mod:CreateLines()
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end
 
-                if left and left ~= "" and right ~= "nil" or (GetMouseFocus() ~= UIParent and v.unitFrameBug and unitFrameBug) then
+                if left and left ~= "" and right ~= "nil" then
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
@@ -583,6 +593,7 @@ function mod:CreateLines()
         --mod.NUM_LINES = lineNum
 	mod:RefixEndLines()
 	draw()
+	GameTooltip:Show()
     end})
 end
 
@@ -1058,6 +1069,7 @@ end
 
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
+	unit = GameTooltip:GetUnit()
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 
 	environment.unitName, environment.unitGuild, environment.unitLocation = UnitStats.GetUnitStats("mouseover")
@@ -1113,15 +1125,20 @@ function mod:SetUnit()
     end
     -- End
 
-    lines()
-
 	if self.db.profile.refreshRate > 0 and self.timer then
 		self.timer:Start()
 	end
-
-	if GetMouseFocus() ~= UIParent and self.unitFrameBugTimer then
-		self.unitFrameBugTimer:Start()
-	end
+		
+	self.unitTimer:Start()
+	
+	lines()
+	
+	GameTooltip:Show()
+	
+	--[[if GetMouseFocus() ~= UIParent and self.unitTimer then
+		StarTip:Print(GetMouseFocus())
+		self.unitTimer:Start()
+	end]]
 end
 
 function mod:RefixEndLines()
