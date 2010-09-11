@@ -166,7 +166,6 @@ local options = {
 }
 
 function updateHistogram(widget)
-	StarTip:Print("bleh")
 	for i = 1, #widget.history do
 		local bar = widget.bars[i] 
 		local segment = widget.history[i]
