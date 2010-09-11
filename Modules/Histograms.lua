@@ -140,11 +140,12 @@ local options = {
 				type = "histogram",
 				min = "return 0",
 				max = "return 100",
-				height = 6,
+				height = WidgetHistogram.defaults.height,
+				width = WidgetHistogram.defaults.width,
 				enabled = true,
-				point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
+				point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -50},
 				texture = LSM:GetDefault("statusbar"),
-				expression = ""
+				expression = "return random(100)",
 			}
 			StarTip:RebuildOpts()
 			createHistograms()
@@ -228,11 +229,11 @@ function createHistograms()
 				local bar = new()
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
 				bar:ClearAllPoints()
-				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
+				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)-- or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
 				if (v.width > 100) then
 					arg4 = (arg4 or 0) + i * (v.width / 100)
 				else
-					arg4 = (arg4 or 0) + i * (v.width or 6)
+					arg4 = (arg4 or 0) + i * v.width
 				end
 				arg5 = (arg5 or 0)
 				bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
@@ -501,7 +502,7 @@ function mod:RebuildOpts()
 							type = "input",
 							pattern = "%d",
 							get = function() return tostring(db.point[4] or 0) end,
-							set = function(info, v) db.point[4] = tonumber(anchors[v]); clearHistograms(); createHistograms() end,
+							set = function(info, v) db.point[4] = tonumber(v); clearHistograms(); createHistograms() end,
 							order = 4
 						},
 						yOfs = {
@@ -509,7 +510,7 @@ function mod:RebuildOpts()
 							type = "input",
 							pattern = "%d",
 							get = function() return tostring(db.point[5] or 0) end,
-							set = function(info, v) db.point[5] = tonumber(anchors[v]); clearHistograms();createHistograms() end,
+							set = function(info, v) db.point[5] = tonumber(v); clearHistograms();createHistograms() end,
 							order = 4						
 						}
 					},
