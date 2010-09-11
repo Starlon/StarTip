@@ -2,6 +2,7 @@ local mod = StarTip:NewModule("Histograms", "AceTimer-3.0")
 mod.name = "Histograms"
 mod.toggled = true
 mod.childGroup = true
+mod.defaultOff = true
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip
@@ -52,8 +53,6 @@ local defaultWidgets = {
 	["widget_mem_histogram"] = {
 		type = "histogram",
 		expression = [[
-num = random(100)
-do return num end
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 
 if mem then
@@ -66,7 +65,7 @@ local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
     memperc = (memdiff / totaldiff * 100)
-    --local num = floor(memperc + 0.5)
+    local num = floor(memperc + 0.5)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
@@ -76,15 +75,49 @@ end
 ]],
 		min = "return 0",
 		max = "return 100",
-		enabled = false,
+		enabled = true,
 		reversed = true,
 		char = "0",
 		width = 10,
 		height = 50,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12},
 		layer = 1,
-		update = 500
+		update = 1000
 	},
+	["widget_cpu_histogram"] = {
+		type = "histogram",
+		expression = [[
+local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+if cpu then
+    if totaldiff == 0 then totaldiff = .001 end
+    return cpudiff / totaldiff * 100
+end
+]],
+		color = [[
+local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+if cpu then
+    if totaldiff == 0 then totaldiff = 1 end
+    cpuperc = (cpudiff / totaldiff * 100)
+    local num = floor(cpuperc)
+    if num < 1 then num = 1 end
+    if num > 100 then num = 100 end
+    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    return r, g, b
+end
+
+]],
+		min = "return 0",
+		max = "return 100",
+		enabled = true,
+		reversed = true,
+		char = "0",
+		width = 10,
+		height = 50,
+		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -12},
+		layer = 1,
+		update = 1000
+	},
+	
 }
 
 local defaults = {
@@ -241,7 +274,7 @@ function mod:OnInitialize()
 
 	for i, v in ipairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
-			tinsert(self.db.profile.bars, v)
+			tinsert(self.db.profile.histograms, v)
 		end
 	end
 	
