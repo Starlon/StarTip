@@ -50,6 +50,11 @@ local function copy(tbl)
 end
 
 local function clearHistograms()
+	for k, widget in pairs(mod.histograms or {}) do
+		for i = 1, #widget.bars do
+			widget.bars[i]:SetValue(0)
+		end
+	end
 	wipe(mod.histograms or {})
 end
 
@@ -181,7 +186,7 @@ function updateHistogram(widget)
 			local r, g, b, a = widget.history[i][2], widget.history[i][3], widget.history[i][4]
 			bar:SetStatusBarColor(r, g, b, a)
 		elseif type(segment) == "number" then
-			bar:SetValue(segment * 100)
+			bar:SetValue(0) --segment * 100)
 			bar:SetStatusBarColor(0, 0, 1, 1)
 		end
 	end
@@ -215,11 +220,13 @@ end
 function createHistograms()
 	if type(mod.histograms) ~= "table" then mod.histograms = {} end
 	for k, widget in pairs(mod.histograms) do
-		--v[1]:Del()
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Hide()
-			del(widget.bars[i])
+			if widget.bars[i] then
+				del(widget.bars[i])
+			end
 		end
+		wipe(widget.bars)
 	end
 	local appearance = StarTip:GetModule("Appearance")	
 	for k, v in pairs(self.db.profile.histograms) do
@@ -424,6 +431,15 @@ function mod:RebuildOpts()
 					end,
 					order = 3
 				},
+				layer = {
+					name = "Histogram Layer",
+					desc = "Enter the histogram's layer",
+					type = "input",
+					pattern = "%d",
+					get = function() return tostring(db.layer or 0) end,
+					set = function(info, v) db.layer = tonumber(v) end,
+					order = 4
+				},
 				update = {
 					name = "Histogram update rate",
 					desc = "Enter the histogram's refresh rate",
@@ -436,7 +452,7 @@ function mod:RebuildOpts()
 						clearHistograms()
 						createHistograms() 
 					end,
-					order = 3
+					order = 5
 				},
 				--[[direction = {
 					name = "Histogram direction",
@@ -468,7 +484,7 @@ function mod:RebuildOpts()
 						clearHistograms()
 						createHistograms()
 					end,
-					order = 4
+					order = 6
 				},
 				point = {
 					name = "Anchor Points",
