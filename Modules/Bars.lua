@@ -15,18 +15,34 @@ local timer
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetBar = LibStub("StarLibWidgetBar-1.0")
 local LibCore = LibStub("StarLibCore-1.0")
+local Utils = LibStub("StarLibUtils-1.0")
 
+local anchors = {
+	"TOP",
+	"TOPRIGHT",
+	"TOPLEFT",
+	"BOTTOM",
+	"BOTTOMRIGHT",
+	"BOTTOMLEFT",
+	"RIGHT",
+	"LEFT",
+	"CENTER"
+}
+
+local anchorsDict = {}
+
+for i, v in ipairs(anchors) do
+	anchorsDict[v] = i
+end
 
 local createBars
 local widgets = {}
 
 local function copy(tbl)
+	if type(tbl) ~= "table" then return tbl end
 	local newTbl = {}
 	for k, v in pairs(tbl) do
-		if type(v) == "table" then
-			v = copy(v)
-		end
-		newTbl[k] = v
+		newTbl[k] = copy(v)
 	end
 	return newTbl
 end
@@ -52,7 +68,8 @@ end
 		height = 6,
 		point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
 		texture1 = LSM:GetDefault("statusbar"),
-		enabled = true
+		enabled = true,
+		layer = 1
 	},
 	["Mana Bar"] = {
 		type = "bar",
@@ -69,7 +86,8 @@ return PowerColor(nil, "mouseover")
 		height = 6,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT"},
 		texture1 = LSM:GetDefault("statusbar"),
-		enabled = true
+		enabled = true,
+		layer = 1
 	},
 	
 
@@ -121,14 +139,12 @@ local options = {
 
 function updateBar(widget, bar)
 	bar:SetValue(widget.val1 * 100)
-	
-	if not widget.color1 then return end
-	
+		
 	local r, g, b = 0, 0, 1
 	
-	if widget.bar1 then
+	if widget.color1 and widget.bar1 then
 		r, g, b = widget.color1.res1, widget.color1.res2, widget.color1.res3
-	elseif widget.color2.is_valid then
+	elseif widget.color2 and widget.color2.is_valid then
 		r, g, b = widget.color2.res1, widget.color2.res2, widget.color2.res3
 	end
 	
@@ -164,6 +180,14 @@ do
 	end
 end
 
+local defaultPoint = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}
+	
+local strataNameList = {
+	"BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG", "TOOLTIP"
+}
+
+local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Fullscreen", "Fullscreen Dialog", "Tooltip"}
+
 function createBars()
 	if type(mod.bars) ~= "table" then mod.bars = {} end
 	for k, v in pairs(mod.bars) do
@@ -173,13 +197,14 @@ function createBars()
 	end
 	wipe(mod.bars)
 	local appearance = StarTip:GetModule("Appearance")	
-	for k, v in pairs(self.db.profile.bars) do
+	for k, v in pairs(copy(self.db.profile.bars)) do
 		if v.enabled then
+			
 			local bar = new()
-			local widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+			local widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
 			bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 			bar:ClearAllPoints()
-			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
+			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
 			arg4 = (arg4 or 0)
 			arg5 = (arg5 or 0)
 			bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
@@ -192,15 +217,16 @@ function createBars()
 			bar:SetHeight(v.height)
 			bar:SetMinMaxValues(0, 100)
 			bar:Show()
+			bar:SetFrameStrata(strataNameList[widget.layer])
 			widget.bar1 = true
 			tinsert(mod.bars, {widget, bar})
 			
 			if v.expression2 then
 				bar = new()
-				widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateBar, bar)
+				widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
 				bar:ClearAllPoints()
-				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
+				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
 				arg4 = (arg4 or 0)
 				if v.top then
 					arg5 = (arg5 or 0) - (v.height or 12)
@@ -217,6 +243,7 @@ function createBars()
 				bar:SetHeight(v.height)
 				bar:SetMinMaxValues(0, 100)
 				bar:Show()
+				bar:SetFrameStrata(strataNameList[widget.layer])
 				tinsert(mod.bars, {widget, bar})
 			end
 		end
@@ -230,8 +257,8 @@ function mod:OnInitialize()
 		self.db.profile.bars = {}
 	end
 	
-	for k, v in pairs(defaultWidgets) do
-		for kk, vv in pairs(self.db.profile.bars) do
+	for i, v in ipairs(defaultWidgets) do
+		for j, vv in ipairs(self.db.profile.lines) do
 			if v.name == vv.name then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
@@ -243,6 +270,25 @@ function mod:OnInitialize()
 		end
 	end
 
+	for i, v in ipairs(defaultWidgets) do
+		if not v.tagged and not v.deleted then
+			tinsert(self.db.profile.bars, v)
+		end
+	end
+--[[	
+	for k, v in pairs(defaultWidgets) do
+		for kk, vv in pairs(self.db.profile.bars) do
+			if v.name == vv.name then
+				for k, val in pairs(v) do
+					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
+						vv[k] = copy(v[k])
+					end
+				end
+				v.tagged = true
+			end
+		end
+	end
+]]
 	for k, v in pairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
 			self.db.profile.bars[k] = copy(v)
@@ -250,8 +296,6 @@ function mod:OnInitialize()
 	end
 	
 	self.core = LibCore:New(mod, StarTip.environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)		
-	
-	self.offset = 0	
 	
 	StarTip:SetOptionsDisabled(options, true)
 
@@ -289,7 +333,6 @@ end
 
 function mod:SetUnit()
 	GameTooltipStatusBar:Hide()
-	self.offset = 0
 	createBars()
 	for i, bar in pairs(self.bars) do
 		bar[1]:Start()
@@ -339,6 +382,18 @@ function mod:RebuildOpts()
 			type="group",
 			order = 6,
 			args={
+				enabled = {
+					name = "Enabled",
+					desc = "Whether this bar is enabled or not",
+					type = "toggle",
+					get = function() return db.enabled end,
+					set = function(info, v)
+						db.enabled = v
+						db["enabledDirty"] = true
+						createBars()
+					end,
+					order = 1
+				},
 				height = {
 					name = "Bar height",
 					desc = "Enter the bar's height",
@@ -347,7 +402,7 @@ function mod:RebuildOpts()
 					get = function() return tostring(db.height or defaults.height) end,
 					set = function(info, v) 
 						db.height = tonumber(v); 
-						db[k.."Dirty"] = true
+						db["heightDirty"] = true
 						createBars();  
 					end,
 					order = 2
@@ -360,7 +415,7 @@ function mod:RebuildOpts()
 					get = function() return tostring(db.update or defaults.update) end,
 					set = function(info, v) 
 						db.update = tonumber(v); 
-						db[k.."Dirty"] = true						
+						db["updateDirty"] = true						
 						createBars() 
 					end,
 					order = 3
@@ -391,7 +446,7 @@ function mod:RebuildOpts()
 					end,
 					set = function(info, v)
 						db.texture1 = LSM:List("statusbar")[v]
-						db[k.."Dirty"] = true						
+						db["texture1Dirty"] = true						
 						createBars()
 					end,
 					order = 4
@@ -406,21 +461,64 @@ function mod:RebuildOpts()
 					end,
 					set = function(info, v) 
 						db.texture2 = LSM:List("statusbar")[v] 
-						db[k.."Dirty"] = true						
+						db["texture2Dirty"] = true						
 						createBars() end,
 					order = 5
+				},
+				strata = {
+					name = "Strata",
+					type = "select",
+					values = strataLocaleList,
+					get = function() return db.strata end,
+					set = function(info, v) db.strata = v end,
+					order = 6
 				},
 				point = {
 					name = "Anchor Points",
 					desc = "This bar's anchor point. These arguments are passed to bar:SetPoint()",
-					type = "input",
-					get = function() return db.point end,
-					set = function(info, v) 
-						db.point = v; 
-						db[k.."Dirty"] = true						
-						createBars() 
-					end,
-					order = 6
+					type = "group",
+					args = {
+						point = {
+							name = "Bar anchor",
+							type = "select",
+							values = anchors,
+							get = function() return anchorsDict[db.point[1] or 1] end,
+							set = function(info, v) db.point[1] = anchors[v] end,
+							order = 1
+						},
+						relativeFrame = {
+							name = "Relative Frame",
+							type = "input",
+							get = function() return db.point[2] end,
+							set = function(info, v) db.point[2] = v end,
+							order = 2
+						},
+						relativePoint = {
+							name = "Relative Point",
+							type = "select",
+							values = anchors,
+							get = function() return anchorsDict[db.point[3] or 1] end,
+							set = function(info, v) db.point[3] = anchors[v] end,
+							order = 3
+						},
+						xOfs = {
+							name = "X Offset",
+							type = "input",
+							pattern = "%d",
+							get = function() return tostring(db.point[4] or 0) end,
+							set = function(info, v) db.point[4] = tonumber(anchors[v]) end,
+							order = 4
+						},
+						yOfs = {
+							name = "Y Offset",
+							type = "input",
+							pattern = "%d",
+							get = function() return tostring(db.point[5] or 0) end,
+							set = function(info, v) db.point[5] = tonumber(anchors[v]) end,
+							order = 4						
+						}
+					},
+					order = 7
 				},
 				top = {
 					name = "First is Top",
@@ -429,10 +527,10 @@ function mod:RebuildOpts()
 					get = function() return db.top end,
 					set = function(info, v) 
 						db.top = v; 
-						db[k.."Dirty"] = true						
+						db["topDirty"] = true						
 						createBars() 
 					end,
-					order = 7
+					order = 8
 				},
 				expression = {
 					name = "Bar expression",
@@ -443,10 +541,10 @@ function mod:RebuildOpts()
 					get = function() return db.expression end,
 					set = function(info, v) 
 						db.expression = v; 
-						db[k.."Dirty"] = true
+						db["expressionDirty"] = true
 						createBars() 
 					end,
-					order = 8
+					order = 9
 				},
 				expression2 = {
 					name = "Bar second expression",
@@ -457,10 +555,10 @@ function mod:RebuildOpts()
 					get = function() return db.expression2 end,
 					set = function(info, v) 
 						db.expression2 = v ; 
-						db[k.."Dirty"] = true
+						db["expressionDirty"] = true
 						createBars()
 					end,
-					order = 9
+					order = 10
 				},
 				min = {
 					name = "Bar min expression",
@@ -471,10 +569,10 @@ function mod:RebuildOpts()
 					get = function() return db.min end,
 					set = function(info, v) 
 						db.min = v; 
-						db[k.."Dirty"] = true
+						db["minDirty"] = true
 						createBars() 
 					end,
-					order = 10
+					order = 11
 				
 				},
 				max = {
@@ -486,10 +584,10 @@ function mod:RebuildOpts()
 					get = function() return db.max end,
 					set = function(info, v) 
 						db.max = v; 
-						db[k.."Dirty"] = true
+						db["maxDirty"] = true
 						createBars() 
 					end,
-					order = 11
+					order = 12
 				},
 				color1 = {
 					name = "First bar color script",
@@ -500,9 +598,9 @@ function mod:RebuildOpts()
 					get = function() return db.color1 end,
 					set = function(info, v) 
 						db.color1 = v; 
-						db[k.."Dirty"] = true
+						db["color1Dirty"] = true
 					createBars() end,
-					order = 12
+					order = 13
 				},
 				color2 = {
 					name = "Second bar color script",
@@ -513,7 +611,7 @@ function mod:RebuildOpts()
 					get = function() return db.color2 end,
 					set = function(info, v) 
 						db.color2 = v; 
-						db[k.."Dirty"] = true
+						db["color2Dirty"] = true
 						createBars() 
 					end,
 					order = 13

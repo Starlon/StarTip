@@ -19,6 +19,24 @@ local LibCore = LibStub("StarLibCore-1.0")
 local createHistograms
 local widgets = {}
 
+local anchors = {
+	"TOP",
+	"TOPRIGHT",
+	"TOPLEFT",
+	"BOTTOM",
+	"BOTTOMRIGHT",
+	"BOTTOMLEFT",
+	"RIGHT",
+	"LEFT",
+	"CENTER"
+}
+
+local anchorsDict = {}
+
+for i, v in ipairs(anchors) do
+	anchorsDict[v] = i
+end
+
 local function copy(tbl)
 	local newTbl = {}
 	for k, v in pairs(tbl) do
@@ -34,7 +52,8 @@ local defaultWidgets = {
 	["widget_mem_histogram"] = {
 		type = "histogram",
 		expression = [[
-do return random(100) end
+num = random(100)
+do return num end
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 
 if mem then
@@ -43,12 +62,12 @@ if mem then
 end
 ]],
 		color = [[
+do return ColorGradient((num or 0)) end
 local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
     memperc = (memdiff / totaldiff * 100)
-	do return ColorGradient(memperc) end
-    local num = floor(memperc + 0.5)
+    --local num = floor(memperc + 0.5)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
@@ -128,7 +147,7 @@ function updateHistogram(widget, hist)
 	if type(r) == "number" then
 		hist:SetStatusBarColor(r, g, b)
 	else
-		--histogram:Hide()
+		histogram:Hide()
 	end
 end
 
@@ -208,9 +227,9 @@ function mod:OnInitialize()
 		self.db.profile.histograms = {}
 	end
 	
-	for k, v in ipairs(defaultWidgets) do
-		for kk, vv in ipairs(self.db.profile.histograms) do
-			if k == kk then
+	for i, v in ipairs(defaultWidgets) do
+		for j, vv in ipairs(self.db.profile.lines) do
+			if v.name == vv.name then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
 						vv[k] = v[k]
@@ -221,9 +240,9 @@ function mod:OnInitialize()
 		end
 	end
 
-	for k, v in pairs(defaultWidgets) do
+	for i, v in ipairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
-			self.db.profile.histograms[k] = copy(v)
+			tinsert(self.db.profile.bars, v)
 		end
 	end
 	
@@ -322,7 +341,12 @@ function mod:RebuildOpts()
 					desc = "Toggle whether this histogram is enabled or not",
 					type = "toggle",
 					get = function() return db.enabled end,
-					set = function(info, v) db.enabled = v end,
+					set = function(info, v) 
+						db.enabled = v 
+						db["enabledDirty"] = true
+						createHistograms()
+						StarTip:RebuildOpts()
+					end,
 					order = 1
 				},
 				height = {
@@ -333,8 +357,9 @@ function mod:RebuildOpts()
 					get = function() return tostring(db.height or defaults.height) end,
 					set = function(info, v) 
 						db.height = tonumber(v); 
-						db[k.."Dirty"] = true
+						db["heightDirty"] = true
 						createHistograms();  
+						StarTip:RebuildOpts()
 					end,
 					order = 2
 				},
@@ -346,8 +371,9 @@ function mod:RebuildOpts()
 					get = function() return tostring(db.update or defaults.update) end,
 					set = function(info, v) 
 						db.update = tonumber(v); 
-						db[k.."Dirty"] = true						
+						db["updateDirty"] = true						
 						createHistograms() 
+						StarTip:RebuildOpts()
 					end,
 					order = 3
 				},
@@ -356,7 +382,7 @@ function mod:RebuildOpts()
 					type = "select",
 					values = WidgetHistogram.directionList,
 					get = function() return db.direction or defaults.direction end,
-					set = function(info, v) db.direction = v; createHistograms() end,
+					set = function(info, v) db.direction = v; createHistograms()StarTip:RebuildOpts() end,
 					order = 4
 				},
 				style = {
@@ -364,7 +390,7 @@ function mod:RebuildOpts()
 					type = "select",
 					values = WidgetHistogram.styleList,
 					get = function() return db.style or defaults.style end,
-					set = function(info, v) db.style = v; createHistograms() end,
+					set = function(info, v) db.style = v; createHistograms()StarTip:RebuildOpts() end,
 					order = 5
 				},]]
 				texture = {
@@ -377,23 +403,58 @@ function mod:RebuildOpts()
 					end,
 					set = function(info, v)
 						db.texture = LSM:List("statusbar")[v]
-						db[k.."Dirty"] = true						
+						db["textureDirty"] = true						
 						createHistograms()
+						StarTip:RebuildOpts()
 					end,
 					order = 4
 				},
 				point = {
 					name = "Anchor Points",
-					desc = "This histogram's anchor point. These arguments are passed to histogram:SetPoint()",
-					type = "input",
-					width = "full",
-					get = function() return db.point end,
-					set = function(info, v) 
-						db.point = v; 
-						db[k.."Dirty"] = true						
-						createHistograms() 
-					end,
-					order = 6
+					desc = "This histogram's anchor point. These arguments are passed to bar:SetPoint()",
+					type = "group",
+					args = {
+						point = {
+							name = "Bar anchor",
+							type = "select",
+							values = anchors,
+							get = function() return anchorsDict[db.point[1] or 1] end,
+							set = function(info, v) db.point[1] = anchors[v];createHistograms() end,
+							order = 1
+						},
+						relativeFrame = {
+							name = "Relative Frame",
+							type = "input",
+							get = function() return db.point[2] end,
+							set = function(info, v) db.point[2] = v;createHistograms() end,
+							order = 2
+						},
+						relativePoint = {
+							name = "Relative Point",
+							type = "select",
+							values = anchors,
+							get = function() return anchorsDict[db.point[3] or 1] end,
+							set = function(info, v) db.point[3] = anchors[v];createHistograms() end,
+							order = 3
+						},
+						xOfs = {
+							name = "X Offset",
+							type = "input",
+							pattern = "%d",
+							get = function() return tostring(db.point[4] or 0) end,
+							set = function(info, v) db.point[4] = tonumber(anchors[v]);createHistograms() end,
+							order = 4
+						},
+						yOfs = {
+							name = "Y Offset",
+							type = "input",
+							pattern = "%d",
+							get = function() return tostring(db.point[5] or 0) end,
+							set = function(info, v) db.point[5] = tonumber(anchors[v]);createHistograms() end,
+							order = 4						
+						}
+					},
+					order = 7
 				},
 				expression = {
 					name = "Histogram expression",
@@ -404,8 +465,9 @@ function mod:RebuildOpts()
 					get = function() return db.expression end,
 					set = function(info, v) 
 						db.expression = v; 
-						db[k.."Dirty"] = true
+						db["expressionDirty"] = true
 						createHistograms() 
+						StarTip:RebuildOpts()
 					end,
 					order = 8
 				},
@@ -418,8 +480,9 @@ function mod:RebuildOpts()
 					get = function() return db.min end,
 					set = function(info, v) 
 						db.min = v; 
-						db[k.."Dirty"] = true
+						db["minDirty"] = true
 						createHistograms() 
+						StarTip:RebuildOpts()
 					end,
 					order = 10
 				
@@ -433,8 +496,9 @@ function mod:RebuildOpts()
 					get = function() return db.max end,
 					set = function(info, v) 
 						db.max = v; 
-						db[k.."Dirty"] = true
+						db["maxDirty"] = true
 						createHistograms() 
+						StarTip:RebuildOpts()
 					end,
 					order = 11
 				},
@@ -447,10 +511,23 @@ function mod:RebuildOpts()
 					get = function() return db.color end,
 					set = function(info, v) 
 						db.color = v; 
-						db[k.."Dirty"] = true
-					createHistograms() end,
+						db["colorDirty"] = true
+						createHistograms() 
+						StarTip:RebuildOpts()
+					end,
 					order = 12
 				},
+				delete = {
+					name = "Delete",
+					desc = "Delete this widget",
+					type = "execute",
+					func = function()
+						self.db.profile.histograms[k] = nil
+						createHistograms()
+						StarTip:RebuildOpts()
+					end,
+					order = 13
+				}
 			}
 		}
 	end
