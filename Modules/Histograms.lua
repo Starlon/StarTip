@@ -62,7 +62,6 @@ if mem then
 end
 ]],
 		color = [[
-do return ColorGradient((num or 0)) end
 local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
