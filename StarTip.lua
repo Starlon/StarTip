@@ -515,7 +515,17 @@ function StarTip:OpenConfig()
 end
 	
 function StarTip.OnTooltipSetUnit()	
-	StarTip.unit = GameTooltip:GetUnit()
+	StarTip.unit = "mouseover"
+	if UnitInRaid("player") then
+		for i=1, GetNumRaidMembers() do
+			if GameTooltip:GetUnit() == UnitName("raid" .. i) then
+				StarTip.unit = "raid" .. i
+			end
+		end
+	--elseif UnitInParty("player") then
+		
+	end
+
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
