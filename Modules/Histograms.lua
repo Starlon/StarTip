@@ -134,6 +134,9 @@ end
 		width = 10,
 		height = 50,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -65},
+		color = [[
+return HPColor(UnitHealth("player"), UnitHealthMax("player"))
+]],
 		layer = 1,
 		update = 1000
 	},
@@ -145,6 +148,9 @@ end
 		width = 10,
 		height = 50,
 		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -65},
+		color = [[
+return PowerColor("RAGE", "player")
+]],
 		layer = 1,
 		update = 1000
 	}
