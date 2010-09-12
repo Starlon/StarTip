@@ -515,6 +515,7 @@ function StarTip:OpenConfig()
 end
 	
 function StarTip.OnTooltipSetUnit()	
+	StarTip.unit = GameTooltip:GetUnit()
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
