@@ -126,7 +126,28 @@ end
 		layer = 1,
 		update = 1000
 	},
-	
+	["widget_health_histogram"] = {
+		expression = "return UnitHealth('player')",
+		min = "return 0",
+		max = "return UnitHealthMax('player')",
+		enabled = true,
+		width = 10,
+		height = 50,
+		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -65},
+		layer = 1,
+		update = 1000
+	},
+	["widget_mana_histogram"] = {
+		expression = "return UnitMana('player')",
+		min = "return 0",
+		max = "return UnitManaMax('player')",
+		enabled = true,
+		width = 10,
+		height = 50,
+		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -65},
+		layer = 1,
+		update = 1000
+	}
 }
 
 local defaults = {
@@ -258,6 +279,7 @@ function createHistograms()
 				bar:SetHeight(v.height)
 				bar:SetMinMaxValues(0, 100)
 				bar:SetOrientation("VERTICAL")
+				bar:SetValue(0)
 				bar:Show()
 				if not widget.bars then widget.bars = {} end
 				tinsert(widget.bars, bar)
@@ -274,9 +296,9 @@ function mod:OnInitialize()
 	if not self.db.profile.histograms then
 		self.db.profile.histograms = {}
 	end
-	
+		
 	for i, v in ipairs(defaultWidgets) do
-		for j, vv in ipairs(self.db.profile.lines) do
+		for j, vv in ipairs(self.db.profile.histograms) do
 			if v.name == vv.name then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
