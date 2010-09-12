@@ -1097,8 +1097,8 @@ function mod:SetUnit()
 
     lastLine = lastLine + 1
 
-	lines()
-	
+	GameTooltip:ClearLines()
+		
 	wipe(linesToAdd)
 	wipe(linesToAddR)
 	wipe(linesToAddG)
@@ -1129,8 +1129,10 @@ function mod:SetUnit()
 	if self.db.profile.refreshRate > 0 and self.timer then
 		self.timer:Start()
 	end
+
+	lines()
 		
-	self.unitTimer:Start()
+	--self.unitTimer:Start()
 		
 	GameTooltip:Show()
 	
