@@ -478,7 +478,6 @@ function mod:CreateLines()
 		if UnitInRaid("player") then
 			local txt = ''
 			for i=1, GetNumRaidMembers() do
-				StarTip:Print(unit)
 				if UnitGUID(unit) == UnitGUID("raid" .. i) then
 					environment.unit = "raid" .. i
 				end
@@ -1098,6 +1097,8 @@ function mod:SetUnit()
 
     lastLine = lastLine + 1
 
+	lines()
+	
 	wipe(linesToAdd)
 	wipe(linesToAddR)
 	wipe(linesToAddG)
@@ -1130,15 +1131,9 @@ function mod:SetUnit()
 	end
 		
 	self.unitTimer:Start()
-	
-	lines()
-	
+		
 	GameTooltip:Show()
 	
-	--[[if GetMouseFocus() ~= UIParent and self.unitTimer then
-		StarTip:Print(GetMouseFocus())
-		self.unitTimer:Start()
-	end]]
 end
 
 function mod:RefixEndLines()
