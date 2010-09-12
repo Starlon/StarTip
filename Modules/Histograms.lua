@@ -89,7 +89,7 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12},
+		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -65},
 		layer = 1,
 		update = 1000
 	},
@@ -122,7 +122,7 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -12},
+		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -65},
 		layer = 1,
 		update = 1000
 	},
@@ -133,7 +133,7 @@ end
 		enabled = true,
 		width = 10,
 		height = 50,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -65},
+		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12},
 		color = [[
 return HPColor(UnitHealth("player"), UnitHealthMax("player"))
 ]],
@@ -147,7 +147,7 @@ return HPColor(UnitHealth("player"), UnitHealthMax("player"))
 		enabled = true,
 		width = 10,
 		height = 50,
-		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -65},
+		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -12},
 		color = [[
 return PowerColor("RAGE", "player")
 ]],
