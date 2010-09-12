@@ -28,7 +28,7 @@ local select = _G.select
 local format = _G.format
 local floor = _G.floor
 local tostring = _G.tostring
-local environment = StarTip.environment
+local environment = {}
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local factionList = {}
 local linesToAdd = {}
@@ -376,8 +376,8 @@ function mod:OnInitialize()
     self:RegisterEvent("UPDATE_FACTION")
     StarTip:SetOptionsDisabled(options, true)
 
-	--self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
-	self.core = StarTip.core
+	self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
+	--self.core = StarTip.core
 	if ResourceServer then ResourceServer:New(environment) end
 	--self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
 	--self.core.lcd = self.lcd
@@ -403,7 +403,7 @@ end
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
 	if self.timer then self.timer:Del() end
-ad
+end
 
 function mod:GetOptions()
     self:RebuildOpts()
@@ -473,24 +473,20 @@ function mod:CreateLines()
     lines = setmetatable(llines, {__call=function(self, unitTimer)
 		environment.unit = "mouseover"
 		if UnitInRaid("player") then
-			local txt = ''
 			for i=1, GetNumRaidMembers() do
-				if UnitGUID(unit) == UnitGUID("raid" .. i) then
+				if UnitGUID("mouseover") == UnitGUID("raid" .. i) then
 					environment.unit = "raid" .. i
 				end
 			end
-			if txt ~= '' then
-				GameTooltip:AddLine("Targeting: " .. txt, .5, .5, 1, 1)
-			end
 		end
-		
+
 
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
 			if v.enabled and not v.deleted then
                 local left, right, c, cc = '', ''
-                if v.right and v.right ~= "" then					
+                if v.right and v.right ~= "" then
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
@@ -1092,7 +1088,7 @@ function mod:SetUnit()
     end
 
     lastLine = lastLine + 1
-		
+
 	wipe(linesToAdd)
 	wipe(linesToAddR)
 	wipe(linesToAddG)
@@ -1121,20 +1117,20 @@ function mod:SetUnit()
     -- End
 
 	lines()
-		
+
 	self:RefixEndLines()
-	
+
 	GameTooltip:Show()
 
 	if self.db.profile.refreshRate > 0 and self.timer then
 		self.timer:Start()
-	end	
+	end
 end
 
 function mod:RefixEndLines()
     -- Another part taken from CowTip
     for i, left in ipairs(linesToAdd) do
-		
+
         local right = linesToAddRight[i]
         if right then
             GameTooltip:AddDoubleLine(left, right, linesToAddR[i], linesToAddG[i], linesToAddB[i], linesToAddRightR[i], linesToAddRightG[i], linesToAddRightB[i])

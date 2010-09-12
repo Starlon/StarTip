@@ -17,6 +17,9 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetHistogram = LibStub("StarLibWidgetHistogram-1.0")
 local LibCore = LibStub("StarLibCore-1.0")
 
+local unit 
+local environment = {}
+
 local createHistograms
 local widgets = {}
 
@@ -127,29 +130,29 @@ end
 		update = 1000
 	},
 	["widget_health_histogram"] = {
-		expression = "return UnitHealth('player')",
+		expression = "return UnitHealth(unit)",
 		min = "return 0",
-		max = "return UnitHealthMax('player')",
+		max = "return UnitHealthMax(unit)",
 		enabled = true,
 		width = 10,
 		height = 50,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12},
 		color = [[
-return HPColor(UnitHealth("player"), UnitHealthMax("player"))
+return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 ]],
 		layer = 1,
 		update = 1000
 	},
 	["widget_mana_histogram"] = {
-		expression = "return UnitMana('player')",
+		expression = "return UnitMana(unit)",
 		min = "return 0",
-		max = "return UnitManaMax('player')",
+		max = "return UnitManaMax(unit)",
 		enabled = true,
 		width = 10,
 		height = 50,
 		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -12},
 		color = [[
-return PowerColor("RAGE", "player")
+return PowerColor("RAGE", unit)
 ]],
 		layer = 1,
 		update = 1000
@@ -255,6 +258,16 @@ function createHistograms()
 		end
 		wipe(widget.bars)
 	end
+
+	environment.unit = "mouseover"
+	if UnitInRaid("player") then
+		for i=1, GetNumRaidMembers() do
+			if UnitGUID("mouseover") == UnitGUID("raid" .. i) then
+				environment.unit = "raid" .. i
+			end
+		end
+	end
+	
 	local appearance = StarTip:GetModule("Appearance")	
 	for k, v in pairs(self.db.profile.histograms) do
 		if v.enabled then
@@ -302,6 +315,8 @@ function mod:OnInitialize()
 	if not self.db.profile.histograms then
 		self.db.profile.histograms = {}
 	end
+	
+	self.db.profile.histograms = copy(defaultWidgets)
 		
 	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.histograms) do
@@ -322,7 +337,7 @@ function mod:OnInitialize()
 		end
 	end
 	
-	self.core = LibCore:New(mod, StarTip.environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)		
+	self.core = LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)		
 	
 	self.offset = 0	
 	
@@ -397,7 +412,9 @@ function mod:OnHide()
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Hide()
 		end
-		widget:Stop()
+		if not widget.persistent then
+			widget:Stop()
+		end
 	end
 end
 

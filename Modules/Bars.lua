@@ -17,6 +17,10 @@ local WidgetBar = LibStub("StarLibWidgetBar-1.0")
 local LibCore = LibStub("StarLibCore-1.0")
 local Utils = LibStub("StarLibUtils-1.0")
 
+local environment = {}
+
+local unit
+
 local anchors = {
 	"TOP",
 	"TOPRIGHT",
@@ -57,11 +61,11 @@ return UnitHealth("mouseover")
 		min = "return 0",
 		max = "return UnitHealthMax('mouseover')",
 		color1 = [[
-if not UnitExists("mouseover") or not self then return end
+if not UnitExists(unit) or not self then return end
 if self.visitor.visitor.db.profile.classColors then
-    return ClassColor("mouseover")
+    return ClassColor("player")
 else
-    local min, max = UnitHealth("mouseover"), UnitHealthMax("mouseover")
+    local min, max = UnitHealth(unit), UnitHealthMax("mouseover")
     return HPColor(min, max)
 end
 ]],
@@ -196,6 +200,15 @@ function createBars()
 		del(v[2])
 	end
 	wipe(mod.bars)
+	environment.unit = "mouseover"
+	if UnitInRaid("player") and unit then
+		for i=1, GetNumRaidMembers() do
+			if UnitGUID(unit) == UnitGUID("raid" .. i) then
+				environment.unit = "raid" .. i
+			end
+		end
+	end
+	
 	local appearance = StarTip:GetModule("Appearance")	
 	for k, v in pairs(copy(self.db.profile.bars)) do
 		if v.enabled then
@@ -275,6 +288,8 @@ function mod:OnInitialize()
 			tinsert(self.db.profile.bars, v)
 		end
 	end
+	
+	self.db.profile.bars = copy(defaultWidgets)
 --[[	
 	for k, v in pairs(defaultWidgets) do
 		for kk, vv in pairs(self.db.profile.bars) do
@@ -295,7 +310,7 @@ function mod:OnInitialize()
 		end
 	end
 	
-	self.core = LibCore:New(mod, StarTip.environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)		
+	self.core = LibCore:New(mod, environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)		
 	
 	StarTip:SetOptionsDisabled(options, true)
 
@@ -332,6 +347,7 @@ function mod:GetOptions()
 end
 
 function mod:SetUnit()
+	unit = GameTooltip:GetUnit()
 	GameTooltipStatusBar:Hide()
 	createBars()
 	for i, bar in pairs(self.bars) do
