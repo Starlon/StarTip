@@ -214,7 +214,9 @@ function createBars()
 		if v.enabled then
 			
 			local bar = new()
-			local widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+			local cfg = copy(v)
+			cfg.unit = StarTip.unit
+			local widget = WidgetBar:New(mod.core, k, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
 			bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 			bar:ClearAllPoints()
 			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)

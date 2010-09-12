@@ -28,7 +28,6 @@ local select = _G.select
 local format = _G.format
 local floor = _G.floor
 local tostring = _G.tostring
-local environment = {}
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local factionList = {}
 local linesToAdd = {}
@@ -42,6 +41,7 @@ local linesToAddRightB = {}
 local lines = {}
 
 local unit
+local environment = {}
 
 local appearance = StarTip:GetModule("Appearance")
 
@@ -105,7 +105,7 @@ return GetColorCode(UnitName(unit), r, g, b)
         left = 'return "Target:"',
         right = [[
 local r, g, b
-local unit = unit .. "target"
+local unit = (unit or "mouseover") .. "target"
 if UnitExists(unit) then
     if UnitIsPlayer(unit) then
 		r, g, b = ClassColor(unit)
@@ -377,7 +377,6 @@ function mod:OnInitialize()
     StarTip:SetOptionsDisabled(options, true)
 
 	self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
-	--self.core = StarTip.core
 	if ResourceServer then ResourceServer:New(environment) end
 	--self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
 	--self.core.lcd = self.lcd
@@ -388,6 +387,7 @@ end
 
 local function unitTimerFunction()
 	lines(true)
+	mod:RefixEndLines()
 end
 
 local draw
@@ -398,6 +398,8 @@ function mod:OnEnable()
 	if self.db.profile.refreshRate > 0 then
 		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
 	end
+	
+	self.unitTimer = LibTimer:New(mod.name .. ".unitTimer", 100, false, unitTimerFunction, nil, self.db.profile.errorLevel)
 end
 
 function mod:OnDisable()
@@ -470,23 +472,14 @@ function mod:CreateLines()
 			llines[j].config = copy(v)
 		end
     end
-    lines = setmetatable(llines, {__call=function(self, unitTimer)
-		environment.unit = "mouseover"
-		if UnitInRaid("player") then
-			for i=1, GetNumRaidMembers() do
-				if UnitGUID("mouseover") == UnitGUID("raid" .. i) then
-					environment.unit = "raid" .. i
-				end
-			end
-		end
-
+    lines = setmetatable(llines, {__call=function(self)		
 
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
 			if v.enabled and not v.deleted then
                 local left, right, c, cc = '', ''
-                if v.right and v.right ~= "" then
+                if v.right and v.right ~= "" then					
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
@@ -567,6 +560,7 @@ function mod:CreateLines()
 							v.rightObj.speed = 0
 							v.rightObj:Init()
 						end
+						v.rightObj.config.unit = StarTip.unit
 						v.rightObj:Start()
 					end
 					if v.leftObj then
@@ -575,6 +569,7 @@ function mod:CreateLines()
 							v.leftObj.speed = 0
 							v.leftObj:Init()
 						end
+						v.leftObj.config.unit = StarTip.unit
 						v.leftObj:Start()
 					end
 					v.lineNum = lineNum
@@ -1060,7 +1055,6 @@ end
 
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
-	unit = GameTooltip:GetUnit()
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 
 	environment.unitName, environment.unitGuild, environment.unitLocation = UnitStats.GetUnitStats("mouseover")
@@ -1088,7 +1082,7 @@ function mod:SetUnit()
     end
 
     lastLine = lastLine + 1
-
+		
 	wipe(linesToAdd)
 	wipe(linesToAddR)
 	wipe(linesToAddG)
@@ -1117,20 +1111,22 @@ function mod:SetUnit()
     -- End
 
 	lines()
-
-	self:RefixEndLines()
-
+	
 	GameTooltip:Show()
 
 	if self.db.profile.refreshRate > 0 and self.timer then
 		self.timer:Start()
+	end	
+	
+	if StarTip.unit ~= "mouseover" then
+		self.unitTimer:Start()
 	end
 end
 
 function mod:RefixEndLines()
     -- Another part taken from CowTip
     for i, left in ipairs(linesToAdd) do
-
+		
         local right = linesToAddRight[i]
         if right then
             GameTooltip:AddDoubleLine(left, right, linesToAddR[i], linesToAddG[i], linesToAddB[i], linesToAddRightR[i], linesToAddRightG[i], linesToAddRightB[i])
