@@ -403,7 +403,7 @@ end
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
 	if self.timer then self.timer:Del() end
-end
+ad
 
 function mod:GetOptions()
     self:RebuildOpts()
@@ -1136,7 +1136,6 @@ function mod:RefixEndLines()
     for i, left in ipairs(linesToAdd) do
 		
         local right = linesToAddRight[i]
-		StarTip:Print("add line", right, left)
         if right then
             GameTooltip:AddDoubleLine(left, right, linesToAddR[i], linesToAddG[i], linesToAddB[i], linesToAddRightR[i], linesToAddRightG[i], linesToAddRightB[i])
         else
