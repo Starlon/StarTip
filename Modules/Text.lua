@@ -174,7 +174,6 @@ end
 return lvl
 ]],
 		enabled = true,
-		unitTimer = true
     },
     [7] = {
         name = "Race",
@@ -399,13 +398,11 @@ function mod:OnEnable()
 	if self.db.profile.refreshRate > 0 then
 		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
 	end
-	self.unitTimer = LibTimer:New("Funky unit frames timer", 100, false, unitTimerFunction, nil, StarTip.db.profile.errorLevel)
 end
 
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
 	if self.timer then self.timer:Del() end
-	self.unitTimer:Del()
 end
 
 function mod:GetOptions()
@@ -590,7 +587,6 @@ function mod:CreateLines()
 
         end
         --mod.NUM_LINES = lineNum
-	mod:RefixEndLines()
 	draw()
 	GameTooltip:Show()
     end})
@@ -1096,8 +1092,6 @@ function mod:SetUnit()
     end
 
     lastLine = lastLine + 1
-
-	GameTooltip:ClearLines()
 		
 	wipe(linesToAdd)
 	wipe(linesToAddR)
@@ -1126,22 +1120,23 @@ function mod:SetUnit()
     end
     -- End
 
-	if self.db.profile.refreshRate > 0 and self.timer then
-		self.timer:Start()
-	end
-
 	lines()
 		
-	--self.unitTimer:Start()
-		
-	GameTooltip:Show()
+	self:RefixEndLines()
 	
+	GameTooltip:Show()
+
+	if self.db.profile.refreshRate > 0 and self.timer then
+		self.timer:Start()
+	end	
 end
 
 function mod:RefixEndLines()
     -- Another part taken from CowTip
     for i, left in ipairs(linesToAdd) do
+		
         local right = linesToAddRight[i]
+		StarTip:Print("add line", right, left)
         if right then
             GameTooltip:AddDoubleLine(left, right, linesToAddR[i], linesToAddG[i], linesToAddB[i], linesToAddRightR[i], linesToAddRightG[i], linesToAddRightB[i])
         else
