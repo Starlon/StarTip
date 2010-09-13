@@ -190,6 +190,16 @@ local strataNameList = {
 
 local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Fullscreen", "Fullscreen Dialog", "Tooltip"}
 
+function clearBars()
+	for k, bar in pairs(mod.bars) do
+		for i, v in ipairs(bar.bars) do
+			del(v)
+		end
+		bar:Del()
+	end
+	wipe(mod.bars)
+end
+
 function createBars()
 	if type(mod.bars) ~= "table" then mod.bars = {} end
 	
@@ -395,6 +405,7 @@ function mod:RebuildOpts()
 					set = function(info, v)
 						db.enabled = v
 						db["enabledDirty"] = true
+						clearBars()
 						createBars()
 					end,
 					order = 1
@@ -408,6 +419,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.height = tonumber(v); 
 						db["heightDirty"] = true
+						clearBars()
 						createBars();  
 					end,
 					order = 2
@@ -421,6 +433,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.update = tonumber(v); 
 						db["updateDirty"] = true						
+						clearBars()
 						createBars() 
 					end,
 					order = 3
@@ -452,6 +465,7 @@ function mod:RebuildOpts()
 					set = function(info, v)
 						db.texture1 = LSM:List("statusbar")[v]
 						db["texture1Dirty"] = true						
+						clearBars()
 						createBars()
 					end,
 					order = 4
@@ -467,6 +481,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.texture2 = LSM:List("statusbar")[v] 
 						db["texture2Dirty"] = true						
+						clearBars()
 						createBars() end,
 					order = 5
 				},
@@ -475,7 +490,7 @@ function mod:RebuildOpts()
 					type = "select",
 					values = strataLocaleList,
 					get = function() return db.strata end,
-					set = function(info, v) db.strata = v end,
+					set = function(info, v) db.strata = v; clearBars() end,
 					order = 6
 				},
 				point = {
@@ -488,14 +503,14 @@ function mod:RebuildOpts()
 							type = "select",
 							values = anchors,
 							get = function() return anchorsDict[db.point[1] or 1] end,
-							set = function(info, v) db.point[1] = anchors[v] end,
+							set = function(info, v) db.point[1] = anchors[v]; clearBars() end,
 							order = 1
 						},
 						relativeFrame = {
 							name = "Relative Frame",
 							type = "input",
 							get = function() return db.point[2] end,
-							set = function(info, v) db.point[2] = v end,
+							set = function(info, v) db.point[2] = v; clearBars() end,
 							order = 2
 						},
 						relativePoint = {
@@ -503,7 +518,7 @@ function mod:RebuildOpts()
 							type = "select",
 							values = anchors,
 							get = function() return anchorsDict[db.point[3] or 1] end,
-							set = function(info, v) db.point[3] = anchors[v] end,
+							set = function(info, v) db.point[3] = anchors[v]; clearBars() end,
 							order = 3
 						},
 						xOfs = {
@@ -511,7 +526,7 @@ function mod:RebuildOpts()
 							type = "input",
 							pattern = "%d",
 							get = function() return tostring(db.point[4] or 0) end,
-							set = function(info, v) db.point[4] = tonumber(anchors[v]) end,
+							set = function(info, v) db.point[4] = tonumber(anchors[v]); clearBars() end,
 							order = 4
 						},
 						yOfs = {
@@ -519,7 +534,7 @@ function mod:RebuildOpts()
 							type = "input",
 							pattern = "%d",
 							get = function() return tostring(db.point[5] or 0) end,
-							set = function(info, v) db.point[5] = tonumber(anchors[v]) end,
+							set = function(info, v) db.point[5] = tonumber(anchors[v]); clearBars() end,
 							order = 4						
 						}
 					},
@@ -533,6 +548,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.top = v; 
 						db["topDirty"] = true						
+						clearBars()
 						createBars() 
 					end,
 					order = 8
@@ -547,6 +563,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.expression = v; 
 						db["expressionDirty"] = true
+						clearBars()
 						createBars() 
 					end,
 					order = 9
@@ -561,6 +578,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.expression2 = v ; 
 						db["expressionDirty"] = true
+						clearBars()
 						createBars()
 					end,
 					order = 10
@@ -575,6 +593,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.min = v; 
 						db["minDirty"] = true
+						clearBars()
 						createBars() 
 					end,
 					order = 11
@@ -590,6 +609,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.max = v; 
 						db["maxDirty"] = true
+						clearBars()
 						createBars() 
 					end,
 					order = 12
@@ -604,7 +624,9 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.color1 = v; 
 						db["color1Dirty"] = true
-					createBars() end,
+						clearBars()
+						createBars() 
+					end,
 					order = 13
 				},
 				color2 = {
@@ -617,6 +639,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.color2 = v; 
 						db["color2Dirty"] = true
+						clearBars()
 						createBars() 
 					end,
 					order = 13
