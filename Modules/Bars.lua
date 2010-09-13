@@ -192,52 +192,20 @@ local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Full
 
 function createBars()
 	if type(mod.bars) ~= "table" then mod.bars = {} end
-	--[[for k, v in pairs(mod.bars) do
-		v:Del()
-		v.bar:Hide()
-		del(v.bar)
-	end]]
-	--wipe(mod.bars)	
-	local appearance = StarTip:GetModule("Appearance")	
+	
 	for k, v in pairs(copy(self.db.profile.bars)) do
 		if v.enabled then
 			
-			local bar = new()
-			local cfg = copy(v)
-			local widget = mod.bars[v] or WidgetBar:New(mod.core, k, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
-			widget.config.unit = "mouseover"--StarTip.unit
-			bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
-			bar:ClearAllPoints()
-			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
-			arg4 = (arg4 or 0)
-			arg5 = (arg5 or 0)
-			bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
-			if type(v.width) == "number" then
-				bar:SetWidth(v.width)
-			else
-				bar:SetPoint("LEFT", GameTooltip, "LEFT")
-				bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
-			end
-			bar:SetHeight(v.height)
-			bar:SetMinMaxValues(0, 100)
-			bar:Show()
-			bar:SetFrameStrata(strataNameList[widget.layer])
-			widget.bar1 = true
-			widget.bar = bar
-			mod.bars[v] = widget
-			
-			if v.expression2 then
-				bar = new()
-				widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
-				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
+			local widget = mod.bars[v]
+			if not widget then
+				local bar = new()
+				local cfg = copy(v)
+				widget = mod.bars[v] or WidgetBar:New(mod.core, k, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
 				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
 				arg4 = (arg4 or 0)
-				if v.top then
-					arg5 = (arg5 or 0) - (v.height or 12)
-				else
-					arg5 = (arg5 or 0) + (v.height or 12)
-				end
+				arg5 = (arg5 or 0)
 				bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 				if type(v.width) == "number" then
 					bar:SetWidth(v.width)
@@ -249,8 +217,37 @@ function createBars()
 				bar:SetMinMaxValues(0, 100)
 				bar:Show()
 				bar:SetFrameStrata(strataNameList[widget.layer])
-				tinsert(mod.bars, {widget, bar})
+				widget.bar1 = true
+				widget.bar = bar
+				mod.bars[v] = widget
+				
+				if v.expression2 then
+					bar = new()
+					widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
+					bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
+					bar:ClearAllPoints()
+					local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
+					arg4 = (arg4 or 0)
+					if v.top then
+						arg5 = (arg5 or 0) - (v.height or 12)
+					else
+						arg5 = (arg5 or 0) + (v.height or 12)
+					end
+					bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
+					if type(v.width) == "number" then
+						bar:SetWidth(v.width)
+					else
+						bar:SetPoint("LEFT", GameTooltip, "LEFT")
+						bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
+					end
+					bar:SetHeight(v.height)
+					bar:SetMinMaxValues(0, 100)
+					bar:Show()
+					bar:SetFrameStrata(strataNameList[widget.layer])
+					tinsert(mod.bars, {widget, bar})
+				end
 			end
+			widget.config.unit = StarTip.unit
 		end
 	end
 end
