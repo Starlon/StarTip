@@ -371,6 +371,15 @@ function mod:OnInitialize()
 		end
 	end
 
+	local text = StarTip:GetModule("Text")
+	if text.db.profile.lines then
+		local lines = copy(text.db.profile.lines)
+		for k, line in pairs(lines) do
+			self.db.profile.lines[k] = line
+		end
+		text.db.profile.lines = nil
+	end
+
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")

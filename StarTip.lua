@@ -522,8 +522,12 @@ function StarTip.OnTooltipSetUnit()
 				StarTip.unit = "raid" .. i
 			end
 		end
-	--elseif UnitInParty("player") then
-		
+	elseif UnitInParty("player") then
+		for i=1, GetNumPartyMembers() do
+			if GameTooltip:GetUnit() == UnitName("party" .. i) then
+				StarTip.unit = "party" .. i
+			end
+		end
 	end
 
 	if not StarTip.justSetUnit then

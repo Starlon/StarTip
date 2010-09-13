@@ -11,6 +11,7 @@
 <Script file = "Modules\Text.lua"/>
 <Script file = "Modules\Bars.lua"/>
 <Script file = "Modules\Histograms.lua"/>
+<Script file = "Modules\UnitTooltip.lua"/>
 <Script file = "Modules\Talents.lua"/>
 
 <!--<Script file = "Modules\LCDDisplay.lua"/>-->
