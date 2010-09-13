@@ -601,18 +601,6 @@ function mod:OnHide()
 	end
 end
 
-local function copy(t)
-	local new = {}
-	for k, v in pairs(t) do
-		if type(v) == "table" then
-			new[k] = copy(v)
-		else
-			new[k] = v
-		end
-	end
-	return new
-end
-
 local function escape(text)
 	return text:replace("|","||")
 end

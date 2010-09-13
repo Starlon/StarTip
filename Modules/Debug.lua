@@ -2,6 +2,7 @@
 local mod = StarTip:NewModule("Debug", "AceEvent-3.0")
 mod.name = "Debug"
 mod.toggled = true
+mod.defaultOff = true
 local LibTimer = LibStub("StarLibTimer-1.0")
 local LibBuffer = LibStub("StarLibBuffer-1.0")
 local WidgetText = LibStub("StarLibWidgetText-1.0")

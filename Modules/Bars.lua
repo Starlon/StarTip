@@ -192,23 +192,24 @@ local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Full
 function clearBar(obj)
 	obj = mod.bars and mod.bars[obj]
 	if not obj then return end
-	for i, v in pairs(obj.bars) do
-		del(v)
-	end
+	del(obj.bar)
 	obj:Del()
+	if obj.secondBar then
+		del(obj.secondBar.bar)
+		obj.secondBar:Del()
+	end
 end
 
 function createBars()
 	if type(mod.bars) ~= "table" then mod.bars = {} end
 	
-	for k, v in pairs(copy(self.db.profile.bars)) do
+	for k, v in pairs(self.db.profile.bars) do
 		if v.enabled then
 			
 			local widget = mod.bars[v]
 			if not widget then
 				local bar = new()
-				local cfg = copy(v)
-				widget = mod.bars[v] or WidgetBar:New(mod.core, k, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+				widget = mod.bars[v] or WidgetBar:New(mod.core, k, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
 				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
@@ -252,7 +253,7 @@ function createBars()
 					bar:SetMinMaxValues(0, 100)
 					bar:Show()
 					bar:SetFrameStrata(strataNameList[widget.layer])
-					tinsert(mod.bars, {widget, bar})
+					mod.bars[v].secondBar = widget
 				end
 			end
 			widget.config.unit = StarTip.unit
@@ -350,6 +351,10 @@ function mod:SetUnit()
 	for i, bar in pairs(self.bars) do
 		bar:Start()
 		bar.bar:Show()
+		if bar.secondBar then
+			bar.secondBar:Start()
+			bar.secondBar.bar:Show()
+		end
 	end
 end
 
@@ -357,6 +362,10 @@ function mod:SetItem()
 	for i, bar in pairs(self.bars) do
 		bar:Stop()
 		bar.bar:Hide()
+		if bar.secondBar then
+			bar.secondBar:Stop()
+			bar.secondBar.bar:Hide()
+		end
 	end
 end
 
@@ -364,6 +373,10 @@ function mod:SetSpell()
 	for i, bar in pairs(self.bars) do
 		bar:Stop()
 		bar.bar:Hide()
+		if bar.secondBar then
+			bar.secondBar:Stop()
+			bar.secondBar.bar:Hide()
+		end
 	end
 end
 
@@ -375,6 +388,10 @@ function mod:OnHide()
 	for i, bar in pairs(self.bars) do
 		bar:Stop()
 		bar.bar:Hide()
+		if bar.secondBar then
+			bar.secondBar:Stop()
+			bar.secondBar.bar:Hide()
+		end
 	end
 end
 

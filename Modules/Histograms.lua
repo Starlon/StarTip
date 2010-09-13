@@ -275,7 +275,7 @@ local function createHistograms()
 			local newWidget
 			if not mod.histograms then mod.histograms = {} end
 			if not widget then
-				widget = WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
+				widget = WidgetHistogram:New(mod.core, k, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
 				newWidget = true
 				for i = 0, v.width - 1 do				
 					local bar = new()
