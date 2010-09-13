@@ -2,7 +2,7 @@ local mod = StarTip:NewModule("Talents", "AceTimer-3.0", "AceEvent-3.0")
 mod.name = "Talents"
 mod.toggled = true
 mod.defaultOff = true
-local text = StarTip:GetModule("Text")
+local text = StarTip:GetModule("UnitTooltip")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -131,7 +131,6 @@ local updateTalents = function()
 		expired = nil
 		return
 	end	
-	local text = StarTip:GetModule("Text")
 	local nameRealm = select(1, UnitName("mouseover")) .. (select(2, UnitName("mouseover")) or '')
 	if spec[nameRealm] and spec[nameRealm][4] and spec[nameRealm][1] and spec[nameRealm][2] and spec[nameRealm][3] then
 		local specText = mod:SpecText(select(1, UnitName("mouseover")), select(2, UnitName("mouseover")))

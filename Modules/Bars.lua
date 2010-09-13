@@ -2,6 +2,7 @@ local mod = StarTip:NewModule("Bars", "AceTimer-3.0")
 mod.name = "Bars"
 mod.toggled = true
 mod.childGroup = true
+mod.defaultOff = true
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip
@@ -55,17 +56,15 @@ local defaultWidgets = {
 	["Health Bar"] = {
 		type = "bar",
 		expression = [[
-if not UnitExists("mouseover") then return end
-return UnitHealth("mouseover")
+return UnitHealth(unit)
 ]],
 		min = "return 0",
-		max = "return UnitHealthMax('mouseover')",
+		max = "assert(unit); return UnitHealthMax(unit)",
 		color1 = [[
-if not UnitExists(unit) or not self then return end
-if self.visitor.visitor.db.profile.classColors then
-    return ClassColor("player")
+if true or self.visitor.visitor.db.profile.classColors then
+    return ClassColor(unit)
 else
-    local min, max = UnitHealth(unit), UnitHealthMax("mouseover")
+    local min, max = UnitHealth(unit), UnitHealthMax(unit)
     return HPColor(min, max)
 end
 ]],
@@ -78,14 +77,13 @@ end
 	["Mana Bar"] = {
 		type = "bar",
 		expression = [[
-if not UnitExists("mouseover") then return end
-return UnitMana("mouseover")
+if not UnitExists(unit) then return end
+return UnitMana(unit)
 ]],
 		min = "return 0",
 		max = "return UnitManaMax('mouseover')",
-		color1 = [[
-if not UnitExists("mouseover") then return end
-return PowerColor(nil, "mouseover")
+		color1 = [[		
+return PowerColor(nil, unit)
 ]],
 		height = 6,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT"},
@@ -194,29 +192,20 @@ local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Full
 
 function createBars()
 	if type(mod.bars) ~= "table" then mod.bars = {} end
-	for k, v in pairs(mod.bars) do
-		v[1]:Del()
-		v[2]:Hide()
-		del(v[2])
-	end
-	wipe(mod.bars)
-	environment.unit = "mouseover"
-	if UnitInRaid("player") and unit then
-		for i=1, GetNumRaidMembers() do
-			if UnitGUID(unit) == UnitGUID("raid" .. i) then
-				environment.unit = "raid" .. i
-			end
-		end
-	end
-	
+	--[[for k, v in pairs(mod.bars) do
+		v:Del()
+		v.bar:Hide()
+		del(v.bar)
+	end]]
+	--wipe(mod.bars)	
 	local appearance = StarTip:GetModule("Appearance")	
 	for k, v in pairs(copy(self.db.profile.bars)) do
 		if v.enabled then
 			
 			local bar = new()
 			local cfg = copy(v)
-			cfg.unit = StarTip.unit
-			local widget = WidgetBar:New(mod.core, k, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+			local widget = mod.bars[v] or WidgetBar:New(mod.core, k, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+			widget.config.unit = "mouseover"--StarTip.unit
 			bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 			bar:ClearAllPoints()
 			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
@@ -234,7 +223,8 @@ function createBars()
 			bar:Show()
 			bar:SetFrameStrata(strataNameList[widget.layer])
 			widget.bar1 = true
-			tinsert(mod.bars, {widget, bar})
+			widget.bar = bar
+			mod.bars[v] = widget
 			
 			if v.expression2 then
 				bar = new()
@@ -322,7 +312,7 @@ function mod:OnEnable()
 	if not self.bars then self.bars = {} end
 	
 	for k, bar in pairs(self.bars) do
-		bar[2]:Hide()
+		bar.bar:Hide()
 	end
 	createBars()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
@@ -331,8 +321,8 @@ end
 
 function mod:OnDisable()
 	for k, bar in pairs(self.bars) do
-		bar[1]:Del()
-		bar[2]:Hide()
+		bar:Del()
+		bar.bar:Hide()
 	end
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
@@ -353,22 +343,22 @@ function mod:SetUnit()
 	GameTooltipStatusBar:Hide()
 	createBars()
 	for i, bar in pairs(self.bars) do
-		bar[1]:Start()
-		bar[2]:Show()
+		bar:Start()
+		bar.bar:Show()
 	end
 end
 
 function mod:SetItem()
 	for i, bar in pairs(self.bars) do
-		bar[1]:Stop()
-		bar[2]:Hide()
+		bar:Stop()
+		bar.bar:Hide()
 	end
 end
 
 function mod:SetSpell()
 	for i, bar in pairs(self.bars) do
-		bar[1]:Stop()
-		bar[2]:Hide()
+		bar:Stop()
+		bar.bar:Hide()
 	end
 end
 
@@ -378,8 +368,8 @@ function mod:OnHide()
 		timer = nil
 	end
 	for i, bar in pairs(self.bars) do
-		bar[1]:Stop()
-		bar[2]:Hide()
+		bar:Stop()
+		bar.bar:Hide()
 	end
 end
 

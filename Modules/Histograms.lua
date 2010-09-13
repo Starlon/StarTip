@@ -2,7 +2,6 @@ local mod = StarTip:NewModule("Histograms", "AceTimer-3.0")
 mod.name = "Histograms"
 mod.toggled = true
 mod.childGroup = true
-mod.defaultOff = true
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip
@@ -87,7 +86,7 @@ end
 ]],
 		min = "return 0",
 		max = "return 100",
-		enabled = true,
+		enabled = false,
 		reversed = true,
 		char = "0",
 		width = 10,
@@ -120,7 +119,7 @@ end
 ]],
 		min = "return 0",
 		max = "return 100",
-		enabled = true,
+		enabled = false,
 		reversed = true,
 		char = "0",
 		width = 10,

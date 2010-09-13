@@ -1,359 +1,244 @@
-﻿local mod = StarTip:NewModule("Text", "AceEvent-3.0")
+local mod = StarTip:NewModule("Text", "AceTimer-3.0")
 mod.name = "Text"
 mod.toggled = true
-assert(LibStub("StarLibEvaluator-1.0", true), "Text module requires StarLibEvaluator-1.0")
-local LibProperty = LibStub("StarLibProperty-1.0", true)
-assert(LibProperty, "Text module requires StarLibProperty-1.0")
-local WidgetText = LibStub("StarLibWidgetText-1.0", true)
-assert(WidgetText, "Text module requires StarLibWidgetText-1.0")
-local LCDText = LibStub("StarLibLCDText-1.0", true)
-assert(LCDText, mod.name .. " requires StarLibLCDText-1.0")
-local LibCore = LibStub("StarLibCore-1.0", true)
-assert(LibCore, mod.name .. " requires StarLibCore-1.0")
-local LibTimer = LibStub("StarLibTimer-1.0", true)
-assert(LibTimer, mod.name .. " requires StarLibTimer-1.0")
-local LibEvaluator = LibStub("StarLibEvaluator-1.0", true)
-assert(LibEvaluator, mod.name .. " requires StarLibEvaluator-1.0")
-local UnitStats = LibStub("StarLibPluginUnitStats-1.0", true)
-assert(UnitStats, mod.name .. " requires StarLibPluginUnitStats-1.0")
-
+mod.childGroup = true
 local _G = _G
-local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
-local self = mod
 local GameTooltip = _G.GameTooltip
-local tinsert = _G.tinsert
-local unpack = _G.unpack
-local select = _G.select
-local format = _G.format
-local floor = _G.floor
-local tostring = _G.tostring
-local LSM = _G.LibStub("LibSharedMedia-3.0")
-local factionList = {}
-local linesToAdd = {}
-local linesToAddR = {}
-local linesToAddG = {}
-local linesToAddB = {}
-local linesToAddRight = {}
-local linesToAddRightR = {}
-local linesToAddRightG = {}
-local linesToAddRightB = {}
-local lines = {}
+local GameTooltipStatusBar = _G.GameTooltipStatusBar
+local UnitIsPlayer = _G.UnitIsPlayer
+local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
+local UnitSelectionColor = _G.UnitSelectionColor
+local UnitClass = _G.UnitClass
+local self = mod
+local timer
+local LSM = LibStub("LibSharedMedia-3.0")
+local WidgetText = LibStub("StarLibWidgetText-1.0")
+local LibCore = LibStub("StarLibCore-1.0")
+local Utils = LibStub("StarLibUtils-1.0")
+local LibQTip = LibStub("LibQTip-1.0")
 
-local unit
 local environment = {}
 
-local appearance = StarTip:GetModule("Appearance")
-
-local function errorhandler(err)
-    return geterrorhandler()(err)
-end
-
-local ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALIGN_PINGPONG = 1, 2, 3, 4, 5, 6
-
-local SCROLL_RIGHT, SCROLL_LEFT = 1, 2
-
-environment.powers = {
-    ["WARRIOR"] = "Rage:",
-    ["ROGUE"] = "Energy:",
-	["DEATHKNIGHT"] = "Rune Power:"
+local anchors = {
+	"TOP",
+	"TOPRIGHT",
+	"TOPLEFT",
+	"BOTTOM",
+	"BOTTOMRIGHT",
+	"BOTTOMLEFT",
+	"RIGHT",
+	"LEFT",
+	"CENTER"
 }
 
-environment.unitHasAura = function(aura)
-    local i = 1
-    while true do
-        local buff = UnitBuff("mouseover", i, true)
-        if not buff then return end
-        if buff == aura then return true end
-        i = i + 1
-    end
+local anchorsDict = {}
+
+for i, v in ipairs(anchors) do
+	anchorsDict[v] = i
 end
 
-local function copy(src, dst)
-	if type(src) ~= "table" then return nil end
-	if type(dst) ~= "table" then dst = StarTip.new() end
-	for k, v in pairs(src) do
-		if type(v) == "table" then
-			v = copy(v)
-		end
-		dst[k] = v
+local createTexts
+local widgets = {}
+
+local function copy(tbl)
+	if type(tbl) ~= "table" then return tbl end
+	local newTbl = {}
+	for k, v in pairs(tbl) do
+		newTbl[k] = copy(v)
 	end
-	return dst
+	return newTbl
 end
 
-
-local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500, color = {r = 1, g = 1, b = 1}}}
-
-local defaultLines={
-    [1] = {
-        name = "UnitName",
-        left = [[
-local r, g, b
-if UnitIsPlayer(unit) then
-    r, g, b = ClassColor(unit)
-else
-    r, g, b = UnitSelectionColor(unit)
-end
-return GetColorCode(UnitName(unit), r, g, b)
-]],
-        right = nil,
-		bold = true,
-		enabled = true
-    },
-    [2] = {
-        name = "Target",
-        left = 'return "Target:"',
-        right = [[
-local r, g, b
-local unit = (unit or "mouseover") .. "target"
-if UnitExists(unit) then
-    if UnitIsPlayer(unit) then
-		r, g, b = ClassColor(unit)
-    else
-        r, g, b = UnitSelectionColor(unit)
-    end
-else
-	r = 1
-	g = 1
-	b = 1
-end
-local name = UnitName(unit)
-if name == select(1, UnitName("player")) then name = "<<YOU>>" end
-return name and GetColorCode(name, r, g, b) or "None"
-]],
-        rightUpdating = true,
-		update = 1000,
-		enabled = true
-    },
-    [3] = {
-        name = "Guild",
-        left = 'return "Guild:"',
-        right = [[
-guild = GetGuildInfo(unit)
-if guild then return "<" .. GetGuildInfo(unit) .. ">" else return unitGuild end
-]],
-		enabled = true
-    },
-    [4] = {
-        name = "Rank",
-        left = 'return "Rank:"',
-        right = [[
-return select(2, GetGuildInfo(unit))
-]],
+local defaultWidgets = {
+	["Name"] = {
 		enabled = true,
-    },
-    [5] = {
-        name = "Realm",
-        left = 'return "Realm:"',
-        right = [[
-return select(2, UnitName(unit))
+		value = [[
+if not UnitExists(unit) then return end
+return '--' .. select(1, UnitName(unit)) .. '--'
 ]],
-		enabled = true
-    },
-    [6] = {
-        name = "Level",
-        left = 'return "Level:"',
-        right = [[
-lvl = UnitLevel(unit)
-class = UnitClassification(unit)
-
-if lvl <= 0 then
-    lvl = ''
-end
-
-if class == "worldboss" then
-    lvl = lvl .. "Boss"
-elseif class == "rareelite" then
-    lvl = lvl .. "+ Rare"
-elseif class == "elite" then
-    lvl = lvl .. "+"
-elseif class == "rare" then
-    lvl = lvl .. "rare"
-end
-
-return lvl
+		color = [[
+if not UnitExists(unit) then return end
+return ClassColor(unit)
 ]],
-		enabled = true,
-    },
-    [7] = {
-        name = "Race",
-        left = 'return "Race:"',
-        right = [[
-return (UnitIsPlayer(unit) and UnitRace(unit)) or UnitCreatureFamily(unit) or UnitCreatureType(unit)
-]],
-		enabled = true,
-    },
-    [8] = {
-        name = "Class",
-        left = 'return "Class:"',
-        right = [[
-if UnitClass(unit) == UnitName(unit) then return end
-local r, g, b
-if UnitIsPlayer(unit) then
-    r, g, b = ClassColor(unit)
-else
-    r, g, b = 1, 1, 1
-end
-return GetColorCode(UnitClass(unit), r, g, b)
-]],
-		enabled = true,
-    },
-    [9] = {
-        name = "Faction",
-        left = 'return "Faction:"',
-        right = [[
-return UnitFactionGroup(unit)
-]],
-		enabled = true,
-    },
-    [10] = {
-        name = "Status",
-        left = 'return "Status:"',
-        right = [[
-if not UnitIsConnected(unit) then
-    return "Offline"
-elseif unitHasAura(GetSpellInfo(19752)) then
-    return "Divine Intervention"
-elseif UnitIsFeignDeath(unit) then
-    return "Feigned Death"
-elseif UnitIsGhost(unit) then
-    return "Ghost"
-elseif UnitIsDead(unit) and  unitHasAura(GetSpellInfo(20707)) then
-    return "Soulstoned"
-elseif UnitIsDead(unit) then
-    return "Dead"
-end
-]],
-		enabled = true,
-    },
-    [11] = {
-        name = "Health",
-        left = 'return "Health:"',
-        right = [[
-health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
-r, g, b = HPColor(health, maxHealth)
-value = "Unknown"
-if maxHealth == 100 then
-    value = GetColorCode(health .. "%", r, g, b)
-elseif maxHealth ~= 0 then
-    value = GetColorCode(format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100), r, g, b)
-end
-return value
-]],
-        rightUpdating = true,
-		update = 1000,
-		enabled = true
-    },
-    [12] = {
-        name = "Mana",
-        left = [[
-class = select(2, UnitClass(unit))
-if not UnitIsPlayer(unit) then
-	class = "MAGE"
-end
-
-return (powers[class] or "Mana:")
-]],
-        right = [[
-mana = UnitMana(unit)
-maxMana = UnitManaMax(unit)
-r, g, b = PowerColor(nil, unit)
-value = "Unknown"
-if maxMana == 100 then
-    value = GetColorCode(tostring(mana), r, g, b)
-elseif maxMana ~= 0 then
-    value = GetColorCode(format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100), r, g, b)
-end
-return value
-]],
-        rightUpdating = true,
-		enabled = true,
-		update = 1000
-    },
-    [13] = {
-        name = "Location",
-        left = 'return "Location:"',
-        right = "return unitLocation",
-		enabled = true
-    },
-	[14] = {
-		name = "Marquee",
-		left = 'return "StarTip " .. _G.StarTip.version',
-		leftUpdating = true,
-		enabled = false,
-		marquee = true,
-		cols = 40,
-		bold = true,
-		align = WidgetText.ALIGN_MARQUEE,
+		cols = 50,
+		align = WidgetText.ALIGN_PINGPONG,
 		update = 1000,
 		speed = 100,
-		direction = WidgetText.SCROLL_LEFT,
-		dontRtrim = true
-	},
-	[15] = {
-		name = "Memory Usage",
-		left = "return 'Memory Usage:'",
-		right = [[
-local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
-if mem then
-    if totaldiff == 0 then totaldiff = 1 end
-    memperc = (memdiff / totaldiff * 100)
-    local num = floor(memperc + 0.5)
-    if num < 1 then num = 1 end
-    if num > 100 then num = 100 end
-    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
-    return GetColorCode(format("%s (%.2f%%)", memshort(mem), memperc), r, g, b)
-end
-]],
-		rightUpdating = true,
-		update = 1000
-	},
-	[16] = {
-		name = "CPU Usage",
-		desc = "Note that you must turn on CPU profiling",
-		left = 'return "CPU Usage:"',
-		right = [[
-local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
-if cpu then
-    if totaldiff == 0 then totaldiff = 100 end
-    cpuperc = cpudiff / totaldiff * 100;
-    local num = floor(cpuperc + 0.5)
-    if num < 1 then num = 1 end
-    if num > 100 then num = 100 end
-    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
-    return GetColorCode(format("%s (%.2f%%)", timeshort(cpu), cpuperc), r, g, b)
-end
-]],
-		rightUpdating = true,
-		update = 1000
-	},
-	[17] = {
-		name = "Range",
-		left = [[
-local min, max = RangeCheck:GetRange(unit)
-if not min then
-    return "No range info"
-elseif not max then
-    return "Target is over " .. min .. " yards"
-else
-    return "Between " .. min .. " and " .. max .. " yards"
-end
-]],
-		leftUpdating = true,
+		direction = SCROLL_LEFT,
+		dontRtrim = true,
+		point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 12},
+		parent = "GameTooltip",
+	},	
+	["Health"] = {
 		enabled = true,
-		update = 1000
+		value = [[
+if not UnitExists(unit) then return end
+local health, max = UnitHealth(unit), UnitHealthMax(unit)
+if max == 0 then max = 0.0001 end
+return format('Health: %.1f%%', health / max * 100)
+]],
+		color = [[
+if not UnitExists(unit) then return end
+local health, max = UnitHealth(unit), UnitHealthMax(unit)
+return HPColor(health, max)		
+]],
+		cols = 15,
+		update = 1000,
+		dontRtrim = true,
+		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, 1},
+		parent = "GameTooltip"
+	},
+	["Mana"] = {
+		enabled = true,
+		value = [[
+if not UnitExists(unit) then return end
+local mana, max = UnitMana(unit), UnitManaMax(unit)
+if max == 0 then max = 0.0001 end		
+return format('Mana: %.1f%%', mana / max * 100)
+]],
+		color = [[
+if not UnitExists(unit) then return end
+local mana, max = UnitMana(unit), UnitManaMax(unit)
+return HPColor(mana, max)
+]],
+		cols = 15,
+		update = 1000,
+		dontRtrim = true,
+		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, 1},
+		parent = "GameTooltip"
 	},
 }
 
-local options = {}
+local defaults = {
+	profile = {
+		classColors = true,
+	}
+}
+
+local options = {
+	add = {
+		name = "Add Text",
+		desc = "Add a text widget",
+		type = "input",
+		set = function(info, v)
+			mod.db.profile.texts[v] = {
+				type = "text",
+				min = "return 0",
+				max = "return 100",
+				height = 6,
+				point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
+				texture = LSM:GetDefault("statustext"),
+				expression = ""
+			}
+			StarTip:RebuildOpts()
+			createTexts()
+		end,
+		order = 5
+	},
+	defaults = {
+		name = "Restore Defaults",
+		desc = "Restore Defaults",
+		type = "execute",
+		func = function() 
+			mod.db.profile.texts = copy(defaultWidgets); 
+			StarTip:RebuildOpts() 
+			StarTip:Print("Bug: You'll have to reload your UI to see the change in the texts list. I'm not sure why.")
+		end,
+		order = 6
+	},
+	texts = {
+		name = "Texts",
+		type = "group",
+		args = {}
+	},
+}
+
+function updateText(widget)
+	widget.text:SetText(widget.buffer)
+	
+	local r, g, b = 0, 0, 1
+	
+	if widget.color then
+		r, g, b, a = widget.color.res1, widget.color.res2, widget.color.res3, widget.color.res4
+	end
+	
+	if type(r) == "number" then
+		widget.text:SetVertexColor(r, g, b, a)
+	end
+end
+
+local textureDict = {}
+
+function mod:CreateTexts()
+	createTexts()
+end
+
+local new, del
+do
+	local pool = {}
+	local i = 0
+	function new(cols)
+		local text = next(pool)
+		
+		if text then
+			pool[text] = nil
+		else
+			text = GameTooltip:CreateFontString()
+			text:SetFontObject(GameTooltipText)
+		end
+		
+		return text
+	end
+	function del(text)
+		pool[text] = true
+	end
+end
+
+local defaultPoint = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}
+	
+local strataNameList = {
+	"BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG", "TOOLTIP"
+}
+
+local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Fullscreen", "Fullscreen Dialog", "Tooltip"}
+
+function createTexts()
+	if type(mod.texts) ~= "table" then mod.texts = {} end
+	--[[for k, v in pairs(mod.texts) do
+		v:Del()
+		v.text:Hide()
+		del(v.text)
+	end]]
+	local appearance = StarTip:GetModule("Appearance")	
+	for k, v in pairs(self.db.profile.texts) do
+		if v.enabled then
+			local text = new(v.cols or WidgetText.defaults.cols)
+			local cfg = copy(v)
+			cfg.unit = StarTip.unit
+			local widget = mod.texts[v] or WidgetText:New(mod.core, k, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText) 
+			text:ClearAllPoints()
+			text:SetParent(v.parent)
+			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
+			arg4 = (arg4 or 0)
+			arg5 = (arg5 or 0)
+			text:SetPoint(arg1, arg2, arg3, arg4, arg5)
+			text:Show()
+			widget.text = text
+			mod.texts[v] = widget
+		end
+	end
+end
 
 function mod:OnInitialize()
-    self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-
-	for i, v in ipairs(defaultLines) do
+	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+	
+	if not self.db.profile.texts then
+		self.db.profile.texts = {}
+	end
+	
+	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.lines) do
-			vv.colorLeft = nil
-			vv.colorRight = nil
 			if v.name == vv.name then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
@@ -365,774 +250,245 @@ function mod:OnInitialize()
 		end
 	end
 
-	for i, v in ipairs(defaultLines) do
+	for i, v in ipairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
-			tinsert(self.db.profile.lines, v)
+			tinsert(self.db.profile.texts, v)
 		end
 	end
-
-    self.leftLines = StarTip.leftLines
-    self.rightLines = StarTip.rightLines
-    self:RegisterEvent("UPDATE_FACTION")
-    StarTip:SetOptionsDisabled(options, true)
-
-	self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
-	if ResourceServer then ResourceServer:New(environment) end
-	--self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
-	--self.core.lcd = self.lcd
-
-	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
-
-end
-
-local function unitTimerFunction()
-	lines(true)
-	mod:RefixEndLines()
-end
-
-local draw
-local update
-function mod:OnEnable()
-	StarTip:SetOptionsDisabled(options, false)
-	self:CreateLines()
-	if self.db.profile.refreshRate > 0 then
-		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
+	
+	self.db.profile.texts = copy(defaultWidgets)
+--[[	
+	for k, v in pairs(defaultWidgets) do
+		for kk, vv in pairs(self.db.profile.texts) do
+			if v.name == vv.name then
+				for k, val in pairs(v) do
+					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
+						vv[k] = copy(v[k])
+					end
+				end
+				v.tagged = true
+			end
+		end
+	end
+]]
+	for k, v in pairs(defaultWidgets) do
+		if not v.tagged and not v.deleted then
+			self.db.profile.texts[k] = copy(v)
+		end
 	end
 	
-	self.unitTimer = LibTimer:New(mod.name .. ".unitTimer", 100, false, unitTimerFunction, nil, self.db.profile.errorLevel)
+	self.core = LibCore:New(mod, environment, "StarTip.Texts", {["StarTip.Texts"] = {}}, nil, StarTip.db.profile.errorLevel)		
+	
+	StarTip:SetOptionsDisabled(options, true)
+
+end
+
+function mod:OnEnable()
+	if not self.texts then self.texts = {} end
+	
+	for k, text in pairs(self.texts) do
+		text.text:Hide()
+	end
+	createTexts()
+	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
+	StarTip:SetOptionsDisabled(options, false)
 end
 
 function mod:OnDisable()
-    StarTip:SetOptionsDisabled(options, true)
-	if self.timer then self.timer:Del() end
+	for k, text in pairs(self.texts) do
+		text:Del()
+		text.text:Hide()
+	end
+	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
+	StarTip:SetOptionsDisabled(options, true)
 end
+
+--[[function mod:RebuildOpts()
+	for k, v in ipairs(self.db.profile.texts) do
+		options.texts.args[k] = WidgetText:GetOptions(v)
+	end
+end]]
 
 function mod:GetOptions()
-    self:RebuildOpts()
-    return options
+	return options
 end
 
-function mod:UPDATE_FACTION()
-    for i = 1, GetNumFactions() do
-        local name = GetFactionInfo(i)
-        factionList[name] = true
-    end
-end
-
-local fontStringsToDraw = {}
-local tbl
-local function updateFontString(widget, fontString)
-	tbl = StarTip.new(widget, fontString)
-	fontStringsToDraw[tbl] = true
-end
-
-do
-	local fontsList = LSM:List("font")
-	local widget, fontString
-	function draw()
-		for table in pairs(fontStringsToDraw) do
-			widget = table[1]
-			fontString = table[2]
-			if not fontString or not widget then break end
-			fontString:SetText(widget.buffer)
-
-			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
-
-			if widget.bold then
-				if mod.leftLines and mod.leftLines[widget.i] then
-					mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
-				end
-				if mod.rightLines and mod.rightLines[widget.i] then
-					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
-				end
-			else
-				if mod.leftlines and mod.leftLines[widget.i] then
-					mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-			end
-				if mod.rightLines and mod.rightLines[widget.i] then
-					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-				end
-			end
-		end
-		for table in pairs(fontStringsToDraw) do
-			StarTip.del(table)
-		end
-		table.wipe(fontStringsToDraw)
+function mod:SetUnit()
+	GameTooltipStatusBar:Hide()
+	createTexts()
+	for k, text in pairs(self.texts) do
+		text:Start()
+		text.text:Show()
 	end
 end
 
-local tbl
-function mod:CreateLines()
-    local llines = {}
-	local j = 0
-    for i, v in ipairs(self.db.profile.lines) do
-		if not v.deleted then
-			j = j + 1
-			llines[j] = copy(v)
-			llines[j].config = copy(v)
-		end
-    end
-    lines = setmetatable(llines, {__call=function(self)		
+function mod:SetItem()
+	for i, text in pairs(self.texts) do
+		text:Stop()
+		text.text:Hide()
+	end
+end
 
-        local lineNum = 0
-		GameTooltip:ClearLines()
-        for i, v in ipairs(self) do
-			if v.enabled and not v.deleted then
-                local left, right, c, cc = '', ''
-                if v.right and v.right ~= "" then					
-                    right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
-                    left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
-					if right == "" then right = "nil" end
-
-                else
-                    right = ''
-                    left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
-                end
-
-                if left and left ~= "" and right ~= "nil" then
-                    lineNum = lineNum + 1
-                    if v.right then
-						GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
-
-						if not v.leftObj or v.lineNum ~= lineNum then
-							--if v.leftObj then v.leftObj:Del() end
-							v.config.value = v.left
-							local tmp = v.update
-							if not v.leftUpdating then v.update = 0 end
-							if mod.db.profile.refreshRate == 0 then
-								v.config.update = 0
-								v.config.scroll = 0
-							end
-							if v.leftObj then
-								v.leftObj.data = mod.leftLines[lineNum]
-							else
-								v.leftObj = WidgetText:New(mod.core, v.name .. "left", v.config, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
-							end
-							v.update = tmp
-						end
-
-						if not v.rightObj or v.lineNum ~= lineNum then
-							--if v.rightObj then v.rightObj:Del() end
-							v.config.value = v.right
-							local tmp = v.update
-							if not v.rightUpdating then v.update = 0 end
-							if mod.db.profile.refreshRate == 0 then
-								v.config.update = 0
-								v.config.scroll = 0
-							end
-							if v.rightObj then
-								v.rightObj.data = mod.rightLines[lineNum]
-							else
-								v.rightObj = WidgetText:New(mod.core, v.name .. "right", v.config, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString, mod.rightLines[lineNum])
-							end
-							v.update = tmp
-						end
-						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
-						fontStringsToDraw[tbl] = true
-						tbl = StarTip.new(v.rightObj, mod.rightLines[lineNum])
-						fontStringsToDraw[tbl] = true
-                    else
-						GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
-
-						if not v.leftObj or v.lineNum ~= lineNum then
-							--if v.leftObj then v.leftObj:Del() end
-							v.config.value = v.left
-							local tmp = v.update
-							if not v.leftUpdating then v.update = 0 end
-							if mod.db.profile.refreshRate == 0 then
-								v.config.update = 0
-								v.config.scroll = 0
-							end
-							if v.leftObj then
-								v.leftObj.data = mod.leftLines[lineNum]
-							else
-								v.leftObj = WidgetText:New(mod.core, v.name, v.config, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString, mod.leftLines[lineNum])
-							end
-							v.update = tmp
-							v.lineNum = lineNum
-						end
-						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
-						fontStringsToDraw[tbl] = true
-                    end
-					if v.rightObj then
-						if mod.db.profile.refreshRate == 0 then
-							v.rightObj.update = 0
-							v.rightObj.speed = 0
-							v.rightObj:Init()
-						end
-						v.rightObj.config.unit = StarTip.unit
-						v.rightObj:Start()
-					end
-					if v.leftObj then
-						if mod.db.profile.refreshRate == 0 then
-							v.leftObj.update = 0
-							v.leftObj.speed = 0
-							v.leftObj:Init()
-						end
-						v.leftObj.config.unit = StarTip.unit
-						v.leftObj:Start()
-					end
-					v.lineNum = lineNum
-				end
-			end
-
-        end
-        --mod.NUM_LINES = lineNum
-	draw()
-	GameTooltip:Show()
-    end})
+function mod:SetSpell()
+	for i, text in pairs(self.texts) do
+		text:Stop()
+		text.text:Hide()
+	end
 end
 
 function mod:OnHide()
-	for i, v in ipairs(lines) do
-		if v.leftObj then
-			v.leftObj:Stop()
-		end
-		if v.rightObj then
-			v.rightObj:Stop()
-		end
+	if timer then
+		self:CancelTimer(timer)
+		timer = nil
 	end
-	if self.timer then
-		self.timer:Stop()
+	for i, text in pairs(self.texts) do
+		text:Stop()
+		text.text:Hide()
 	end
 end
 
-local function copy(t)
-	local new = {}
-	for k, v in pairs(t) do
-		if type(v) == "table" then
-			new[k] = copy(v)
-		else
-			new[k] = v
-		end
-	end
-	return new
-end
-
-local function escape(text)
-	return text:replace("|","||")
-end
-
-local function unescape(text)
-	return text:replace("||", "|")
+local function colorGradient(perc)
+    if perc <= 0.5 then
+        return 1, perc*2, 0
+    else
+        return 2 - perc*2, 1, 0
+    end
 end
 
 function mod:RebuildOpts()
-    options = {
-		add = {
-			name = "Add Line",
-			desc = "Give the line a name",
-			type = "input",
-			set = function(info, v)
-				if v == "" then return end
-				tinsert(self.db.profile.lines, {name = v, left = "", right = "", rightUpdating = false, enabled = true})
-				self:RebuildOpts()
-				StarTip:RebuildOpts()
-				self:CreateLines()
-			end,
-			order = 5
-		},
-		refreshRate = {
-			name = "Refresh Rate",
-			desc = "The rate at which the tooltip will be refreshed",
-			type = "input",
-			pattern = "%d",
-			get = function() return tostring(self.db.profile.refreshRate) end,
-			set = function(info, v)
-				self.db.profile.refreshRate = tonumber(v)
-				self:OnDisable()
-				self:OnEnable()
-			end,
-			order = 6
-		},
-		color = {
-			name = "Default Color",
-			desc = "The default color for tooltip lines",
-			type = "color",
-			get = function() return self.db.profile.color.r, self.db.profile.color.g, self.db.profile.color.b end,
-			set = function(info, r, g, b)
-				self.db.profile.color.r = r
-				self.db.profile.color.g = g
-				self.db.profile.color.b = b
-			end,
-			order = 7
-		},
-		defaults = {
-			name = "Restore Defaults",
-			desc = "Roll back to defaults.",
-			type = "execute",
-			func = function()
-				local replace = {}
-				for i, v in ipairs(self.db.profile.lines) do
-					local insert = true
-					for j, vv in ipairs(defaultLines) do
-						if v.name == vv.name then
-							insert = false
-						end
-					end
-					if insert then
-						tinsert(replace, v)
-					end
-				end
-				table.wipe(self.db.profile.lines)
-				for i, v in ipairs(defaultLines) do
-					tinsert(self.db.profile.lines, copy(v))
-				end
-				for i, v in ipairs(replace) do
-					tinsert(self.db.profile.lines, copy(v))
-				end
-				StarTip:RebuildOpts()
-				self:CreateLines()
-			end,
-			order = 8
-		},
-	}
-    for i, v in ipairs(self.db.profile.lines) do
-		if type(v) == "table" and not v.deleted then
-			options["line" .. i] = {
-				name = v.name,
-				type = "group",
-				order = i + 5
-			}
-			options["line" .. i].args = {
-					enabled = {
-						name = "Enabled",
-						desc = "Whether to show this line or not",
-						type = "toggle",
-						get = function() return self.db.profile.lines[i].enabled end,
-						set = function(info, val)
-							v.enabled = val
-							v.enabledDirty = true
-							self:CreateLines()
-						end,
-						order = 2
-					},
-					leftUpdating = {
-						name = "Left Updating",
-						desc = "Whether this segment refreshes",
-						type = "toggle",
-						get = function() return v.leftUpdating end,
-						set = function(info, val)
-							v.leftUpdating = val
-							if v.update == 0 then
-								v.update = 500
-							end
-							v.leftUpdatingDirty = true
-							self:CreateLines()
-						end,
-						order = 3
-					},
-					rightUpdating = {
-						name = "Right Updating",
-						desc = "Whether this segment refreshes",
-						type = "toggle",
-						get = function() return v.rightUpdating end,
-						set = function(info, val)
-							v.rightUpdating = val
-							if v.update == 0 then
-								v.update = 500
-							end
-							v.rightUpdatingDirty = true
-							self:CreateLines()
-						end,
-						order = 4
-					},
-					up = {
-						name = "Move Up",
-						desc = "Move this line up by one",
-						type = "execute",
-						func = function()
-							if i == 1 then return end
-							local tmp = self.db.profile.lines[i - 1]
-							if not v.left then v.left = "" end
-							if not v.right then v.right = "" end
-							if not tmp.left then tmp.left = "" end
-							if not tmp.right then tmp.right = "" end
-							self.db.profile.lines[i - 1] = v
-							self.db.profile.lines[i] = tmp
-							self:RebuildOpts()
-							StarTip:RebuildOpts()
-							self:CreateLines()
-						end,
-						order = 5
-					},
-					down = {
-						name = "Move Down",
-						desc = "Move this line down by one",
-						type = "execute",
-						func = function()
-							if i == #self.db.profile.lines then return end
-							local tmp = self.db.profile.lines[i + 1]
-							if not v.left then v.left = "" end
-							if not v.right then v.right = "" end
-							if not tmp.left then tmp.left = "" end
-							if not tmp.right then tmp.right = "" end
-							self.db.profile.lines[i + 1] = v
-							self.db.profile.lines[i] = tmp
-							self:RebuildOpts()
-							StarTip:RebuildOpts()
-							self:CreateLines()
-						end,
-						order = 6
-					},
-					bold = {
-						name = "Bold",
-						desc = "Whether to bold this line or not",
-						type = "toggle",
-						get = function() return self.db.profile.lines[i].bold end,
-						set = function(info, val)
-							v.bold = val
-							v.boldDirty = true
-							self:CreateLines()
-						end,
-						order = 7
-					},
-					delete = {
-						name = "Delete",
-						desc = "Delete this line",
-						type = "execute",
-						func = function()
-							local name = v.name
-							table.wipe(self.db.profile.lines[i])
-							v.name = name
-							v.deleted = true
-							StarTip:RebuildOpts()
-							self:CreateLines()
-						end,
-						order = 8
-					},
-					linesHeader = {
-						name = "Lines",
-						type = "header",
-						order = 9
-					},
-					left = {
-						name = "Left",
-						type = "input",
-						desc = "Left text code",
-						get = function() return escape(v.left or "") end,
-						set = function(info, val)
-							v.left = unescape(val)
-							v.leftDirty = true
-							if val == "" then
-								v.left = nil
-							end
-							self:CreateLines()
-						end,
-						validate = function(info, str)
-							return mod.evaluator:Validate(environment, str)
-						end,
-						multiline = true,
-						width = "full",
-						order = 10
-					},
-					right = {
-						name = "Right",
-						type = "input",
-						desc = "Right text code",
-						get = function() return escape(v.right or "") end,
-						set = function(info, val)
-							v.right = unescape(val);
-							v.rightDirty = true
-							if val == "" then
-								v.right = nil
-							end
-							self:CreateLines()
-						end,
-						validate = function(info, str)
-							return mod.evaluator:Validate(environment, str)
-						end,
-						multiline = true,
-						width = "full",
-						order = 11
-					},
-					--[[
-					colorLeft = {
-						name = "Left Color",
-						type = "input",
-						desc = "Color for left segment",
-						get = function() return v.colorLeft end,
-						set = function(info, val)
-							v.colorLeft = val
-							v.colorLeftDirty = true
-							self:CreateLines()
-						end,
-						validate = function(info, str)
-							return mod.evaluator:Validate(environment, str)
-						end,
-						multiline = true,
-						width = "full",
-						order = 12
-					},
-					colorRight = {
-						name = "Right Color",
-						type = "input",
-						desc = "Color for right segment",
-						get = function() return v.colorRight end,
-						set = function(info, val)
-							v.colorRight = val
-							v.colorRightDirty = true
-							self:CreateLines()
-						end,
-						validate = function(info, str)
-							return mod.evaluator:Validate(environment, str)
-						end,
-						multiline = true,
-						width = "full",
-						order = 13
-					},]]
-					marquee = {
-						name = "Enhanced Settings",
-						type = "group",
-						args = {
-							header = {
-								name = "Note that only the left line script is used for marquee text",
-								type = "header",
-								order = 1
-							},
-							marquee = {
-								name = "Enabled",
-								desc = "Enable marquee. Note that this just makes marquees use the left line only. Technically all segments on the tooltip are marquee widgets.",
-								type = "toggle",
-								get = function() return v.marquee end,
-								set = function(info, val)
-									v.marquee = val
-									v.marqueeDirty = true
-									self:CreateLines()
-								end
-							},
-							prefix = {
-								name = "Prefix",
-								desc = "The prefix for this marquee",
-								type = "input",
-								width = "full",
-								multiline = true,
-								get = function()
-									return v.prefix
-								end,
-								set = function(info, val)
-									v.prefix = val
-									v.prefixDirty = true
-									self:CreateLines()
-								end,
-								order = 2
-							},
-							postfix = {
-								name = "Postfix",
-								desc = "The postfix for this marquee",
-								type = "input",
-								width = "full",
-								multiline = true,
-								get = function()
-									return v.postfix or WidgetText.defaults.postfix
-								end,
-								set = function(info, val)
-									v.postfix = v
-									v.postfixDirty = true
-									self:CreateLines()
-								end,
-								order = 3
-							},
-							precision = {
-								name = "Precision",
-								desc = "How precise displayed numbers are",
-								type = "input",
-								pattern = "%d",
-								get = function()
-									return tostring(v.precision or WidgetText.defaults.precision)
-								end,
-								set = function(info, val)
-									v.precision = tonumber(val)
-									v.precisionDirty = true
-									self:CreateLines()
-								end,
-								order = 4
-							},
-							align = {
-								name = "Alignment",
-								desc = "The alignment information",
-								type = "select",
-								values = WidgetText.alignmentList,
-								get = function()
-									return v.align
-								end,
-								set = function(info, val)
-									v.align = val
-									v.alignDirty = true
-									self:CreateLines()
-								end,
-								order = 5
-							},
-							update = {
-								name = "Text Update",
-								desc = "How often to update the text. Use this option if you want your line to update.",
-								type = "input",
-								pattern = "%d",
-								get = function()
-									return tostring(v.update or WidgetText.defaults.update)
-								end,
-								set = function(info, val)
-									v.update = tonumber(val)
-									v.updateDirty = true
-									self:CreateLines()
-								end,
-								order = 6
-							},
-							speed = {
-								name = "Scroll Speed",
-								desc = "How fast to scroll the marquee",
-								type = "input",
-								pattern = "%d",
-								get = function()
-									return tostring(v.speed or WidgetText.defaults.speed)
-								end,
-								set = function(info, val)
-									v.speed = tonumber(val)
-									v.speedDirty = true
-									self:CreateLines()
-								end,
-								order = 7
-							},
-							direction = {
-								name = "Direction",
-								desc = "Which direction to scroll",
-								type = "select",
-								values = WidgetText.directionList,
-								get = function()
-									return v.direction or WidgetText.defaults.direction
-								end,
-								set = function(info, val)
-									v.direction = val
-									v.directionDirty = true
-									self:CreateLines()
-								end,
-								order = 8
-							},
-							cols = {
-								name = "Columns",
-								desc = "How wide the marquee is",
-								type = "input",
-								pattern = "%d",
-								get = function()
-									return tostring(v.cols or WidgetText.defaults.cols)
-								end,
-								set = function(info, val)
-									v.cols = tonumber(val)
-									v.colsDirty = true
-									self:CreateLines()
-								end,
-								order = 9
-							},
-							dontRtrim = {
-								name = "Don't right trim",
-								desc = "Prevent trimming white space to the right of text",
-								type = "toggle",
-								get = function()
-									return v.dontRtrim or WidgetText.defaults.dontRtrim
-								end,
-								set = function(info, val)
-									v.dontRtrim = val
-									v.dontRtrimDirty = true
-									self:CreateLines()
-								end,
-								order = 10
-							}
-						},
-						order = 9
-					}
-			}
-		end
-		if v.desc then
-			options["line" .. i].args.desc = {
-				name = v.desc,
-				type = "header",
-				order = 1
-			}
-
-		end
-    end
-end
-
-local ff = CreateFrame("Frame")
-function mod:SetUnit()
-    if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
-
-	environment.unitName, environment.unitGuild, environment.unitLocation = UnitStats.GetUnitStats("mouseover")
-
-    -- Taken from CowTip
-    local lastLine = 2
-    local text2 = self.leftLines[2]:GetText()
-
-    if not text2 then
-        lastLine = lastLine - 1
-    elseif not text2:find("^"..LEVEL) then
-        lastLine = lastLine + 1
-    end
-    if not UnitPlayerControlled("mouseover") and not UnitIsPlayer("mouseover") then
-        local factionText = self.leftLines[lastLine + 1]:GetText()
-        if factionText == PVP then
-            factionText = nil
-        end
-        if factionText and (factionList[factionText] or UnitFactionGroup("mouseover")) then
-            lastLine = lastLine + 1
-        end
-    end
-    if not UnitIsConnected("mouseover") or not UnitIsVisible("mouseover") or UnitIsPVP("mouseover") then
-        lastLine = lastLine + 1
-    end
-
-    lastLine = lastLine + 1
-		
-	wipe(linesToAdd)
-	wipe(linesToAddR)
-	wipe(linesToAddG)
-	wipe(linesToAddB)
-	wipe(linesToAddRight)
-	wipe(linesToAddRightR)
-	wipe(linesToAddRightG)
-	wipe(linesToAddRightB)
-    for i = lastLine, GameTooltip:NumLines() do
-        local left = self.leftLines[i]
-        local j = i - lastLine + 1
-        linesToAdd[j] = left:GetText()
-        local r, g, b = left:GetTextColor()
-        linesToAddR[j] = r
-        linesToAddG[j] = g
-        linesToAddB[j] = b
-        local right = self.rightLines[i]
-        if right:IsShown() then
-            linesToAddRight[j] = right:GetText()
-            local r, g, b = right:GetTextColor()
-            linesToAddRightR[j] = r
-            linesToAddRightG[j] = g
-            linesToAddRightB[j] = b
-        end
-    end
-    -- End
-
-	lines()
+	local defaults = WidgetText.defaults
 	
-	GameTooltip:Show()
-
-	if self.db.profile.refreshRate > 0 and self.timer then
-		self.timer:Start()
-	end	
-	
-	if StarTip.unit ~= "mouseover" then
-		self.unitTimer:Start()
+	for k, db in pairs(self.db.profile.texts) do
+		options.texts.args[k:gsub(" ", "_")] = {
+			name = k,
+			type="group",
+			order = 6,
+			args=WidgetText:GetOptions(StarTip, db)
+		}
 	end
 end
 
-function mod:RefixEndLines()
-    -- Another part taken from CowTip
-    for i, left in ipairs(linesToAdd) do
-		
-        local right = linesToAddRight[i]
-        if right then
-            GameTooltip:AddDoubleLine(left, right, linesToAddR[i], linesToAddG[i], linesToAddB[i], linesToAddRightR[i], linesToAddRightG[i], linesToAddRightB[i])
-        else
-            GameTooltip:AddLine(left, linesToAddR[i], linesToAddG[i], linesToAddB[i], true)
-        end
-    end
-    -- End
+--[[				enabled = {
+					name = "Enabled",
+					desc = "Whether this text is enabled or not",
+					type = "toggle",
+					get = function() return db.enabled end,
+					set = function(info, v)
+						db.enabled = v
+						db["enabledDirty"] = true
+						createTexts()
+					end,
+					order = 1
+				},
+				height = {
+					name = "Text height",
+					desc = "Enter the text's height",
+					type = "input",
+					pattern = "%d",
+					get = function() return tostring(db.height or defaults.height) end,
+					set = function(info, v) 
+						db.height = tonumber(v); 
+						db["heightDirty"] = true
+						createTexts();  
+					end,
+					order = 2
+				},
+				update = {
+					name = "Text update rate",
+					desc = "Enter the text's refresh rate",
+					type = "input",
+					pattern = "%d",
+					get = function() return tostring(db.update or defaults.update) end,
+					set = function(info, v) 
+						db.update = tonumber(v); 
+						db["updateDirty"] = true						
+						createTexts() 
+					end,
+					order = 3
+				},
+				strata = {
+					name = "Strata",
+					type = "select",
+					values = strataLocaleList,
+					get = function() return db.strata end,
+					set = function(info, v) db.strata = v end,
+					order = 6
+				},
+				point = {
+					name = "Anchor Points",
+					desc = "This text's anchor point. These arguments are passed to text:SetPoint()",
+					type = "group",
+					args = {
+						point = {
+							name = "Text anchor",
+							type = "select",
+							values = anchors,
+							get = function() return anchorsDict[db.point[1] or 1] end,
+							set = function(info, v) db.point[1] = anchors[v] end,
+							order = 1
+						},
+						relativeFrame = {
+							name = "Relative Frame",
+							type = "input",
+							get = function() return db.point[2] end,
+							set = function(info, v) db.point[2] = v end,
+							order = 2
+						},
+						relativePoint = {
+							name = "Relative Point",
+							type = "select",
+							values = anchors,
+							get = function() return anchorsDict[db.point[3] or 1] end,
+							set = function(info, v) db.point[3] = anchors[v] end,
+							order = 3
+						},
+						xOfs = {
+							name = "X Offset",
+							type = "input",
+							pattern = "%d",
+							get = function() return tostring(db.point[4] or 0) end,
+							set = function(info, v) db.point[4] = tonumber(anchors[v]) end,
+							order = 4
+						},
+						yOfs = {
+							name = "Y Offset",
+							type = "input",
+							pattern = "%d",
+							get = function() return tostring(db.point[5] or 0) end,
+							set = function(info, v) db.point[5] = tonumber(anchors[v]) end,
+							order = 4						
+						}
+					},
+					order = 7
+				},
+				top = {
+					name = "First is Top",
+					desc = "Toggle whether to place the first text on top",
+					type = "toggle",
+					get = function() return db.top end,
+					set = function(info, v) 
+						db.top = v; 
+						db["topDirty"] = true						
+						createTexts() 
+					end,
+					order = 8
+				},
+				value = {
+					name = "Text expression",
+					desc = "Enter the text's expression",
+					type = "input",
+					multiline = true,
+					width = "full",
+					get = function() return db.value end,
+					set = function(info, v) 
+						db.value = v; 
+						db["valueDirty"] = true
+						createTexts() 
+					end,
+					order = 9
+				},
+			}
+		}
+	end
 end
+]]
