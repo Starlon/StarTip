@@ -429,20 +429,18 @@ function mod:UPDATE_FACTION()
 end
 
 local fontStringsToDraw = {}
-local tbl
 local function updateFontString(widget, fontString)
-	tbl = StarTip.new(widget, fontString)
-	fontStringsToDraw[tbl] = true
+	widget.fontString = fontString
+	fontStringsToDraw[widget] = true
 end
 
 do
 	local fontsList = LSM:List("font")
 	local widget, fontString
 	function draw()
-		for table in pairs(fontStringsToDraw) do
-			widget = table[1]
-			fontString = table[2]
-			if not fontString or not widget then break end
+		for widget in pairs(fontStringsToDraw) do
+			fontString = widget.fontString
+			if not fontString then break end
 			fontString:SetText(widget.buffer)
 
 			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
@@ -462,9 +460,6 @@ do
 					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
 				end
 			end
-		end
-		for table in pairs(fontStringsToDraw) do
-			StarTip.del(table)
 		end
 		table.wipe(fontStringsToDraw)
 	end
@@ -536,10 +531,10 @@ function mod:CreateLines()
 							end
 							v.update = tmp
 						end
-						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
-						fontStringsToDraw[tbl] = true
-						tbl = StarTip.new(v.rightObj, mod.rightLines[lineNum])
-						fontStringsToDraw[tbl] = true
+						v.leftObj.fontstring = mod.leftLines[lineNum]
+						fontStringsToDraw[v.leftObj] = true
+						v.rightObj.fontstring = mod.rightLines[lineNum]
+						fontStringsToDraw[v.rightObj] = true
                     else
 						GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
 
@@ -560,8 +555,8 @@ function mod:CreateLines()
 							v.update = tmp
 							v.lineNum = lineNum
 						end
-						tbl = StarTip.new(v.leftObj, mod.leftLines[lineNum])
-						fontStringsToDraw[tbl] = true
+						v.leftObj.fontstring = mod.leftLines[lineNum]
+						fontStringsToDraw[v.leftObj] = true
                     end
 					if v.rightObj then
 						if mod.db.profile.refreshRate == 0 then
