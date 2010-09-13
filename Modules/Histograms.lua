@@ -51,15 +51,6 @@ local function copy(tbl)
 	return newTbl
 end
 
-local function clearHistograms()
-	for k, widget in pairs(mod.histograms or {}) do
-		for i = 1, #widget.bars do
-			widget.bars[i]:SetValue(0)
-		end
-	end
-	wipe(mod.histograms or {})
-end
-
 local defaultWidgets = {
 	["widget_mem_histogram"] = {
 		type = "histogram",
@@ -246,7 +237,17 @@ do
 	end
 end
 
-function createHistograms()
+local function clearHistograms()
+	for k, v in pairs(mod.histograms) do
+		for i, v in pairs(v) do
+			del(v)
+			v:SetValue(0)
+		end
+		v:Del()
+	end
+end
+
+local function createHistograms()
 	if type(mod.histograms) ~= "table" then mod.histograms = {} end
 	--[[for k, widget in pairs(mod.histograms) do
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
@@ -276,9 +277,6 @@ function createHistograms()
 			if not widget then
 				widget = WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
 				newWidget = true
-			end
-			widget.config.unit = StarTip.unit
-			if newWidget then
 				for i = 0, v.width - 1 do				
 					local bar = new()
 					bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
@@ -309,7 +307,8 @@ function createHistograms()
 					if not widget.bars then widget.bars = {} end
 					tinsert(widget.bars, bar)
 				end
-			end
+			end			
+			widget.config.unit = StarTip.unit			
 			mod.histograms[v] = widget
 		end
 	end
