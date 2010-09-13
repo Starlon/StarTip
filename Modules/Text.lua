@@ -95,7 +95,7 @@ return HPColor(health, max)
 if not UnitExists(unit) then return end
 local mana, max = UnitMana(unit), UnitManaMax(unit)
 if max == 0 then max = 0.0001 end		
-return format('Mana: %.1f%%', mana / max * 100)
+return format(PowerName(unit)..': %.1f%%', mana / max * 100)
 ]],
 		color = [[
 if not UnitExists(unit) then return end
