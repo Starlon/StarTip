@@ -248,7 +248,7 @@ end
 
 function createHistograms()
 	if type(mod.histograms) ~= "table" then mod.histograms = {} end
-	for k, widget in pairs(mod.histograms) do
+	--[[for k, widget in pairs(mod.histograms) do
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Hide()
 			if widget.bars[i] then
@@ -256,7 +256,7 @@ function createHistograms()
 			end
 		end
 		wipe(widget.bars)
-	end
+	end]]
 
 	environment.unit = "mouseover"
 	if UnitInRaid("player") then
@@ -266,44 +266,51 @@ function createHistograms()
 			end
 		end
 	end
-	
-	local appearance = StarTip:GetModule("Appearance")	
+		
 	for k, v in pairs(self.db.profile.histograms) do
 		if v.enabled then
 			v.width = v.width or WidgetHistogram.defaults.width
-			local widget = mod.histograms[k] or WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
-			for i = 0, v.width - 1 do				
-				local bar = new()
-				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
-				bar:ClearAllPoints()
-				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)-- or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
-				if (v.width > 100) then
-					arg4 = (arg4 or 0) + i * (v.width / 100)
-				else
-					arg4 = (arg4 or 0) + i * v.width
-				end
-				arg5 = (arg5 or 0)
-				bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
-				if v.width then
-					if (v.width > 100) then
-						bar:SetWidth(v.width / 100)
-					else
-						bar:SetWidth(v.width or 6)
-					end
-				else
-					bar:SetPoint("TOPLEFT", GameTooltip, "TOPLEFT")
-					bar:SetPoint("BOTTOMLEFT", GameTooltip, "BOTTOMLEFT")
-				end
-				bar:SetHeight(v.height)
-				bar:SetMinMaxValues(0, 100)
-				bar:SetOrientation("VERTICAL")
-				bar:SetValue(0)
-				bar:Show()
-				if not widget.bars then widget.bars = {} end
-				tinsert(widget.bars, bar)
-			end
+			local widget = mod.histograms[v]
+			local newWidget
 			if not mod.histograms then mod.histograms = {} end
-			mod.histograms[k] = widget
+			if not widget then
+				widget = WidgetHistogram:New(mod.core, k, copy(v), v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
+				newWidget = true
+			end
+			widget.config.unit = StarTip.unit
+			if newWidget then
+				for i = 0, v.width - 1 do				
+					local bar = new()
+					bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
+					bar:ClearAllPoints()
+					local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)-- or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
+					if (v.width > 100) then
+						arg4 = (arg4 or 0) + i * (v.width / 100)
+					else
+						arg4 = (arg4 or 0) + i * v.width
+					end
+					arg5 = (arg5 or 0)
+					bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
+					if v.width then
+						if (v.width > 100) then
+							bar:SetWidth(v.width / 100)
+						else
+							bar:SetWidth(v.width or 6)
+						end
+					else
+					bar:SetPoint("TOPLEFT", GameTooltip, "TOPLEFT")
+						bar:SetPoint("BOTTOMLEFT", GameTooltip, "BOTTOMLEFT")
+					end
+					bar:SetHeight(v.height)
+					bar:SetMinMaxValues(0, 100)
+					bar:SetOrientation("VERTICAL")
+					bar:SetValue(0)
+					bar:Show()
+					if not widget.bars then widget.bars = {} end
+					tinsert(widget.bars, bar)
+				end
+			end
+			mod.histograms[v] = widget
 		end
 	end
 end
@@ -376,7 +383,7 @@ function mod:SetUnit()
 	GameTooltipStatusBar:Hide()
 	self.offset = 0
 	createHistograms()
-	for i, widget in pairs(self.histograms) do
+	for k, widget in pairs(self.histograms) do
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Show()			
 		end
