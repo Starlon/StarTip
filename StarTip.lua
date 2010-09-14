@@ -125,6 +125,39 @@ StarTip.opposites = {
 	RIGHT = "LEFT",
 }
 
+local SINGLETON_CLASSIFICATIONS = {
+	"player",
+	"pet",
+	"pettarget",
+	"target",
+	"targettarget",
+	"targettargettarget",
+	"focus",
+	"focustarget",
+	"focustargettarget",
+}
+StarTip.SINGLETON_CLASSIFICATIONS = SINGLETON_CLASSIFICATIONS
+
+local UNIT_PARTY_GROUPS = {
+	"party",
+	"partytarget",
+	"partytargettarget",
+	"partypet",
+	"partypettarget",
+	"partypettargettarget"
+}
+StarTip.UNIT_PARTY_GROUPS = UNIT_PARTY_GROUPS
+
+local UNIT_RAID_GROUPS = {
+	"raid",
+	"raidtarget",
+	"raidtargettarget",
+	"raidpet",
+	"raidpettarget",
+	"raidpettargettarget",
+}
+StarTip.UNIT_RAID_GROUPS = UNIT_RAID_GROUPS
+
 local defaults = {
 	profile = {
 		modules = {},
@@ -513,20 +546,34 @@ function StarTip:OpenConfig()
 	AceConfigDialog:SetDefaultSize("StarTip", 800, 450)
 	AceConfigDialog:Open("StarTip")	
 end
-	
+
 function StarTip.OnTooltipSetUnit()	
+	local unit = GameTooltip:GetUnit()
 	StarTip.unit = "mouseover"
-	if UnitInRaid("player") then
-		for i=1, GetNumRaidMembers() do
-			if GameTooltip:GetUnit() == UnitName("raid" .. i) then
-				StarTip.unit = "raid" .. i
-			end
+	for i, v in ipairs(SINGLETON_CLASSIFICATIONS) do
+		if unit == UnitName(v) then
+			StarTip.unit = v
 		end
-	elseif UnitInParty("player") then
-		for i=1, GetNumPartyMembers() do
-			if GameTooltip:GetUnit() == UnitName("party" .. i) then
-				StarTip.unit = "party" .. i
+	end
+	if UnitInRaid("player") and StarTip.unit == "mouseover" then
+		for i=1, GetNumRaidMembers() do
+			for i, v in ipairs(UNIT_RAID_GROUPS) do
+				if unit == UnitName(v .. i) then
+					StarTip.unit = v .. i
+					break
+				end
 			end
+			if StarTip.unit ~= "mouseover" then break end
+		end
+	elseif UnitInParty("player") and StarTip.unit == "mouseover" then
+		for i=1, GetNumPartyMembers() do
+			for i, v in ipairs(UNIT_PARTY_GROUPS) do
+				if unit == UnitName(v .. i) then
+					StarTip.unit = v .. i
+					break
+				end
+			end
+			if StarTip.unit ~= "mouseover" then break end
 		end
 	end
 
