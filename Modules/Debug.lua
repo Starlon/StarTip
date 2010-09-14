@@ -24,7 +24,7 @@ return '--' .. select(1, UnitName(unit)) .. '--'
 if not UnitExists(unit) then return end
 return ClassColor(unit)
 ]],
-		cols = 50,
+		cols = 500,
 		align = WidgetText.ALIGN_PINGPONG,
 		update = 1000,
 		speed = 100,
@@ -54,21 +54,30 @@ local function new3()
 	return LibProperty:New(nil, core,	"debug property", "", "")
 end
 
+local plugin = {}
+LibStub("StarLibPluginString-1.0"):New(plugin)
 
 local function update()
+	do return end
 	for i, v in ipairs(objects) do
 		v:Del()
 	end
 	wipe(objects)
-	for j = 1, random(10) do
+	ResourceServer.Update()
+	local mem1, percent1, memdiff1, totalMem1, totaldiff1 = ResourceServer.GetMemUsage("StarTip")
+	for j = 1, random(50) do
 		local object = new2()
+		object.cols = random(50)
+		object:Start()
 		tinsert(objects, object)
 	end
-	StarTip:Print(#objects)
+	ResourceServer.Update()
+	local mem2, percent2, memdiff2, totalMem2, totaldiff2 = ResourceServer.GetMemUsage("StarTip")	
+	StarTip:Print("Memory",  plugin.memshort(mem2 - mem1), plugin.memshort(memdiff2))
 end
 
 function mod:OnEnable()
-	timer = timer or LibTimer:New("Debug timer", 100, true, update)
+	timer = timer or LibTimer:New("Debug timer", 1000, true, update)
 	timer:Start()
 end
 

@@ -309,21 +309,13 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-	if not self.bars then self.bars = {} end
-
-	for k, bar in pairs(self.bars) do
-		bar.bar:Hide()
-	end
-	createBars()
+	self:ClearBars()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 end
 
 function mod:OnDisable()
-	for k, bar in pairs(self.bars) do
-		bar:Del()
-		bar.bar:Hide()
-	end
+	self:ClearBars()
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
 end

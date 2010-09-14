@@ -430,7 +430,7 @@ end
 
 local widgetsToDraw = {}
 local function updateWidget(widget)
-	widgetsToDraw[widget] = true
+	tinsert(widgetsToDraw, widget)
 	if mod.db.profile.refreshRate == 0 then
 		draw()
 	end
@@ -440,7 +440,7 @@ do
 	local fontsList = LSM:List("font")
 	local widget, fontString
 	function draw()
-		for widget in pairs(widgetsToDraw) do
+		for i, widget in ipairs(widgetsToDraw) do
 			if not widget.fontString then break end
 			local fontString = widget.fontString
 			fontString:SetText(widget.buffer)
@@ -467,6 +467,12 @@ do
 	end
 end
 
+--@debug@
+local PluginResources = ResourceServer or LibStub("StarLibPluginResourceTools-1.0")
+local plugin = {}
+LibStub("StarLibPluginString-1.0"):New(plugin)
+--@end-debug@
+
 local tbl
 function mod:CreateLines()
     local llines = {}
@@ -478,8 +484,11 @@ function mod:CreateLines()
 			llines[j].config = copy(v)
 		end
     end
-    lines = setmetatable(llines, {__call=function(self)		
-
+    lines = setmetatable(llines, {__call=function(self)
+		--@debug@
+		PluginResources.Update()
+		local mem, percent, memdiff, totalMem, totaldiff = PluginResources.GetMemUsage("StarTip")
+		--@end-debug@
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
@@ -494,14 +503,13 @@ function mod:CreateLines()
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end
-
+				
                 if left and left ~= "" and right ~= "nil" then
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
 
 						if not v.leftObj or v.lineNum ~= lineNum then
-							--if v.leftObj then v.leftObj:Del() end
 							v.config.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
@@ -510,7 +518,6 @@ function mod:CreateLines()
 						end
 
 						if not v.rightObj or v.lineNum ~= lineNum then
-							--if v.rightObj then v.rightObj:Del() end
 							v.config.value = v.right
 							local tmp = v.update
 							if not v.rightUpdating then v.update = 0 end
@@ -518,9 +525,7 @@ function mod:CreateLines()
 							v.update = tmp
 						end
 						v.leftObj.fontString = mod.leftLines[lineNum]
-						widgetsToDraw[v.leftObj] = true
 						v.rightObj.fontString = mod.rightLines[lineNum]
-						widgetsToDraw[v.rightObj] = true
                     else
 						GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
 
@@ -530,23 +535,12 @@ function mod:CreateLines()
 						v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name, copy(v.config), 0, 0, 0, StarTip.db.profile.errorLevel, updateWidget)
 						v.update = tmp
 						v.leftObj.fontString = mod.leftLines[lineNum]
-						widgetsToDraw[v.leftObj] = true
                     end
 					if v.rightObj then
-						if mod.db.profile.refreshRate == 0 then
-							v.rightObj.update = 0
-							v.rightObj.speed = 0
-							v.rightObj:Init()
-						end
 						v.rightObj.config.unit = StarTip.unit
 						v.rightObj:Start()
 					end
 					if v.leftObj then
-						if mod.db.profile.refreshRate == 0 then
-							v.leftObj.update = 0
-							v.leftObj.speed = 0
-							v.leftObj:Init()
-						end
 						v.leftObj.config.unit = StarTip.unit
 						v.leftObj:Start()
 					end
@@ -555,8 +549,14 @@ function mod:CreateLines()
 			end
 
         end
-        --mod.NUM_LINES = lineNum
-	GameTooltip:Show()
+        mod.NUM_LINES = lineNum
+		--@debug@
+		PluginResources.Update()
+		local mem2, percent2, memdiff2, totalMem2, totaldiff2 = PluginResources.GetMemUsage("StarTip")
+		--StarTip:Print("Memory: ", plugin.memshort(mem2 - mem))
+		--@end-debug@
+		draw()
+		GameTooltip:Show()
     end})
 end
 

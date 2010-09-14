@@ -113,7 +113,7 @@ return HPColor(mana, max)
 		parent = "GameTooltip"
 	},
 	[4] = {
-		name = "Memory",
+		name = "Memory Percent",
 		enabled = false,
 		value = [[		
 local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
@@ -147,7 +147,30 @@ end
 		parent = "GameTooltip"
 	},
 	[5] = {
-		name = "CPU",
+		name = "Memory Total",
+		enabled = false,
+		value = [[		
+local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+if mem then
+    if totaldiff == 0 then totaldiff = 1 end
+    memperc = (mem / totalMem * 100)
+    local num = floor(memperc + 0.5)
+    if num < 1 then num = 1 end
+    if num > 100 then num = 100 end
+    return format("%s (%.2f%%)", memshort(mem), memperc)
+end
+]],
+		color = [[
+return 1, 1, 0
+]],
+		cols = 10,
+		update = 1000,
+		dontRtrim = true,
+		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -124},
+		parent = "GameTooltip"
+	},	
+	[6] = {
+		name = "CPU Percent",
 		enabled = false,
 		value = [[
 local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
@@ -180,6 +203,27 @@ end
 		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -62},
 		parent = "GameTooltip"
 	},
+	[7] = {
+		name = "CPU Total",
+		enabled = false,
+		value = [[
+local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+if cpu then
+    if totalCPU == 0 then totalCPU = 100 end
+    cpuperc = cpu / totalCPU * 100;
+    return format("%s (%.2f%%)", timeshort(cpu), cpuperc)
+end
+]],
+		color = [[
+return 1, 1, 0 
+]],
+		cols = 10,
+		align = WidgetText.ALIGN_RIGHT,
+		update = 1000,
+		dontRtrim = true,
+		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -124},
+		parent = "GameTooltip"
+	},	
 }
 
 local defaults = {
@@ -319,14 +363,7 @@ function mod:OnInitialize()
 	if not self.db.profile.texts then
 		self.db.profile.texts = {}
 	end
-	
-	for k in pairs(self.db.profile.texts) do
-		if type(k) == "string" then
-			wipe(self.db.profile.texts)
-			break
-		end
-	end
-	
+		
 	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.texts) do
 			if v.name == vv.name and not vv.custom then
@@ -354,21 +391,14 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-	if not self.texts then self.texts = {} end
-	
-	for k, text in pairs(self.texts) do
-		text.text:Hide()
-	end
+	self:ClearTexts()
 	createTexts()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 end
 
 function mod:OnDisable()
-	for k, text in pairs(self.texts) do
-		text:Del()
-		text.text:Hide()
-	end
+	self:ClearTexts()
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
 end

@@ -87,7 +87,7 @@ return PowerColor("RAGE", unit)
 		name = "Mem",
 		type = "histogram",
 		expression = [[
-mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
 
 if mem then
     if totaldiff == 0 then totaldiff = 1 end
@@ -370,19 +370,14 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-	if not self.histograms then self.histograms = {} end
-
+	self:ClearHistograms()
+	createHistograms()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 end
 
 function mod:OnDisable()
-	for k, widget in pairs(self.histograms) do
-		widget.bars:Del()
-		for i = 1, #widget.bars do
-			widget.bars[i]:Hide()
-		end
-	end
+	self:ClearHistograms()
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
 end
