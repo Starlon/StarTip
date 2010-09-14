@@ -336,6 +336,17 @@ do
 		pool[t] = true	
 		delCount = delCount + 1
 	end
+	function StarTip.copy(src, dst)
+		if type(src) ~= "table" then return nil end
+		if type(dst) ~= "table" then dst = StarTip.new() end
+		for k, v in pairs(src) do
+			if type(v) == "table" then
+				v = StarTip.copy(v)
+			end
+			dst[k] = v
+		end
+		return dst
+	end
 end
 
 local environment = {}

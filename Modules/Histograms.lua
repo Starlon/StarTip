@@ -1,7 +1,7 @@
 local mod = StarTip:NewModule("Histograms", "AceTimer-3.0")
 mod.name = "Histograms"
 mod.toggled = true
-mod.childGroup = true
+--mod.childGroup = true
 mod.defaultOff = true
 local _G = _G
 local StarTip = _G.StarTip
@@ -53,7 +53,38 @@ local function copy(tbl)
 end
 
 local defaultWidgets = {
-	["widget_mem_histogram"] = {
+	[1] = {
+		name = "Health",
+		expression = "return UnitHealth(unit)",
+		min = "return 0",
+		max = "return UnitHealthMax(unit)",
+		enabled = true,
+		width = 10,
+		height = 50,
+		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12},
+		color = [[
+return HPColor(UnitHealth(unit), UnitHealthMax(unit))
+]],
+		layer = 1,
+		update = 1000
+	},
+	[2] = {
+		name = "Power",
+		expression = "return UnitMana(unit)",
+		min = "return 0",
+		max = "return UnitManaMax(unit)",
+		enabled = true,
+		width = 10,
+		height = 50,
+		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -12},
+		color = [[
+return PowerColor("RAGE", unit)
+]],
+		layer = 1,
+		update = 1000
+	},
+	[3] = {
+		name = "Mem",
 		type = "histogram",
 		expression = [[
 mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
@@ -83,11 +114,13 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -65},
+		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -77},
 		layer = 1,
-		update = 1000
+		update = 1000,
+		persistent = true
 	},
-	["widget_cpu_histogram"] = {
+	[4] = {
+		name = "CPU",
 		type = "histogram",
 		expression = [[
 local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
@@ -116,38 +149,12 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -65},
+		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -77},
 		layer = 1,
-		update = 1000
+		update = 1000,
+		persistent = true
 	},
-	["widget_health_histogram"] = {
-		expression = "return UnitHealth(unit)",
-		min = "return 0",
-		max = "return UnitHealthMax(unit)",
-		enabled = true,
-		width = 10,
-		height = 50,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12},
-		color = [[
-return HPColor(UnitHealth(unit), UnitHealthMax(unit))
-]],
-		layer = 1,
-		update = 1000
-	},
-	["widget_mana_histogram"] = {
-		expression = "return UnitMana(unit)",
-		min = "return 0",
-		max = "return UnitManaMax(unit)",
-		enabled = true,
-		width = 10,
-		height = 50,
-		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -12},
-		color = [[
-return PowerColor("RAGE", unit)
-]],
-		layer = 1,
-		update = 1000
-	}
+	
 }
 
 local defaults = {
@@ -275,7 +282,8 @@ local function createHistograms()
 			local newWidget
 			if not mod.histograms then mod.histograms = {} end
 			if not widget then
-				widget = WidgetHistogram:New(mod.core, k, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
+				widget = WidgetHistogram:New(mod.core, v.name, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
+				widget.persistent = v.persistent
 				newWidget = true
 				for i = 0, v.width - 1 do				
 					local bar = new()
@@ -321,8 +329,15 @@ function mod:OnInitialize()
 		self.db.profile.histograms = {}
 	end
 	
-	self.db.profile.histograms = copy(defaultWidgets)
-		
+	wipe(self.db.profile.histograms)
+			
+	for k in pairs(self.db.profile.histograms) do
+		if type(k) == "string" then
+			wipe(self.db.profile.histograms)
+			break
+		end
+	end
+			
 	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.histograms) do
 			if v.name == vv.name then
@@ -338,7 +353,7 @@ function mod:OnInitialize()
 
 	for i, v in ipairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
-			tinsert(self.db.profile.histograms, v)
+			tinsert(self.db.profile.histograms, copy(v))
 		end
 	end
 	
@@ -395,7 +410,9 @@ function mod:SetItem()
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Hide()
 		end
-		widget:Stop()
+		if not widget.persistent then
+			widget:Stop()
+		end
 	end
 end
 
@@ -404,7 +421,9 @@ function mod:SetSpell()
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Hide()
 		end
-		widget:Stop()
+		if not widget.persistent then
+			widget:Stop()
+		end
 	end
 end
 
@@ -434,11 +453,11 @@ end
 function mod:RebuildOpts()
 	local defaults = WidgetHistogram.defaults
 	
-	for k, db in pairs(self.db.profile.histograms) do
-		options.histograms.args[k:gsub(" ", "_")] = {
-			name = k,
+	for i, db in ipairs(self.db.profile.histograms) do
+		options.histograms.args[db.name:gsub(" ", "_")] = {
+			name = db.name,
 			type="group",
-			order = 6,
+			order = i,
 			args={
 				enabled = {
 					name = "Enable",
@@ -583,6 +602,14 @@ function mod:RebuildOpts()
 					},
 					order = 7
 				},
+				persistent = {
+					name = "Persistent",
+					desc = "Whether this histogram is persistent or not, meaning it won't stop when the tooltip hides.",
+					type = "toggle",
+					get = function() return db.persistent end,
+					set = function(info, v) db.persistent = v end,
+					order = 8
+				},
 				expression = {
 					name = "Histogram expression",
 					desc = "Enter the histogram's first expression",
@@ -596,7 +623,7 @@ function mod:RebuildOpts()
 						clearHistogram(db)
 						createHistograms() 
 					end,
-					order = 8
+					order = 9
 				},
 				min = {
 					name = "Histogram min expression",

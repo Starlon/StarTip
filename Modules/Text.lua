@@ -1,7 +1,7 @@
 local mod = StarTip:NewModule("Text", "AceTimer-3.0")
 mod.name = "Text"
 mod.toggled = true
-mod.childGroup = true
+--mod.childGroup = true
 mod.defaultOff = true
 local _G = _G
 local StarTip = _G.StarTip
@@ -52,7 +52,8 @@ local function copy(tbl)
 end
 
 local defaultWidgets = {
-	["Name"] = {
+	[1] = {
+		name = "Name",
 		enabled = true,
 		value = [[
 if not UnitExists(unit) then return end
@@ -71,7 +72,8 @@ return ClassColor(unit)
 		point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 12},
 		parent = "GameTooltip",
 	},	
-	["Health"] = {
+	[2] = {
+		name = "Health",
 		enabled = true,
 		value = [[
 if not UnitExists(unit) then return end
@@ -90,7 +92,8 @@ return HPColor(health, max)
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, 1},
 		parent = "GameTooltip"
 	},
-	["Mana"] = {
+	[3] = {
+		name = "Power",
 		enabled = true,
 		value = [[
 if not UnitExists(unit) then return end
@@ -107,6 +110,74 @@ return HPColor(mana, max)
 		update = 1000,
 		dontRtrim = true,
 		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, 1},
+		parent = "GameTooltip"
+	},
+	[4] = {
+		name = "Memory",
+		enabled = false,
+		value = [[		
+local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+if mem then
+    if totaldiff == 0 then totaldiff = 1 end
+    memperc = (memdiff / totaldiff * 100)
+    local num = floor(memperc + 0.5)
+    if num < 1 then num = 1 end
+    if num > 100 then num = 100 end
+    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    return format("Mem: %.2f%%", memperc)
+end
+]],
+		color = [[
+local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+if mem then
+    if totaldiff == 0 then totaldiff = 1 end
+    memperc = (memdiff / totaldiff * 100)
+    local num = floor(memperc + 0.5)
+    if num < 1 then num = 1 end
+    if num > 100 then num = 100 end
+    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    return r, g, b
+end
+
+]],
+		cols = 20,
+		update = 1000,
+		dontRtrim = true,
+		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -62},
+		parent = "GameTooltip"
+	},
+	[5] = {
+		name = "CPU",
+		enabled = false,
+		value = [[
+local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+if cpu then
+    if totaldiff == 0 then totaldiff = 100 end
+    cpuperc = cpudiff / totaldiff * 100;
+    local num = floor(cpuperc + 0.5)
+    if num < 1 then num = 1 end
+    if num > 100 then num = 100 end
+    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    return format("CPU: %.2f%%", cpuperc)
+end
+]],
+		color = [[
+local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+if cpu then
+    if totaldiff == 0 then totaldiff = 1 end
+    cpuperc = (cpudiff / totaldiff * 100)
+    local num = floor(cpuperc)
+    if num < 1 then num = 1 end
+    if num > 100 then num = 100 end
+    local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
+    return r, g, b
+end		
+]],
+		cols = 20,
+		align = WidgetText.ALIGN_RIGHT,
+		update = 1000,
+		dontRtrim = true,
+		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -62},
 		parent = "GameTooltip"
 	},
 }
@@ -217,7 +288,7 @@ function createTexts()
 			local text = new(v.cols or WidgetText.defaults.cols)
 			local cfg = copy(v)
 			cfg.unit = StarTip.unit
-			local widget = mod.texts[v] or WidgetText:New(mod.core, k, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText) 
+			local widget = mod.texts[v] or WidgetText:New(mod.core, v.name, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText) 
 			text:ClearAllPoints()
 			text:SetParent(v.parent)
 			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
@@ -238,8 +309,15 @@ function mod:OnInitialize()
 		self.db.profile.texts = {}
 	end
 	
+	for k in pairs(self.db.profile.texts) do
+		if type(k) == "string" then
+			wipe(self.db.profile.texts)
+			break
+		end
+	end
+	
 	for i, v in ipairs(defaultWidgets) do
-		for j, vv in ipairs(self.db.profile.lines) do
+		for j, vv in ipairs(self.db.profile.texts) do
 			if v.name == vv.name then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
@@ -253,28 +331,7 @@ function mod:OnInitialize()
 
 	for i, v in ipairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
-			tinsert(self.db.profile.texts, v)
-		end
-	end
-	
-	self.db.profile.texts = copy(defaultWidgets)
---[[	
-	for k, v in pairs(defaultWidgets) do
-		for kk, vv in pairs(self.db.profile.texts) do
-			if v.name == vv.name then
-				for k, val in pairs(v) do
-					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
-						vv[k] = copy(v[k])
-					end
-				end
-				v.tagged = true
-			end
-		end
-	end
-]]
-	for k, v in pairs(defaultWidgets) do
-		if not v.tagged and not v.deleted then
-			self.db.profile.texts[k] = copy(v)
+			tinsert(self.db.profile.texts, copy(v))
 		end
 	end
 	
@@ -359,11 +416,11 @@ end
 function mod:RebuildOpts()
 	local defaults = WidgetText.defaults
 	
-	for k, db in pairs(self.db.profile.texts) do
-		options.texts.args[k:gsub(" ", "_")] = {
-			name = k,
+	for i, db in ipairs(self.db.profile.texts) do
+		options.texts.args[db.name:gsub(" ", "_")] = {
+			name = db.name,
 			type="group",
-			order = 6,
+			order = i,
 			args=WidgetText:GetOptions(StarTip, db)
 		}
 	end

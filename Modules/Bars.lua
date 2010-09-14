@@ -1,7 +1,7 @@
 local mod = StarTip:NewModule("Bars", "AceTimer-3.0")
 mod.name = "Bars"
 mod.toggled = true
-mod.childGroup = true
+--mod.childGroup = true
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip
@@ -52,7 +52,8 @@ local function copy(tbl)
 end
 
 local defaultWidgets = {
-	["Health Bar"] = {
+	[1] = {
+		name = "Health Bar",
 		type = "bar",
 		expression = [[
 return UnitHealth(unit)
@@ -73,7 +74,8 @@ end
 		enabled = true,
 		layer = 1
 	},
-	["Mana Bar"] = {
+	[2] = {
+		name = "Mana Bar",
 		type = "bar",
 		expression = [[
 if not UnitExists(unit) then return end
@@ -209,7 +211,7 @@ function createBars()
 			local widget = mod.bars[v]
 			if not widget then
 				local bar = new()
-				widget = mod.bars[v] or WidgetBar:New(mod.core, k, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+				widget = mod.bars[v] or WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
 				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
@@ -232,7 +234,7 @@ function createBars()
 				
 				if v.expression2 then
 					bar = new()
-					widget = WidgetBar:New(mod.core, k, copy(v), v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
+					widget = WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
 					bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
 					bar:ClearAllPoints()
 					local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
@@ -268,8 +270,15 @@ function mod:OnInitialize()
 		self.db.profile.bars = {}
 	end
 	
-	for i, v in ipairs(defaultWidgets) do
-		for j, vv in ipairs(self.db.profile.lines) do
+	for k in pairs(self.db.profile.bars) do
+		if type(k) == "string" then
+			wipe(self.db.profile.bars)
+			break
+		end
+	end
+	
+	for k, v in pairs(defaultWidgets) do
+		for j, vv in ipairs(self.db.profile.bars) do
 			if v.name == vv.name then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
@@ -281,33 +290,12 @@ function mod:OnInitialize()
 		end
 	end
 
-	for i, v in ipairs(defaultWidgets) do
-		if not v.tagged and not v.deleted then
-			tinsert(self.db.profile.bars, v)
-		end
-	end
-	
-	self.db.profile.bars = copy(defaultWidgets)
---[[	
-	for k, v in pairs(defaultWidgets) do
-		for kk, vv in pairs(self.db.profile.bars) do
-			if v.name == vv.name then
-				for k, val in pairs(v) do
-					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
-						vv[k] = copy(v[k])
-					end
-				end
-				v.tagged = true
-			end
-		end
-	end
-]]
 	for k, v in pairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
 			self.db.profile.bars[k] = copy(v)
 		end
 	end
-	
+		
 	self.core = LibCore:New(mod, environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)		
 	
 	StarTip:SetOptionsDisabled(options, true)
@@ -406,11 +394,11 @@ end
 function mod:RebuildOpts()
 	local defaults = WidgetBar.defaults
 	
-	for k, db in pairs(self.db.profile.bars) do
-		options.bars.args[k:gsub(" ", "_")] = {
-			name = k,
+	for i, db in ipairs(self.db.profile.bars) do
+		options.bars.args[db.name:gsub(" ", "_")] = {
+			name = db.name,
 			type="group",
-			order = 6,
+			order = i,
 			args={
 				enabled = {
 					name = "Enabled",
