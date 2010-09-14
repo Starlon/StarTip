@@ -86,9 +86,8 @@ if not UnitExists(unit) then return end
 local health, max = UnitHealth(unit), UnitHealthMax(unit)
 return HPColor(health, max)		
 ]],
-		cols = 15,
+		cols = 20,
 		update = 1000,
-		dontRtrim = true,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, 1},
 		parent = "GameTooltip"
 	},
@@ -106,9 +105,9 @@ if not UnitExists(unit) then return end
 local mana, max = UnitMana(unit), UnitManaMax(unit)
 return HPColor(mana, max)
 ]],
-		cols = 15,
+		cols = 20,
 		update = 1000,
-		dontRtrim = true,
+		align = WidgetText.ALIGN_RIGHT,
 		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, 1},
 		parent = "GameTooltip"
 	},

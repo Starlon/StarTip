@@ -561,33 +561,35 @@ end
 function StarTip.OnTooltipSetUnit()	
 	local unit = GameTooltip:GetUnit()
 	StarTip.unit = "mouseover"
-	for i, v in ipairs(SINGLETON_CLASSIFICATIONS) do
-		if unit == UnitName(v) then
-			StarTip.unit = v
+	if not UnitExists("mouseover") then
+		if UnitInRaid("player") then
+			for i=1, GetNumRaidMembers() do
+				for i, v in ipairs(UNIT_RAID_GROUPS) do
+					if unit == UnitName(v .. i) then
+						StarTip.unit = v .. i
+						break
+					end
+				end
+				if StarTip.unit ~= "mouseover" then break end
+			end
+		elseif UnitInParty("player") then
+			for i=1, GetNumPartyMembers() do
+				for i, v in ipairs(UNIT_PARTY_GROUPS) do
+					if unit == UnitName(v .. i) then
+						StarTip.unit = v .. i
+						break
+					end
+				end
+				if StarTip.unit ~= "mouseover" then break end
+			end
+		end
+		for i, v in ipairs(SINGLETON_CLASSIFICATIONS) do
+			if unit == UnitName(v) then
+				StarTip.unit = v
+			end
 		end
 	end
-	if UnitInRaid("player") and StarTip.unit == "mouseover" then
-		for i=1, GetNumRaidMembers() do
-			for i, v in ipairs(UNIT_RAID_GROUPS) do
-				if unit == UnitName(v .. i) then
-					StarTip.unit = v .. i
-					break
-				end
-			end
-			if StarTip.unit ~= "mouseover" then break end
-		end
-	elseif UnitInParty("player") and StarTip.unit == "mouseover" then
-		for i=1, GetNumPartyMembers() do
-			for i, v in ipairs(UNIT_PARTY_GROUPS) do
-				if unit == UnitName(v .. i) then
-					StarTip.unit = v .. i
-					break
-				end
-			end
-			if StarTip.unit ~= "mouseover" then break end
-		end
-	end
-
+	
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
