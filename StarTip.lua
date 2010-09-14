@@ -564,7 +564,7 @@ function StarTip.OnTooltipSetUnit()
 	if not UnitExists("mouseover") then
 		if UnitInRaid("player") then
 			for i=1, GetNumRaidMembers() do
-				for i, v in ipairs(UNIT_RAID_GROUPS) do
+				for j, v in ipairs(UNIT_RAID_GROUPS) do
 					if unit == UnitName(v .. i) then
 						StarTip.unit = v .. i
 						break
@@ -574,7 +574,7 @@ function StarTip.OnTooltipSetUnit()
 			end
 		elseif UnitInParty("player") then
 			for i=1, GetNumPartyMembers() do
-				for i, v in ipairs(UNIT_PARTY_GROUPS) do
+				for j, v in ipairs(UNIT_PARTY_GROUPS) do
 					if unit == UnitName(v .. i) then
 						StarTip.unit = v .. i
 						break
@@ -589,7 +589,6 @@ function StarTip.OnTooltipSetUnit()
 			end
 		end
 	end
-	
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end

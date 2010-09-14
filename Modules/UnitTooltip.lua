@@ -223,8 +223,11 @@ elseif UnitIsDead(unit) and  unitHasAura(GetSpellInfo(20707)) then
 elseif UnitIsDead(unit) then
     return "Dead"
 end
+return "Alive"
 ]],
 		enabled = true,
+		update = 1000,
+		rightUpdating = true
     },
     [11] = {
         name = "Health",
@@ -391,11 +394,6 @@ function mod:OnInitialize()
 
 end
 
-local function unitTimerFunction()
-	lines(true)
-	mod:RefixEndLines()
-end
-
 local draw
 local update
 function mod:OnEnable()
@@ -404,8 +402,6 @@ function mod:OnEnable()
 	if self.db.profile.refreshRate > 0 then
 		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
 	end
-	
-	self.unitTimer = LibTimer:New(mod.name .. ".unitTimer", 100, false, unitTimerFunction, nil, self.db.profile.errorLevel)
 end
 
 function mod:OnDisable()
@@ -493,6 +489,8 @@ function mod:CreateLines()
         for i, v in ipairs(self) do
 			if v.enabled and not v.deleted then
                 local left, right, c, cc = '', ''
+				environment.unit = StarTip.unit
+				v.config.unit = StarTip.unit
                 if v.right and v.right ~= "" then					
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
@@ -512,10 +510,10 @@ function mod:CreateLines()
 							v.config.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
+							
 							v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name .. "left", copy(v.config), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 							v.update = tmp
 						end
-
 						if not v.rightObj or v.lineNum ~= lineNum then
 							v.config.value = v.right
 							local tmp = v.update
@@ -1084,9 +1082,6 @@ function mod:SetUnit()
 		self.timer:Start()
 	end	
 	
-	if StarTip.unit ~= "mouseover" then
-		self.unitTimer:Start()
-	end
 end
 
 function mod:RefixEndLines()
