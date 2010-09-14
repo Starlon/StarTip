@@ -294,13 +294,12 @@ return value
 		name = "Memory Usage",
 		left = "return 'Memory Usage:'",
 		right = [[
-local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip")
 if mem then
-    if totaldiff == 0 then totaldiff = 1 end
-    memperc = (memdiff / totaldiff * 100)
-    local num = floor(memperc + 0.5)
+    local num = floor(memperc)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
+	assert(gradient[num], format("%d", num))
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
     return GetColorCode(format("%s (%.2f%%)", memshort(mem), memperc), r, g, b)
 end
@@ -313,11 +312,9 @@ end
 		desc = "Note that you must turn on CPU profiling",
 		left = 'return "CPU Usage:"',
 		right = [[
-local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip")
 if cpu then
-    if totaldiff == 0 then totaldiff = 100 end
-    cpuperc = cpudiff / totaldiff * 100;
-    local num = floor(cpuperc + 0.5)
+    local num = floor(cpuperc)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
@@ -486,8 +483,10 @@ function mod:CreateLines()
     end
     lines = setmetatable(llines, {__call=function(self)
 		--@debug@
-		PluginResources.Update()
-		local mem, percent, memdiff, totalMem, totaldiff = PluginResources.GetMemUsage("StarTip")
+		if debugging then
+			PluginResources.Update()
+			local mem, percent, memdiff, totalMem, totaldiff = PluginResources.GetMemUsage("StarTip")
+		end
 		--@end-debug@
         local lineNum = 0
 		GameTooltip:ClearLines()
@@ -551,9 +550,11 @@ function mod:CreateLines()
         end
         mod.NUM_LINES = lineNum
 		--@debug@
-		PluginResources.Update()
-		local mem2, percent2, memdiff2, totalMem2, totaldiff2 = PluginResources.GetMemUsage("StarTip")
-		--StarTip:Print("Memory: ", plugin.memshort(mem2 - mem))
+		if debugging then
+			PluginResources.Update()
+			local mem2, percent2, memdiff2, totalMem2, totaldiff2 = PluginResources.GetMemUsage("StarTip")
+			StarTip:Print("Memory: ", plugin.memshort(mem2 - mem))
+		end
 		--@end-debug@
 		draw()
 		GameTooltip:Show()

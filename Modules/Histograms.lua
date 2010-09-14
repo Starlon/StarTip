@@ -87,19 +87,15 @@ return PowerColor("RAGE", unit)
 		name = "Mem",
 		type = "histogram",
 		expression = [[
-local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
-
+local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip")
 if mem then
-    if totaldiff == 0 then totaldiff = 1 end
-    return memdiff / totaldiff * 100
+    return memperc
 end
 ]],
 		color = [[
-local mem, percent, memdiff, totalMem, totaldiff = GetMemUsage("StarTip")
+local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip")
 if mem then
-    if totaldiff == 0 then totaldiff = 1 end
-    memperc = (memdiff / totaldiff * 100)
-    local num = floor(memperc + 0.5)
+    local num = floor(memperc)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
@@ -123,17 +119,12 @@ end
 		name = "CPU",
 		type = "histogram",
 		expression = [[
-local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
-if cpu then
-    if totaldiff == 0 then totaldiff = .001 end
-    return cpudiff / totaldiff * 100
-end
+local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip")
+return cpuperc
 ]],
 		color = [[
-local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
+local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip")
 if cpu then
-    if totaldiff == 0 then totaldiff = 1 end
-    cpuperc = (cpudiff / totaldiff * 100)
     local num = floor(cpuperc)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
