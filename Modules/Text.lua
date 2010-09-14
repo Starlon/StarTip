@@ -188,23 +188,27 @@ local defaults = {
 	}
 }
 
-local options = {
+local options = {}
+local optionsDefaults = {
 	add = {
 		name = "Add Text",
 		desc = "Add a text widget",
 		type = "input",
 		set = function(info, v)
-			mod.db.profile.texts[v] = {
+			local widget = {
+				name = v,
 				type = "text",
 				min = "return 0",
 				max = "return 100",
 				height = 6,
 				point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
 				texture = LSM:GetDefault("statustext"),
-				expression = ""
+				expression = "",
+				custom = true
 			}
+			tinsert(mod.db.profile.texts, widget)
 			StarTip:RebuildOpts()
-			createTexts()
+			mod:ClearTexts()
 		end,
 		order = 5
 	},
@@ -215,14 +219,8 @@ local options = {
 		func = function() 
 			mod.db.profile.texts = copy(defaultWidgets); 
 			StarTip:RebuildOpts() 
-			StarTip:Print("Bug: You'll have to reload your UI to see the change in the texts list. I'm not sure why.")
 		end,
 		order = 6
-	},
-	texts = {
-		name = "Texts",
-		type = "group",
-		args = {}
 	},
 }
 
@@ -275,6 +273,20 @@ local strataNameList = {
 
 local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Fullscreen", "Fullscreen Dialog", "Tooltip"}
 
+local function clearText(obj)
+	local widget = mod.texts[obj]
+	if not widget then return end
+	widget:Del()
+	del(widget.text)
+end
+
+function mod:ClearTexts()
+	for k, v in pairs(mod.texts) do
+		clearText(v)
+	end
+	wipe(mod.texts)
+end
+
 function createTexts()
 	if type(mod.texts) ~= "table" then mod.texts = {} end
 	--[[for k, v in pairs(mod.texts) do
@@ -283,12 +295,11 @@ function createTexts()
 		del(v.text)
 	end]]
 	local appearance = StarTip:GetModule("Appearance")	
-	for k, v in pairs(self.db.profile.texts) do
-		if v.enabled then
+	for i, v in ipairs(self.db.profile.texts) do
+		if v.enabled and not v.deleted then
 			local text = new(v.cols or WidgetText.defaults.cols)
-			local cfg = copy(v)
-			cfg.unit = StarTip.unit
-			local widget = mod.texts[v] or WidgetText:New(mod.core, v.name, cfg, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText) 
+			local widget = mod.texts[v] or WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText) 
+			widget.config.unit = StarTip.unit
 			text:ClearAllPoints()
 			text:SetParent(v.parent)
 			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
@@ -318,7 +329,7 @@ function mod:OnInitialize()
 	
 	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.texts) do
-			if v.name == vv.name then
+			if v.name == vv.name and not vv.custom then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
 						vv[k] = v[k]
@@ -339,6 +350,7 @@ function mod:OnInitialize()
 	
 	StarTip:SetOptionsDisabled(options, true)
 
+	self.texts = {}
 end
 
 function mod:OnEnable()
@@ -415,13 +427,38 @@ end
 
 function mod:RebuildOpts()
 	local defaults = WidgetText.defaults
+	self:ClearTexts()
+
+	wipe(options)
+	for k, v in pairs(optionsDefaults) do
+		options[k] = v
+	end
 	
 	for i, db in ipairs(self.db.profile.texts) do
-		options.texts.args[db.name:gsub(" ", "_")] = {
+		options[db.name:gsub(" ", "_")] = {
 			name = db.name,
 			type="group",
 			order = i,
 			args=WidgetText:GetOptions(StarTip, db)
+		}
+		options[db.name:gsub(" ", "_")].args.delete = {
+			name = "Delete",
+			type = "execute",
+			func = function()
+				local delete = true
+				for i, v in ipairs(defaultWidgets) do
+					if db.name == v.name then
+						db.deleted = true
+						delete = false
+					end
+				end
+				if delete then
+					self.db.profile.texts[i] = nil
+				end
+				self:ClearTexts()
+				StarTip:RebuildOpts()
+			end,
+			order = 100
 		}
 	end
 end

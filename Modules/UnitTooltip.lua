@@ -71,7 +71,7 @@ end
 
 local function copy(src, dst)
 	if type(src) ~= "table" then return nil end
-	if type(dst) ~= "table" then dst = StarTip.new() end
+	if type(dst) ~= "table" then dst = {} end
 	for k, v in pairs(src) do
 		if type(v) == "table" then
 			v = copy(v)
@@ -428,16 +428,19 @@ function mod:UPDATE_FACTION()
     end
 end
 
-local fontStringsToDraw = {}
-local function updateFontString(widget, fontString)
-	fontStringsToDraw[widget] = true
+local widgetsToDraw = {}
+local function updateWidget(widget)
+	widgetsToDraw[widget] = true
+	if mod.db.profile.refreshRate == 0 then
+		draw()
+	end
 end
 
 do
 	local fontsList = LSM:List("font")
 	local widget, fontString
 	function draw()
-		for widget in pairs(fontStringsToDraw) do
+		for widget in pairs(widgetsToDraw) do
 			if not widget.fontString then break end
 			local fontString = widget.fontString
 			fontString:SetText(widget.buffer)
@@ -460,7 +463,7 @@ do
 				end
 			end
 		end
-		table.wipe(fontStringsToDraw)
+		table.wipe(widgetsToDraw)
 	end
 end
 
@@ -502,11 +505,7 @@ function mod:CreateLines()
 							v.config.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
-							if mod.db.profile.refreshRate == 0 then
-								v.config.update = 0
-								v.config.scroll = 0
-							end
-							v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name .. "left", v.config, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString)
+							v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name .. "left", copy(v.config), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 							v.update = tmp
 						end
 
@@ -515,31 +514,23 @@ function mod:CreateLines()
 							v.config.value = v.right
 							local tmp = v.update
 							if not v.rightUpdating then v.update = 0 end
-							if mod.db.profile.refreshRate == 0 then
-								v.config.update = 0
-								v.config.scroll = 0
-							end
-							v.rightObj = v.rightObj or WidgetText:New(mod.core, v.name .. "right", v.config, 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateFontString)
+							v.rightObj = v.rightObj or WidgetText:New(mod.core, v.name .. "right", copy(v.config), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 							v.update = tmp
 						end
 						v.leftObj.fontString = mod.leftLines[lineNum]
-						fontStringsToDraw[v.leftObj] = true
+						widgetsToDraw[v.leftObj] = true
 						v.rightObj.fontString = mod.rightLines[lineNum]
-						fontStringsToDraw[v.rightObj] = true
+						widgetsToDraw[v.rightObj] = true
                     else
 						GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
 
 						v.config.value = v.left
 						local tmp = v.update
 						if not v.leftUpdating then v.update = 0 end
-						if mod.db.profile.refreshRate == 0 then
-							v.config.update = 0
-							v.config.scroll = 0
-						end
-						v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name, v.config, 0, 0, 0, StarTip.db.profile.errorLevel, updateFontString)
+						v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name, copy(v.config), 0, 0, 0, StarTip.db.profile.errorLevel, updateWidget)
 						v.update = tmp
 						v.leftObj.fontString = mod.leftLines[lineNum]
-						fontStringsToDraw[v.leftObj] = true
+						widgetsToDraw[v.leftObj] = true
                     end
 					if v.rightObj then
 						if mod.db.profile.refreshRate == 0 then
@@ -565,7 +556,6 @@ function mod:CreateLines()
 
         end
         --mod.NUM_LINES = lineNum
-	draw()
 	GameTooltip:Show()
     end})
 end

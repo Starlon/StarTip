@@ -163,13 +163,15 @@ local defaults = {
 	}
 }
 
-local options = {
+local options = {}
+local optionsDefaults = {
 	add = {
 		name = "Add Histogram",
 		desc = "Add a histogram",
 		type = "input",
 		set = function(info, v)
-			mod.db.profile.histograms[v] = {
+			local widget = {
+				name = v,
 				type = "histogram",
 				min = "return 0",
 				max = "return 100",
@@ -179,10 +181,12 @@ local options = {
 				point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -50},
 				texture = LSM:GetDefault("statusbar"),
 				expression = "return random(100)",
-				color = "return 0, 0, 1"
+				color = "return 0, 0, 1",
+				custom = true
 			}
+			tinsert(mod.db.profile.histograms, widget)
 			StarTip:RebuildOpts()
-			createHistograms()
+			
 		end,
 		order = 5
 	},
@@ -193,14 +197,8 @@ local options = {
 		func = function() 
 			mod.db.profile.histograms = copy(defaultWidgets); 
 			StarTip:RebuildOpts() 
-			StarTip:Print("Bug: You'll have to reload your UI to see the change in the histograms list. I'm not sure why.")
 		end,
 		order = 6
-	},
-	histograms = {
-		name = "Histograms",
-		type = "group",
-		args = {}
 	},
 }
 
@@ -221,10 +219,6 @@ function updateHistogram(widget)
 end
 
 local textureDict = {}
-
-function mod:CreateHistograms()
-	createHistograms()
-end
 
 local new, del
 do
@@ -254,6 +248,13 @@ local function clearHistogram(obj)
 	obj:Del()
 end
 
+function mod:ClearHistograms()
+	for k, v in pairs(mod.histograms) do
+		clearHistogram(v)
+	end
+	wipe(mod.histograms)
+end
+
 local function createHistograms()
 	if type(mod.histograms) ~= "table" then mod.histograms = {} end
 	--[[for k, widget in pairs(mod.histograms) do
@@ -276,7 +277,7 @@ local function createHistograms()
 	end
 		
 	for k, v in pairs(self.db.profile.histograms) do
-		if v.enabled then
+		if v.enabled and not v.deleted then
 			v.width = v.width or WidgetHistogram.defaults.width
 			local widget = mod.histograms[v]
 			local newWidget
@@ -322,15 +323,17 @@ local function createHistograms()
 	end
 end
 
+function mod:CreateHistograms()
+	createHistograms()
+end
+
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	
 	if not self.db.profile.histograms then
 		self.db.profile.histograms = {}
 	end
-	
-	wipe(self.db.profile.histograms)
-			
+				
 	for k in pairs(self.db.profile.histograms) do
 		if type(k) == "string" then
 			wipe(self.db.profile.histograms)
@@ -340,7 +343,7 @@ function mod:OnInitialize()
 			
 	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.histograms) do
-			if v.name == vv.name then
+			if v.name == vv.name and not vv.custom then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
 						vv[k] = v[k]
@@ -363,6 +366,7 @@ function mod:OnInitialize()
 	
 	StarTip:SetOptionsDisabled(options, true)
 
+	self.histograms = {}
 end
 
 function mod:OnEnable()
@@ -382,12 +386,6 @@ function mod:OnDisable()
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
 end
-
---[[function mod:RebuildOpts()
-	for k, v in ipairs(self.db.profile.histograms) do
-		options.histograms.args[k] = WidgetHistogram:GetOptions(v)
-	end
-end]]
 
 function mod:GetOptions()
 	return options
@@ -452,9 +450,13 @@ end
 
 function mod:RebuildOpts()
 	local defaults = WidgetHistogram.defaults
-	
+	self:ClearHistograms()
+	wipe(options)
+	for k, v in pairs(optionsDefaults) do
+		options[k] = v
+	end
 	for i, db in ipairs(self.db.profile.histograms) do
-		options.histograms.args[db.name:gsub(" ", "_")] = {
+		options[db.name:gsub(" ", "_")] = {
 			name = db.name,
 			type="group",
 			order = i,
@@ -467,8 +469,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.enabled = v 
 						db["enabledDirty"] = true
-						clearHistogram(db)
-						createHistograms()
+						self:ClearHistograms()
 					end,
 					order = 1
 				},
@@ -481,8 +482,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.height = tonumber(v); 
 						db["heightDirty"] = true
-						clearHistogram(db)
-						createHistograms();  
+						self:ClearHistograms()  
 					end,
 					order = 2
 				},
@@ -495,8 +495,7 @@ function mod:RebuildOpts()
 					set = function(info, v)
 						db.width = tonumber(v)
 						db["widthDirty"] = true
-						clearHistogram(db)
-						createHistograms()
+						self:ClearHistograms()
 					end,
 					order = 3
 				},
@@ -518,8 +517,7 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.update = tonumber(v); 
 						db["updateDirty"] = true						
-						clearHistogram(db)
-						createHistograms() 
+						self:ClearHistograms() 
 					end,
 					order = 5
 				},
@@ -550,8 +548,7 @@ function mod:RebuildOpts()
 					set = function(info, v)
 						db.texture = LSM:List("statusbar")[v]
 						db["textureDirty"] = true						
-						clearHistogram(db)
-						createHistograms()
+						self:ClearHistograms()
 					end,
 					order = 6
 				},
@@ -565,14 +562,14 @@ function mod:RebuildOpts()
 							type = "select",
 							values = anchors,
 							get = function() return anchorsDict[db.point[1] or 1] end,
-							set = function(info, v) db.point[1] = anchors[v];clearHistogram(db);createHistograms() end,
+							set = function(info, v) db.point[1] = anchors[v];self:ClearHistograms(); end,
 							order = 1
 						},
 						relativeFrame = {
 							name = "Relative Frame",
 							type = "input",
 							get = function() return db.point[2] end,
-							set = function(info, v) db.point[2] = v; clearHistogram(db); createHistograms() end,
+							set = function(info, v) db.point[2] = v; self:ClearHistograms();  end,
 							order = 2
 						},
 						relativePoint = {
@@ -580,7 +577,7 @@ function mod:RebuildOpts()
 							type = "select",
 							values = anchors,
 							get = function() return anchorsDict[db.point[3] or 1] end,
-							set = function(info, v) db.point[3] = anchors[v]; clearHistogram(db); createHistograms() end,
+							set = function(info, v) db.point[3] = anchors[v]; self:ClearHistograms();  end,
 							order = 3
 						},
 						xOfs = {
@@ -588,7 +585,7 @@ function mod:RebuildOpts()
 							type = "input",
 							pattern = "%d",
 							get = function() return tostring(db.point[4] or 0) end,
-							set = function(info, v) db.point[4] = tonumber(v); clearHistogram(db); createHistograms() end,
+							set = function(info, v) db.point[4] = tonumber(v); self:ClearHistograms();  end,
 							order = 4
 						},
 						yOfs = {
@@ -596,7 +593,7 @@ function mod:RebuildOpts()
 							type = "input",
 							pattern = "%d",
 							get = function() return tostring(db.point[5] or 0) end,
-							set = function(info, v) db.point[5] = tonumber(v); clearHistogram(db);createHistograms() end,
+							set = function(info, v) db.point[5] = tonumber(v); self:ClearHistograms(); end,
 							order = 4						
 						}
 					},
@@ -620,8 +617,8 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.expression = v; 
 						db["expressionDirty"] = true
-						clearHistogram(db)
-						createHistograms() 
+						self:ClearHistograms()
+						 
 					end,
 					order = 9
 				},
@@ -635,8 +632,8 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.min = v; 
 						db["minDirty"] = true
-						clearHistogram(db)
-						createHistograms() 
+						self:ClearHistograms()
+						 
 					end,
 					order = 10
 				
@@ -651,8 +648,8 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.max = v; 
 						db["maxDirty"] = true
-						clearHistogram(db)
-						createHistograms() 
+						self:ClearHistograms()
+						 
 					end,
 					order = 11
 				},
@@ -666,8 +663,8 @@ function mod:RebuildOpts()
 					set = function(info, v) 
 						db.color = v; 
 						db["colorDirty"] = true
-						clearHistogram(db)
-						createHistograms() 
+						self:ClearHistograms()
+						 
 					end,
 					order = 12
 				},
@@ -676,9 +673,18 @@ function mod:RebuildOpts()
 					desc = "Delete this widget",
 					type = "execute",
 					func = function()
-						self.db.profile.histograms[k] = nil
-						clearHistogram(db)
-						createHistograms()
+						local delete = true
+						for i, v in ipairs(defaultWidgets) do
+							if db.name == v.name then
+								db.deleted = true
+								delete = false
+							end
+						end
+						if delete then
+							self.db.profile.histograms[i] = nil
+						end
+						self:ClearHistograms()	
+						StarTip:RebuildOpts()						
 					end,
 					order = 13
 				}

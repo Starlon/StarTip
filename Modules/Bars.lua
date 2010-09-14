@@ -83,7 +83,7 @@ return UnitMana(unit)
 ]],
 		min = "return 0",
 		max = "return UnitManaMax('mouseover')",
-		color1 = [[		
+		color1 = [[
 return PowerColor(nil, unit)
 ]],
 		height = 6,
@@ -92,7 +92,7 @@ return PowerColor(nil, unit)
 		enabled = true,
 		layer = 1
 	},
-	
+
 
 }
 
@@ -102,23 +102,27 @@ local defaults = {
 	}
 }
 
-local options = {
+local options = {}
+local optionsDefaults = {
 	add = {
 		name = "Add Bar",
 		desc = "Add a bar",
 		type = "input",
 		set = function(info, v)
-			mod.db.profile.bars[v] = {
+			local widget = {
+				name = v,
 				type = "bar",
 				min = "return 0",
 				max = "return 100",
 				height = 6,
 				point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
 				texture = LSM:GetDefault("statusbar"),
-				expression = ""
+				expression = "",
+				custom = true
 			}
+			tinsert(mod.db.profile.bars, widget)
 			StarTip:RebuildOpts()
-			createBars()
+			mod:ClearBars()
 		end,
 		order = 5
 	},
@@ -126,31 +130,25 @@ local options = {
 		name = "Restore Defaults",
 		desc = "Restore Defaults",
 		type = "execute",
-		func = function() 
-			mod.db.profile.bars = copy(defaultWidgets); 
-			StarTip:RebuildOpts() 
-			StarTip:Print("Bug: You'll have to reload your UI to see the change in the bars list. I'm not sure why.")
+		func = function()
+			mod.db.profile.bars = copy(defaultWidgets);
+			StarTip:RebuildOpts()
 		end,
 		order = 6
-	},
-	bars = {
-		name = "Bars",
-		type = "group",
-		args = {}
 	},
 }
 
 function updateBar(widget, bar)
 	bar:SetValue(widget.val1 * 100)
-		
+
 	local r, g, b = 0, 0, 1
-	
+
 	if widget.color1 and widget.bar1 then
 		r, g, b = widget.color1.res1, widget.color1.res2, widget.color1.res3
 	elseif widget.color2 and widget.color2.is_valid then
 		r, g, b = widget.color2.res1, widget.color2.res2, widget.color2.res3
 	end
-	
+
 	if type(r) == "number" then
 		bar:SetStatusBarColor(r, g, b)
 	else
@@ -160,22 +158,18 @@ end
 
 local textureDict = {}
 
-function mod:CreateBars()
-	createBars()
-end
-
 local new, del
 do
 	local pool = {}
 	function new()
 		local bar = next(pool)
-		
+
 		if bar then
 			pool[bar] = nil
 		else
 			bar = CreateFrame("StatusBar", nil, GameTooltip)
 		end
-		
+
 		return bar
 	end
 	function del(bar)
@@ -184,14 +178,14 @@ do
 end
 
 local defaultPoint = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}
-	
+
 local strataNameList = {
 	"BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG", "TOOLTIP"
 }
 
 local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Fullscreen", "Fullscreen Dialog", "Tooltip"}
 
-function clearBar(obj)
+local function clearBar(obj)
 	obj = mod.bars and mod.bars[obj]
 	if not obj then return end
 	del(obj.bar)
@@ -202,16 +196,23 @@ function clearBar(obj)
 	end
 end
 
-function createBars()
+function mod:ClearBars()
+	for k, v in pairs(mod.bars) do
+		clearBar(v)
+	end
+	wipe(mod.bars)
+end
+
+local function createBars()
 	if type(mod.bars) ~= "table" then mod.bars = {} end
-	
+
 	for k, v in pairs(self.db.profile.bars) do
-		if v.enabled then
-			
+		if v.enabled and not v.deleted then
+
 			local widget = mod.bars[v]
 			if not widget then
 				local bar = new()
-				widget = mod.bars[v] or WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar) 
+				widget = mod.bars[v] or WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
 				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
@@ -231,7 +232,7 @@ function createBars()
 				widget.bar1 = true
 				widget.bar = bar
 				mod.bars[v] = widget
-				
+
 				if v.expression2 then
 					bar = new()
 					widget = WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
@@ -263,23 +264,27 @@ function createBars()
 	end
 end
 
+function mod:CreateBars()
+	createBars()
+end
+
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-	
+
 	if not self.db.profile.bars then
 		self.db.profile.bars = {}
 	end
-	
+
 	for k in pairs(self.db.profile.bars) do
 		if type(k) == "string" then
 			wipe(self.db.profile.bars)
 			break
 		end
 	end
-	
+
 	for k, v in pairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.bars) do
-			if v.name == vv.name then
+			if v.name == vv.name and not vv.custom then
 				for k, val in pairs(v) do
 					if v[k] ~= vv[k] and not vv[k.."Dirty"] then
 						vv[k] = v[k]
@@ -295,16 +300,17 @@ function mod:OnInitialize()
 			self.db.profile.bars[k] = copy(v)
 		end
 	end
-		
-	self.core = LibCore:New(mod, environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)		
-	
-	StarTip:SetOptionsDisabled(options, true)
 
+	self.core = LibCore:New(mod, environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)
+
+	StarTip:SetOptionsDisabled(options, true)
+	
+	self.bars = {}
 end
 
 function mod:OnEnable()
 	if not self.bars then self.bars = {} end
-	
+
 	for k, bar in pairs(self.bars) do
 		bar.bar:Hide()
 	end
@@ -393,9 +399,14 @@ end
 
 function mod:RebuildOpts()
 	local defaults = WidgetBar.defaults
-	
+
+	wipe(options)
+	for k, v in pairs(optionsDefaults) do
+		options[k] = v
+	end
+
 	for i, db in ipairs(self.db.profile.bars) do
-		options.bars.args[db.name:gsub(" ", "_")] = {
+		options[db.name:gsub(" ", "_")] = {
 			name = db.name,
 			type="group",
 			order = i,
@@ -408,8 +419,7 @@ function mod:RebuildOpts()
 					set = function(info, v)
 						db.enabled = v
 						db["enabledDirty"] = true
-						clearBar(db)
-						createBars()
+						self:ClearBars()
 					end,
 					order = 1
 				},
@@ -419,11 +429,10 @@ function mod:RebuildOpts()
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(db.height or defaults.height) end,
-					set = function(info, v) 
-						db.height = tonumber(v); 
+					set = function(info, v)
+						db.height = tonumber(v);
 						db["heightDirty"] = true
-						clearBar(db)
-						createBars();  
+						self:ClearBars()
 					end,
 					order = 2
 				},
@@ -433,11 +442,10 @@ function mod:RebuildOpts()
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(db.update or defaults.update) end,
-					set = function(info, v) 
-						db.update = tonumber(v); 
-						db["updateDirty"] = true						
-						clearBar(db)
-						createBars() 
+					set = function(info, v)
+						db.update = tonumber(v);
+						db["updateDirty"] = true
+						self:ClearBars()
 					end,
 					order = 3
 				},
@@ -446,7 +454,7 @@ function mod:RebuildOpts()
 					type = "select",
 					values = WidgetBar.directionList,
 					get = function() return db.direction or defaults.direction end,
-					set = function(info, v) db.direction = v; createBars() end,
+					set = function(info, v) db.direction = v;  end,
 					order = 4
 				},
 				style = {
@@ -454,7 +462,7 @@ function mod:RebuildOpts()
 					type = "select",
 					values = WidgetBar.styleList,
 					get = function() return db.style or defaults.style end,
-					set = function(info, v) db.style = v; createBars() end,
+					set = function(info, v) db.style = v;  end,
 					order = 5
 				},]]
 				texture1 = {
@@ -467,9 +475,8 @@ function mod:RebuildOpts()
 					end,
 					set = function(info, v)
 						db.texture1 = LSM:List("statusbar")[v]
-						db["texture1Dirty"] = true						
-						clearBar(db)
-						createBars()
+						db["texture1Dirty"] = true
+						self:ClearBars()
 					end,
 					order = 4
 				},
@@ -479,13 +486,13 @@ function mod:RebuildOpts()
 					type = "select",
 					values = LSM:List("statusbar"),
 					get = function()
-						return db.texture2 or db.texture1 or "Blizzard" 
+						return db.texture2 or db.texture1 or "Blizzard"
 					end,
-					set = function(info, v) 
-						db.texture2 = LSM:List("statusbar")[v] 
-						db["texture2Dirty"] = true						
-						clearBar(db)
-						createBars() end,
+					set = function(info, v)
+						db.texture2 = LSM:List("statusbar")[v]
+						db["texture2Dirty"] = true
+						self:ClearBars()
+						 end,
 					order = 5
 				},
 				strata = {
@@ -493,7 +500,7 @@ function mod:RebuildOpts()
 					type = "select",
 					values = strataLocaleList,
 					get = function() return db.strata end,
-					set = function(info, v) db.strata = v; clearBar(db) end,
+					set = function(info, v) db.strata = v; self:ClearBars() end,
 					order = 6
 				},
 				point = {
@@ -506,14 +513,14 @@ function mod:RebuildOpts()
 							type = "select",
 							values = anchors,
 							get = function() return anchorsDict[db.point[1] or 1] end,
-							set = function(info, v) db.point[1] = anchors[v]; clearBar(db) end,
+							set = function(info, v) db.point[1] = anchors[v]; self:ClearBars() end,
 							order = 1
 						},
 						relativeFrame = {
 							name = "Relative Frame",
 							type = "input",
 							get = function() return db.point[2] end,
-							set = function(info, v) db.point[2] = v; clearBar(db) end,
+							set = function(info, v) db.point[2] = v; self:ClearBars() end,
 							order = 2
 						},
 						relativePoint = {
@@ -521,7 +528,7 @@ function mod:RebuildOpts()
 							type = "select",
 							values = anchors,
 							get = function() return anchorsDict[db.point[3] or 1] end,
-							set = function(info, v) db.point[3] = anchors[v]; clearBar(db) end,
+							set = function(info, v) db.point[3] = anchors[v]; self:ClearBars() end,
 							order = 3
 						},
 						xOfs = {
@@ -529,7 +536,7 @@ function mod:RebuildOpts()
 							type = "input",
 							pattern = "%d",
 							get = function() return tostring(db.point[4] or 0) end,
-							set = function(info, v) db.point[4] = tonumber(anchors[v]); clearBar(db) end,
+							set = function(info, v) db.point[4] = tonumber(anchors[v]); self:ClearBars() end,
 							order = 4
 						},
 						yOfs = {
@@ -537,8 +544,8 @@ function mod:RebuildOpts()
 							type = "input",
 							pattern = "%d",
 							get = function() return tostring(db.point[5] or 0) end,
-							set = function(info, v) db.point[5] = tonumber(anchors[v]); clearBar(db) end,
-							order = 4						
+							set = function(info, v) db.point[5] = tonumber(anchors[v]); self:ClearBars() end,
+							order = 4
 						}
 					},
 					order = 7
@@ -548,11 +555,10 @@ function mod:RebuildOpts()
 					desc = "Toggle whether to place the first bar on top",
 					type = "toggle",
 					get = function() return db.top end,
-					set = function(info, v) 
-						db.top = v; 
-						db["topDirty"] = true						
-						clearBar(db)
-						createBars() 
+					set = function(info, v)
+						db.top = v;
+						db["topDirty"] = true
+						self:ClearBars()
 					end,
 					order = 8
 				},
@@ -563,11 +569,10 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.expression end,
-					set = function(info, v) 
-						db.expression = v; 
+					set = function(info, v)
+						db.expression = v;
 						db["expressionDirty"] = true
-						clearBar(db)
-						createBars() 
+						self:ClearBars()
 					end,
 					order = 9
 				},
@@ -578,11 +583,10 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.expression2 end,
-					set = function(info, v) 
-						db.expression2 = v ; 
-						db["expressionDirty"] = true
-						clearBar(db)
-						createBars()
+					set = function(info, v)
+						db.expression2 = v ;
+						db["expression2Dirty"] = true
+						self:ClearBars()
 					end,
 					order = 10
 				},
@@ -593,14 +597,13 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.min end,
-					set = function(info, v) 
-						db.min = v; 
+					set = function(info, v)
+						db.min = v;
 						db["minDirty"] = true
-						clearBar(db)
-						createBars() 
+						self:ClearBars()
 					end,
 					order = 11
-				
+
 				},
 				max = {
 					name = "Bar max expression",
@@ -609,11 +612,10 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.max end,
-					set = function(info, v) 
-						db.max = v; 
+					set = function(info, v)
+						db.max = v;
 						db["maxDirty"] = true
-						clearBar(db)
-						createBars() 
+						self:ClearBars()
 					end,
 					order = 12
 				},
@@ -624,11 +626,10 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.color1 end,
-					set = function(info, v) 
-						db.color1 = v; 
+					set = function(info, v)
+						db.color1 = v;
 						db["color1Dirty"] = true
-						clearBar(db)
-						createBars() 
+						self:ClearBars()
 					end,
 					order = 13
 				},
@@ -639,14 +640,32 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.color2 end,
-					set = function(info, v) 
-						db.color2 = v; 
+					set = function(info, v)
+						db.color2 = v;
 						db["color2Dirty"] = true
-						clearBar(db)
-						createBars() 
+						self:ClearBars()
 					end,
 					order = 13
-				}	
+				},
+				delete = {
+					name = "Delete",
+					type = "execute",
+					func = function()
+						local delete = true
+						for i, v in ipairs(defaultWidgets) do
+							if db.name == v.name then
+								db.deleted = true
+								delete = false
+							end
+						end
+						if delete then
+							self.db.profile.bars[i] = nil
+						end
+						self:ClearBars()
+						StarTip:RebuildOpts()
+					end,
+					order = 100
+				}
 			}
 		}
 	end
@@ -686,7 +705,7 @@ function mod:UpdateBar()
 		color.r, color.g, color.b = colorGradient(min/max)
 	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
 		color = health[1]
-	elseif UnitIsPlayer(unit) then 
+	elseif UnitIsPlayer(unit) then
 		color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
 	else
 		color = StarTip.new()
@@ -697,7 +716,7 @@ function mod:UpdateBar()
 	StarTip.del(color)
 end
 ]]
--- Logic snagged from oUF 
+-- Logic snagged from oUF
 --[[
 function mod:UpdateHealth()
 	local unit = "mouseover"
@@ -712,7 +731,7 @@ function mod:UpdateHealth()
 		color.r, color.g, color.b = colorGradient(min/max)
 	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
 		color = health[1]
-	elseif UnitIsPlayer(unit) then 
+	elseif UnitIsPlayer(unit) then
 		color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
 	else
 		color = StarTip.new()
