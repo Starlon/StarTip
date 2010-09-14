@@ -163,7 +163,7 @@ end
 		color = [[
 return 1, 1, 0
 ]],
-		cols = 10,
+		cols = 20,
 		update = 1000,
 		dontRtrim = true,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -124},
@@ -217,7 +217,7 @@ end
 		color = [[
 return 1, 1, 0 
 ]],
-		cols = 10,
+		cols = 20,
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
