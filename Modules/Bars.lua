@@ -69,10 +69,11 @@ else
 end
 ]],
 		height = 6,
-		point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
+		points = {{"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
-		layer = 1
+		layer = 1, 
+		level = 100
 	},
 	[2] = {
 		name = "Mana Bar",
@@ -87,10 +88,11 @@ return UnitMana(unit)
 return PowerColor(nil, unit)
 ]],
 		height = 6,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT"},
+		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
-		layer = 1
+		layer = 1,
+		level = 100
 	},
 
 
@@ -115,7 +117,9 @@ local optionsDefaults = {
 				min = "return 0",
 				max = "return 100",
 				height = 6,
-				point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
+				points = {{"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 0}},
+				level = 100,
+				strata = 1,
 				texture = LSM:GetDefault("statusbar"),
 				expression = "",
 				custom = true
@@ -180,17 +184,22 @@ end
 local defaultPoint = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}
 
 local strataNameList = {
-	"BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG", "TOOLTIP"
+	"TOOLTIP", "FULLSCREEN_DIALOG", "FULLSCREEN", "DIALOG", "HIGH", "MEDIUM", "LOW", "BACKGROUND"
 }
 
-local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Fullscreen", "Fullscreen Dialog", "Tooltip"}
+local strataLocaleList = {
+	"Tooltip", "Fullscreen Dialog", "Fullscreen", "Dialog", "High", "Medium", "Low", "Background"
+}
 
 local function clearBar(obj)
 	obj = mod.bars and mod.bars[obj]
 	if not obj then return end
+	obj.bar:ClearAllPoints()
+	obj.bar:Hide()
 	del(obj.bar)
 	obj:Del()
 	if obj.secondBar then
+		obj.secondBar.bar:Hide()
 		del(obj.secondBar.bar)
 		obj.secondBar:Del()
 	end
@@ -212,23 +221,21 @@ local function createBars()
 			local widget = mod.bars[v]
 			if not widget then
 				local bar = new()
-				widget = mod.bars[v] or WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
+				widget = WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
-				local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
-				arg4 = (arg4 or 0)
-				arg5 = (arg5 or 0)
-				bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
-				if type(v.width) == "number" then
-					bar:SetWidth(v.width)
-				else
-					bar:SetPoint("LEFT", GameTooltip, "LEFT")
-					bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
+				for j, point in ipairs(v.points) do
+					local arg1, arg2, arg3, arg4, arg5 = unpack(point)
+					arg4 = (arg4 or 0)
+					arg5 = (arg5 or 0)
+					bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 				end
+				bar:SetWidth(v.width or 20)
 				bar:SetHeight(v.height)
 				bar:SetMinMaxValues(0, 100)
 				bar:Show()
-				bar:SetFrameStrata(strataNameList[widget.layer])
+				bar:SetFrameStrata(strataNameList[v.layer])
+				bar:SetFrameLevel(v.level)
 				widget.bar1 = true
 				widget.bar = bar
 				mod.bars[v] = widget
@@ -238,24 +245,22 @@ local function createBars()
 					widget = WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
 					bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
 					bar:ClearAllPoints()
-					local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
-					arg4 = (arg4 or 0)
-					if v.top then
-						arg5 = (arg5 or 0) - (v.height or 12)
-					else
-						arg5 = (arg5 or 0) + (v.height or 12)
+					for i, point in ipairs(v.points) do
+						local arg1, arg2, arg3, arg4, arg5 = unpack(point)
+						arg4 = (arg4 or 0)
+						if v.top then
+							arg5 = (arg5 or 0) - (v.height or 12)
+						else
+							arg5 = (arg5 or 0) + (v.height or 12)
+						end
+						bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 					end
-					bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
-					if type(v.width) == "number" then
-						bar:SetWidth(v.width)
-					else
-						bar:SetPoint("LEFT", GameTooltip, "LEFT")
-						bar:SetPoint("RIGHT", GameTooltip, "RIGHT")
-					end
+					bar:SetWidth(v.width or 10)
 					bar:SetHeight(v.height)
 					bar:SetMinMaxValues(0, 100)
 					bar:Show()
 					bar:SetFrameStrata(strataNameList[widget.layer])
+					bar:SetFrameLevel(v.level)
 					mod.bars[v].secondBar = widget
 				end
 			end
@@ -391,7 +396,7 @@ end
 
 function mod:RebuildOpts()
 	local defaults = WidgetBar.defaults
-
+	self:ClearBars()
 	wipe(options)
 	for k, v in pairs(optionsDefaults) do
 		options[k] = v
@@ -402,264 +407,40 @@ function mod:RebuildOpts()
 			name = db.name,
 			type="group",
 			order = i,
-			args={
-				enabled = {
-					name = "Enabled",
-					desc = "Whether this bar is enabled or not",
-					type = "toggle",
-					get = function() return db.enabled end,
-					set = function(info, v)
-						db.enabled = v
-						db["enabledDirty"] = true
-						self:ClearBars()
-					end,
-					order = 1
-				},
-				height = {
-					name = "Bar height",
-					desc = "Enter the bar's height",
-					type = "input",
-					pattern = "%d",
-					get = function() return tostring(db.height or defaults.height) end,
-					set = function(info, v)
-						db.height = tonumber(v);
-						db["heightDirty"] = true
-						self:ClearBars()
-					end,
-					order = 2
-				},
-				update = {
-					name = "Bar update rate",
-					desc = "Enter the bar's refresh rate",
-					type = "input",
-					pattern = "%d",
-					get = function() return tostring(db.update or defaults.update) end,
-					set = function(info, v)
-						db.update = tonumber(v);
-						db["updateDirty"] = true
-						self:ClearBars()
-					end,
-					order = 3
-				},
-				--[[direction = {
-					name = "Bar direction",
-					type = "select",
-					values = WidgetBar.directionList,
-					get = function() return db.direction or defaults.direction end,
-					set = function(info, v) db.direction = v;  end,
-					order = 4
-				},
-				style = {
-					name = "Bar Style",
-					type = "select",
-					values = WidgetBar.styleList,
-					get = function() return db.style or defaults.style end,
-					set = function(info, v) db.style = v;  end,
-					order = 5
-				},]]
-				texture1 = {
-					name = "Texture #1",
-					desc = "The bar's first texture",
-					type = "select",
-					values = LSM:List("statusbar"),
-					get = function()
-						return StarTip:GetLSMIndexByName("statusbar", db.texture1 or "Blizzard")
-					end,
-					set = function(info, v)
-						db.texture1 = LSM:List("statusbar")[v]
-						db["texture1Dirty"] = true
-						self:ClearBars()
-					end,
-					order = 4
-				},
-				texture2 = {
-					name = "Texture #2",
-					desc = "The bar's second texture",
-					type = "select",
-					values = LSM:List("statusbar"),
-					get = function()
-						return db.texture2 or db.texture1 or "Blizzard"
-					end,
-					set = function(info, v)
-						db.texture2 = LSM:List("statusbar")[v]
-						db["texture2Dirty"] = true
-						self:ClearBars()
-						 end,
-					order = 5
-				},
-				strata = {
-					name = "Strata",
-					type = "select",
-					values = strataLocaleList,
-					get = function() return db.strata end,
-					set = function(info, v) db.strata = v; self:ClearBars() end,
-					order = 6
-				},
-				point = {
-					name = "Anchor Points",
-					desc = "This bar's anchor point. These arguments are passed to bar:SetPoint()",
-					type = "group",
-					args = {
-						point = {
-							name = "Bar anchor",
-							type = "select",
-							values = anchors,
-							get = function() return anchorsDict[db.point[1] or 1] end,
-							set = function(info, v) db.point[1] = anchors[v]; self:ClearBars() end,
-							order = 1
-						},
-						relativeFrame = {
-							name = "Relative Frame",
-							type = "input",
-							get = function() return db.point[2] end,
-							set = function(info, v) db.point[2] = v; self:ClearBars() end,
-							order = 2
-						},
-						relativePoint = {
-							name = "Relative Point",
-							type = "select",
-							values = anchors,
-							get = function() return anchorsDict[db.point[3] or 1] end,
-							set = function(info, v) db.point[3] = anchors[v]; self:ClearBars() end,
-							order = 3
-						},
-						xOfs = {
-							name = "X Offset",
-							type = "input",
-							pattern = "%d",
-							get = function() return tostring(db.point[4] or 0) end,
-							set = function(info, v) db.point[4] = tonumber(anchors[v]); self:ClearBars() end,
-							order = 4
-						},
-						yOfs = {
-							name = "Y Offset",
-							type = "input",
-							pattern = "%d",
-							get = function() return tostring(db.point[5] or 0) end,
-							set = function(info, v) db.point[5] = tonumber(anchors[v]); self:ClearBars() end,
-							order = 4
-						}
-					},
-					order = 7
-				},
-				top = {
-					name = "First is Top",
-					desc = "Toggle whether to place the first bar on top",
-					type = "toggle",
-					get = function() return db.top end,
-					set = function(info, v)
-						db.top = v;
-						db["topDirty"] = true
-						self:ClearBars()
-					end,
-					order = 8
-				},
-				expression = {
-					name = "Bar expression",
-					desc = "Enter the bar's first expression",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.expression end,
-					set = function(info, v)
-						db.expression = v;
-						db["expressionDirty"] = true
-						self:ClearBars()
-					end,
-					order = 9
-				},
-				expression2 = {
-					name = "Bar second expression",
-					desc = "Enter the bar's second expression",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.expression2 end,
-					set = function(info, v)
-						db.expression2 = v ;
-						db["expression2Dirty"] = true
-						self:ClearBars()
-					end,
-					order = 10
-				},
-				min = {
-					name = "Bar min expression",
-					desc = "Enter the bar's minimum expression",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.min end,
-					set = function(info, v)
-						db.min = v;
-						db["minDirty"] = true
-						self:ClearBars()
-					end,
-					order = 11
-
-				},
-				max = {
-					name = "Bar max expression",
-					desc = "Enter the bar's maximum expression",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.max end,
-					set = function(info, v)
-						db.max = v;
-						db["maxDirty"] = true
-						self:ClearBars()
-					end,
-					order = 12
-				},
-				color1 = {
-					name = "First bar color script",
-					desc = "Enter the bar's first color script",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.color1 end,
-					set = function(info, v)
-						db.color1 = v;
-						db["color1Dirty"] = true
-						self:ClearBars()
-					end,
-					order = 13
-				},
-				color2 = {
-					name = "Second bar color script",
-					desc = "Enter the bar's second color script",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.color2 end,
-					set = function(info, v)
-						db.color2 = v;
-						db["color2Dirty"] = true
-						self:ClearBars()
-					end,
-					order = 13
-				},
-				delete = {
-					name = "Delete",
-					type = "execute",
-					func = function()
-						local delete = true
-						for i, v in ipairs(defaultWidgets) do
-							if db.name == v.name then
-								db.deleted = true
-								delete = false
-							end
-						end
-						if delete then
-							self.db.profile.bars[i] = nil
-						end
-						self:ClearBars()
-						StarTip:RebuildOpts()
-					end,
-					order = 100
-				}
-			}
+			args = WidgetBar:GetOptions(db, StarTip.RebuildOpts, StarTip),
 		}
+		options[db.name:gsub(" ", "_")].args.delete = {
+			name = "Delete",
+			type = "execute",
+			func = function()
+				local delete = true
+				for i, v in ipairs(defaultWidgets) do
+					if db.name == v.name then
+						db.deleted = true
+						delete = false
+					end
+				end
+				if delete then
+					tremove(self.db.profile.bars, i)
+				end
+				self:ClearTexts()
+				StarTip:RebuildOpts()
+			end,
+			order = 100
+		}
+		options[db.name:gsub(" ", "_")].args.enabled = {
+			name = "Enabled",
+			desc = "Whether the histogram's enabled or not",
+			type = "toggle",
+			get = function() return db.enabled end,
+			set = function(info, v) 
+				db.enabled = v; 
+				db["enabledDirty"] = true 
+				self:ClearBars()
+			end,
+			order = 1
+		}
+		
 	end
 end
 

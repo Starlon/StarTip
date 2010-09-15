@@ -61,7 +61,7 @@ local defaultWidgets = {
 		enabled = true,
 		width = 10,
 		height = 50,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12},
+		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12}},
 		color = [[
 return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 ]],
@@ -76,7 +76,7 @@ return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 		enabled = true,
 		width = 10,
 		height = 50,
-		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -12},
+		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -12}},
 		color = [[
 return PowerColor("RAGE", unit)
 ]],
@@ -110,7 +110,7 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -77},
+		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -77}},
 		layer = 1,
 		update = 1000,
 		persistent = true
@@ -140,7 +140,7 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -77},
+		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -77}},
 		layer = 1,
 		update = 1000,
 		persistent = true
@@ -169,7 +169,7 @@ local optionsDefaults = {
 				height = WidgetHistogram.defaults.height,
 				width = WidgetHistogram.defaults.width,
 				enabled = true,
-				point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -50},
+				points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -50}},
 				texture = LSM:GetDefault("statusbar"),
 				expression = "return random(100)",
 				color = "return 0, 0, 1",
@@ -235,6 +235,7 @@ local function clearHistogram(obj)
 	if not obj then return end
 	for k, v in pairs(obj.bars) do
 		del(v)
+		v:Hide()
 	end
 	obj:Del()
 end
@@ -281,14 +282,16 @@ local function createHistograms()
 					local bar = new()
 					bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
 					bar:ClearAllPoints()
-					local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)-- or {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"})
-					if (v.width > 100) then
-						arg4 = (arg4 or 0) + i * (v.width / 100)
-					else
-						arg4 = (arg4 or 0) + i * v.width
+					for _, point in ipairs(v.points) do
+						local arg1, arg2, arg3, arg4, arg5 = unpack(point)
+						if (v.width > 100) then
+							arg4 = (arg4 or 0) + i * (v.width / 100)
+						else
+							arg4 = (arg4 or 0) + i * v.width
+						end
+						arg5 = (arg5 or 0)
+						bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 					end
-					arg5 = (arg5 or 0)
-					bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 					if v.width then
 						if (v.width > 100) then
 							bar:SetWidth(v.width / 100)
@@ -446,235 +449,39 @@ function mod:RebuildOpts()
 			name = db.name,
 			type="group",
 			order = i,
-			args={
-				enabled = {
-					name = "Enable",
-					desc = "Toggle whether this histogram is enabled or not",
-					type = "toggle",
-					get = function() return db.enabled end,
-					set = function(info, v)
-						db.enabled = v
-						db["enabledDirty"] = true
-						self:ClearHistograms()
-					end,
-					order = 1
-				},
-				height = {
-					name = "Histogram height",
-					desc = "Enter the histogram's height",
-					type = "input",
-					pattern = "%d",
-					get = function() return tostring(db.height or defaults.height) end,
-					set = function(info, v)
-						db.height = tonumber(v);
-						db["heightDirty"] = true
-						self:ClearHistograms()
-					end,
-					order = 2
-				},
-				width = {
-					name = "Histogram width",
-					desc = "Enter the histogram's width",
-					type = "input",
-					pattern = "%d",
-					get = function() return tostring(db.width or defaults.width) end,
-					set = function(info, v)
-						db.width = tonumber(v)
-						db["widthDirty"] = true
-						self:ClearHistograms()
-					end,
-					order = 3
-				},
-				layer = {
-					name = "Histogram Layer",
-					desc = "Enter the histogram's layer",
-					type = "input",
-					pattern = "%d",
-					get = function() return tostring(db.layer or 0) end,
-					set = function(info, v) db.layer = tonumber(v) end,
-					order = 4
-				},
-				update = {
-					name = "Histogram update rate",
-					desc = "Enter the histogram's refresh rate",
-					type = "input",
-					pattern = "%d",
-					get = function() return tostring(db.update or defaults.update) end,
-					set = function(info, v)
-						db.update = tonumber(v);
-						db["updateDirty"] = true
-						self:ClearHistograms()
-					end,
-					order = 5
-				},
-				--[[direction = {
-					name = "Histogram direction",
-					type = "select",
-					values = WidgetHistogram.directionList,
-					get = function() return db.direction or defaults.direction end,
-					set = function(info, v) db.direction = v; createHistograms()StarTip:RebuildOpts() end,
-					order = 4
-				},
-				style = {
-					name = "Histogram Style",
-					type = "select",
-					values = WidgetHistogram.styleList,
-					get = function() return db.style or defaults.style end,
-					set = function(info, v) db.style = v; createHistograms()StarTip:RebuildOpts() end,
-					order = 5
-				},]]
-				texture = {
-					name = "Texture",
-					desc = "The histogram's texture",
-					type = "select",
-					values = LSM:List("statusbar"),
-					get = function()
-						return StarTip:GetLSMIndexByName("statusbar", db.texture or "Blizzard")
-					end,
-					set = function(info, v)
-						db.texture = LSM:List("statusbar")[v]
-						db["textureDirty"] = true
-						self:ClearHistograms()
-					end,
-					order = 6
-				},
-				point = {
-					name = "Anchor Points",
-					desc = "This histogram's anchor point. These arguments are passed to bar:SetPoint()",
-					type = "group",
-					args = {
-						point = {
-							name = "Bar anchor",
-							type = "select",
-							values = anchors,
-							get = function() return anchorsDict[db.point[1] or 1] end,
-							set = function(info, v) db.point[1] = anchors[v];self:ClearHistograms(); end,
-							order = 1
-						},
-						relativeFrame = {
-							name = "Relative Frame",
-							type = "input",
-							get = function() return db.point[2] end,
-							set = function(info, v) db.point[2] = v; self:ClearHistograms();  end,
-							order = 2
-						},
-						relativePoint = {
-							name = "Relative Point",
-							type = "select",
-							values = anchors,
-							get = function() return anchorsDict[db.point[3] or 1] end,
-							set = function(info, v) db.point[3] = anchors[v]; self:ClearHistograms();  end,
-							order = 3
-						},
-						xOfs = {
-							name = "X Offset",
-							type = "input",
-							pattern = "%d",
-							get = function() return tostring(db.point[4] or 0) end,
-							set = function(info, v) db.point[4] = tonumber(v); self:ClearHistograms();  end,
-							order = 4
-						},
-						yOfs = {
-							name = "Y Offset",
-							type = "input",
-							pattern = "%d",
-							get = function() return tostring(db.point[5] or 0) end,
-							set = function(info, v) db.point[5] = tonumber(v); self:ClearHistograms(); end,
-							order = 4
-						}
-					},
-					order = 7
-				},
-				persistent = {
-					name = "Persistent",
-					desc = "Whether this histogram is persistent or not, meaning it won't stop when the tooltip hides.",
-					type = "toggle",
-					get = function() return db.persistent end,
-					set = function(info, v) db.persistent = v end,
-					order = 8
-				},
-				expression = {
-					name = "Histogram expression",
-					desc = "Enter the histogram's first expression",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.expression end,
-					set = function(info, v)
-						db.expression = v;
-						db["expressionDirty"] = true
-						self:ClearHistograms()
-
-					end,
-					order = 9
-				},
-				min = {
-					name = "Histogram min expression",
-					desc = "Enter the histogram's minimum expression",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.min end,
-					set = function(info, v)
-						db.min = v;
-						db["minDirty"] = true
-						self:ClearHistograms()
-
-					end,
-					order = 10
-
-				},
-				max = {
-					name = "Histogram max expression",
-					desc = "Enter the histogram's maximum expression",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.max end,
-					set = function(info, v)
-						db.max = v;
-						db["maxDirty"] = true
-						self:ClearHistograms()
-
-					end,
-					order = 11
-				},
-				color = {
-					name = "Histogram color script",
-					desc = "Enter the histogram's color script",
-					type = "input",
-					multiline = true,
-					width = "full",
-					get = function() return db.color end,
-					set = function(info, v)
-						db.color = v;
-						db["colorDirty"] = true
-						self:ClearHistograms()
-
-					end,
-					order = 12
-				},
-				delete = {
-					name = "Delete",
-					desc = "Delete this widget",
-					type = "execute",
-					func = function()
-						local delete = true
-						for i, v in ipairs(defaultWidgets) do
-							if db.name == v.name then
-								db.deleted = true
-								delete = false
-							end
-						end
-						if delete then
-							self.db.profile.histograms[i] = nil
-						end
-						self:ClearHistograms()
-						StarTip:RebuildOpts()
-					end,
-					order = 13
-				}
-			}
+			args=WidgetHistogram:GetOptions(db, StarTip.RebuildOpts, StarTip)
+		}
+		options[db.name:gsub(" ", "_")].args.delete = {
+			name = "Delete",
+			desc = "Delete this widget",
+			type = "execute",
+			func = function()
+				local delete = true
+				for i, v in ipairs(defaultWidgets) do
+					if db.name == v.name then
+						db.deleted = true
+						delete = false
+					end
+				end
+				if delete then
+					self.db.profile.histograms[i] = nil
+				end
+				self:ClearHistograms()
+				StarTip:RebuildOpts()
+			end,
+			order = 13
+		}
+		options[db.name:gsub(" ", "_")].args.enabled = {
+			name = "Enable",
+			desc = "Toggle whether this histogram is enabled or not",
+			type = "toggle",
+			get = function() return db.enabled end,
+			set = function(info, v)
+				db.enabled = v
+				db["enabledDirty"] = true
+				self:ClearHistograms()
+			end,
+			order = 1
 		}
 	end
 end

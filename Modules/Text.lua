@@ -69,8 +69,10 @@ return ClassColor(unit)
 		speed = 100,
 		direction = SCROLL_LEFT,
 		dontRtrim = true,
-		point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 12},
+		points = {{"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 12}},
 		parent = "GameTooltip",
+		strata = 1,
+		level = 1
 	},
 	[2] = {
 		name = "Health",
@@ -88,8 +90,10 @@ return HPColor(health, max)
 ]],
 		cols = 20,
 		update = 1000,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, 1},
-		parent = "GameTooltip"
+		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, 1}},
+		parent = "GameTooltip",
+		strata = 1,
+		level = 1
 	},
 	[3] = {
 		name = "Power",
@@ -108,8 +112,10 @@ return HPColor(mana, max)
 		cols = 20,
 		update = 1000,
 		align = WidgetText.ALIGN_RIGHT,
-		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, 1},
-		parent = "GameTooltip"
+		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, 1}},
+		parent = "GameTooltip",
+		strata = 1,
+		level = 1
 	},
 	[4] = {
 		name = "Memory Percent",
@@ -138,8 +144,10 @@ end
 		cols = 20,
 		update = 1000,
 		dontRtrim = true,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -62},
-		parent = "GameTooltip"
+		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -62}},
+		parent = "GameTooltip",
+		strata = 1,
+		level = 1
 	},
 	[5] = {
 		name = "Memory Total",
@@ -158,8 +166,10 @@ return 1, 1, 0
 		cols = 20,
 		update = 1000,
 		dontRtrim = true,
-		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -124},
-		parent = "GameTooltip"
+		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -124}},
+		parent = "GameTooltip",
+		strata = 1,
+		level = 1
 	},
 	[6] = {
 		name = "CPU Percent",
@@ -184,8 +194,10 @@ end
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
-		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -62},
-		parent = "GameTooltip"
+		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -62}},
+		parent = "GameTooltip",
+		strata = 1,
+		level = 1
 	},
 	[7] = {
 		name = "CPU Total",
@@ -205,8 +217,10 @@ return 1, 1, 0
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
-		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -124},
-		parent = "GameTooltip"
+		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -124}},
+		parent = "GameTooltip",
+		strata = 1,
+		level = 1
 	},
 }
 
@@ -229,9 +243,11 @@ local optionsDefaults = {
 				min = "return 0",
 				max = "return 100",
 				height = 6,
-				point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"},
+				points = {{"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}},
 				texture = LSM:GetDefault("statustext"),
 				expression = "",
+				strata = 1,
+				level = 1,
 				custom = true
 			}
 			tinsert(mod.db.profile.texts, widget)
@@ -253,7 +269,9 @@ local optionsDefaults = {
 }
 
 function updateText(widget)
-	widget.text:SetText(widget.buffer)
+	widget.text.fontstring:SetText(widget.buffer)
+	widget.text:SetHeight(widget.text.fontstring:GetStringHeight())
+	widget.text:SetWidth(widget.text.fontstring:GetStringWidth())
 
 	local r, g, b = 0, 0, 1
 
@@ -262,7 +280,7 @@ function updateText(widget)
 	end
 
 	if type(r) == "number" then
-		widget.text:SetVertexColor(r, g, b, a)
+		widget.text.fontstring:SetVertexColor(r, g, b, a)
 	end
 end
 
@@ -276,14 +294,25 @@ local new, del
 do
 	local pool = {}
 	local i = 0
-	function new(cols)
+	function new()
 		local text = next(pool)
 
 		if text then
 			pool[text] = nil
 		else
-			text = GameTooltip:CreateFontString()
-			text:SetFontObject(GameTooltipText)
+			local frame = CreateFrame("Frame")
+			frame:SetParent(UIParent)
+			frame:SetBackdrop({
+				insets = {left = 0, right = 0, top = 0, bottom = 0},
+			})
+			frame:ClearAllPoints()
+			frame:SetAlpha(1)
+			local fs = frame:CreateFontString()
+			fs:SetAllPoints(frame)
+			fs:SetFontObject(GameTooltipText)
+			fs:Show()
+			frame.fontstring = fs
+			text = frame
 		end
 
 		return text
@@ -296,15 +325,18 @@ end
 local defaultPoint = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}
 
 local strataNameList = {
-	"BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG", "TOOLTIP"
+	"TOOLTIP", "FULLSCREEN_DIALOG", "FULLSCREEN", "DIALOG", "HIGH", "MEDIUM", "LOW", "BACKGROUND"
 }
 
-local strataLocaleList = {"Background", "Low", "Medium", "High", "Dialog", "Fullscreen", "Fullscreen Dialog", "Tooltip"}
+local strataLocaleList = {
+	"Tooltip", "Fullscreen Dialog", "Fullscreen", "Dialog", "High", "Medium", "Low", "Background"
+}
 
 local function clearText(obj)
 	local widget = mod.texts[obj]
 	if not widget then return end
 	widget:Del()
+	widget.text:Hide()
 	del(widget.text)
 end
 
@@ -324,19 +356,26 @@ function createTexts()
 	end]]
 	local appearance = StarTip:GetModule("Appearance")
 	for i, v in ipairs(self.db.profile.texts) do
-		if v.enabled and not v.deleted then
-			local text = new(v.cols or WidgetText.defaults.cols)
-			local widget = mod.texts[v] or WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)
-			widget.config.unit = StarTip.unit
-			text:ClearAllPoints()
-			text:SetParent(v.parent)
-			local arg1, arg2, arg3, arg4, arg5 = unpack(v.point)
-			arg4 = (arg4 or 0)
-			arg5 = (arg5 or 0)
-			text:SetPoint(arg1, arg2, arg3, arg4, arg5)
-			text:Show()
-			widget.text = text
-			mod.texts[v] = widget
+		if v.enabled and not v.deleted then			
+			local widget = mod.texts[v]
+			if not widget then
+				local text = new()
+				widget = WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)				
+				text:ClearAllPoints()
+				text:SetParent(v.parent)
+				for j, point in ipairs(v.points) do
+					local arg1, arg2, arg3, arg4, arg5 = unpack(point)
+					arg4 = (arg4 or 0)
+					arg5 = (arg5 or 0)
+					text:SetPoint(arg1, arg2, arg3, arg4, arg5)
+				end
+				text:SetFrameStrata(strataNameList[v.strata or 1])
+				text:SetFrameLevel(v.level or 1)
+				text:Show()
+				widget.text = text
+				mod.texts[v] = widget
+			end
+			widget.config.unit = StarTip.unit			
 		end
 	end
 end
@@ -442,7 +481,6 @@ end
 function mod:RebuildOpts()
 	local defaults = WidgetText.defaults
 	self:ClearTexts()
-
 	wipe(options)
 	for k, v in pairs(optionsDefaults) do
 		options[k] = v
@@ -453,7 +491,7 @@ function mod:RebuildOpts()
 			name = db.name,
 			type="group",
 			order = i,
-			args=WidgetText:GetOptions(StarTip, db)
+			args=WidgetText:GetOptions(db, StarTip.RebuildOpts, StarTip)
 		}
 		options[db.name:gsub(" ", "_")].args.delete = {
 			name = "Delete",
@@ -467,12 +505,24 @@ function mod:RebuildOpts()
 					end
 				end
 				if delete then
-					self.db.profile.texts[i] = nil
+					tremove(self.db.profile.texts, i)
 				end
 				self:ClearTexts()
 				StarTip:RebuildOpts()
 			end,
 			order = 100
+		}
+		options[db.name:gsub(" ", "_")].args.enabled = {
+			name = "Enabled",
+			desc = "Whether the histogram's enabled or not",
+			type = "toggle",
+			get = function() return db.enabled end,
+			set = function(info, v) 
+				db.enabled = v; 
+				db["enabledDirty"] = true 
+				self:ClearTexts()
+			end,
+			order = 1
 		}
 	end
 end
