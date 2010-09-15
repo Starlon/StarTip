@@ -71,7 +71,7 @@ return ClassColor(unit)
 		dontRtrim = true,
 		point = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 12},
 		parent = "GameTooltip",
-	},	
+	},
 	[2] = {
 		name = "Health",
 		enabled = true,
@@ -84,7 +84,7 @@ return format('Health: %.1f%%', health / max * 100)
 		color = [[
 if not UnitExists(unit) then return end
 local health, max = UnitHealth(unit), UnitHealthMax(unit)
-return HPColor(health, max)		
+return HPColor(health, max)
 ]],
 		cols = 20,
 		update = 1000,
@@ -97,7 +97,7 @@ return HPColor(health, max)
 		value = [[
 if not UnitExists(unit) then return end
 local mana, max = UnitMana(unit), UnitManaMax(unit)
-if max == 0 then max = 0.0001 end		
+if max == 0 then max = 0.0001 end
 return format(PowerName(unit)..': %.1f%%', mana / max * 100)
 ]],
 		color = [[
@@ -114,7 +114,7 @@ return HPColor(mana, max)
 	[4] = {
 		name = "Memory Percent",
 		enabled = false,
-		value = [[		
+		value = [[
 local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip")
 if mem then
     local num = floor(memperc)
@@ -144,9 +144,11 @@ end
 	[5] = {
 		name = "Memory Total",
 		enabled = false,
-		value = [[		
+		value = [[
 local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip")
 if mem then
+    if totalMem == 0 then totalMem = 100; mem = 0 end
+    memperc = mem / totalMem * 100
     return format("%s (%.2f%%)", memshort(mem), memperc)
 end
 ]],
@@ -158,7 +160,7 @@ return 1, 1, 0
 		dontRtrim = true,
 		point = {"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -124},
 		parent = "GameTooltip"
-	},	
+	},
 	[6] = {
 		name = "CPU Percent",
 		enabled = false,
@@ -176,7 +178,7 @@ if cpu then
     if num > 100 then num = 100 end
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
     return r, g, b
-end		
+end
 ]],
 		cols = 20,
 		align = WidgetText.ALIGN_RIGHT,
@@ -197,7 +199,7 @@ if cpu then
 end
 ]],
 		color = [[
-return 1, 1, 0 
+return 1, 1, 0
 ]],
 		cols = 20,
 		align = WidgetText.ALIGN_RIGHT,
@@ -205,7 +207,7 @@ return 1, 1, 0
 		dontRtrim = true,
 		point = {"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -124},
 		parent = "GameTooltip"
-	},	
+	},
 }
 
 local defaults = {
@@ -242,9 +244,9 @@ local optionsDefaults = {
 		name = "Restore Defaults",
 		desc = "Restore Defaults",
 		type = "execute",
-		func = function() 
-			mod.db.profile.texts = copy(defaultWidgets); 
-			StarTip:RebuildOpts() 
+		func = function()
+			mod.db.profile.texts = copy(defaultWidgets);
+			StarTip:RebuildOpts()
 		end,
 		order = 6
 	},
@@ -252,13 +254,13 @@ local optionsDefaults = {
 
 function updateText(widget)
 	widget.text:SetText(widget.buffer)
-	
+
 	local r, g, b = 0, 0, 1
-	
+
 	if widget.color then
 		r, g, b, a = widget.color.res1, widget.color.res2, widget.color.res3, widget.color.res4
 	end
-	
+
 	if type(r) == "number" then
 		widget.text:SetVertexColor(r, g, b, a)
 	end
@@ -276,14 +278,14 @@ do
 	local i = 0
 	function new(cols)
 		local text = next(pool)
-		
+
 		if text then
 			pool[text] = nil
 		else
 			text = GameTooltip:CreateFontString()
 			text:SetFontObject(GameTooltipText)
 		end
-		
+
 		return text
 	end
 	function del(text)
@@ -292,7 +294,7 @@ do
 end
 
 local defaultPoint = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}
-	
+
 local strataNameList = {
 	"BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG", "TOOLTIP"
 }
@@ -320,11 +322,11 @@ function createTexts()
 		v.text:Hide()
 		del(v.text)
 	end]]
-	local appearance = StarTip:GetModule("Appearance")	
+	local appearance = StarTip:GetModule("Appearance")
 	for i, v in ipairs(self.db.profile.texts) do
 		if v.enabled and not v.deleted then
 			local text = new(v.cols or WidgetText.defaults.cols)
-			local widget = mod.texts[v] or WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText) 
+			local widget = mod.texts[v] or WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)
 			widget.config.unit = StarTip.unit
 			text:ClearAllPoints()
 			text:SetParent(v.parent)
@@ -341,11 +343,11 @@ end
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-	
+
 	if not self.db.profile.texts then
 		self.db.profile.texts = {}
 	end
-		
+
 	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.texts) do
 			if v.name == vv.name and not vv.custom then
@@ -364,9 +366,9 @@ function mod:OnInitialize()
 			tinsert(self.db.profile.texts, copy(v))
 		end
 	end
-	
-	self.core = LibCore:New(mod, environment, "StarTip.Texts", {["StarTip.Texts"] = {}}, nil, StarTip.db.profile.errorLevel)		
-	
+
+	self.core = LibCore:New(mod, environment, "StarTip.Texts", {["StarTip.Texts"] = {}}, nil, StarTip.db.profile.errorLevel)
+
 	StarTip:SetOptionsDisabled(options, true)
 
 	self.texts = {}
@@ -445,7 +447,7 @@ function mod:RebuildOpts()
 	for k, v in pairs(optionsDefaults) do
 		options[k] = v
 	end
-	
+
 	for i, db in ipairs(self.db.profile.texts) do
 		options[db.name:gsub(" ", "_")] = {
 			name = db.name,
@@ -493,10 +495,10 @@ end
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(db.height or defaults.height) end,
-					set = function(info, v) 
-						db.height = tonumber(v); 
+					set = function(info, v)
+						db.height = tonumber(v);
 						db["heightDirty"] = true
-						createTexts();  
+						createTexts();
 					end,
 					order = 2
 				},
@@ -506,10 +508,10 @@ end
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(db.update or defaults.update) end,
-					set = function(info, v) 
-						db.update = tonumber(v); 
-						db["updateDirty"] = true						
-						createTexts() 
+					set = function(info, v)
+						db.update = tonumber(v);
+						db["updateDirty"] = true
+						createTexts()
 					end,
 					order = 3
 				},
@@ -563,7 +565,7 @@ end
 							pattern = "%d",
 							get = function() return tostring(db.point[5] or 0) end,
 							set = function(info, v) db.point[5] = tonumber(anchors[v]) end,
-							order = 4						
+							order = 4
 						}
 					},
 					order = 7
@@ -573,10 +575,10 @@ end
 					desc = "Toggle whether to place the first text on top",
 					type = "toggle",
 					get = function() return db.top end,
-					set = function(info, v) 
-						db.top = v; 
-						db["topDirty"] = true						
-						createTexts() 
+					set = function(info, v)
+						db.top = v;
+						db["topDirty"] = true
+						createTexts()
 					end,
 					order = 8
 				},
@@ -587,10 +589,10 @@ end
 					multiline = true,
 					width = "full",
 					get = function() return db.value end,
-					set = function(info, v) 
-						db.value = v; 
+					set = function(info, v)
+						db.value = v;
 						db["valueDirty"] = true
-						createTexts() 
+						createTexts()
 					end,
 					order = 9
 				},

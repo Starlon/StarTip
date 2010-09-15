@@ -304,7 +304,7 @@ function mod:OnInitialize()
 	self.core = LibCore:New(mod, environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)
 
 	StarTip:SetOptionsDisabled(options, true)
-	
+
 	self.bars = {}
 end
 

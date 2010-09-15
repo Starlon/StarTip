@@ -17,7 +17,7 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetHistogram = LibStub("StarLibWidgetHistogram-1.0")
 local LibCore = LibStub("StarLibCore-1.0")
 
-local unit 
+local unit
 local environment = {}
 
 local createHistograms
@@ -145,7 +145,7 @@ end
 		update = 1000,
 		persistent = true
 	},
-	
+
 }
 
 local defaults = {
@@ -177,7 +177,7 @@ local optionsDefaults = {
 			}
 			tinsert(mod.db.profile.histograms, widget)
 			StarTip:RebuildOpts()
-			
+
 		end,
 		order = 5
 	},
@@ -185,9 +185,9 @@ local optionsDefaults = {
 		name = "Restore Defaults",
 		desc = "Restore Defaults",
 		type = "execute",
-		func = function() 
-			mod.db.profile.histograms = copy(defaultWidgets); 
-			StarTip:RebuildOpts() 
+		func = function()
+			mod.db.profile.histograms = copy(defaultWidgets);
+			StarTip:RebuildOpts()
 		end,
 		order = 6
 	},
@@ -195,7 +195,7 @@ local optionsDefaults = {
 
 function updateHistogram(widget)
 	for i = 1, #widget.history do
-		local bar = widget.bars[i] 
+		local bar = widget.bars[i]
 		local segment = widget.history[i]
 		if not segment then break end
 		if type(segment) == "table" then
@@ -216,13 +216,13 @@ do
 	local pool = {}
 	function new()
 		local histogram = next(pool)
-		
+
 		if histogram then
 			pool[histogram] = nil
 		else
 			histogram = CreateFrame("StatusBar", nil, GameTooltip)
 		end
-		
+
 		return histogram
 	end
 	function del(histogram)
@@ -266,7 +266,7 @@ local function createHistograms()
 			end
 		end
 	end
-		
+
 	for k, v in pairs(self.db.profile.histograms) do
 		if v.enabled and not v.deleted then
 			v.width = v.width or WidgetHistogram.defaults.width
@@ -274,10 +274,10 @@ local function createHistograms()
 			local newWidget
 			if not mod.histograms then mod.histograms = {} end
 			if not widget then
-				widget = WidgetHistogram:New(mod.core, v.name, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram) 
+				widget = WidgetHistogram:New(mod.core, v.name, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram)
 				widget.persistent = v.persistent
 				newWidget = true
-				for i = 0, v.width - 1 do				
+				for i = 0, v.width - 1 do
 					local bar = new()
 					bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture))
 					bar:ClearAllPoints()
@@ -307,8 +307,8 @@ local function createHistograms()
 					if not widget.bars then widget.bars = {} end
 					tinsert(widget.bars, bar)
 				end
-			end			
-			widget.config.unit = StarTip.unit			
+			end
+			widget.config.unit = StarTip.unit
 			mod.histograms[v] = widget
 		end
 	end
@@ -320,18 +320,18 @@ end
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-	
+
 	if not self.db.profile.histograms then
 		self.db.profile.histograms = {}
 	end
-				
+
 	for k in pairs(self.db.profile.histograms) do
 		if type(k) == "string" then
 			wipe(self.db.profile.histograms)
 			break
 		end
 	end
-			
+
 	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.histograms) do
 			if v.name == vv.name and not vv.custom then
@@ -350,11 +350,11 @@ function mod:OnInitialize()
 			tinsert(self.db.profile.histograms, copy(v))
 		end
 	end
-	
-	self.core = LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)		
-	
-	self.offset = 0	
-	
+
+	self.core = LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)
+
+	self.offset = 0
+
 	StarTip:SetOptionsDisabled(options, true)
 
 	self.histograms = {}
@@ -383,7 +383,7 @@ function mod:SetUnit()
 	createHistograms()
 	for k, widget in pairs(self.histograms) do
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
-			widget.bars[i]:Show()			
+			widget.bars[i]:Show()
 		end
 		widget:Start()
 	end
@@ -452,8 +452,8 @@ function mod:RebuildOpts()
 					desc = "Toggle whether this histogram is enabled or not",
 					type = "toggle",
 					get = function() return db.enabled end,
-					set = function(info, v) 
-						db.enabled = v 
+					set = function(info, v)
+						db.enabled = v
 						db["enabledDirty"] = true
 						self:ClearHistograms()
 					end,
@@ -465,10 +465,10 @@ function mod:RebuildOpts()
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(db.height or defaults.height) end,
-					set = function(info, v) 
-						db.height = tonumber(v); 
+					set = function(info, v)
+						db.height = tonumber(v);
 						db["heightDirty"] = true
-						self:ClearHistograms()  
+						self:ClearHistograms()
 					end,
 					order = 2
 				},
@@ -500,10 +500,10 @@ function mod:RebuildOpts()
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(db.update or defaults.update) end,
-					set = function(info, v) 
-						db.update = tonumber(v); 
-						db["updateDirty"] = true						
-						self:ClearHistograms() 
+					set = function(info, v)
+						db.update = tonumber(v);
+						db["updateDirty"] = true
+						self:ClearHistograms()
 					end,
 					order = 5
 				},
@@ -533,7 +533,7 @@ function mod:RebuildOpts()
 					end,
 					set = function(info, v)
 						db.texture = LSM:List("statusbar")[v]
-						db["textureDirty"] = true						
+						db["textureDirty"] = true
 						self:ClearHistograms()
 					end,
 					order = 6
@@ -580,7 +580,7 @@ function mod:RebuildOpts()
 							pattern = "%d",
 							get = function() return tostring(db.point[5] or 0) end,
 							set = function(info, v) db.point[5] = tonumber(v); self:ClearHistograms(); end,
-							order = 4						
+							order = 4
 						}
 					},
 					order = 7
@@ -600,11 +600,11 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.expression end,
-					set = function(info, v) 
-						db.expression = v; 
+					set = function(info, v)
+						db.expression = v;
 						db["expressionDirty"] = true
 						self:ClearHistograms()
-						 
+
 					end,
 					order = 9
 				},
@@ -615,14 +615,14 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.min end,
-					set = function(info, v) 
-						db.min = v; 
+					set = function(info, v)
+						db.min = v;
 						db["minDirty"] = true
 						self:ClearHistograms()
-						 
+
 					end,
 					order = 10
-				
+
 				},
 				max = {
 					name = "Histogram max expression",
@@ -631,11 +631,11 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.max end,
-					set = function(info, v) 
-						db.max = v; 
+					set = function(info, v)
+						db.max = v;
 						db["maxDirty"] = true
 						self:ClearHistograms()
-						 
+
 					end,
 					order = 11
 				},
@@ -646,11 +646,11 @@ function mod:RebuildOpts()
 					multiline = true,
 					width = "full",
 					get = function() return db.color end,
-					set = function(info, v) 
-						db.color = v; 
+					set = function(info, v)
+						db.color = v;
 						db["colorDirty"] = true
 						self:ClearHistograms()
-						 
+
 					end,
 					order = 12
 				},
@@ -669,8 +669,8 @@ function mod:RebuildOpts()
 						if delete then
 							self.db.profile.histograms[i] = nil
 						end
-						self:ClearHistograms()	
-						StarTip:RebuildOpts()						
+						self:ClearHistograms()
+						StarTip:RebuildOpts()
 					end,
 					order = 13
 				}
@@ -713,7 +713,7 @@ function mod:UpdateHistogram()
 		color.r, color.g, color.b = colorGradient(min/max)
 	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
 		color = health[1]
-	elseif UnitIsPlayer(unit) then 
+	elseif UnitIsPlayer(unit) then
 		color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
 	else
 		color = StarTip.new()
@@ -724,7 +724,7 @@ function mod:UpdateHistogram()
 	StarTip.del(color)
 end
 ]]
--- Logic snagged from oUF 
+-- Logic snagged from oUF
 --[[
 function mod:UpdateHealth()
 	local unit = "mouseover"
@@ -739,7 +739,7 @@ function mod:UpdateHealth()
 		color.r, color.g, color.b = colorGradient(min/max)
 	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
 		color = health[1]
-	elseif UnitIsPlayer(unit) then 
+	elseif UnitIsPlayer(unit) then
 		color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
 	else
 		color = StarTip.new()

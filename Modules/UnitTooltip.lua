@@ -108,14 +108,14 @@ local r, g, b
 local unit = (unit or "mouseover") .. "target"
 if UnitExists(unit) then
     if UnitIsPlayer(unit) then
-		r, g, b = ClassColor(unit)
+        r, g, b = ClassColor(unit)
     else
         r, g, b = UnitSelectionColor(unit)
     end
 else
-	r = 1
-	g = 1
-	b = 1
+    r = 1
+    g = 1
+    b = 1
 end
 local name = UnitName(unit)
 if name == select(1, UnitName("player")) then name = "<<YOU>>" end
@@ -250,12 +250,7 @@ return value
     [12] = {
         name = "Mana",
         left = [[
-class = select(2, UnitClass(unit))
-if not UnitIsPlayer(unit) then
-	class = "MAGE"
-end
-
-return (powers[class] or "Mana:")
+return PowerName(unit)
 ]],
         right = [[
 mana = UnitMana(unit)
@@ -302,7 +297,6 @@ if mem then
     local num = floor(memperc)
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
-	assert(gradient[num], format("%d", num))
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
     return GetColorCode(format("%s (%.2f%%)", memshort(mem), memperc), r, g, b)
 end
@@ -491,7 +485,7 @@ function mod:CreateLines()
                 local left, right, c, cc = '', ''
 				environment.unit = StarTip.unit
 				v.config.unit = StarTip.unit
-                if v.right and v.right ~= "" then					
+                if v.right and v.right ~= "" then
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
@@ -500,7 +494,7 @@ function mod:CreateLines()
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end
-				
+
                 if left and left ~= "" and right ~= "nil" then
                     lineNum = lineNum + 1
                     if v.right then
@@ -510,7 +504,7 @@ function mod:CreateLines()
 							v.config.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
-							
+
 							v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name .. "left", copy(v.config), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 							v.update = tmp
 						end
@@ -1046,7 +1040,7 @@ function mod:SetUnit()
     end
 
     lastLine = lastLine + 1
-		
+
 	wipe(linesToAdd)
 	wipe(linesToAddR)
 	wipe(linesToAddG)
@@ -1075,19 +1069,19 @@ function mod:SetUnit()
     -- End
 
 	lines()
-	
+
 	GameTooltip:Show()
 
 	if self.db.profile.refreshRate > 0 and self.timer then
 		self.timer:Start()
-	end	
-	
+	end
+
 end
 
 function mod:RefixEndLines()
     -- Another part taken from CowTip
     for i, left in ipairs(linesToAdd) do
-		
+
         local right = linesToAddRight[i]
         if right then
             GameTooltip:AddDoubleLine(left, right, linesToAddR[i], linesToAddG[i], linesToAddB[i], linesToAddRightR[i], linesToAddRightG[i], linesToAddRightB[i])
