@@ -402,6 +402,16 @@ Update()
 	},	
 }
 
+local checkTooltipAlphaFrame
+local checkTooltipAlpha = function()
+	if GameTooltip:GetAlpha() < 1 then
+		StarTip.fading = true
+		checkTooltipAlphaFrame:SetScript("OnUpdate", nil)
+	end
+end
+
+checkTooltipAlphaFrame = CreateFrame("Frame")
+
 function StarTip:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
 	
@@ -559,6 +569,7 @@ function StarTip:OpenConfig()
 end
 
 function StarTip.OnTooltipSetUnit()	
+	StarTip.fading = false
 	local unit = GameTooltip:GetUnit()
 	StarTip.unit = "mouseover"
 	if not UnitExists("mouseover") then
@@ -595,6 +606,7 @@ function StarTip.OnTooltipSetUnit()
 		end
 	end
 	StarTip.justSetUnit = nil
+	checkTooltipAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
 end
 
 function StarTip.OnTooltipSetItem(self, ...)	

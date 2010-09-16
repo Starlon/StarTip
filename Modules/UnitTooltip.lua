@@ -94,7 +94,7 @@ if UnitIsPlayer(unit) then
 else
     r, g, b = UnitSelectionColor(unit)
 end
-return GetColorCode(UnitName(unit), r, g, b)
+return Colorize(UnitName(unit), r, g, b)
 ]],
         right = nil,
 		bold = true,
@@ -119,7 +119,7 @@ else
 end
 local name = UnitName(unit)
 if name == select(1, UnitName("player")) then name = "<<YOU>>" end
-return name and GetColorCode(name, r, g, b) or "None"
+return name and Colorize(name, r, g, b) or "None"
 ]],
         rightUpdating = true,
 		update = 1000,
@@ -194,7 +194,7 @@ if UnitIsPlayer(unit) then
 else
     r, g, b = 1, 1, 1
 end
-return GetColorCode(UnitClass(unit), r, g, b)
+return Colorize(UnitClass(unit), r, g, b)
 ]],
 		enabled = true,
     },
@@ -237,9 +237,9 @@ health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
 r, g, b = HPColor(health, maxHealth)
 value = "Unknown"
 if maxHealth == 100 then
-    value = GetColorCode(health .. "%", r, g, b)
+    value = Colorize(health .. "%", r, g, b)
 elseif maxHealth ~= 0 then
-    value = GetColorCode(format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100), r, g, b)
+    value = Colorize(format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100), r, g, b)
 end
 return value
 ]],
@@ -258,9 +258,9 @@ maxMana = UnitManaMax(unit)
 r, g, b = PowerColor(nil, unit)
 value = "Unknown"
 if maxMana == 100 then
-    value = GetColorCode(tostring(mana), r, g, b)
+    value = Colorize(tostring(mana), r, g, b)
 elseif maxMana ~= 0 then
-    value = GetColorCode(format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100), r, g, b)
+    value = Colorize(format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100), r, g, b)
 end
 return value
 ]],
@@ -298,7 +298,7 @@ if mem then
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
-    return GetColorCode(format("%s (%.2f%%)", memshort(mem), memperc), r, g, b)
+    return Colorize(format("%s (%.2f%%)", memshort(mem), memperc), r, g, b)
 end
 ]],
 		rightUpdating = true,
@@ -315,7 +315,7 @@ if cpu then
     if num < 1 then num = 1 end
     if num > 100 then num = 100 end
     local r, g, b = gradient[num][1], gradient[num][2], gradient[num][3]
-    return GetColorCode(format("%s (%.2f%%)", timeshort(cpu), cpuperc), r, g, b)
+    return Colorize(format("%s (%.2f%%)", timeshort(cpu), cpuperc), r, g, b)
 end
 ]],
 		rightUpdating = true,
@@ -337,6 +337,16 @@ end
 		enabled = true,
 		update = 1000
 	},
+	[18] = {
+		name = "Talents",
+		left = "return 'Talents:'",
+		right = [[
+return SpecText(unit)
+]],
+		rightUpdating = true,
+		enabled = true,
+		update = 1000
+	}
 }
 
 local options = {}
@@ -419,14 +429,18 @@ local widgetsToDraw = {}
 local function updateWidget(widget)
 	tinsert(widgetsToDraw, widget)
 	if mod.db.profile.refreshRate == 0 then
-		draw()
+		draw(UnitExists(StarTip.unit))
 	end
 end
 
 do
 	local fontsList = LSM:List("font")
 	local widget, fontString
-	function draw()
+	function draw(show)
+		if StarTip.fading then
+			table.wipe(widgetsToDraw)
+			return
+		end
 		for i, widget in ipairs(widgetsToDraw) do
 			if not widget.fontString then break end
 			local fontString = widget.fontString
@@ -451,6 +465,9 @@ do
 			end
 		end
 		table.wipe(widgetsToDraw)
+		if UnitExists(StarTip.unit) then
+			GameTooltip:Show()
+		end
 	end
 end
 
@@ -700,6 +717,7 @@ function mod:RebuildOpts()
 						desc = "Move this line up by one",
 						type = "execute",
 						func = function()
+							StarTip:Print("up", i)
 							if i == 1 then return end
 							local tmp = self.db.profile.lines[i - 1]
 							if not v.left then v.left = "" end
@@ -721,6 +739,7 @@ function mod:RebuildOpts()
 						func = function()
 							if i == #self.db.profile.lines then return end
 							local tmp = self.db.profile.lines[i + 1]
+							if tmp.deleted then return end
 							if not v.left then v.left = "" end
 							if not v.right then v.right = "" end
 							if not tmp.left then tmp.left = "" end
@@ -751,9 +770,19 @@ function mod:RebuildOpts()
 						type = "execute",
 						func = function()
 							local name = v.name
-							table.wipe(self.db.profile.lines[i])
-							v.name = name
-							v.deleted = true
+							local delete = true
+							for i, line in ipairs(defaultLines) do
+								if line.name == name then
+									delete = false
+								end
+							end
+							tremove(self.db.profile.lines, i)
+							if not delete then
+								wipe(v)
+								v.deleted = true
+								v.name = name
+								tinsert(self.db.profile.lines, v)
+							end
 							StarTip:RebuildOpts()
 							self:CreateLines()
 						end,
@@ -777,9 +806,9 @@ function mod:RebuildOpts()
 							end
 							self:CreateLines()
 						end,
-						validate = function(info, str)
+						--[[validate = function(info, str)
 							return mod.evaluator:Validate(environment, str)
-						end,
+						end,]]
 						multiline = true,
 						width = "full",
 						order = 10
@@ -797,48 +826,10 @@ function mod:RebuildOpts()
 							end
 							self:CreateLines()
 						end,
-						validate = function(info, str)
-							return mod.evaluator:Validate(environment, str)
-						end,
 						multiline = true,
 						width = "full",
 						order = 11
 					},
-					--[[
-					colorLeft = {
-						name = "Left Color",
-						type = "input",
-						desc = "Color for left segment",
-						get = function() return v.colorLeft end,
-						set = function(info, val)
-							v.colorLeft = val
-							v.colorLeftDirty = true
-							self:CreateLines()
-						end,
-						validate = function(info, str)
-							return mod.evaluator:Validate(environment, str)
-						end,
-						multiline = true,
-						width = "full",
-						order = 12
-					},
-					colorRight = {
-						name = "Right Color",
-						type = "input",
-						desc = "Color for right segment",
-						get = function() return v.colorRight end,
-						set = function(info, val)
-							v.colorRight = val
-							v.colorRightDirty = true
-							self:CreateLines()
-						end,
-						validate = function(info, str)
-							return mod.evaluator:Validate(environment, str)
-						end,
-						multiline = true,
-						width = "full",
-						order = 13
-					},]]
 					marquee = {
 						name = "Enhanced Settings",
 						type = "group",
@@ -1000,14 +991,14 @@ function mod:RebuildOpts()
 					}
 			}
 		end
-		if v.desc then
+		--[[if v.desc then
 			options["line" .. i].args.desc = {
 				name = v.desc,
 				type = "header",
 				order = 1
 			}
 
-		end
+		end]]
     end
 end
 
