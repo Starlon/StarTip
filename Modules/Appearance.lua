@@ -29,7 +29,10 @@ local defaults = {
 			tapped = {0.25, 0.25, 0.25, 1},
 		},
 		borderColor = { 1, 1, 1, 1 },
-		padding = 4,
+		paddingTop = 4,
+		paddingBottom = 4,
+		paddingLeft = 4,
+		paddinRight = 4,
 		edgeSize = 16
 	}
 }
@@ -127,16 +130,49 @@ local options = {
 		end,
 		order = 10
 	},
-	padding = {
-		name = "Tooltip Padding",
-		desc = "Set the tooltip's padding",
+	paddingTop = {
+		name = "Tooltip Top Padding",
+		desc = "Set the tooltip's top side padding",
 		type = "range",
-		min = 0,
+		min = -20,
 		max = 20,
 		step = 1,
 		get = get,
 		set = set,
 		order = 11
+	},
+	paddingBottom = {
+		name = "Tooltip Bottom Padding",
+		desc = "Set the tooltip's bottom side padding",
+		type = "range",
+		min = -20,
+		max = 20,
+		step = 1,
+		get = get,
+		set = set,
+		order = 12
+	},
+	paddingLeft = {
+		name = "Tooltip Left Padding",
+		desc = "Set the tooltip's left side padding",
+		type = "range",
+		min = -20,
+		max = 20,
+		step = 1,
+		get = get,
+		set = set,
+		order = 13
+	},
+	paddingRight = {
+		name = "Tooltip Right Padding",
+		desc = "Set the tooltip's right side padding",
+		type = "range",
+		min = -20,
+		max = 20,
+		step = 1,
+		get = get,
+		set = set,
+		order = 14
 	},
 	edgeSize = {
 		name = "Tooltip Edge Size",
@@ -147,12 +183,13 @@ local options = {
 		step = 1,
 		get = get,
 		set = set,
-		order = 12
+		order = 15
 	},
 	bgColor = {
 		name = "Background Color",
 		desc = "Set options for background color",
 		type = "group",
+		order = 16,
 		get = function(info) 
 			return unpack(self.db.profile.bgColor[info[#info]]) 
 		end,
@@ -371,10 +408,10 @@ function mod:SetBackdrop()
 			tmp.tile = false
 			tmp.edgeSize = self.db.profile.edgeSize
 			tmp.insets = tmp2
-			tmp2.left = self.db.profile.padding
-			tmp2.right = self.db.profile.padding
-			tmp2.top = self.db.profile.padding
-			tmp2.bottom = self.db.profile.padding
+			tmp2.left = self.db.profile.paddingLeft
+			tmp2.right = self.db.profile.paddingRight
+			tmp2.top = self.db.profile.paddingTop
+			tmp2.bottom = self.db.profile.paddingBottom
 			GameTooltip:SetBackdrop(tmp)
 			ShoppingTooltip1:SetBackdrop(tmp)
 			ShoppingTooltip2:SetBackdrop(tmp)
