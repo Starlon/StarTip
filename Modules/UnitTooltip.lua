@@ -322,6 +322,16 @@ end
 		update = 1000
 	},
 	[17] = {
+		name = "Talents",
+		left = "return 'Talents:'",
+		right = [[
+return SpecText(unit)
+]],
+		rightUpdating = true,
+		enabled = true,
+		update = 1000
+	},
+	[18] = {
 		name = "Range",
 		left = [[
 local min, max = RangeCheck:GetRange(unit)
@@ -337,16 +347,6 @@ end
 		enabled = true,
 		update = 1000
 	},
-	[18] = {
-		name = "Talents",
-		left = "return 'Talents:'",
-		right = [[
-return SpecText(unit)
-]],
-		rightUpdating = true,
-		enabled = true,
-		update = 1000
-	}
 }
 
 local options = {}
