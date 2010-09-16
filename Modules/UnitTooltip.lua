@@ -485,10 +485,10 @@ LibStub("StarLibPluginString-1.0"):New(plugin)
 function mod:ClearLines()
 	for k, v in pairs(lines) do
 		if v.leftObj then
-			v.leftObj:Del()
+			v.leftObj:Stop()
 		end
 		if v.rightObj then
-			v.rightObj:Del()
+			v.rightObj:Stop()
 		end
 	end
 	wipe(lines)
