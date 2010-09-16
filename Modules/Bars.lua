@@ -101,6 +101,7 @@ return PowerColor(nil, unit)
 local defaults = {
 	profile = {
 		classColors = true,
+		bars = {}
 	}
 }
 
@@ -273,9 +274,7 @@ function mod:CreateBars()
 	createBars()
 end
 
-function mod:OnInitialize()
-	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-
+function mod:ReInit()
 	if not self.db.profile.bars then
 		self.db.profile.bars = {}
 	end
@@ -299,7 +298,13 @@ function mod:OnInitialize()
 			end
 		end
 	end
+end
 
+function mod:OnInitialize()
+	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+
+	self:ReInit()
+	
 	for k, v in pairs(defaultWidgets) do
 		if not v.tagged and not v.deleted then
 			self.db.profile.bars[k] = copy(v)

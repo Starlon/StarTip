@@ -227,6 +227,7 @@ return 1, 1, 0
 local defaults = {
 	profile = {
 		classColors = true,
+		texts = {}
 	}
 }
 
@@ -380,13 +381,13 @@ function createTexts()
 	end
 end
 
-function mod:OnInitialize()
-	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-
+function mod:ReInit()
 	if not self.db.profile.texts then
 		self.db.profile.texts = {}
 	end
 
+	--wipe(self.db.profile.texts)
+	
 	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.texts) do
 			if v.name == vv.name and not vv.custom then
@@ -405,7 +406,15 @@ function mod:OnInitialize()
 			tinsert(self.db.profile.texts, copy(v))
 		end
 	end
+end
 
+function mod:OnInitialize()
+	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+
+	wipe(self.db.profile.texts)
+	
+	self:ReInit()
+	
 	self.core = LibCore:New(mod, environment, "StarTip.Texts", {["StarTip.Texts"] = {}}, nil, StarTip.db.profile.errorLevel)
 
 	StarTip:SetOptionsDisabled(options, true)

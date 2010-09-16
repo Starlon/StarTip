@@ -151,6 +151,7 @@ end
 local defaults = {
 	profile = {
 		classColors = true,
+		histograms = {}
 	}
 }
 
@@ -321,9 +322,7 @@ function mod:CreateHistograms()
 	createHistograms()
 end
 
-function mod:OnInitialize()
-	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-
+function mod:ReInit()
 	if not self.db.profile.histograms then
 		self.db.profile.histograms = {}
 	end
@@ -353,7 +352,14 @@ function mod:OnInitialize()
 			tinsert(self.db.profile.histograms, copy(v))
 		end
 	end
+end
 
+function mod:OnInitialize()
+	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+
+	wipe(self.db.profile.histograms)
+	self:ReInit()
+	
 	self.core = LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)
 
 	self.offset = 0

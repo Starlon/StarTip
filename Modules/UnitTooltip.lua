@@ -351,9 +351,8 @@ return SpecText(unit)
 
 local options = {}
 
-function mod:OnInitialize()
-    self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-
+function mod:ReInit()
+	self:ClearLines()
 	for k, v in ipairs(defaultLines) do
 		for j, vv in ipairs(self.db.profile.lines) do
 			vv.colorLeft = nil
@@ -371,10 +370,17 @@ function mod:OnInitialize()
 
 	for k, v in ipairs(defaultLines) do
 		if not v.tagged and not v.deleted then
-			tinsert(self.db.profile.lines, v)
+			tinsert(self.db.profile.lines, copy(v))
 		end
 	end
+	self:CreateLines()
+end
 
+function mod:OnInitialize()
+    self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+
+	self:ReInit()
+	
 	local text = StarTip:GetModule("Text")
 	if text.db.profile.lines then
 		local lines = copy(text.db.profile.lines)
@@ -402,7 +408,6 @@ local draw
 local update
 function mod:OnEnable()
 	StarTip:SetOptionsDisabled(options, false)
-	self:CreateLines()
 	if self.db.profile.refreshRate > 0 then
 		self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
 	end
@@ -477,6 +482,18 @@ local plugin = {}
 LibStub("StarLibPluginString-1.0"):New(plugin)
 --@end-debug@
 
+function mod:ClearLines()
+	for k, v in pairs(lines) do
+		if v.leftObj then
+			v.leftObj:Del()
+		end
+		if v.rightObj then
+			v.rightObj:Del()
+		end
+	end
+	wipe(lines)
+end
+
 local tbl
 function mod:CreateLines()
     local llines = {}
@@ -488,6 +505,7 @@ function mod:CreateLines()
 			llines[j].config = copy(v)
 		end
     end
+	self:ClearLines()
     lines = setmetatable(llines, {__call=function(self)
 		--@debug@
 		if debugging then
@@ -603,6 +621,7 @@ function mod:RebuildOpts()
 				tinsert(self.db.profile.lines, {name = v, left = "", right = "", rightUpdating = false, enabled = true})
 				self:RebuildOpts()
 				StarTip:RebuildOpts()
+				self:ClearLines()
 				self:CreateLines()
 			end,
 			order = 5
@@ -784,6 +803,7 @@ function mod:RebuildOpts()
 								tinsert(self.db.profile.lines, v)
 							end
 							StarTip:RebuildOpts()
+							self:ClearLines()
 							self:CreateLines()
 						end,
 						order = 8
@@ -801,9 +821,7 @@ function mod:RebuildOpts()
 						set = function(info, val)
 							v.left = unescape(val)
 							v.leftDirty = true
-							if val == "" then
-								v.left = nil
-							end
+							if val == "" then v.left = nil end
 							self:CreateLines()
 						end,
 						--[[validate = function(info, str)
@@ -821,9 +839,7 @@ function mod:RebuildOpts()
 						set = function(info, val)
 							v.right = unescape(val);
 							v.rightDirty = true
-							if val == "" then
-								v.right = nil
-							end
+							if val == "" then v.right = nil end
 							self:CreateLines()
 						end,
 						multiline = true,

@@ -161,6 +161,7 @@ StarTip.UNIT_RAID_GROUPS = UNIT_RAID_GROUPS
 local defaults = {
 	profile = {
 		modules = {},
+		timers = {},
 		minimap = {hide=true},
 		modifier = 1,
 		unitShow = 1,
@@ -402,6 +403,16 @@ Update()
 	},	
 }
 
+function StarTip:RefreshConfig()
+	for k, v in self:IterateModules() do
+		if v.ReInit then
+			v:ReInit()
+		end
+	end
+	self:RebuildOpts()
+	self:Print("You may need to reload your UI. I'm not sure why yet.")
+end
+
 local checkTooltipAlphaFrame
 local checkTooltipAlpha = function()
 	if GameTooltip:GetAlpha() < 1 then
@@ -414,6 +425,9 @@ checkTooltipAlphaFrame = CreateFrame("Frame")
 
 function StarTip:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
+	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 	
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", options)
 	self:RegisterChatCommand("startip", "OpenConfig")
