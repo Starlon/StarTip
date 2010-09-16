@@ -14,8 +14,8 @@ local LibTimer = LibStub("StarLibTimer-1.0", true)
 assert(LibTimer, mod.name .. " requires StarLibTimer-1.0")
 local LibEvaluator = LibStub("StarLibEvaluator-1.0", true)
 assert(LibEvaluator, mod.name .. " requires StarLibEvaluator-1.0")
-local UnitStats = LibStub("StarLibPluginUnitStats-1.0", true)
-assert(UnitStats, mod.name .. " requires StarLibPluginUnitStats-1.0")
+local UnitTooltipStats = LibStub("StarLibPluginUnitTooltipStats-1.0", true)
+assert(UnitTooltipStats, mod.name .. " requires StarLibPluginUnitTooltipStats-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -1022,7 +1022,7 @@ local ff = CreateFrame("Frame")
 function mod:SetUnit()
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 
-	environment.unitName, environment.unitGuild, environment.unitLocation = UnitStats.GetUnitStats("mouseover")
+	environment.unitName, environment.unitGuild, environment.unitLocation = UnitTooltipStats.GetUnitTooltipStats("mouseover")
 
     -- Taken from CowTip
     local lastLine = 2
