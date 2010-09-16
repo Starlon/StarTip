@@ -1067,6 +1067,7 @@ function mod:SetUnit()
 		self.timer:Start()
 	end
 
+	self:RefixEndLines()
 end
 
 function mod:RefixEndLines()
