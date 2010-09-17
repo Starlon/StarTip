@@ -128,7 +128,7 @@ StarTip.opposites = {
 }
 
 local SINGLETON_CLASSIFICATIONS = {
-	"player",
+	--"player", This causes the tooltip to stay shown after you mouse over your own unit frame.
 	"pet",
 	"pettarget",
 	"target",
@@ -485,6 +485,8 @@ function StarTip:OnEnable()
 	self:RawHookScript(GameTooltip, "OnHide", "OnTooltipHide")
 	self:RawHookScript(GameTooltip, "OnShow", "OnTooltipShow")
 	self:SecureHook(GameTooltip, "Show", self.GameTooltipShow)
+	self:SecureHook(GameTooltip, "AddDoubleLine", self.GameTooltipAddLine)
+	self:SecureHook(GameTooltip, "AddLine", self.GameTooltipAddLine)
 	
 	for k,v in self:IterateModules() do
 		if (self.db.profile.modules[k]  == nil and not v.defaultOff) or self.db.profile.modules[k] then
@@ -497,6 +499,10 @@ function StarTip:OnEnable()
 	self:RebuildOpts()
 	
 	self:RegisterEvent("MODIFIER_STATE_CHANGED")
+	
+	local plugin = {}
+	LibStub("StarLibPluginColor-1.0"):New(plugin)
+	ChatFrame1:AddMessage(plugin.Colorize("Welcome to StarTip: Tooltips from outerspace.", 0, 1, 1) .. plugin.Colorize(" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon.", 1, 1, 0))
 end
 
 function StarTip:OnDisable()
@@ -593,16 +599,41 @@ function StarTip:OpenConfig()
 	AceConfigDialog:Open("StarTip")	
 end
 
+function StarTip.GameTooltipAddLine(...)
+	local mod = StarTip:GetModule("UnitTooltip")
+	mod.NUM_LINES = mod.NUM_LINES + 1
+	return ...
+end
+
 local function endThrottle()
 	StarTip.OnTooltipSetUnit()
 end
 
+local hideTimer
+local function hideTooltip()
+StarTip:Print("What wahat")
+	local mod = StarTip:GetModule("UnitTooltip")
+	if GameTooltip:GetAlpha() < 1 then GameTooltip:Hide(); StarTip.unit = false; return end
+	if GameTooltip:NumLines() > mod.NUM_LINES then GameTooltip:Hide(); StarTip.unit = false; return end
+	if not StarTip.unit then GameTooltip:Hide() return end
+	hideTimer:Start()
+end
+
 local throttleTimer
 local lastTime = GetTime()
+
 function StarTip.OnTooltipSetUnit(...)
-	
+
+
+	hideTimer = hideTimer or LibTimer:New("StarTip.Hide", 100, false, hideTooltip, nil, StarTip.db.profile.errorLevel)
+	hideTimer:Stop()
 	throttleTimer = throttleTimer or LibTimer:New("StarTip.Throttle", StarTip.db.profile.throttleVal, false, endThrottle, nil, StarTip.db.profile.errorLevel)
-	if GetTime() < lastTime + StarTip.db.profile.throttleVal and UnitIsPlayer("mouseover") then throttleTimer:Start(); GameTooltip:Hide() return ... end
+	if GetTime() < lastTime + StarTip.db.profile.throttleVal and UnitIsPlayer("mouseover") and StarTip.db.profile.throttleVal > 0 then 
+		hideTimer:Start()
+		throttleTimer:Start(); 
+		GameTooltip:Hide() 
+		return ... 
+	end
 	lastTime = GetTime()
 	
 	StarTip.fading = false
@@ -684,6 +715,7 @@ function StarTip:OnTooltipHide(...)
 		end
 	end
 	self.justHide = nil
+	self.unit = false
 	self.hooks[GameTooltip].OnHide(...)  	
 end
 
