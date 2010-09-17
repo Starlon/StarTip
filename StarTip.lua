@@ -130,7 +130,7 @@ StarTip.opposites = {
 }
 
 local SINGLETON_CLASSIFICATIONS = {
-	--"player", This causes the tooltip to stay shown after you mouse over your own unit frame.
+	"player", --This causes the tooltip to stay shown after you mouse over your own unit frame.
 	"pet",
 	"pettarget",
 	"target",
@@ -608,21 +608,26 @@ function StarTip.GameTooltipAddLine(...)
 	return ...
 end
 
-local function endThrottle()
-	StarTip.OnTooltipSetUnit()
-end
-
 local hideTimer
 local function hideTooltip()
 	local mod = StarTip:GetModule("UnitTooltip")
 	if GameTooltip:GetAlpha() < 1 then GameTooltip:Hide(); StarTip.unit = false; return end
 	if GameTooltip:NumLines() > mod.NUM_LINES then GameTooltip:Hide(); StarTip.unit = false; return end
+	if UnitGUID(StarTip.unit or "mouseover") == UnitGUID("player") and StarTip.unit ~= "player" then GameTooltip:Hide(); StarTip.unit = false; return end
 	if not StarTip.unit then GameTooltip:Hide() return end
 	hideTimer:Start()
 end
 
+local playerUnitTimer
+local function playerUnitHide()
+	GameTooltip:Hide()
+end
+
 local throttleTimer
 local lastTime = GetTime()
+local function endThrottle()
+	StarTip.OnTooltipSetUnit()
+end
 
 function StarTip.OnTooltipSetUnit(...)
 
@@ -672,6 +677,10 @@ function StarTip.OnTooltipSetUnit(...)
 	
 	if not UnitExists(StarTip.unit) then GameTooltip:Hide(); return end
 	
+	if StarTip.unit == "player" then
+		playerUnitTimer = playerUnitTimer or LibTimer:New("StarTip.Throttle", 2, false, playerUnitHide, nil, StarTip.db.profile.errorLevel)
+		playerUnitTimer:Start()
+	end
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
