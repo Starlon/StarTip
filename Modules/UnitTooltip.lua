@@ -1009,16 +1009,16 @@ function mod:SetUnit()
     elseif not text2:find("^"..LEVEL) then
         lastLine = lastLine + 1
     end
-    if not UnitPlayerControlled("mouseover") and not UnitIsPlayer("mouseover") then
+    if not UnitPlayerControlled(StarTip.unit) and not UnitIsPlayer(StarTip.unit) then
         local factionText = self.leftLines[lastLine + 1]:GetText()
         if factionText == PVP then
             factionText = nil
         end
-        if factionText and (factionList[factionText] or UnitFactionGroup("mouseover")) then
+        if factionText and (factionList[factionText] or UnitFactionGroup(StarTip.unit)) then
             lastLine = lastLine + 1
         end
     end
-    if not UnitIsConnected("mouseover") or not UnitIsVisible("mouseover") or UnitIsPVP("mouseover") then
+    if not UnitIsConnected(StarTip.unit) or not UnitIsVisible(StarTip.unit) or UnitIsPVP(StarTip.unit) then
         lastLine = lastLine + 1
     end
 
@@ -1060,6 +1060,15 @@ function mod:SetUnit()
 	end
 
 	self:RefixEndLines()
+	
+	local hide = 1
+	for i = 1, GameTooltip:NumLines() do
+		if string.trim(self.leftLines[i]:GetText()) == "" and string.trim(self.rightLines[i]:GetText()) == "" then hide = hide + 1 end
+	end
+	
+	if hide >= GameTooltip:NumLines() then
+		GameTooltip:Hide()
+	end
 end
 
 function mod:RefixEndLines()

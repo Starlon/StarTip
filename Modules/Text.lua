@@ -86,7 +86,7 @@ return format('Health: %.1f%%', health / max * 100)
 		color = [[
 if not UnitExists(unit) then return end
 local health, max = UnitHealth(unit), UnitHealthMax(unit)
-return HPColor(health, max)
+return ColorGradient(health / max)
 ]],
 		cols = 20,
 		update = 1000,
