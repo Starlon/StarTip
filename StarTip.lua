@@ -1,5 +1,7 @@
 ﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip: @project-version@", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0") 
 StarTip.version = GetAddOnMetadata("StarTip", "X-StarTip-Version") or ""
+StarTip.name = GetAddOnMetadata("StarTip", "Notes")
+StarTip.name = "StarTip: " .. (StarTip.name or " tooltips from outerspace")
 MAJOR = StarTip.version
 
 local LibDBIcon = LibStub("LibDBIcon-1.0")
@@ -171,7 +173,7 @@ local defaults = {
 		unitFrameShow = 1,
 		otherFrameShow = 1,
 		errorLevel = 1,
-		throttleVal = 0.4
+		throttleVal = 0
 	}
 }
 			
@@ -502,7 +504,7 @@ function StarTip:OnEnable()
 	
 	local plugin = {}
 	LibStub("StarLibPluginColor-1.0"):New(plugin)
-	ChatFrame1:AddMessage(plugin.Colorize("Welcome to StarTip: Tooltips from outerspace.", 0, 1, 1) .. plugin.Colorize(" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon.", 1, 1, 0))
+	ChatFrame1:AddMessage(plugin.Colorize("Welcome to " .. StarTip.name, 0, 1, 1) .. plugin.Colorize(" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon.", 1, 1, 0))
 end
 
 function StarTip:OnDisable()
