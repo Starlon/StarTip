@@ -1063,7 +1063,7 @@ function mod:SetUnit()
 	
 	local hide = 1
 	for i = 1, GameTooltip:NumLines() do
-		if string.trim(self.leftLines[i]:GetText()) == "" and string.trim(self.rightLines[i]:GetText()) == "" then hide = hide + 1 end
+		if string.trim(self.leftLines[i]:GetText() or "") == "" and string.trim(self.rightLines[i]:GetText() or "") == "" then hide = hide + 1 end
 	end
 	
 	if hide >= GameTooltip:NumLines() then
