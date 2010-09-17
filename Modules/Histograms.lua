@@ -16,6 +16,7 @@ local timer
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetHistogram = LibStub("StarLibWidgetHistogram-1.0")
 local LibCore = LibStub("StarLibCore-1.0")
+local LibTimer = LibStub("StarLibTimer-1.0")
 
 local unit
 local environment = {}
@@ -66,7 +67,8 @@ local defaultWidgets = {
 return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 ]],
 		layer = 1,
-		update = 1000
+		update = 1000,
+		intersect = true
 	},
 	[2] = {
 		name = "Power",
@@ -113,7 +115,8 @@ end
 		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -77}},
 		layer = 1,
 		update = 1000,
-		persistent = true
+		persistent = true,
+		intersect = true
 	},
 	[4] = {
 		name = "CPU",
@@ -143,7 +146,8 @@ end
 		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -77}},
 		layer = 1,
 		update = 1000,
-		persistent = true
+		persistent = true,
+		intersect = true
 	},
 
 }
@@ -194,6 +198,29 @@ local optionsDefaults = {
 	},
 }
 
+local frame_cache = {}
+local insersectTimer
+local intersectUpdate = function()
+	if GetMouseFocus() and GetMouseFocus() ~= UIParent then
+		frame_cache[GetMouseFocus()] = true
+	end
+	for k, widget in pairs(mod.histograms or {}) do
+		for parent in pairs(frame_cache) do
+			for i, bar in ipairs(widget.bars) do
+				if widget.config.intersect and type(bar) == "table" and bar.GetCenter then
+					if GetMouseFocus() ~= UIParent and environment.Intersect and environment.Intersect(GetMouseFocus(), bar) then
+						widget.hidden = true
+						bar:Hide()
+					elseif environment.Intersect and not environment.Intersect(GetMouseFocus(), bar) and widget.hidden then
+						widget.hidden = false
+						bar:Show()
+					end
+				end
+			end
+		end
+	end
+end
+
 function updateHistogram(widget)
 	for i = 1, #widget.history do
 		local bar = widget.bars[i]
@@ -207,6 +234,7 @@ function updateHistogram(widget)
 			bar:SetValue(0) --segment * 100)
 			bar:SetStatusBarColor(0, 0, 1, 1)
 		end
+		if not UnitExists(StarTip.unit) then bar:Hide() end
 	end
 end
 
@@ -373,12 +401,14 @@ function mod:OnEnable()
 	createHistograms()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
+	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
 end
 
 function mod:OnDisable()
 	self:ClearHistograms()
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
+	if intersectTimer then intersectTimer:Stop() end
 end
 
 function mod:GetOptions()

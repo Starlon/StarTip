@@ -1,5 +1,5 @@
 local mod = StarTip:NewModule("Text", "AceTimer-3.0")
-mod.name = "Text"
+mod.name = "Texts"
 mod.toggled = true
 --mod.childGroup = true
 mod.defaultOff = true
@@ -16,8 +16,9 @@ local timer
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetText = LibStub("StarLibWidgetText-1.0")
 local LibCore = LibStub("StarLibCore-1.0")
-local Utils = LibStub("StarLibUtils-1.0")
 local LibQTip = LibStub("LibQTip-1.0")
+local PluginUtils = LibStub("StarLibPluginUtils-1.0")
+local LibTimer = LibStub("StarLibTimer-1.0")
 
 local environment = {}
 
@@ -151,7 +152,8 @@ end
 		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -62}},
 		parent = "GameTooltip",
 		strata = 1,
-		level = 1
+		level = 1,
+		intersect = true
 	},
 	[5] = {
 		name = "Memory Total",
@@ -161,19 +163,17 @@ local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip
 if mem then
     if totalMem == 0 then totalMem = 100; mem = 0 end
     memperc = mem / totalMem * 100
-    return format("%s (%.2f%%)", memshort(mem), memperc)
+	return Colorize(format("%s (%.2f%%)", timeshort(mem), memperc), Color2RGBA("return 0xffff00"))
 end
 ]],
-		color = [[
-return 1, 1, 0
-]],
-		cols = 20,
+		cols = 34,
 		update = 1000,
 		dontRtrim = true,
 		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -124}},
 		parent = "GameTooltip",
 		strata = 1,
-		level = 1
+		level = 1,
+		intersect = true
 	},
 	[6] = {
 		name = "CPU Percent",
@@ -201,7 +201,8 @@ end
 		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -62}},
 		parent = "GameTooltip",
 		strata = 1,
-		level = 1
+		level = 1,
+		intersect = true
 	},
 	[7] = {
 		name = "CPU Total",
@@ -211,20 +212,18 @@ local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     if totalCPU == 0 then totalCPU = 100; cpu = 0 end
     cpuperc = cpu / totalCPU * 100;
-    return format("%s (%.2f%%)", timeshort(cpu), cpuperc)
+    return Colorize(format("%s (%.2f%%)", timeshort(cpu), cpuperc), Color2RGBA("return 0xffff00"))
 end
 ]],
-		color = [[
-return 1, 1, 0
-]],
-		cols = 20,
+		cols = 34,
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
 		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -124}},
 		parent = "GameTooltip",
 		strata = 1,
-		level = 1
+		level = 1,
+		intersect = true
 	},
 }
 
@@ -273,19 +272,56 @@ local optionsDefaults = {
 	},
 }
 
+local frame_cache = {}
+local intersectTimer
+local intersectUpdate = function()
+	if GetMouseFocus() and GetMouseFocus() ~= UIParent then
+		frame_cache[GetMouseFocus()] = true
+	end
+	for k, widget in pairs(mod.texts or {}) do
+		for parent in pairs(frame_cache) do
+			if widget.config.intersect and type(widget.text) == "table" and widget.text.GetCenter then
+				if widget.config.intersect and environment.Intersect and environment.Intersect(parent, widget.text.fontstring) then
+					widget.hidden = true
+					widget.text:Hide()
+				elseif widget.config.intersect and environment.Intersect and not environment.Intersect(GetMouseFocus(), widget.text) and widget.hidden then
+					widget.hidden = false
+					widget.text:Show()
+				end
+			end
+		end
+	end
+end
+
 function updateText(widget)
 	widget.text.fontstring:SetText(widget.buffer)
 	widget.text:SetHeight(widget.text.fontstring:GetStringHeight())
 	widget.text:SetWidth(widget.text.fontstring:GetStringWidth())
 
-	local r, g, b = 0, 0, 1
+	local r, g, b, a = 0, 0, 1, 1
 
 	if widget.color then
 		r, g, b, a = widget.color.res1, widget.color.res2, widget.color.res3, widget.color.res4
 	end
 
 	if type(r) == "number" then
-		widget.text.fontstring:SetVertexColor(r, g, b, a)
+		widget.text.fontstring:SetTextColor(r, g, b, a)
+	end
+	
+	if type(widget.background) == "table" then
+		r, g, b, a = unpack(widget.background)
+	end
+	
+	widget.text:SetBackdropColor(r, g, b, a)
+	
+	if GetMouseFocus() ~= UIParent and environment.Intersect and environment.Intersect(GetMouseFocus(), widget.text) then
+		widget.text:Hide()
+	elseif GetMouseFocus() == UIParent then
+		widget.text:Show()
+	end
+	
+	if not UnitExists(StarTip.unit or "mouseover") then
+		widget.text:Hide()
 	end
 end
 
@@ -299,7 +335,7 @@ local new, del
 do
 	local pool = {}
 	local i = 0
-	function new()
+	function new(background)
 		local text = next(pool)
 
 		if text then
@@ -307,9 +343,18 @@ do
 		else
 			local frame = CreateFrame("Frame")
 			frame:SetParent(UIParent)
-			frame:SetBackdrop({
-				insets = {left = 0, right = 0, top = 0, bottom = 0},
-			})
+			if background then
+				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+					tile = true,
+					tileSize = 4,
+					edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", 
+					edgeSize=4, 
+					insets = { left = 0, right = 0, top = 0, bottom = 0}})
+			else
+				frame:SetBackdrop({
+					insets = {left = 0, right = 0, top = 0, bottom = 0},
+				})
+			end
 			frame:ClearAllPoints()
 			frame:SetAlpha(1)
 			local fs = frame:CreateFontString()
@@ -352,6 +397,7 @@ function mod:ClearTexts()
 	wipe(mod.texts)
 end
 
+local fontstrings = {}
 function createTexts()
 	if type(mod.texts) ~= "table" then mod.texts = {} end
 	--[[for k, v in pairs(mod.texts) do
@@ -359,12 +405,13 @@ function createTexts()
 		v.text:Hide()
 		del(v.text)
 	end]]
+		
 	local appearance = StarTip:GetModule("Appearance")
 	for i, v in ipairs(self.db.profile.texts) do
 		if v.enabled and not v.deleted then			
 			local widget = mod.texts[v]
 			if not widget then
-				local text = new()
+				local text = new(v.background)
 				widget = WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)				
 				text:ClearAllPoints()
 				text:SetParent(v.parent)
@@ -423,17 +470,23 @@ function mod:OnInitialize()
 	StarTip:SetOptionsDisabled(options, true)
 
 	self.texts = {}
+	
 end
 
 function mod:OnEnable()
 	self:ClearTexts()
 	createTexts()
+	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
+	intersectTimer:Start()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 end
 
 function mod:OnDisable()
 	self:ClearTexts()
+	if type(intersectTimer) == "table" then
+		intersectTimer:Stop()
+	end
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
 end

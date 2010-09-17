@@ -16,6 +16,7 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetBar = LibStub("StarLibWidgetBar-1.0")
 local LibCore = LibStub("StarLibCore-1.0")
 local Utils = LibStub("StarLibUtils-1.0")
+local LibTimer = LibStub("StarLibTimer-1.0")
 
 local environment = {}
 
@@ -143,6 +144,29 @@ local optionsDefaults = {
 	},
 }
 
+local frame_cache = {}
+local intersectTimer
+local intersectUpdate = function()
+	if GetMouseFocus() and GetMouseFocus() ~= UIParent then
+		frame_cache[GetMouseFocus()] = true
+	end
+	for k, widget in pairs(mod.bars or {}) do
+		if widget.config.intersect and type(widget.bar) == "table" and widget.bar.GetCenter then
+			for frame in pairs(frame_cache) do
+				if GetMouseFocus() ~= UIParent and environment.Intersect and environment.Intersect(frame, widget.bar) then
+					widget.hidden = true
+					widget.bar:Hide()
+				elseif environment.Intersect and not environment.Intersect(frame, widget.bar) and widget.hidden and (UnitExists(StarTip.unit or "mouseover") and not widget.config.persistent) then
+					widget.hidden = false
+					widget.bar:Show()
+				else
+					widget.bar:Hide()
+				end
+			end
+		end
+	end
+end
+
 function updateBar(widget, bar)
 	bar:SetValue(widget.val1 * 100)
 
@@ -159,6 +183,7 @@ function updateBar(widget, bar)
 	else
 		--bar:Hide()
 	end
+	
 end
 
 local textureDict = {}
@@ -322,12 +347,15 @@ function mod:OnEnable()
 	self:ClearBars()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
+	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
+	intersectTimer:Start()
 end
 
 function mod:OnDisable()
 	self:ClearBars()
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
+	if type(intersectTimer) == "table" then intersectTimer:Stop() end
 end
 
 --[[function mod:RebuildOpts()
