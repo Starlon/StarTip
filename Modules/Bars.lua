@@ -144,15 +144,12 @@ local optionsDefaults = {
 	},
 }
 
-local frame_cache = {}
 local intersectTimer
 local intersectUpdate = function()
-	if GetMouseFocus() and GetMouseFocus() ~= UIParent then
-		frame_cache[GetMouseFocus()] = true
-	end
-	for k, widget in pairs(mod.bars or {}) do
-		if widget.config.intersect and type(widget.bar) == "table" then
-			for frame in pairs(frame_cache) do
+	local frame = GetMouseFocus()
+	if frame ~= UIParent then
+		for k, widget in pairs(mod.bars or {}) do
+			if widget.config.intersect and type(widget.bar) == "table" then
 				if environment.Intersect(widget.bar, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) then
 					widget.hidden = true
 					widget.bar:Hide()

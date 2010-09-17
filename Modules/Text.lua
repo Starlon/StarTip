@@ -271,24 +271,21 @@ local optionsDefaults = {
 	},
 }
 
-local frame_cache = {}
 local intersectTimer
 local intersectUpdate = function()
-	if GetMouseFocus() and GetMouseFocus() ~= UIParent then
-		frame_cache[GetMouseFocus()] = true
-	end
+	local frame = GetMouseFocus()
+	if frame ~= UIParent then
 	for k, widget in pairs(mod.texts) do
-		for parent in pairs(frame_cache) do
-			if widget.config.intersect then
-				if environment.Intersect(widget.text, parent, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) then
-					widget.hidden = true
-					widget.text:Hide()
-				elseif not environment.Intersect(widget.text, parent, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) and widget.hidden then
-					widget.hidden = false
-					widget.text:Show()
-				end
+		if widget.config.intersect then
+			if environment.Intersect(widget.text, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) then
+				widget.hidden = true
+				widget.text:Hide()
+			elseif not environment.Intersect(widget.text, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) and widget.hidden then
+				widget.hidden = false
+				widget.text:Show()
 			end
 		end
+	end
 	end
 end
 
