@@ -89,7 +89,7 @@ return format('Health: %.1f%%', health / max * 100)
 		color = [[
 if not UnitExists(unit) then return end
 local health, max = UnitHealth(unit), UnitHealthMax(unit)
-return ColorGradient(health / max)
+return Gradient(health / max)
 ]],
 		cols = 20,
 		update = 1000,
@@ -110,7 +110,7 @@ return format(PowerName(unit)..': %.1f%%', mana / max * 100)
 		color = [[
 if not UnitExists(unit) then return end
 local mana, max = UnitMana(unit), UnitManaMax(unit)
-return HPColor(mana, max)
+return Gradient(mana / max)
 ]],
 		cols = 20,
 		update = 1000,
