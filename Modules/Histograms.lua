@@ -67,7 +67,7 @@ local defaultWidgets = {
 return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 ]],
 		layer = 1,
-		update = 100,
+		update = 1000,
 		intersect = true
 	},
 	[2] = {
@@ -207,14 +207,13 @@ local intersectUpdate = function()
 		for k, widget in pairs(mod.histograms) do
 			for i, bar in ipairs(widget.bars or {}) do
 				if widget.config.intersect then
-					--if environment.Intersect(bar, frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 					if environment.Intersect(bar, frame, widget.config.intersectxPad1 or widget.config.itnersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 						widget.hidden = true
 						bar:Hide()
 						widget.frame:Hide()
 					elseif not environment.Intersect(bar, frame, widget.config.intersectxPad1 or widget.config.itnersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) and widget.hidden then
 						widget.hidden = false
-						--bar:Show()
+						bar:Show()
 					end
 				end
 			end
