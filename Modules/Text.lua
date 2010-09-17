@@ -60,8 +60,11 @@ if not UnitExists(unit) then return end
 return '--' .. select(1, UnitName(unit)) .. '--'
 ]],
 		color = [[
-if not UnitExists(unit) then return end
-return ClassColor(unit)
+if UnitIsPlayer(unit) then
+    return ClassColor(unit)
+else
+    return UnitSelectionColor(unit)
+end
 ]],
 		cols = 50,
 		align = WidgetText.ALIGN_PINGPONG,
