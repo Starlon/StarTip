@@ -147,7 +147,7 @@ end
 if lvl < 0 then
     return Classification(unit) or "Unknown"
 else 
-    return format("%d", Level(unit))
+    return format("%s", Level(unit))
 end
 ]],
 		enabled = true,

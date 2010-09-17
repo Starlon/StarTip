@@ -60,6 +60,8 @@ assert(PluginUnitTooltipStats, MAJOR .. " requires StarLibPluginUnitTooltipStats
 local PluginDBM = LibStub("StarLibPluginDBM-1.0", true)
 local PluginLinq = LibStub("StarLibPluginLinq-1.0", true)
 assert(PluginLinq, MAJOR .. " requires StarLibPluginLinq-1.0")
+local LibTimer = LibStub("StarLibTimer-1.0", true)
+assert(LibTimer, MAJOR .. " requires StarLibtimer-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -168,7 +170,8 @@ local defaults = {
 		objectShow = 1,
 		unitFrameShow = 1,
 		otherFrameShow = 1,
-		errorLevel = 1
+		errorLevel = 1,
+		throttleVal = 1
 	}
 }
 			
@@ -294,6 +297,14 @@ local options = {
 					get = function() return StarTip.db.profile.errorLevel end,
 					set = function(info, v) StarTip.db.profile.errorLevel = v; StarTip:Print("Note that changing error verbosity requires a UI reload.") end,
 					order = 11
+				},
+				throttleVal = {
+					name = "Throttle Threshold",
+					desc = "StarTip can throttle your mouseovers, so it doesn't show a tooltip if you mouse over units really fast. Note that if you're mousing over unit frames, you likely don't want this.",
+					type = "input",
+					pattern = "%d",
+					get = function() return tostring(StarTip.db.profile.throttleVal) end,
+					set = function(info, v) StarTip.db.profile.throttleVal = tonumber(v) end
 				}
 			}
 		}
@@ -582,7 +593,18 @@ function StarTip:OpenConfig()
 	AceConfigDialog:Open("StarTip")	
 end
 
-function StarTip.OnTooltipSetUnit()	
+local function endThrottle()
+	StarTip.OnTooltipSetUnit()
+end
+
+local throttleTimer
+local lastTime = GetTime()
+function StarTip.OnTooltipSetUnit(...)
+	
+	throttleTimer = throttleTimer or LibTimer:New("StarTip.Throttle", StarTip.db.profile.throttleVal, false, endThrottle, nil, StarTip.db.profile.errorLevel)
+	if GetTime() < lastTime + StarTip.db.profile.throttleVal then throttleTimer:Start(); return end
+	lastTime = GetTime()
+	
 	StarTip.fading = false
 	local unit = GameTooltip:GetUnit()
 	StarTip.unit = "mouseover"
@@ -621,6 +643,7 @@ function StarTip.OnTooltipSetUnit()
 	end
 	StarTip.justSetUnit = nil
 	checkTooltipAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
+	return ...
 end
 
 function StarTip.OnTooltipSetItem(self, ...)	
@@ -630,6 +653,7 @@ function StarTip.OnTooltipSetItem(self, ...)
 		end
 	end
 	StarTip.justSetItem = nil
+	return ...
 end
 
 function StarTip.OnTooltipSetSpell(...)	
@@ -639,6 +663,7 @@ function StarTip.OnTooltipSetSpell(...)
 		end
 	end
 	StarTip.justSetSpell = nil
+	return ...
 end
 
 function StarTip:HideAll()
