@@ -136,7 +136,7 @@ local SINGLETON_CLASSIFICATIONS = {
 	"targettargettarget",
 	"focus",
 	"focustarget",
-	"focustargettarget",
+	"focustargettarget"
 }
 StarTip.SINGLETON_CLASSIFICATIONS = SINGLETON_CLASSIFICATIONS
 
@@ -171,7 +171,7 @@ local defaults = {
 		unitFrameShow = 1,
 		otherFrameShow = 1,
 		errorLevel = 1,
-		throttleVal = 0.3
+		throttleVal = 0.35
 	}
 }
 			
