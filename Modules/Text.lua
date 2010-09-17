@@ -77,7 +77,6 @@ end
 		parent = "GameTooltip",
 		strata = 1,
 		level = 1,
-		background = {0, 0, 0, 1}
 	},
 	[2] = {
 		name = "Health",
