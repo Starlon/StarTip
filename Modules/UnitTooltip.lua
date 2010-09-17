@@ -1059,6 +1059,8 @@ function mod:SetUnit()
 		self.timer:Start()
 	end
 
+	if GameTooltip:NumLines() > mod.NUM_LINES then GameTooltip:Hide(); return end
+	
 	self:RefixEndLines()
 	
 	local hide = 1
