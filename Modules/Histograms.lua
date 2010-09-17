@@ -117,7 +117,7 @@ end
 		update = 1000,
 		persistent = true,
 		intersect = true,
-		intersectPad = 100
+		intersectPad = 1000
 	},
 	[4] = {
 		name = "CPU",
@@ -204,13 +204,16 @@ local insersectTimer
 local intersectUpdate = function()
 	local frame = GetMouseFocus()
 	if frame and frame ~= UIParent and frame ~= WorldFrame  then
-		for k, widget in pairs(mod.histograms or {}) do
+		for k, widget in pairs(mod.histograms) do
 			for i, bar in ipairs(widget.bars or {}) do
 				if widget.config.intersect then
-					if environment.Intersect(frame, bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
+					--if environment.Intersect(bar, frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
+					if environment.Intersect(frame, bar, widget.config.intersectxPad1 or widget.config.itnersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 						widget.hidden = true
 						bar:Hide()
-					elseif environment.Intersect(frame, bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
+						widget.frame:Hide()
+						StarTip:Print("intersect", widget.name)
+					elseif not environment.Intersect(bar, frame) and widget.hidden then
 						widget.hidden = false
 						bar:Show()
 					end
@@ -334,7 +337,8 @@ local function createHistograms()
 					bar:SetMinMaxValues(0, 100)
 					bar:SetOrientation("VERTICAL")
 					bar:SetValue(0)
-					bar:Show()
+					widget.frame = bar
+					bar.widget = widget
 					if not widget.bars then widget.bars = {} end
 					tinsert(widget.bars, bar)
 				end

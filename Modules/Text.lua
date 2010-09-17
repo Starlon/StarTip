@@ -152,7 +152,8 @@ end
 		parent = "GameTooltip",
 		strata = 1,
 		level = 1,
-		intersect = true
+		intersect = true,
+		intersectPad = 100
 	},
 	[5] = {
 		name = "Memory Total",
@@ -172,7 +173,8 @@ end
 		parent = "GameTooltip",
 		strata = 1,
 		level = 1,
-		intersect = true
+		intersect = true,
+		intersectPad = 100
 	},
 	[6] = {
 		name = "CPU Percent",
@@ -201,7 +203,8 @@ end
 		parent = "GameTooltip",
 		strata = 1,
 		level = 1,
-		intersect = true
+		intersect = true,
+		intersectPad = 100
 	},
 	[7] = {
 		name = "CPU Total",
@@ -222,7 +225,8 @@ end
 		parent = "GameTooltip",
 		strata = 1,
 		level = 1,
-		intersect = true
+		intersect = true,
+		intersectPad = 100
 	},
 }
 
@@ -277,12 +281,14 @@ local intersectUpdate = function()
 	if frame and frame ~= UIParent and frame ~= WorldFrame then
 		for k, widget in pairs(mod.texts) do
 			if widget.config.intersect then
-				if environment.Intersect(frame, widget.frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
+				if environment.Intersect(widget.frame, frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 					widget.hidden = true
-					widget.frame:Hide()
-				elseif environment.Intersect(frame, widget.frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
+					widget.frame.fontstring:Hide()
+					widget:Stop()
+				elseif not environment.Intersect(widget.frame, frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) and widget.hidden then
 					widget.hidden = false
 					widget.frame:Show()
+					widget:Start()
 				end
 			end
 		end

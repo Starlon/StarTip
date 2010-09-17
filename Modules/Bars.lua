@@ -153,9 +153,11 @@ local intersectUpdate = function()
 				if environment.Intersect(frame, widget.bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 					widget.hidden = true
 					bar:Hide()
-				elseif environment.Intersect(frame, widget.bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
+					widget:Stop()
+				elseif not environment.Intersect(frame, widget.bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) and widget.hidden then
 					widget.hidden = false
 					bar:Show()
+					widget:Start()
 				end
 			end
 		end
