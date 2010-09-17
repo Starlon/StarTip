@@ -637,7 +637,7 @@ function StarTip.OnTooltipSetUnit(...)
 		end
 	end
 	
-	if not UnitExists(StarTip.unit) then return end
+	if not UnitExists(StarTip.unit) then GameTooltip:Hide(); return end
 	
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
