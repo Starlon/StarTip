@@ -602,7 +602,7 @@ local lastTime = GetTime()
 function StarTip.OnTooltipSetUnit(...)
 	
 	throttleTimer = throttleTimer or LibTimer:New("StarTip.Throttle", StarTip.db.profile.throttleVal, false, endThrottle, nil, StarTip.db.profile.errorLevel)
-	if GetTime() < lastTime + StarTip.db.profile.throttleVal then throttleTimer:Start(); GameTooltip:Hide() return ... end
+	if GetTime() < lastTime + StarTip.db.profile.throttleVal and UnitIsPlayer("mouseover") then throttleTimer:Start(); GameTooltip:Hide() return ... end
 	lastTime = GetTime()
 	
 	StarTip.fading = false
