@@ -173,7 +173,7 @@ local defaults = {
 		unitFrameShow = 1,
 		otherFrameShow = 1,
 		errorLevel = 1,
-		throttleVal = 0
+		throttleVal = 0.5
 	}
 }
 			
