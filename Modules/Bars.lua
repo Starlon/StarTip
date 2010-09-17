@@ -153,10 +153,10 @@ local intersectUpdate = function()
 	for k, widget in pairs(mod.bars or {}) do
 		if widget.config.intersect and type(widget.bar) == "table" then
 			for frame in pairs(frame_cache) do
-				if GetMouseFocus() ~= UIParent and environment.Intersect and environment.Intersect(frame, widget.bar) then
+				if environment.Intersect(widget.bar, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) then
 					widget.hidden = true
 					widget.bar:Hide()
-				elseif environment.Intersect and not environment.Intersect(frame, widget.bar) and widget.hidden and (UnitExists(StarTip.unit or "mouseover") and not widget.config.persistent) then
+				elseif not environment.Intersect(widget.bar, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) and widget.hidden and UnitExists(StarTip.unit or "mouseover") then
 					widget.hidden = false
 					widget.bar:Show()
 				else
@@ -348,7 +348,6 @@ function mod:OnEnable()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
-	intersectTimer:Start()
 end
 
 function mod:OnDisable()
@@ -380,6 +379,7 @@ function mod:SetUnit()
 			bar.secondBar.bar:Show()
 		end
 	end
+	intersectTimer:Start()
 end
 
 function mod:SetItem()
@@ -391,6 +391,7 @@ function mod:SetItem()
 			bar.secondBar.bar:Hide()
 		end
 	end
+	intersectTimer:Start()
 end
 
 function mod:SetSpell()
@@ -402,6 +403,7 @@ function mod:SetSpell()
 			bar.secondBar.bar:Hide()
 		end
 	end
+	intersectTimer:Start()
 end
 
 function mod:OnHide()
@@ -417,6 +419,7 @@ function mod:OnHide()
 			bar.secondBar.bar:Hide()
 		end
 	end
+	intersectTimer:Stop()
 end
 
 local function colorGradient(perc)

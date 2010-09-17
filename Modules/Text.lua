@@ -278,12 +278,12 @@ local intersectUpdate = function()
 		frame_cache[GetMouseFocus()] = true
 	end
 	for k, widget in pairs(mod.texts) do
-		for parent in pairs(frame_cache) and type(widget.text) == "table" do
+		for parent in pairs(frame_cache) do
 			if widget.config.intersect then
-				if environment.Intersect(parent, widget.text) then
+				if environment.Intersect(widget.text, parent, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) then
 					widget.hidden = true
 					widget.text:Hide()
-				elseif not environment.Intersect(parent, widget.text) and widget.hidden then
+				elseif not environment.Intersect(widget.text, parent, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) and widget.hidden then
 					widget.hidden = false
 					widget.text:Show()
 				end
@@ -476,7 +476,6 @@ function mod:OnEnable()
 	self:ClearTexts()
 	createTexts()
 	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
-	intersectTimer:Start()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 end
@@ -507,6 +506,7 @@ function mod:SetUnit()
 		text:Start()
 		text.text:Show()
 	end
+	intersectTimer:Start()
 end
 
 function mod:SetItem()
@@ -516,6 +516,7 @@ function mod:SetItem()
 			text.text:Hide()
 		end
 	end
+	intersectTimer:Start()
 end
 
 function mod:SetSpell()
@@ -525,6 +526,7 @@ function mod:SetSpell()
 			text.text:Hide()
 		end
 	end
+	intersectTimer:Start()
 end
 
 function mod:OnHide()
@@ -538,6 +540,7 @@ function mod:OnHide()
 			text.text:Hide()
 		end
 	end
+	intersectTimer:Stop()
 end
 
 function mod:RebuildOpts()

@@ -205,13 +205,13 @@ local intersectUpdate = function()
 		frame_cache[GetMouseFocus()] = true
 	end
 	for k, widget in pairs(mod.histograms or {}) do
-		for i, bar in ipairs(widget.bars) do
-			for parent in pairs(frame_cache) do
-				if widget.config.intersect and type(bar) == "table" then
-					if environment.Intersect(parent, bar) then
+		for parent in pairs(frame_cache) do
+			for i, bar in ipairs(widget.bars or {}) do
+				if widget.config.intersect then
+					if environment.Intersect(bar, parent, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) then
 						widget.hidden = true
 						bar:Hide()
-					elseif environment.Intersect(parent, bar) and widget.hidden then
+					elseif environment.Intersect(bar, parent, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) and widget.hidden then
 						widget.hidden = false
 						bar:Show()
 					end
@@ -425,6 +425,7 @@ function mod:SetUnit()
 		end
 		widget:Start()
 	end
+	intersectTimer:Start()
 end
 
 function mod:SetItem()
@@ -436,6 +437,7 @@ function mod:SetItem()
 			widget:Stop()
 		end
 	end
+	intersectTimer:Start()
 end
 
 function mod:SetSpell()
@@ -447,6 +449,7 @@ function mod:SetSpell()
 			widget:Stop()
 		end
 	end
+	intersectTimer:Start()
 end
 
 function mod:OnHide()
@@ -462,6 +465,7 @@ function mod:OnHide()
 			widget:Stop()
 		end
 	end
+	intersectTimer:Stop()
 end
 
 local function colorGradient(perc)
