@@ -136,12 +136,12 @@ return Realm(unit)
         right = [[
 local lvl = UnitLevel(unit)
 local class = " "
-if Classification(unit) then
-    class = " (" .. Classification(unit) .. ")"
-end
+--if Classification(unit) then
+--    class = " (" .. Classification(unit) .. ")"
+--end
 
 if lvl < 0 then
-    return Classification(unit) or "Unknown"
+    return "*"--Classification(unit) or "Unknown"
 else 
     return format("%s", Level(unit))
 end
@@ -369,6 +369,8 @@ function mod:OnInitialize()
     StarTip:SetOptionsDisabled(options, true)
 
 	self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
+	environment.core = self.core
+	
 	if ResourceServer then ResourceServer:New(environment) end
 	--self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
 	--self.core.lcd = self.lcd
