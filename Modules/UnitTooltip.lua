@@ -89,19 +89,14 @@ return Colorize(Name(unit), r, g, b)
         right = [[
 local r, g, b
 local unit = (unit or "mouseover") .. "target"
-if UnitExists(unit) then
-    if UnitIsPlayer(unit) then
-        r, g, b = ClassColor(unit)
-    else
-        r, g, b = UnitSelectionColor(unit)
-    end
+if UnitIsPlayer(unit) then
+    r, g, b = ClassColor(unit)
 else
-    r = 1
-    g = 1
-    b = 1
+    r, g, b = UnitSelectionColor(unit)
 end
 local name = UnitName(unit)
-if name == select(1, UnitName("player")) then name = "<<YOU>>" end
+local name2 = UnitName("player")
+if name == name2 and Realm(unit) == Realm("player") then name = "<<YOU>>" end
 return name and Colorize(name, r, g, b) or "None"
 ]],
         rightUpdating = true,
