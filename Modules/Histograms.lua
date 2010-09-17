@@ -67,7 +67,7 @@ local defaultWidgets = {
 return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 ]],
 		layer = 1,
-		update = 1000,
+		update = 100,
 		intersect = true
 	},
 	[2] = {
@@ -117,7 +117,7 @@ end
 		update = 1000,
 		persistent = true,
 		intersect = true,
-		intersectPad = 1000
+		intersectPad = 100
 	},
 	[4] = {
 		name = "CPU",
@@ -208,14 +208,13 @@ local intersectUpdate = function()
 			for i, bar in ipairs(widget.bars or {}) do
 				if widget.config.intersect then
 					--if environment.Intersect(bar, frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
-					if environment.Intersect(frame, bar, widget.config.intersectxPad1 or widget.config.itnersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
+					if environment.Intersect(bar, frame, widget.config.intersectxPad1 or widget.config.itnersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 						widget.hidden = true
 						bar:Hide()
 						widget.frame:Hide()
-						StarTip:Print("intersect", widget.name)
-					elseif not environment.Intersect(bar, frame) and widget.hidden then
+					elseif not environment.Intersect(bar, frame, widget.config.intersectxPad1 or widget.config.itnersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) and widget.hidden then
 						widget.hidden = false
-						bar:Show()
+						--bar:Show()
 					end
 				end
 			end
@@ -357,7 +356,7 @@ function mod:ReInit()
 	if not self.db.profile.histograms then
 		self.db.profile.histograms = {}
 	end
-
+	
 	for k in pairs(self.db.profile.histograms) do
 		if type(k) == "string" then
 			wipe(self.db.profile.histograms)
