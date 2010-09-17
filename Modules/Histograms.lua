@@ -116,7 +116,8 @@ end
 		layer = 1,
 		update = 1000,
 		persistent = true,
-		intersect = true
+		intersect = true,
+		intersectPad = 100
 	},
 	[4] = {
 		name = "CPU",
@@ -147,7 +148,8 @@ end
 		layer = 1,
 		update = 1000,
 		persistent = true,
-		intersect = true
+		intersect = true,
+		intersectPad = 100
 	},
 
 }
@@ -201,14 +203,14 @@ local optionsDefaults = {
 local insersectTimer
 local intersectUpdate = function()
 	local frame = GetMouseFocus()
-	if frame ~= UIParent then
+	if frame and frame ~= UIParent and frame ~= WorldFrame  then
 		for k, widget in pairs(mod.histograms or {}) do
 			for i, bar in ipairs(widget.bars or {}) do
 				if widget.config.intersect then
-					if environment.Intersect(bar, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) then
+					if environment.Intersect(frame, bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 						widget.hidden = true
 						bar:Hide()
-					elseif environment.Intersect(bar, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) and widget.hidden then
+					elseif environment.Intersect(frame, bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 						widget.hidden = false
 						bar:Show()
 					end

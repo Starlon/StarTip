@@ -147,17 +147,15 @@ local optionsDefaults = {
 local intersectTimer
 local intersectUpdate = function()
 	local frame = GetMouseFocus()
-	if frame ~= UIParent then
+	if frame and frame ~= UIParent and frame ~= WorldFrame then
 		for k, widget in pairs(mod.bars or {}) do
-			if widget.config.intersect and type(widget.bar) == "table" then
-				if environment.Intersect(widget.bar, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) then
+			if widget.config.intersect then
+				if environment.Intersect(frame, widget.bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 					widget.hidden = true
-					widget.bar:Hide()
-				elseif not environment.Intersect(widget.bar, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) and widget.hidden and UnitExists(StarTip.unit or "mouseover") then
+					bar:Hide()
+				elseif environment.Intersect(frame, widget.bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
 					widget.hidden = false
-					widget.bar:Show()
-				else
-					widget.bar:Hide()
+					bar:Show()
 				end
 			end
 		end

@@ -274,25 +274,25 @@ local optionsDefaults = {
 local intersectTimer
 local intersectUpdate = function()
 	local frame = GetMouseFocus()
-	if frame ~= UIParent then
-	for k, widget in pairs(mod.texts) do
-		if widget.config.intersect then
-			if environment.Intersect(widget.text, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) then
-				widget.hidden = true
-				widget.text:Hide()
-			elseif not environment.Intersect(widget.text, frame, widget.config.xPad1 or 0, widget.config.yPad1 or 0, widget.config.xPad2 or 0, widget.config.yPad2 or 0) and widget.hidden then
-				widget.hidden = false
-				widget.text:Show()
+	if frame and frame ~= UIParent and frame ~= WorldFrame then
+		for k, widget in pairs(mod.texts) do
+			if widget.config.intersect then
+				if environment.Intersect(frame, widget.frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
+					widget.hidden = true
+					widget.frame:Hide()
+				elseif environment.Intersect(frame, widget.frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
+					widget.hidden = false
+					widget.frame:Show()
+				end
 			end
 		end
-	end
 	end
 end
 
 function updateText(widget)
-	widget.text.fontstring:SetText(widget.buffer)
-	widget.text:SetHeight(widget.text.fontstring:GetStringHeight())
-	widget.text:SetWidth(widget.text.fontstring:GetStringWidth())
+	widget.frame.fontstring:SetText(widget.buffer)
+	widget.frame:SetHeight(widget.frame.fontstring:GetStringHeight())
+	widget.frame:SetWidth(widget.frame.fontstring:GetStringWidth())
 
 	local r, g, b, a = 0, 0, 1, 1
 
@@ -301,23 +301,17 @@ function updateText(widget)
 	end
 
 	if type(r) == "number" then
-		widget.text.fontstring:SetTextColor(r, g, b, a)
+		widget.frame.fontstring:SetTextColor(r, g, b, a)
 	end
 	
 	if type(widget.background) == "table" then
 		r, g, b, a = unpack(widget.background)
 	end
 	
-	widget.text:SetBackdropColor(r, g, b, a)
-	
-	if GetMouseFocus() ~= UIParent and environment.Intersect and environment.Intersect(GetMouseFocus(), widget.text) then
-		widget.text:Hide()
-	elseif GetMouseFocus() == UIParent then
-		widget.text:Show()
-	end
-	
+	widget.frame:SetBackdropColor(r, g, b, a)
+		
 	if not UnitExists(StarTip.unit or "mouseover") then
-		widget.text:Hide()
+		widget.frame:Hide()
 	end
 end
 
@@ -343,7 +337,6 @@ do
 				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 					tile = true,
 					tileSize = 4,
-					edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", 
 					edgeSize=4, 
 					insets = { left = 0, right = 0, top = 0, bottom = 0}})
 			else
@@ -382,8 +375,8 @@ local function clearText(obj)
 	local widget = mod.texts[obj]
 	if not widget then return end
 	widget:Del()
-	widget.text:Hide()
-	del(widget.text)
+	widget.frame:Hide()
+	del(widget.frame)
 end
 
 function mod:ClearTexts()
@@ -420,7 +413,8 @@ function createTexts()
 				text:SetFrameStrata(strataNameList[v.strata or 1])
 				text:SetFrameLevel(v.level or 1)
 				text:Show()
-				widget.text = text
+				widget.frame = text
+				widget.frame = text
 				mod.texts[v] = widget
 				widget.shownAlways = v.shownAlways
 			end
@@ -501,7 +495,7 @@ function mod:SetUnit()
 	createTexts()
 	for k, text in pairs(self.texts) do
 		text:Start()
-		text.text:Show()
+		text.frame:Show()
 	end
 	intersectTimer:Start()
 end
@@ -510,7 +504,7 @@ function mod:SetItem()
 	for i, text in pairs(self.texts) do
 		if not text.shownAlways then
 			text:Stop()
-			text.text:Hide()
+			text.frame:Hide()
 		end
 	end
 	intersectTimer:Start()
@@ -520,7 +514,7 @@ function mod:SetSpell()
 	for i, text in pairs(self.texts) do
 		if not text.shownAlways then
 			text:Stop()
-			text.text:Hide()
+			text.frame:Hide()
 		end
 	end
 	intersectTimer:Start()
@@ -534,7 +528,7 @@ function mod:OnHide()
 	for i, text in pairs(self.texts) do
 		if not text.shownAlways then
 			text:Stop()
-			text.text:Hide()
+			text.frame:Hide()
 		end
 	end
 	intersectTimer:Stop()
