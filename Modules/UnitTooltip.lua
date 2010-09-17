@@ -53,22 +53,6 @@ local ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALI
 
 local SCROLL_RIGHT, SCROLL_LEFT = 1, 2
 
-environment.powers = {
-    ["WARRIOR"] = "Rage:",
-    ["ROGUE"] = "Energy:",
-	["DEATHKNIGHT"] = "Rune Power:"
-}
-
-environment.unitHasAura = function(aura)
-    local i = 1
-    while true do
-        local buff = UnitBuff("mouseover", i, true)
-        if not buff then return end
-        if buff == aura then return true end
-        i = i + 1
-    end
-end
-
 local function copy(src, dst)
 	if type(src) ~= "table" then return nil end
 	if type(dst) ~= "table" then dst = {} end
@@ -94,7 +78,7 @@ if UnitIsPlayer(unit) then
 else
     r, g, b = UnitSelectionColor(unit)
 end
-return Colorize(UnitName(unit), r, g, b)
+return Colorize(Name(unit), r, g, b)
 ]],
         right = nil,
 		bold = true,
@@ -129,8 +113,8 @@ return name and Colorize(name, r, g, b) or "None"
         name = "Guild",
         left = 'return "Guild:"',
         right = [[
-guild = GetGuildInfo(unit)
-if guild then return "<" .. GetGuildInfo(unit) .. ">" else return unitGuild end
+guild = Guild(unit)
+if guild then return "<" .. guild .. ">" else return unitGuild end
 ]],
 		enabled = true
     },
@@ -138,7 +122,7 @@ if guild then return "<" .. GetGuildInfo(unit) .. ">" else return unitGuild end
         name = "Rank",
         left = 'return "Rank:"',
         right = [[
-return select(2, GetGuildInfo(unit))
+return Rank(unit)
 ]],
 		enabled = true,
     },
@@ -146,7 +130,7 @@ return select(2, GetGuildInfo(unit))
         name = "Realm",
         left = 'return "Realm:"',
         right = [[
-return select(2, UnitName(unit))
+return Realm(unit)
 ]],
 		enabled = true
     },
@@ -154,24 +138,17 @@ return select(2, UnitName(unit))
         name = "Level",
         left = 'return "Level:"',
         right = [[
-lvl = UnitLevel(unit)
-class = UnitClassification(unit)
-
-if lvl <= 0 then
-    lvl = ''
+local lvl = UnitLevel(unit)
+local class = " "
+if Classification(unit) then
+    class = " (" .. Classification(unit) .. ")"
 end
 
-if class == "worldboss" then
-    lvl = lvl .. "Boss"
-elseif class == "rareelite" then
-    lvl = lvl .. "+ Rare"
-elseif class == "elite" then
-    lvl = lvl .. "+"
-elseif class == "rare" then
-    lvl = lvl .. "rare"
+if lvl < 0 then
+    return Classification(unit) or "Unknown"
+else 
+    return format("%d", Level(unit))
 end
-
-return lvl
 ]],
 		enabled = true,
     },
@@ -179,7 +156,7 @@ return lvl
         name = "Race",
         left = 'return "Race:"',
         right = [[
-return (UnitIsPlayer(unit) and UnitRace(unit)) or UnitCreatureFamily(unit) or UnitCreatureType(unit)
+return Race(unit)
 ]],
 		enabled = true,
     },
@@ -202,7 +179,7 @@ return Colorize(UnitClass(unit), r, g, b)
         name = "Faction",
         left = 'return "Faction:"',
         right = [[
-return UnitFactionGroup(unit)
+return Faction(unit)
 ]],
 		enabled = true,
     },
@@ -212,13 +189,13 @@ return UnitFactionGroup(unit)
         right = [[
 if not UnitIsConnected(unit) then
     return "Offline"
-elseif unitHasAura(GetSpellInfo(19752)) then
+elseif HasAura(GetSpellInfo(19752)) then
     return "Divine Intervention"
 elseif UnitIsFeignDeath(unit) then
     return "Feigned Death"
 elseif UnitIsGhost(unit) then
     return "Ghost"
-elseif UnitIsDead(unit) and  unitHasAura(GetSpellInfo(20707)) then
+elseif UnitIsDead(unit) and HasAura(GetSpellInfo(20707)) then
     return "Soulstoned"
 elseif UnitIsDead(unit) then
     return "Dead"
@@ -233,9 +210,9 @@ return "Alive"
         name = "Health",
         left = 'return "Health:"',
         right = [[
-health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
-r, g, b = HPColor(health, maxHealth)
-value = "Unknown"
+local health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
+local r, g, b = HPColor(health, maxHealth)
+local value = "Unknown"
 if maxHealth == 100 then
     value = Colorize(health .. "%", r, g, b)
 elseif maxHealth ~= 0 then
@@ -253,10 +230,10 @@ return value
 return PowerName(unit)
 ]],
         right = [[
-mana = UnitMana(unit)
-maxMana = UnitManaMax(unit)
-r, g, b = PowerColor(nil, unit)
-value = "Unknown"
+local mana = UnitMana(unit)
+local maxMana = UnitManaMax(unit)
+local r, g, b = PowerColor(nil, unit)
+local value = "Unknown"
 if maxMana == 100 then
     value = Colorize(tostring(mana), r, g, b)
 elseif maxMana ~= 0 then
