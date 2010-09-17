@@ -626,7 +626,9 @@ end
 local throttleTimer
 local lastTime = GetTime()
 local function endThrottle()
-	StarTip.OnTooltipSetUnit()
+	if UnitExists(StarTip.unit or "mouseover") then
+		StarTip.OnTooltipSetUnit()
+	end
 end
 
 function StarTip.OnTooltipSetUnit(...)
