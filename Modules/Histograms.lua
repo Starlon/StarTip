@@ -205,13 +205,13 @@ local intersectUpdate = function()
 		frame_cache[GetMouseFocus()] = true
 	end
 	for k, widget in pairs(mod.histograms or {}) do
-		for parent in pairs(frame_cache) do
-			for i, bar in ipairs(widget.bars) do
-				if widget.config.intersect and type(bar) == "table" and bar.GetCenter then
-					if GetMouseFocus() ~= UIParent and environment.Intersect and environment.Intersect(GetMouseFocus(), bar) then
+		for i, bar in ipairs(widget.bars) do
+			for parent in pairs(frame_cache) do
+				if widget.config.intersect and type(bar) == "table" then
+					if environment.Intersect(parent, bar) then
 						widget.hidden = true
 						bar:Hide()
-					elseif environment.Intersect and not environment.Intersect(GetMouseFocus(), bar) and widget.hidden then
+					elseif environment.Intersect(parent, bar) and widget.hidden then
 						widget.hidden = false
 						bar:Show()
 					end

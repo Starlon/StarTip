@@ -277,13 +277,13 @@ local intersectUpdate = function()
 	if GetMouseFocus() and GetMouseFocus() ~= UIParent then
 		frame_cache[GetMouseFocus()] = true
 	end
-	for k, widget in pairs(mod.texts or {}) do
-		for parent in pairs(frame_cache) do
-			if widget.config.intersect and type(widget.text) == "table" and widget.text.GetCenter then
-				if widget.config.intersect and environment.Intersect and environment.Intersect(parent, widget.text.fontstring) then
+	for k, widget in pairs(mod.texts) do
+		for parent in pairs(frame_cache) and type(widget.text) == "table" do
+			if widget.config.intersect then
+				if environment.Intersect(parent, widget.text) then
 					widget.hidden = true
-					--widget.text:Hide()
-				elseif widget.config.intersect and environment.Intersect and not environment.Intersect(GetMouseFocus(), widget.text) and widget.hidden then
+					widget.text:Hide()
+				elseif not environment.Intersect(parent, widget.text) and widget.hidden then
 					widget.hidden = false
 					widget.text:Show()
 				end

@@ -151,7 +151,7 @@ local intersectUpdate = function()
 		frame_cache[GetMouseFocus()] = true
 	end
 	for k, widget in pairs(mod.bars or {}) do
-		if widget.config.intersect and type(widget.bar) == "table" and widget.bar.GetCenter then
+		if widget.config.intersect and type(widget.bar) == "table" then
 			for frame in pairs(frame_cache) do
 				if GetMouseFocus() ~= UIParent and environment.Intersect and environment.Intersect(frame, widget.bar) then
 					widget.hidden = true
