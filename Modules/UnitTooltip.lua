@@ -1,5 +1,4 @@
-﻿-- TODO: Throttle mouseovers
-local mod = StarTip:NewModule("UnitTooltip", "AceEvent-3.0")
+﻿local mod = StarTip:NewModule("UnitTooltip", "AceEvent-3.0")
 mod.name = "Unit Tooltip"
 mod.toggled = true
 assert(LibStub("StarLibEvaluator-1.0", true), "Text module requires StarLibEvaluator-1.0")
