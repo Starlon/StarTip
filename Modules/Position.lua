@@ -12,13 +12,13 @@ local defaults = {
 		anchor = 1,
 		unitFrames = 1,
 		other = 1,
-		inCombatXOffset = 0,
+		inCombatXOffset = 10,
 		inCombatYOffset = 0,
-		anchorXOffset = 0,
+		anchorXOffset = 10,
 		anchorYOffset = 0,
-		unitFramesXOffset = 0,
+		unitFramesXOffset = 10,
 		unitFramesYOffset = 0,
-		otherXOffset = 0,
+		otherXOffset = 10,
 		otherYOffset = 0
 	}
 }
@@ -37,10 +37,19 @@ local set = function(info,v)
 	self.db.profile[info[#info]] = v
 end
 
+local inputGet = function(info)
+	return tostring(self.db.profile[info[#info]] or 0)
+end
+
+local inputSet = function(info, v)
+	self.db.profile[info[#info]] = tonumber(v)
+end
+
 local minX = -math.floor(GetScreenWidth()/5 + 0.5) * 5
 local minY = -math.floor(GetScreenHeight()/5 + 0.5) * 5
 local maxX = math.floor(GetScreenWidth()/5 + 0.5) * 5
 local maxY = math.floor(GetScreenHeight()/5 + 0.5) * 5
+
 local options = {
 	anchor = {
 		name = "World Units",
@@ -52,6 +61,25 @@ local options = {
 		order = 4
 	},
 	anchorXOffset = {
+		name = format("X-axis offset: %d-%d", minX, maxX),
+		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
+		type = "input",
+		pattern = "%d",
+		get = inputGet,
+		set = inputSet,
+		order = 5
+	},
+	anchorYOffset = {
+		name = format("Y-axis offset: %d-%d", minY, maxY),
+		desc = "The y-axis offset used to position the tooltip in relationship to the anchor point",
+		type = "input",
+		pattern = "%d",
+		get = inputGet,
+		set = inputSet,
+		order = 6
+	
+	},
+	--[[anchorXOffset = {
 		name = "X-axis offset",
 		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
 		type = "range",
@@ -75,7 +103,7 @@ local options = {
 		set = set,
 		order = 6
 	
-	},
+	},]]
 	inCombatHeader = {
 		name = "",
 		type = "header",
@@ -91,6 +119,30 @@ local options = {
 		order = 8
 	},
 	inCombatXOffset = {
+		name = format("X-axis offset: %d-%d", minX, maxX),
+		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
+		type = "input",
+		pattern = "%d",
+		get = inputGet,
+		set = inputSet,
+		validate = function(val)
+			return val > minX and val < maxX 
+		end,
+		order = 9
+	},
+	inCombatYOffset = {
+		name = format("Y-axis offset: %d-%d", minY, maxY),
+		desc = "The y-axis offset used to position the tooltip in relationship to the anchor point",
+		type = "input",
+		pattern = "%d",
+		get = inputGet,
+		set = inputSet,
+		validate = function(val)
+			return val > minY and val < maxX 
+		end,
+		order = 10,
+	},	
+	--[[inCombatXOffset = {
 		name = "X-axis offset",
 		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
 		type = "range",
@@ -113,7 +165,7 @@ local options = {
 		get = get,
 		set = set,
 		order = 10
-	},
+	},]]
 	unitFramesHeader = {
 		name = "",
 		type = "header",
@@ -129,6 +181,30 @@ local options = {
 		order = 12
 	},
 	unitFramesXOffset = {
+		name = format("X-axis offset: %d-%d", minX, maxX),
+		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
+		type = "input",
+		pattern = "%d",
+		get = inputGet,
+		set = inputSet,
+		validate = function(val)
+			if val > minX and val < maxX then return true end
+		end,
+		order = 13
+	},
+	unitFramesYOffset = {
+		name = format("Y-axis offset: %d-%d", minY, maxY),
+		desc = "The y-axis offset used to position the tooltip in relationship to the anchor point",
+		type = "input",
+		pattern = "%d",
+		get = inputGet,
+		set = inputSet,
+		validate = function(val)
+			if val > minY and val < maxY then return true end
+		end,
+		order = 14
+	},	
+	--[[unitFramesXOffset = {
 		name = "X-axis offset",
 		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
 		type = "range",
@@ -151,7 +227,7 @@ local options = {
 		get = get,
 		set = set,
 		order = 14
-	},
+	},]]
 	otherHeader = {
 		name = "",
 		type = "header",
@@ -167,6 +243,30 @@ local options = {
 		order = 16
 	},
 	otherXOffset = {
+		name = format("X-axis offset: %d-%d", minX, maxX),
+		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
+		type = "input",
+		pattern = "%d",
+		get = inputGet,
+		set = inputSet,
+		validate = function(val)
+			return val > minX and val < maxX
+		end,
+		order = 17
+	},
+	otherYOffset = {
+		name = format("Y-axis offset: %d-%d", minY, maxY),
+		desc = "The y-axis offset used to position the tooltip in relationship to the anchor point",
+		type = "input",
+		pattern = "%d",
+		get = inputGet,
+		set = inputSet,
+		validate = function(val) 
+			return val > minY and val < maxY
+		end,
+		order = 18
+	}	
+	--[[otherXOffset = {
 		name = "X-axis offset",
 		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
 		type = "range",
@@ -189,7 +289,7 @@ local options = {
 		get = get,
 		set = set,
 		order = 18
-	}
+	}]]
 }
 
 function mod:OnInitialize()

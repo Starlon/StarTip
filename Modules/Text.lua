@@ -375,6 +375,7 @@ function createTexts()
 				text:Show()
 				widget.text = text
 				mod.texts[v] = widget
+				widget.shownAlways = v.shownAlways
 			end
 			widget.config.unit = StarTip.unit			
 		end
@@ -410,8 +411,6 @@ end
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-
-	wipe(self.db.profile.texts)
 	
 	self:ReInit()
 	
@@ -456,15 +455,19 @@ end
 
 function mod:SetItem()
 	for i, text in pairs(self.texts) do
-		text:Stop()
-		text.text:Hide()
+		if not text.shownAlways then
+			text:Stop()
+			text.text:Hide()
+		end
 	end
 end
 
 function mod:SetSpell()
 	for i, text in pairs(self.texts) do
-		text:Stop()
-		text.text:Hide()
+		if not text.shownAlways then
+			text:Stop()
+			text.text:Hide()
+		end
 	end
 end
 
@@ -474,17 +477,11 @@ function mod:OnHide()
 		timer = nil
 	end
 	for i, text in pairs(self.texts) do
-		text:Stop()
-		text.text:Hide()
+		if not text.shownAlways then
+			text:Stop()
+			text.text:Hide()
+		end
 	end
-end
-
-local function colorGradient(perc)
-    if perc <= 0.5 then
-        return 1, perc*2, 0
-    else
-        return 2 - perc*2, 1, 0
-    end
 end
 
 function mod:RebuildOpts()

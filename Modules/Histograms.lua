@@ -357,7 +357,6 @@ end
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 
-	wipe(self.db.profile.histograms)
 	self:ReInit()
 	
 	self.core = LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)
