@@ -171,7 +171,7 @@ local defaults = {
 		unitFrameShow = 1,
 		otherFrameShow = 1,
 		errorLevel = 1,
-		throttleVal = 1
+		throttleVal = 0.3
 	}
 }
 			
@@ -300,7 +300,7 @@ local options = {
 				},
 				throttleVal = {
 					name = "Throttle Threshold",
-					desc = "StarTip can throttle your mouseovers, so it doesn't show a tooltip if you mouse over units really fast. Note that if you're mousing over unit frames, you likely don't want this.",
+					desc = "StarTip can throttle your mouseovers, so it doesn't show a tooltip if you mouse over units really fast.",
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(StarTip.db.profile.throttleVal) end,
@@ -636,6 +636,9 @@ function StarTip.OnTooltipSetUnit(...)
 			end
 		end
 	end
+	
+	if not UnitExists(StarTip.unit) then return end
+	
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
