@@ -52,6 +52,8 @@ local ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALI
 
 local SCROLL_RIGHT, SCROLL_LEFT = 1, 2
 
+mod.NUM_LINES = 0
+
 local function copy(src, dst)
 	if type(src) ~= "table" then return nil end
 	if type(dst) ~= "table" then dst = {} end
@@ -242,7 +244,7 @@ return value
     [13] = {
         name = "Location",
         left = 'return "Location:"',
-        right = "return unitLocation",
+        right = "return nil",
 		enabled = true
     },
 	[14] = {
@@ -372,7 +374,6 @@ function mod:OnInitialize()
 	--self.core.lcd = self.lcd
 
 	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
-
 end
 
 local draw
@@ -502,6 +503,7 @@ function mod:CreateLines()
                 end
 
                 if left and left ~= "" and right ~= "nil" then
+					StarTip.addingLine = true
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
@@ -541,6 +543,7 @@ function mod:CreateLines()
 						v.leftObj.config.unit = StarTip.unit
 						v.leftObj:Start()
 					end
+					StarTip.addingLine = false
 					v.lineNum = lineNum
 				end
 			end
@@ -995,6 +998,8 @@ function mod:SetUnit()
 
 	environment.unitName, environment.unitGuild, environment.unitLocation = UnitTooltipStats.GetUnitTooltipStats("mouseover")
 
+	self.NUM_LINES = 0
+	
     -- Taken from CowTip
     local lastLine = 2
     local text2 = self.leftLines[2]:GetText()
@@ -1073,11 +1078,13 @@ function mod:RefixEndLines()
     for i, left in ipairs(linesToAdd) do
 
         local right = linesToAddRight[i]
+		StarTip.addingLine = true
         if right then
             GameTooltip:AddDoubleLine(left, right, linesToAddR[i], linesToAddG[i], linesToAddB[i], linesToAddRightR[i], linesToAddRightG[i], linesToAddRightB[i])
         else
             GameTooltip:AddLine(left, linesToAddR[i], linesToAddG[i], linesToAddB[i], true)
         end
+		StarTip.addingLine = false
     end
     -- End
 end
