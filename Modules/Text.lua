@@ -283,7 +283,7 @@ local intersectUpdate = function()
 			if widget.config.intersect and type(widget.text) == "table" and widget.text.GetCenter then
 				if widget.config.intersect and environment.Intersect and environment.Intersect(parent, widget.text.fontstring) then
 					widget.hidden = true
-					widget.text:Hide()
+					--widget.text:Hide()
 				elseif widget.config.intersect and environment.Intersect and not environment.Intersect(GetMouseFocus(), widget.text) and widget.hidden then
 					widget.hidden = false
 					widget.text:Show()
