@@ -200,9 +200,10 @@ local optionsDefaults = {
 	},
 }
 
-local intersectTimer
 local intersectUpdate = function()
-	WidgetHistogram.IntersectUpdate(mod.histograms)
+	if type(mod.histograms) == "table" then
+		WidgetHistogram.IntersectUpdate(mod.histograms)
+	end
 end
 
 function updateHistogram(widget)
@@ -384,16 +385,15 @@ end
 function mod:OnEnable()
 	self:ClearHistograms()
 	createHistograms()
-	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
-	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
+	self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
 end
 
 function mod:OnDisable()
 	self:ClearHistograms()
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
-	if intersectTimer then intersectTimer:Stop() end
+	if self.intersectTimer then self.intersectTimer:Stop() end
 end
 
 function mod:GetOptions()
@@ -410,7 +410,7 @@ function mod:SetUnit()
 		end
 		widget:Start()
 	end
-	intersectTimer:Start()
+	self.intersectTimer:Start()
 end
 
 function mod:SetItem()
@@ -422,7 +422,7 @@ function mod:SetItem()
 			widget:Stop()
 		end
 	end
-	intersectTimer:Start()
+	self.intersectTimer:Start()
 end
 
 function mod:SetSpell()
@@ -434,7 +434,7 @@ function mod:SetSpell()
 			widget:Stop()
 		end
 	end
-	intersectTimer:Start()
+	self.intersectTimer:Start()
 end
 
 function mod:OnHide()
@@ -450,7 +450,7 @@ function mod:OnHide()
 			widget:Stop()
 		end
 	end
-	intersectTimer:Stop()
+	self.intersectTimer:Stop()
 end
 
 local function colorGradient(perc)
