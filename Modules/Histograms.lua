@@ -391,7 +391,6 @@ function mod:OnEnable()
 	self:ClearHistograms()
 	createHistograms()
 	StarTip:SetOptionsDisabled(options, false)
-	StarTip:Print(StarTip.db.profile.intersectRate)
 	if StarTip.db.profile.intersectRate > 0 then
 		self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", self.db.profile.intersectRate or 200, true, intersectUpdate)
 	end
