@@ -116,7 +116,7 @@ end
 		update = 1000,
 		persistent = true,
 		intersect = true,
-		intersectPad = 40,
+		intersectPad = 60,
 	},
 	[4] = {
 		name = "CPU",
@@ -148,7 +148,7 @@ end
 		update = 1000,
 		persistent = true,
 		intersect = true,
-		intersectPad = 40
+		intersectPad = 60
 	},
 
 }

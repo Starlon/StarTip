@@ -154,7 +154,7 @@ end
 		strata = 1,
 		level = 1,
 		intersect = true,
-		intersectPad = 80
+		intersectPad = 70
 	},
 	[5] = {
 		name = "Memory Total",
@@ -175,7 +175,7 @@ end
 		strata = 1,
 		level = 1,
 		intersect = true,
-		intersectPad = 80
+		intersectPad = 100
 	},
 	[6] = {
 		name = "CPU Percent",
@@ -205,7 +205,7 @@ end
 		strata = 1,
 		level = 1,
 		intersect = true,
-		intersectPad = 80
+		intersectPad = 70
 	},
 	[7] = {
 		name = "CPU Total",
@@ -227,7 +227,7 @@ end
 		strata = 1,
 		level = 1,
 		intersect = true,
-		intersectPad = 80
+		intersectPad = 100
 	},
 }
 
