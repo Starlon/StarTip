@@ -200,25 +200,9 @@ local optionsDefaults = {
 	},
 }
 
-local insersectTimer
+local intersectTimer
 local intersectUpdate = function()
-	local frame = GetMouseFocus()
-	if frame and frame ~= UIParent and frame ~= WorldFrame  then
-		for k, widget in pairs(mod.histograms) do
-			for i, bar in ipairs(widget.bars or {}) do
-				if widget.config.intersect then
-					if environment.Intersect(bar, frame, widget.config.intersectxPad1 or widget.config.itnersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
-						widget.hidden = true
-						bar:Hide()
-						widget.frame:Hide()
-					elseif not environment.Intersect(bar, frame, widget.config.intersectxPad1 or widget.config.itnersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) and widget.hidden then
-						widget.hidden = false
-						bar:Show()
-					end
-				end
-			end
-		end
-	end
+	WidgetHistogram.IntersectUpdate(mod.histograms)
 end
 
 function updateHistogram(widget)

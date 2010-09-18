@@ -146,23 +146,9 @@ local optionsDefaults = {
 
 local intersectTimer
 local intersectUpdate = function()
-	local frame = GetMouseFocus()
-	if frame and frame ~= UIParent and frame ~= WorldFrame then
-		for k, widget in pairs(mod.bars or {}) do
-			if widget.config.intersect then
-				if environment.Intersect(frame, widget.bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
-					widget.hidden = true
-					bar:Hide()
-					widget:Stop()
-				elseif not environment.Intersect(frame, widget.bar, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) and widget.hidden then
-					widget.hidden = false
-					bar:Show()
-					widget:Start()
-				end
-			end
-		end
-	end
+	WidgetBar.IntersectUpdate(mod.bars)
 end
+
 
 function updateBar(widget, bar)
 	bar:SetValue(widget.val1 * 100)
@@ -262,6 +248,7 @@ local function createBars()
 				widget.bar1 = true
 				widget.bar = bar
 				mod.bars[v] = widget
+				v.bar = bar
 
 				if v.expression2 then
 					bar = new()

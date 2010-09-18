@@ -19,6 +19,7 @@ local LibCore = LibStub("StarLibCore-1.0")
 local LibQTip = LibStub("LibQTip-1.0")
 local PluginUtils = LibStub("StarLibPluginUtils-1.0")
 local LibTimer = LibStub("StarLibTimer-1.0")
+local Widget = LibStub("StarLibWidget-1.0")
 
 local environment = {}
 
@@ -277,20 +278,7 @@ local optionsDefaults = {
 
 local intersectTimer
 local intersectUpdate = function()
-	local frame = GetMouseFocus()
-	if frame and frame ~= UIParent and frame ~= WorldFrame then
-		for k, widget in pairs(mod.texts) do
-			if widget.config.intersect then
-				if environment.Intersect(frame, widget.frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) then
-					widget.hidden = true
-					widget.frame:Hide()
-				elseif not environment.Intersect(frame, widget.frame, widget.config.intersectxPad1 or widget.config.intersectPad or 0, widget.config.intersectyPad1 or widget.config.intersectPad or 0, widget.config.intersectxPad2 or widget.config.intersectPad or 0, widget.config.intersectyPad2 or widget.config.intersectPad or 0) and widget.hidden then
-					widget.hidden = false
-					widget.frame:Show()
-				end
-			end
-		end
-	end
+	WidgetText.IntersectUpdate(mod.texts)
 end
 
 function updateText(widget)
