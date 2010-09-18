@@ -67,8 +67,7 @@ local defaultWidgets = {
 return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 ]],
 		layer = 1,
-		update = 1000,
-		intersect = true
+		update = 1000
 	},
 	[2] = {
 		name = "Power",
