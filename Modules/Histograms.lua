@@ -116,7 +116,7 @@ end
 		update = 1000,
 		persistent = true,
 		intersect = true,
-		intersecPad = 100
+		intersecPad = 200,
 		--[[intersectxPad1 = -100,
 		intersectyPad1 = -100,
 		intersectxPad2 = -100,
@@ -153,7 +153,7 @@ end
 		update = 1000,
 		persistent = true,
 		intersect = true,
-		intersectPad = 100
+		intersectPad = 200
 	},
 
 }
@@ -161,7 +161,8 @@ end
 local defaults = {
 	profile = {
 		classColors = true,
-		histograms = {}
+		histograms = {},
+		intersect = true
 	}
 }
 
@@ -390,7 +391,10 @@ function mod:OnEnable()
 	self:ClearHistograms()
 	createHistograms()
 	StarTip:SetOptionsDisabled(options, false)
-	self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
+	StarTip:Print(StarTip.db.profile.intersectRate)
+	if StarTip.db.profile.intersectRate > 0 then
+		self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", self.db.profile.intersectRate or 200, true, intersectUpdate)
+	end
 end
 
 function mod:OnDisable()
@@ -414,7 +418,9 @@ function mod:SetUnit()
 		end
 		widget:Start()
 	end
-	self.intersectTimer:Start()
+	if self.intersectTimer then
+		self.intersectTimer:Start()
+	end
 end
 
 function mod:SetItem()
@@ -426,7 +432,9 @@ function mod:SetItem()
 			widget:Stop()
 		end
 	end
-	self.intersectTimer:Start()
+	if self.intersectTimer then
+		self.intersectTimer:Start()
+	end
 end
 
 function mod:SetSpell()
@@ -438,7 +446,9 @@ function mod:SetSpell()
 			widget:Stop()
 		end
 	end
-	self.intersectTimer:Start()
+	if self.intersectTimer then
+		self.intersectTimer:Start()
+	end
 end
 
 function mod:OnHide()
@@ -454,7 +464,9 @@ function mod:OnHide()
 			widget:Stop()
 		end
 	end
-	self.intersectTimer:Stop()
+	if self.intersectTimer then
+		self.intersectTimer:Stop()
+	end
 end
 
 local function colorGradient(perc)
