@@ -164,7 +164,7 @@ local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip
 if mem then
     if totalMem == 0 then totalMem = 100; mem = 0 end
     memperc = mem / totalMem * 100
-	return Colorize(format("%s (%.2f%%)", timeshort(mem), memperc), Color2RGBA("return 0xffff00"))
+	return Colorize(format("%s (%.2f%%)", timeshort(mem), memperc), Color2RGBA("return 0xffff00", environment))
 end
 ]],
 		cols = 34,
@@ -215,7 +215,7 @@ local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     if totalCPU == 0 then totalCPU = 100; cpu = 0 end
     cpuperc = cpu / totalCPU * 100;
-    return Colorize(format("%s (%.2f%%)", timeshort(cpu), cpuperc), Color2RGBA("return 0xffff00"))
+    return Colorize(format("%s (%.2f%%)", timeshort(cpu), cpuperc), Color2RGBA("return 0xffff00", environment))
 end
 ]],
 		cols = 34,
