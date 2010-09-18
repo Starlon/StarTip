@@ -116,7 +116,12 @@ end
 		update = 1000,
 		persistent = true,
 		intersect = true,
-		intersectPad = 100
+		intersecPad = 100
+		--[[intersectxPad1 = -100,
+		intersectyPad1 = -100,
+		intersectxPad2 = -100,
+		intersectyPad2 = -100
+		]]
 	},
 	[4] = {
 		name = "CPU",
