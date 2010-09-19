@@ -40,7 +40,7 @@ function mod:OnInitialize()
 end
 
 local function new1()
-	return LibBuffer:New("Debug buffer", 0, " ")
+	return LibBuffer:New("Debug buffer", random(50), " ")
 end
 
 local function updateText(widget)
@@ -66,14 +66,12 @@ local function update()
 	ResourceServer.Update()
 	local mem1, percent1, memdiff1, totalMem1, totaldiff1 = ResourceServer.GetMemUsage("StarTip")
 	for j = 1, random(50) do
-		local object = new2()
-		object.cols = random(50)
-		object:Start()
+		local object = new1()
 		tinsert(objects, object)
 	end
 	ResourceServer.Update()
 	local mem2, percent2, memdiff2, totalMem2, totaldiff2 = ResourceServer.GetMemUsage("StarTip")	
-	StarTip:Print("Memory",  plugin.memshort(mem2 - mem1), plugin.memshort(memdiff2))
+	StarTip:Print("Memory", plugin.memshort(mem2), plugin.memshort(mem2 - mem1), plugin.memshort(memdiff2))
 end
 
 function mod:OnEnable()

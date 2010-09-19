@@ -654,7 +654,7 @@ function mod:RebuildOpts()
 				StarTip:RebuildOpts()
 				self:CreateLines()
 			end,
-			order = 8
+			order = 9
 		},
 	}
     for i, v in ipairs(self.db.profile.lines) do
