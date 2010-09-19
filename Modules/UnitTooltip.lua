@@ -1,7 +1,6 @@
 ﻿local mod = StarTip:NewModule("UnitTooltip", "AceEvent-3.0")
 mod.name = "Unit Tooltip"
 mod.toggled = true
-assert(LibStub("StarLibEvaluator-1.0", true), "Text module requires StarLibEvaluator-1.0")
 local LibProperty = LibStub("StarLibProperty-1.0", true)
 assert(LibProperty, "Text module requires StarLibProperty-1.0")
 local WidgetText = LibStub("StarLibWidgetText-1.0", true)
@@ -354,15 +353,6 @@ function mod:OnInitialize()
 
 	self:ReInit()
 	
-	local text = StarTip:GetModule("Text")
-	if text.db.profile.lines then
-		local lines = copy(text.db.profile.lines)
-		for k, line in pairs(lines) do
-			self.db.profile.lines[k] = line
-		end
-		text.db.profile.lines = nil
-	end
-
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
