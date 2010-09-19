@@ -53,3 +53,5 @@ externals:
         tag: latest
     Libs/StarLibs-1.0:
         url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk
+move-folders:
+    Libs/StarLib-1.0: StarLib-1.0

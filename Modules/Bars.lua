@@ -15,7 +15,7 @@ local timer
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetBar = LibStub("StarLibWidgetBar-1.0")
 local LibCore = LibStub("StarLibCore-1.0")
-local Utils = LibStub("StarLibUtils-1.0")
+local Utils = LibStub("StarLibPluginUtils-1.0")
 local LibTimer = LibStub("StarLibTimer-1.0")
 
 local environment = {}
