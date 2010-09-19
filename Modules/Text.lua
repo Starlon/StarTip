@@ -164,7 +164,7 @@ local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip
 if mem then
     if totalMem == 0 then totalMem = 100; mem = 0 end
     memperc = mem / totalMem * 100
-	return Colorize(format("%s (%.2f%%)", timeshort(mem), memperc), Color2RGBA("return 0xffff00", environment))
+	return Colorize(format("%s (%.2f%%)", timeshort(mem), memperc), Color2RGBA(0xffff00))
 end
 ]],
 		cols = 34,
@@ -181,12 +181,14 @@ end
 		name = "CPU Percent",
 		enabled = false,
 		value = [[
+if not scriptProfile then return Colorize("Profiling Off", 0, 1, 0) end
 local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip")
 if cpu then
     return format("CPU: %.2f%%", cpuperc)
 end
 ]],
 		color = [[
+if not scriptProfile then return 0, 1, 0 end
 local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip")
 if cpu then
     local num = floor(cpuperc)
@@ -196,7 +198,7 @@ if cpu then
     return r, g, b
 end
 ]],
-		cols = 20,
+		cols = 34,
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
@@ -211,11 +213,12 @@ end
 		name = "CPU Total",
 		enabled = false,
 		value = [[
+if not scriptProfile then return Colorize("Profiling Off", 0, 1, 0) end
 local cpu, percent, cpudiff, totalCPU, totaldiff = GetCPUUsage("StarTip")
 if cpu then
     if totalCPU == 0 then totalCPU = 100; cpu = 0 end
     cpuperc = cpu / totalCPU * 100;
-    return Colorize(format("%s (%.2f%%)", timeshort(cpu), cpuperc), Color2RGBA("return 0xffff00", environment))
+    return Colorize(format("%s (%.2f%%)", timeshort(cpu), cpuperc), Color2RGBA(0xffff00))
 end
 ]],
 		cols = 34,

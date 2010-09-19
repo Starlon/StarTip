@@ -116,16 +116,18 @@ end
 		update = 1000,
 		persistent = true,
 		intersect = true,
-		intersectPad = 60,
+		intersectPad = 1000,
 	},
 	[4] = {
 		name = "CPU",
 		type = "histogram",
 		expression = [[
+if not scriptProfile then return 0 end
 local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip")
 return cpuperc
 ]],
 		color = [[
+if not scriptProfile then return 0, 1, 0 end
 local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip")
 if cpu then
     local num = floor(cpuperc)
@@ -148,7 +150,7 @@ end
 		update = 1000,
 		persistent = true,
 		intersect = true,
-		intersectPad = 60
+		intersectPad = 100
 	},
 
 }
