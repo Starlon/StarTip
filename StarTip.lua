@@ -1,7 +1,7 @@
 ﻿StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip: @project-version@", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0") 
 StarTip.version = GetAddOnMetadata("StarTip", "X-StarTip-Version") or ""
 StarTip.name = GetAddOnMetadata("StarTip", "Notes")
-StarTip.name = "StarTip: " .. (StarTip.name or " tooltips from outerspace")
+StarTip.name = "StarTip " .. StarTip.version
 MAJOR = StarTip.version
 
 local LibDBIcon = LibStub("LibDBIcon-1.0")
