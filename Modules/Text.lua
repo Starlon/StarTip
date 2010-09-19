@@ -68,7 +68,7 @@ else
     return UnitSelectionColor(unit)
 end
 ]],
-		cols = 50,
+		cols = 40,
 		align = WidgetText.ALIGN_PINGPONG,
 		update = 1000,
 		speed = 100,

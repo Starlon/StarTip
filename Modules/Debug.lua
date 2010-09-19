@@ -13,6 +13,7 @@ local environment = {}
 
 local core = LibCore:New(mod, environment, "StarTip.Debug", {["StarTip.Debug"] = {}})		
 local objects = {}
+local defaults = {profile={debug=false}}
 local timer
 local cfg = {
 		enabled = true,
@@ -58,7 +59,6 @@ local plugin = {}
 LibStub("StarLibPluginString-1.0"):New(plugin)
 
 local function update()
-	do return end
 	for i, v in ipairs(objects) do
 		v:Del()
 	end
@@ -78,7 +78,9 @@ end
 
 function mod:OnEnable()
 	timer = timer or LibTimer:New("Debug timer", 1000, true, update)
-	timer:Start()
+	if false then
+		timer:Start()
+	end
 end
 
 function mod:OnDisable()
