@@ -613,6 +613,7 @@ function StarTip:OpenConfig()
 end
 
 function StarTip.GameTooltipAddLine(...)
+	do return end
 	if StarTip.addingLine then return ... end
 	local mod = StarTip:GetModule("UnitTooltip")
 	mod.NUM_LINES = mod.NUM_LINES + 1
@@ -621,6 +622,7 @@ end
 
 local hideTimer
 local function hideTooltip()
+	do return end
 	local mod = StarTip:GetModule("UnitTooltip")
 	if GameTooltip:GetAlpha() < 1 then GameTooltip:Hide(); StarTip.unit = false; return end
 	if GameTooltip:NumLines() > mod.NUM_LINES then GameTooltip:Hide(); StarTip.unit = false; return end

@@ -444,7 +444,31 @@ end
 local PluginResources = ResourceServer or LibStub("StarLibPluginResourceTools-1.0")
 local plugin = {}
 LibStub("StarLibPluginString-1.0"):New(plugin)
+
+local mem2, percent2, memdiff2, totalMem2, totaldiff2
+
+local debugging = true
 --@end-debug@
+
+local function debug1()
+	--@debug@
+	if debugging then
+		PluginResources.Update()
+		mem, percent, memdiff, totalMem, totaldiff = PluginResources.GetMemUsage("StarTip")
+	end
+	--@end-debug@
+end
+
+local function debug2(num)
+	--@debug@
+	if debugging then
+		if not num then num = 1 end
+		PluginResources.Update()
+		mem, percent, memdiff, totalMem, totaldiff = PluginResources.GetMemUsage("StarTip")
+		StarTip:Print(num .. ": UnitTooltip... Memory: ", plugin.memshort(mem), plugin.memshort(memdiff))
+	end
+	--@end-debug@
+end
 
 function mod:ClearLines()
 	for k, v in pairs(lines) do
@@ -471,12 +495,7 @@ function mod:CreateLines()
     end
 	self:ClearLines()
     lines = setmetatable(llines, {__call=function(self)
-		--@debug@
-		if debugging then
-			PluginResources.Update()
-			local mem, percent, memdiff, totalMem, totaldiff = PluginResources.GetMemUsage("StarTip")
-		end
-		--@end-debug@
+		if debuging then debug1() end
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
@@ -488,7 +507,6 @@ function mod:CreateLines()
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
-
                 else
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
@@ -500,21 +518,21 @@ function mod:CreateLines()
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
 
-						if not v.leftObj or v.lineNum ~= lineNum then
+						--if not v.leftObj or v.lineNum ~= lineNum then
 							v.config.value = v.left
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
 
 							v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name .. "left", copy(v.config), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 							v.update = tmp
-						end
-						if not v.rightObj or v.lineNum ~= lineNum then
+						--end
+						--if not v.rightObj or v.lineNum ~= lineNum then
 							v.config.value = v.right
 							local tmp = v.update
 							if not v.rightUpdating then v.update = 0 end
 							v.rightObj = v.rightObj or WidgetText:New(mod.core, v.name .. "right", copy(v.config), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 							v.update = tmp
-						end
+						--end
 						v.leftObj.fontString = mod.leftLines[lineNum]
 						v.rightObj.fontString = mod.rightLines[lineNum]
                     else
@@ -541,14 +559,8 @@ function mod:CreateLines()
 			end
 
         end
+		if debugging then debug2(2) end
         mod.NUM_LINES = lineNum
-		--@debug@
-		if debugging then
-			PluginResources.Update()
-			local mem2, percent2, memdiff2, totalMem2, totaldiff2 = PluginResources.GetMemUsage("StarTip")
-			StarTip:Print("Memory: ", plugin.memshort(mem2 - mem))
-		end
-		--@end-debug@
 		draw()
 		GameTooltip:Show()
     end})
@@ -984,8 +996,15 @@ function mod:RebuildOpts()
     end
 end
 
+local plugin = LibStub("StarLibPluginString-1.0")
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
+
+	if debugging then
+		ResourceServer.Update()
+		local mem1, percent1, memdiff1, totalMem1, totaldiff1 = ResourceServer.GetMemUsage("StarTip")
+	end
+	
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 
 	environment.unitName, environment.unitGuild, environment.unitLocation = UnitTooltipStats.GetUnitTooltipStats("mouseover")
@@ -1055,13 +1074,10 @@ function mod:SetUnit()
 	
 	self:RefixEndLines()
 	
-	local hide = 1
-	for i = 1, GameTooltip:NumLines() do
-		if string.trim(self.leftLines[i]:GetText() or "") == "" and string.trim(self.rightLines[i]:GetText() or "") == "" then hide = hide + 1 end
-	end
-	
-	if hide >= GameTooltip:NumLines() then
-		GameTooltip:Hide()
+	if debugging then
+		ResourceServer.Update()
+		local mem2, percent2, memdiff2, totalMem2, totaldiff2 = ResourceServer.GetMemUsage("StarTip")	
+		--StarTip:Print("UnitTooltip Memory", plugin.memshort(mem2), plugin.memshort(mem2 - mem1), plugin.memshort(memdiff2))
 	end
 end
 

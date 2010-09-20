@@ -373,7 +373,7 @@ end
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 
-	self:ReInit()
+	--self:ReInit()
 	
 	self.core = LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)
 
@@ -404,7 +404,9 @@ function mod:GetOptions()
 	return options
 end
 
+local plugin = LibStub("StarLibPluginString-1.0")
 function mod:SetUnit()
+
 	GameTooltipStatusBar:Hide()
 	self.offset = 0
 	createHistograms()
@@ -417,6 +419,7 @@ function mod:SetUnit()
 	if self.intersectTimer then
 		self.intersectTimer:Start()
 	end
+	
 end
 
 function mod:SetItem()

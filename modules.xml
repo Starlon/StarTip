@@ -7,13 +7,12 @@
 <Script file = "Modules\PvP.lua"/>
 <Script file = "Modules\RaidIcon.lua"/>
 <Script file = "Modules\Targeting.lua"/>
-<Script file = "Modules\DeadlyAnnounce.lua"/>
+
 <Script file = "Modules\Text.lua"/>
 <Script file = "Modules\Bars.lua"/>
 <Script file = "Modules\Histograms.lua"/>
 <Script file = "Modules\UnitTooltip.lua"/>
-<Script file = "Modules\Debug.lua"/>
-
-<!--<Script file = "Modules\LCDDisplay.lua"/>-->
+<!--<Script file = "Modules\Debug.lua"/>
+-->
 
 </Ui>

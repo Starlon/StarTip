@@ -40,7 +40,7 @@ function mod:OnInitialize()
 end
 
 local function new1()
-	return LibBuffer:New("Debug buffer", random(50), " ")
+	return LibBuffer:New("Debug buffer", random(1000), " ")
 end
 
 local function updateText(widget)
@@ -65,7 +65,7 @@ local function update()
 	wipe(objects)
 	ResourceServer.Update()
 	local mem1, percent1, memdiff1, totalMem1, totaldiff1 = ResourceServer.GetMemUsage("StarTip")
-	for j = 1, random(50) do
+	for j = 1, 5 do
 		local object = new1()
 		tinsert(objects, object)
 	end
