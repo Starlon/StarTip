@@ -447,7 +447,7 @@ LibStub("StarLibPluginString-1.0"):New(plugin)
 
 local mem2, percent2, memdiff2, totalMem2, totaldiff2
 
-local debugging = true
+local debugging = false
 --@end-debug@
 
 local function debug1()
