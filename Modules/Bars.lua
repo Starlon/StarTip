@@ -328,10 +328,20 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-	self:ClearBars()
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
+	self:ClearBars()
+	for k, bar in pairs(self.bars) do
+		if bar.config.alwaysShown then
+			bar:Start()
+			bar.bar:Show()
+			if bar.secondBar then
+				bar.secondBar:Start()
+				bar.secondBar:Show()
+			end
+		end
+	end
 end
 
 function mod:OnDisable()
@@ -368,11 +378,13 @@ end
 
 function mod:SetItem()
 	for i, bar in pairs(self.bars) do
-		bar:Stop()
-		bar.bar:Hide()
-		if bar.secondBar then
-			bar.secondBar:Stop()
-			bar.secondBar.bar:Hide()
+		if not bar.config.alwaysShown then
+			bar:Stop()
+			bar.bar:Hide()
+			if bar.secondBar then
+				bar.secondBar:Stop()
+				bar.secondBar.bar:Hide()
+			end
 		end
 	end
 	intersectTimer:Start()
@@ -380,11 +392,13 @@ end
 
 function mod:SetSpell()
 	for i, bar in pairs(self.bars) do
-		bar:Stop()
-		bar.bar:Hide()
-		if bar.secondBar then
-			bar.secondBar:Stop()
-			bar.secondBar.bar:Hide()
+		if not bar.config.alwaysShown then
+			bar:Stop()
+			bar.bar:Hide()
+			if bar.secondBar then
+				bar.secondBar:Stop()
+				bar.secondBar.bar:Hide()
+			end
 		end
 	end
 	intersectTimer:Start()
@@ -396,11 +410,13 @@ function mod:OnHide()
 		timer = nil
 	end
 	for i, bar in pairs(self.bars) do
-		bar:Stop()
-		bar.bar:Hide()
-		if bar.secondBar then
-			bar.secondBar:Stop()
-			bar.secondBar.bar:Hide()
+		if not bar.config.alwaysShown then
+			bar:Stop()
+			bar.bar:Hide()
+			if bar.secondBar then
+				bar.secondBar:Stop()
+				bar.secondBar.bar:Hide()
+			end
 		end
 	end
 	intersectTimer:Stop()

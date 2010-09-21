@@ -311,7 +311,7 @@ function updateText(widget)
 	
 	widget.frame:SetBackdropColor(r, g, b, a)
 		
-	if not UnitExists(StarTip.unit or "mouseover") then
+	if not UnitExists(StarTip.unit or "mouseover") and not widget.config.alwaysShown then
 		widget.frame:Hide()
 	end
 end
@@ -349,7 +349,7 @@ do
 			frame:SetAlpha(1)
 			local fs = frame:CreateFontString()
 			fs:SetAllPoints(frame)
-			fs:SetFontObject(GameTooltipText)
+			fs:SetFontObject(GameFontNormal)
 			fs:Show()
 			frame.fontstring = fs
 			text = frame
@@ -377,6 +377,7 @@ local function clearText(obj)
 	if not widget then return end
 	widget:Del()
 	widget.frame:Hide()
+	widget.frame.fontstring:Hide()
 	del(widget.frame)
 end
 
@@ -398,13 +399,16 @@ function createTexts()
 		
 	local appearance = StarTip:GetModule("Appearance")
 	for i, v in ipairs(self.db.profile.texts) do
-		if v.enabled and not v.deleted then			
+		if v.enabled and not v.deleted then		
+			if v.alwaysShown then
+				StarTip:Print("always shown bogeyman")
+			end
 			local widget = mod.texts[v]
 			if not widget then
 				local text = new(v.background)
 				widget = WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)				
 				text:ClearAllPoints()
-				text:SetParent(v.parent)
+				text:SetParent("UIParent")
 				for j, point in ipairs(v.points) do
 					local arg1, arg2, arg3, arg4, arg5 = unpack(point)
 					arg4 = (arg4 or 0)
@@ -417,7 +421,6 @@ function createTexts()
 				widget.frame = text
 				widget.frame = text
 				mod.texts[v] = widget
-				widget.shownAlways = v.shownAlways
 			end
 			widget.config.unit = StarTip.unit			
 		end
@@ -466,10 +469,17 @@ end
 
 function mod:OnEnable()
 	self:ClearTexts()
-	createTexts()
 	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
 	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
+	createTexts()
+	for k, text in pairs(self.texts) do
+		if text.config.alwaysShown then
+			StarTip:Print("always shown -------------------------")
+			text:Start()
+			text.frame:Show()
+		end
+	end
 end
 
 function mod:OnDisable()
@@ -503,7 +513,7 @@ end
 
 function mod:SetItem()
 	for i, text in pairs(self.texts) do
-		if not text.shownAlways then
+		if not text.config.alwaysShown then
 			text:Stop()
 			text.frame:Hide()
 		end
@@ -513,7 +523,7 @@ end
 
 function mod:SetSpell()
 	for i, text in pairs(self.texts) do
-		if not text.shownAlways then
+		if not text.config.alwaysShown then
 			text:Stop()
 			text.frame:Hide()
 		end
@@ -527,7 +537,7 @@ function mod:OnHide()
 		timer = nil
 	end
 	for i, text in pairs(self.texts) do
-		if not text.shownAlways then
+		if not text.config.alwaysShown then
 			text:Stop()
 			text.frame:Hide()
 		end

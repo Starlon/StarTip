@@ -130,7 +130,7 @@ StarTip.opposites = {
 }
 
 local SINGLETON_CLASSIFICATIONS = {
-	"player", --This causes the tooltip to stay shown after you mouse over your own unit frame.
+	"player",
 	"pet",
 	"pettarget",
 	"target",
@@ -622,7 +622,6 @@ end
 
 local hideTimer
 local function hideTooltip()
-	do return end
 	local mod = StarTip:GetModule("UnitTooltip")
 	if GameTooltip:GetAlpha() < 1 then GameTooltip:Hide(); StarTip.unit = false; return end
 	if GameTooltip:NumLines() > mod.NUM_LINES then GameTooltip:Hide(); StarTip.unit = false; return end

@@ -12,7 +12,6 @@ local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local UnitSelectionColor = _G.UnitSelectionColor
 local UnitClass = _G.UnitClass
 local self = mod
-local timer
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetHistogram = LibStub("StarLibWidgetHistogram-1.0")
 local LibCore = LibStub("StarLibCore-1.0")
@@ -221,7 +220,7 @@ function updateHistogram(widget)
 			bar:SetValue(0) --segment * 100)
 			bar:SetStatusBarColor(0, 0, 1, 1)
 		end
-		if not UnitExists(StarTip.unit) then bar:Hide() end
+		if not UnitExists(StarTip.unit) and not widget.config.alwaysShown then bar:Hide() end
 	end
 end
 
@@ -384,12 +383,20 @@ function mod:OnInitialize()
 	self.histograms = {}
 end
 
-function mod:OnEnable()
-	self:ClearHistograms()
-	createHistograms()
+function mod:OnEnable()	
 	StarTip:SetOptionsDisabled(options, false)
 	if StarTip.db.profile.intersectRate > 0 then
 		self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", self.db.profile.intersectRate or 200, true, intersectUpdate)
+	end
+	self:ClearHistograms()
+	createHistograms()
+	for k, histogram in pairs(self.histograms) do
+		if histogram.config.alwaysShown then
+			histogram:Start()
+			for _, bar in pairs(histogram.bars) do
+				bar:Show()
+			end
+		end
 	end
 end
 
@@ -424,11 +431,13 @@ end
 
 function mod:SetItem()
 	for k, widget in pairs(self.histograms) do
-		for i = 1, widget.width or WidgetHistogram.defaults.width do
-			widget.bars[i]:Hide()
-		end
-		if not widget.persistent then
-			widget:Stop()
+		if not widget.config.alwaysShown then
+			for i, bar in pairs(widget.bars) do
+				bar:Hide()
+			end
+			if not widget.persistent then
+				widget:Stop()
+			end
 		end
 	end
 	if self.intersectTimer then
@@ -438,11 +447,13 @@ end
 
 function mod:SetSpell()
 	for k, widget in pairs(self.histograms) do
-		for i = 1, widget.width or WidgetHistogram.defaults.width do
-			widget.bars[i]:Hide()
-		end
-		if not widget.persistent then
-			widget:Stop()
+		if not widget.config.alwaysShown then
+			for i, bar in pairs(widget.bars) do
+				bar:Hide()
+			end
+			if not widget.persistent then
+				widget:Stop()
+			end
 		end
 	end
 	if self.intersectTimer then
@@ -451,16 +462,14 @@ function mod:SetSpell()
 end
 
 function mod:OnHide()
-	if timer then
-		self:CancelTimer(timer)
-		timer = nil
-	end
 	for k, widget in pairs(self.histograms) do
-		for i = 1, widget.width or WidgetHistogram.defaults.width do
-			widget.bars[i]:Hide()
-		end
-		if not widget.persistent then
-			widget:Stop()
+		if not widget.config.alwaysShown then
+			for i, bar in pairs(widget.bars) do
+				bar:Hide()
+			end
+			if not widget.persistent then
+				widget:Stop()
+			end
 		end
 	end
 	if self.intersectTimer then
