@@ -227,7 +227,7 @@ end
 		color = [[
 return 1, 1, 0
 ]],
-		cols = 14,
+		cols = 20,
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
