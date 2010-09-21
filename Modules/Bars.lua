@@ -304,9 +304,16 @@ function mod:ReInit()
 					end
 				end
 				v.tagged = true
+				v.deleted = vv.deleted
 			end
 		end
 	end
+
+	for k, v in pairs(defaultWidgets) do
+		if not v.tagged and not v.deleted then
+			self.db.profile.bars[k] = copy(v)
+		end
+	end	
 end
 
 function mod:OnInitialize()
@@ -314,12 +321,6 @@ function mod:OnInitialize()
 
 	self:ReInit()
 	
-	for k, v in pairs(defaultWidgets) do
-		if not v.tagged and not v.deleted then
-			self.db.profile.bars[k] = copy(v)
-		end
-	end
-
 	self.core = LibCore:New(mod, environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)
 
 	StarTip:SetOptionsDisabled(options, true)

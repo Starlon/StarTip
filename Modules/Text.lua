@@ -443,6 +443,7 @@ function mod:ReInit()
 					end
 				end
 				v.tagged = true
+				v.deleted = vv.deleted
 			end
 		end
 	end

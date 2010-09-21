@@ -342,13 +342,6 @@ function mod:ReInit()
 		self.db.profile.histograms = {}
 	end
 	
-	for k in pairs(self.db.profile.histograms) do
-		if type(k) == "string" then
-			wipe(self.db.profile.histograms)
-			break
-		end
-	end
-
 	for i, v in ipairs(defaultWidgets) do
 		for j, vv in ipairs(self.db.profile.histograms) do
 			if v.name == vv.name and not vv.custom then
@@ -358,6 +351,7 @@ function mod:ReInit()
 					end
 				end
 				v.tagged = true
+				v.deleted = vv.deleted
 			end
 		end
 	end
@@ -372,7 +366,7 @@ end
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 
-	--self:ReInit()
+	self:ReInit()
 	
 	self.core = LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)
 
