@@ -716,7 +716,6 @@ function StarTip.OnTooltipSetUnit(...)
 	end
 	StarTip.justSetUnit = nil
 	checkTooltipAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
-	return ...
 end
 
 function StarTip.OnTooltipSetItem(self, ...)	
@@ -726,7 +725,6 @@ function StarTip.OnTooltipSetItem(self, ...)
 		end
 	end
 	StarTip.justSetItem = nil
-	return ...
 end
 
 function StarTip.OnTooltipSetSpell(...)	
@@ -755,7 +753,7 @@ function StarTip:OnTooltipHide(...)
 	end
 	self.justHide = nil
 	self.unit = false
-	self.hooks[GameTooltip].OnHide(...)  	
+	return self.hooks[GameTooltip].OnHide(...)  	
 end
 
 
@@ -810,8 +808,7 @@ function StarTip:OnTooltipShow(this, ...)
 	
 	self.justShow = false
 	
-	self.hooks[GameTooltip].OnShow(this, ...)
-	
+	return self.hooks[GameTooltip].OnShow(this, ...)
 end
 
 function StarTip:GetLSMIndexByName(category, name)
