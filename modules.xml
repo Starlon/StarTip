@@ -13,7 +13,8 @@
 <Script file = "Modules\Histograms.lua"/>
 <Script file = "Modules\UnitTooltip.lua"/>
 
-<!--<Script file = "Modules\Debug.lua"/>
+<!--
+<Script file = "Modules\Debug.lua"/>
 -->
 
 </Ui>

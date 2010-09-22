@@ -447,15 +447,28 @@ end
 
 checkTooltipAlphaFrame = CreateFrame("Frame")
 
+local menuoptions = {
+	name = "StarTip",
+	type = "group",
+	args = {
+		open = {
+			name = "Open Configuration",
+			type = "execute",
+			func = function() StarTip:OpenConfig() end
+		}
+	}
+}
 function StarTip:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 	
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", options)
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip-Addon", options)
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", menuoptions)
+	AceConfigDialog:SetDefaultSize("StarTip-Addon", 800, 450)
 	self:RegisterChatCommand("startip", "OpenConfig")
-	AceConfigDialog:AddToBlizOptions("StarTip")
+	AceConfigDialog:AddToBlizOptions("StarTip-Addons-Menu")
 	LibDBIcon:Register("StarTipLDB", LDB, self.db.profile.minimap)
 
 	if not options.args.Profiles then
@@ -507,9 +520,10 @@ function StarTip:OnEnable()
 		end
 	end
 
-	self:RestartTimers()
 	
-	self:RebuildOpts()
+	self:RestartTimers()
+
+	--self:RebuildOpts()
 	
 	self:RegisterEvent("MODIFIER_STATE_CHANGED")
 	
@@ -608,8 +622,8 @@ function StarTip:RebuildOpts()
 end
 
 function StarTip:OpenConfig()
-	AceConfigDialog:SetDefaultSize("StarTip", 800, 450)
-	AceConfigDialog:Open("StarTip")	
+	self:RebuildOpts()
+	AceConfigDialog:Open("StarTip-Addon")	
 end
 
 function StarTip.GameTooltipAddLine(...)
