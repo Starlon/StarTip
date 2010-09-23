@@ -56,22 +56,18 @@ local function new3()
 end
 
 local plugin = {}
-LibStub("StarLibPluginString-1.0"):New(plugin)
+LibStub("StarLibPluginUtils-1.0"):New(plugin)
 
 local function update()
-	for i, v in ipairs(objects) do
-		v:Del()
+	mod.frame1:ClearAllPoints()
+	mod.frame2:ClearAllPoints()
+	local width = UIParent:GetWidth()
+	local height = UIParent:GetHeight()
+	mod.frame2:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 550 / 0.5 / 0.2, 550 / 0.5 / 0.2)
+	mod.frame3:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 550, 550)
+	if plugin.Intersect(mod.frame2, mod.frame3) then
+		StarTip:Print("---------------intersection-----------------")
 	end
-	wipe(objects)
-	ResourceServer.Update()
-	local mem1, percent1, memdiff1, totalMem1, totaldiff1 = ResourceServer.GetMemUsage("StarTip")
-	for j = 1, 5 do
-		local object = new1()
-		tinsert(objects, object)
-	end
-	ResourceServer.Update()
-	local mem2, percent2, memdiff2, totalMem2, totaldiff2 = ResourceServer.GetMemUsage("StarTip")	
-	StarTip:Print("Memory", plugin.memshort(mem2), plugin.memshort(mem2 - mem1), plugin.memshort(memdiff2))
 end
 
 function mod:OnEnable()
@@ -79,6 +75,69 @@ function mod:OnEnable()
 	if false then
 		timer:Start()
 	end
+	do return end
+			local frame = CreateFrame("Frame")
+			frame:SetParent(UIParent)
+			frame:SetParent(UIParent)
+				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+					tile = true,
+					tileSize = 4,
+					edgeSize=4, 
+					insets = { left = 0, right = 0, top = 0, bottom = 0}})
+			frame:ClearAllPoints()
+			frame:SetAlpha(1)
+			frame:SetBackdropColor(1, 1, 0)
+			frame:SetHeight(250)
+			frame:SetWidth(250)
+			frame:Show()
+			frame:SetScale(0.2)
+			self.frame0 = frame
+			
+			local frame = CreateFrame("Frame")
+			frame:SetParent(self.frame0)
+				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+					tile = true,
+					tileSize = 4,
+					edgeSize=4, 
+					insets = { left = 0, right = 0, top = 0, bottom = 0}})
+			frame:ClearAllPoints()
+			frame:SetAlpha(1)
+			frame:SetBackdropColor(1, 1, 0)
+			frame:SetHeight(250)
+			frame:SetWidth(250)
+			frame:Show()
+			frame:SetScale(0.5)
+			self.frame1 = frame
+			
+			local frame = CreateFrame("Frame")
+			frame:SetParent(self.frame1)
+				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+					tile = true,
+					tileSize = 4,
+					edgeSize=4, 
+					insets = { left = 0, right = 0, top = 0, bottom = 0}})
+			frame:ClearAllPoints()
+			frame:SetAlpha(1)
+			frame:SetBackdropColor(1, 1, 0)
+			frame:SetHeight(250)
+			frame:SetWidth(250)
+			frame:Show()
+			self.frame2 = frame
+
+			local frame = CreateFrame("Frame")
+			frame:SetParent(UIParent)
+				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+					tile = true,
+					tileSize = 4,
+					edgeSize=4, 
+					insets = { left = 0, right = 0, top = 0, bottom = 0}})
+			frame:ClearAllPoints()
+			frame:SetAlpha(1)
+			frame:SetBackdropColor(1, 1, 0)
+			frame:SetHeight(250)
+			frame:SetWidth(250)
+			frame:Show()
+			self.frame3 = frame
 end
 
 function mod:OnDisable()

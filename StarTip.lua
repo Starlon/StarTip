@@ -636,17 +636,8 @@ end
 
 local hideTimer
 local function hideTooltip()
-	local mod = StarTip:GetModule("UnitTooltip")
-	if GameTooltip:GetAlpha() < 1 then GameTooltip:Hide(); StarTip.unit = false; return end
-	if GameTooltip:NumLines() > mod.NUM_LINES then GameTooltip:Hide(); StarTip.unit = false; return end
-	if UnitGUID(StarTip.unit or "mouseover") == UnitGUID("player") and StarTip.unit ~= "player" then GameTooltip:Hide(); StarTip.unit = false; return end
-	if not StarTip.unit then GameTooltip:Hide() return end
+	if StarTip.unit ~= "mouseover" and (GetMouseFocus() == UIParent or GetMouseFocus() == WorldFrame) then GameTooltip:Hide(); StarTip.unit = nil; return end
 	hideTimer:Start()
-end
-
-local playerUnitTimer
-local function playerUnitHide()
-	GameTooltip:Hide()
 end
 
 local throttleTimer
@@ -659,9 +650,10 @@ end
 
 function StarTip.OnTooltipSetUnit(...)
 
+	local unit = GameTooltip:GetUnit()
 
 	hideTimer = hideTimer or LibTimer:New("StarTip.Hide", 100, false, hideTooltip, nil, StarTip.db.profile.errorLevel)
-	hideTimer:Stop()
+	hideTimer:Start()
 	throttleTimer = throttleTimer or LibTimer:New("StarTip.Throttle", StarTip.db.profile.throttleVal, false, endThrottle, nil, StarTip.db.profile.errorLevel)
 	if GetTime() < lastTime + StarTip.db.profile.throttleVal and UnitIsPlayer("mouseover") and StarTip.db.profile.throttleVal > 0 then 
 		hideTimer:Start()
@@ -672,7 +664,6 @@ function StarTip.OnTooltipSetUnit(...)
 	lastTime = GetTime()
 	
 	StarTip.fading = false
-	local unit = GameTooltip:GetUnit()
 	StarTip.unit = "mouseover"
 	if not UnitExists("mouseover") then
 		if UnitInRaid("player") then
@@ -705,10 +696,11 @@ function StarTip.OnTooltipSetUnit(...)
 	
 	if not UnitExists(StarTip.unit) then GameTooltip:Hide(); return end
 	
-	if StarTip.unit == "player" then
-		playerUnitTimer = playerUnitTimer or LibTimer:New("StarTip.Throttle", 2, false, playerUnitHide, nil, StarTip.db.profile.errorLevel)
-		playerUnitTimer:Start()
-	end
+	--[[if StarTip.unit ~= "mouseover" then
+		unitFrameTimer = unitFrameTimer or LibTimer:New("StarTip.Throttle", 2, false, unitFrameHide, nil, StarTip.db.profile.errorLevel)
+		unitFrameTimer:Start()
+	end]]
+	
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
