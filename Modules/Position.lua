@@ -67,6 +67,10 @@ local options = {
 		pattern = "%d",
 		get = inputGet,
 		set = inputSet,
+		validate = function(info, val)
+			val = tonumber(val)
+			return val >= minX and val <= maxX 
+		end,		
 		order = 5
 	},
 	anchorYOffset = {
@@ -76,6 +80,10 @@ local options = {
 		pattern = "%d",
 		get = inputGet,
 		set = inputSet,
+		validate = function(info, val)
+			val = tonumber(val)
+			return val >= minY and val <= maxY
+		end,		
 		order = 6
 	
 	},
@@ -125,8 +133,9 @@ local options = {
 		pattern = "%d",
 		get = inputGet,
 		set = inputSet,
-		validate = function(val)
-			return val > minX and val < maxX 
+		validate = function(info, val)
+			val = tonumber(val)
+			return val >= minX and val <= maxX 
 		end,
 		order = 9
 	},
@@ -137,8 +146,9 @@ local options = {
 		pattern = "%d",
 		get = inputGet,
 		set = inputSet,
-		validate = function(val)
-			return val > minY and val < maxX 
+		validate = function(info, val)
+			val = tonumber(val)
+			return val >= minY and val <= maxX 
 		end,
 		order = 10,
 	},	
@@ -187,8 +197,9 @@ local options = {
 		pattern = "%d",
 		get = inputGet,
 		set = inputSet,
-		validate = function(val)
-			if val > minX and val < maxX then return true end
+		validate = function(info, val)
+			val = tonumber(val)
+			return val >= minX and val <= maxX
 		end,
 		order = 13
 	},
@@ -199,8 +210,9 @@ local options = {
 		pattern = "%d",
 		get = inputGet,
 		set = inputSet,
-		validate = function(val)
-			if val > minY and val < maxY then return true end
+		validate = function(info, val)
+			val = tonumber(val)
+			return val >= minY and val <= maxY
 		end,
 		order = 14
 	},	
@@ -249,8 +261,9 @@ local options = {
 		pattern = "%d",
 		get = inputGet,
 		set = inputSet,
-		validate = function(val)
-			return val > minX and val < maxX
+		validate = function(info, val)
+			val = tonumber(val)
+			return val >= minX and val <= maxX
 		end,
 		order = 17
 	},
@@ -261,8 +274,9 @@ local options = {
 		pattern = "%d",
 		get = inputGet,
 		set = inputSet,
-		validate = function(val) 
-			return val > minY and val < maxY
+		validate = function(info, val) 
+			val = tonumber(val)
+			return val >= minY and val <= maxY
 		end,
 		order = 18
 	}	
