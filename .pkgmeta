@@ -50,13 +50,11 @@ externals:
         tag: v1.1.4
     Libs/LibQtip-1.0:
         url: svn://svn.wowace.com/wow/libqtip-1-0/mainline/trunk
-    Libs/StarLibs-1.0:
-        url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk
     Libs/LibLinq-1.0:
         url: git://git.wowace.com/wow/liblinq-1-0/mainline.git
     Libs/LibTalentQuery-1.0:
         url: svn://svn.wowace.com/wow/libtalentquery-1-0/mainline/trunk
-    Libs/LibQTip-1.0:
-        url: svn://svn.wowace.com/wow/libqtip-1-0/mainline/trunk
     Libs/LibRangeCheck-1.0:
         url: svn://svn.wowace.com/wow/librangecheck-2-0/mainline/trunk
+    Libs/StarLibs-1.0:
+        url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk
