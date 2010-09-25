@@ -54,7 +54,7 @@ externals:
         url: git://git.wowace.com/wow/liblinq-1-0/mainline.git
     Libs/LibTalentQuery-1.0:
         url: svn://svn.wowace.com/wow/libtalentquery-1-0/mainline/trunk
-    Libs/LibRangeCheck-1.0:
+    Libs/LibRangeCheck-2.0:
         url: svn://svn.wowace.com/wow/librangecheck-2-0/mainline/trunk
     Libs/StarLibs-1.0:
         url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk
