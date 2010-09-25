@@ -636,7 +636,7 @@ end
 
 local hideTimer
 local function hideTooltip()
-	if StarTip.unit ~= "mouseover" and (GetMouseFocus() == UIParent or GetMouseFocus() == WorldFrame) then GameTooltip:Hide(); StarTip.unit = nil; return end
+	if StarTip.unit ~= "mouseover" and GetMouseFocus() == WorldFrame then StarTip.unit = nil; return end
 	hideTimer:Start()
 end
 
@@ -654,12 +654,12 @@ function StarTip.OnTooltipSetUnit(...)
 
 	hideTimer = hideTimer or LibTimer:New("StarTip.Hide", 100, false, hideTooltip, nil, StarTip.db.profile.errorLevel)
 	hideTimer:Start()
+	
 	throttleTimer = throttleTimer or LibTimer:New("StarTip.Throttle", StarTip.db.profile.throttleVal, false, endThrottle, nil, StarTip.db.profile.errorLevel)
 	if GetTime() < lastTime + StarTip.db.profile.throttleVal and UnitIsPlayer("mouseover") and StarTip.db.profile.throttleVal > 0 then 
-		hideTimer:Start()
 		throttleTimer:Start(); 
 		GameTooltip:Hide() 
-		return ... 
+		return
 	end
 	lastTime = GetTime()
 	
@@ -745,6 +745,8 @@ function StarTip:OnTooltipHide(...)
 	end
 	self.justHide = nil
 	self.unit = false
+	if hideTimer then hideTimer:Stop() end
+	if throttleTimer then throttleTimer:Stop() end
 	return self.hooks[GameTooltip].OnHide(...)  	
 end
 

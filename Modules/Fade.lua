@@ -107,10 +107,10 @@ local updateExistenceFrame = CreateFrame("Frame")
 local updateAlphaFrame = CreateFrame("Frame")
 
 local checkExistence = function()
-	if not UnitExists("mouseover") then
+	if not UnitExists(StarTip.unit or "mouseover") then
 		updateExistenceFrame:SetScript("OnUpdate", nil)
 		local kind
-		if GameTooltip:IsOwned(UIParent) then
+		if StarTip.unit == "mousever" then
 			kind = self.db.profile.units
 		else
 			kind = self.db.profile.unitFrames
@@ -141,7 +141,7 @@ local checkTooltipAlpha = function()
 end
 
 function mod:OnShow()
-	if UnitExists("mouseover") then
+	if UnitExists(StarTip.unit or "mouseover") then
 		updateExistenceFrame:SetScript("OnUpdate", checkExistence)
 	else
 		updateAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
