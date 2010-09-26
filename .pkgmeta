@@ -48,13 +48,5 @@ externals:
     Libs/LibDataBroker-1.1:
         url: git://github.com/tekkub/libdatabroker-1-1.git
         tag: v1.1.4
-    Libs/LibQtip-1.0:
-        url: svn://svn.wowace.com/wow/libqtip-1-0/mainline/trunk
-    Libs/LibLinq-1.0:
-        url: git://git.wowace.com/wow/liblinq-1-0/mainline.git
-    Libs/LibTalentQuery-1.0:
-        url: svn://svn.wowace.com/wow/libtalentquery-1-0/mainline/trunk
-    Libs/LibRangeCheck-2.0:
-        url: svn://svn.wowace.com/wow/librangecheck-2-0/mainline/trunk/LibRangeCheck-2.0
     Libs/StarLibs-1.0:
         url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk
