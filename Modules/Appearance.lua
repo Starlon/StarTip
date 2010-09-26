@@ -284,6 +284,7 @@ local options = {
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+
 	StarTip:SetOptionsDisabled(options, true)
 	self.st1left, self.st1right, self.st2left, self.st2right = {}, {}, {}, {}
 	for i = 1, 50 do
