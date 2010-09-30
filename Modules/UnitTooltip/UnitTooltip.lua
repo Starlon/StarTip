@@ -1,20 +1,20 @@
 ﻿local mod = StarTip:NewModule("UnitTooltip", "AceEvent-3.0")
 mod.name = "Unit Tooltip"
 mod.toggled = true
-local LibProperty = LibStub("StarLibProperty-1.0", true)
-assert(LibProperty, "Text module requires StarLibProperty-1.0")
-local WidgetText = LibStub("StarLibWidgetText-1.0", true)
-assert(WidgetText, "Text module requires StarLibWidgetText-1.0")
-local LCDText = LibStub("StarLibLCDText-1.0", true)
-assert(LCDText, mod.name .. " requires StarLibLCDText-1.0")
-local LibCore = LibStub("StarLibCore-1.0", true)
-assert(LibCore, mod.name .. " requires StarLibCore-1.0")
-local LibTimer = LibStub("StarLibTimer-1.0", true)
-assert(LibTimer, mod.name .. " requires StarLibTimer-1.0")
-local LibEvaluator = LibStub("StarLibEvaluator-1.0", true)
-assert(LibEvaluator, mod.name .. " requires StarLibEvaluator-1.0")
-local UnitTooltipStats = LibStub("StarLibPluginUnitTooltipStats-1.0", true)
-assert(UnitTooltipStats, mod.name .. " requires StarLibPluginUnitTooltipStats-1.0")
+local LibProperty = LibStub("LibScriptableDisplayProperty-1.0", true)
+assert(LibProperty, "Text module requires LibScriptableDisplayProperty-1.0")
+local WidgetText = LibStub("LibScriptableDisplayWidgetText-1.0", true)
+assert(WidgetText, "Text module requires LibScriptableDisplayWidgetText-1.0")
+local LCDText = LibStub("LibScriptableDisplayLCDText-1.0", true)
+assert(LCDText, mod.name .. " requires LibScriptableDisplayLCDText-1.0")
+local LibCore = LibStub("LibScriptableDisplayCore-1.0", true)
+assert(LibCore, mod.name .. " requires LibScriptableDisplayCore-1.0")
+local LibTimer = LibStub("LibScriptableDisplayTimer-1.0", true)
+assert(LibTimer, mod.name .. " requires LibScriptableDisplayTimer-1.0")
+local LibEvaluator = LibStub("LibScriptableDisplayEvaluator-1.0", true)
+assert(LibEvaluator, mod.name .. " requires LibScriptableDisplayEvaluator-1.0")
+local UnitTooltipStats = LibStub("LibScriptableDisplayPluginUnitTooltipStats-1.0", true)
+assert(UnitTooltipStats, mod.name .. " requires LibScriptableDisplayPluginUnitTooltipStats-1.0")
 
 local _G = _G
 local StarTip = _G.StarTip
@@ -441,9 +441,9 @@ do
 end
 
 --@debug@
-local PluginResources = ResourceServer or LibStub("StarLibPluginResourceTools-1.0")
+local PluginResources = ResourceServer or LibStub("LibScriptableDisplayPluginResourceTools-1.0")
 local plugin = {}
-LibStub("StarLibPluginString-1.0"):New(plugin)
+LibStub("LibScriptableDisplayPluginString-1.0"):New(plugin)
 
 local mem2, percent2, memdiff2, totalMem2, totaldiff2
 
@@ -996,7 +996,7 @@ function mod:RebuildOpts()
     end
 end
 
-local plugin = LibStub("StarLibPluginString-1.0")
+local plugin = LibStub("LibScriptableDisplayPluginString-1.0")
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
 

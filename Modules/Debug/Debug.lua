@@ -3,11 +3,11 @@ local mod = StarTip:NewModule("Debug", "AceEvent-3.0")
 mod.name = "Debug"
 mod.toggled = true
 mod.defaultOff = true
-local LibTimer = LibStub("StarLibTimer-1.0")
-local LibBuffer = LibStub("StarLibBuffer-1.0")
-local WidgetText = LibStub("StarLibWidgetText-1.0")
-local LibProperty = LibStub("StarLibProperty-1.0")
-local LibCore = LibStub("StarLibCore-1.0")
+local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
+local LibBuffer = LibStub("LibScriptableDisplayBuffer-1.0")
+local WidgetText = LibStub("LibScriptableDisplayWidgetText-1.0")
+local LibProperty = LibStub("LibScriptableDisplayProperty-1.0")
+local LibCore = LibStub("LibScriptableDisplayCore-1.0")
 
 local environment = {}
 
@@ -56,7 +56,7 @@ local function new3()
 end
 
 local plugin = {}
-LibStub("StarLibPluginUtils-1.0"):New(plugin)
+LibStub("LibScriptableDisplayPluginUtils-1.0"):New(plugin)
 
 local function update()
 	mod.frame1:ClearAllPoints()
