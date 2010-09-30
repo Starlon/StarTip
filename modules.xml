@@ -1,6 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
+<!--@debug@-->
 <Script file = "Modules\Fade\Fade.lua"/>
 <Script file = "Modules\Appearance\Appearance.lua"/>
 <Script file = "Modules\Position\Position.lua"/>
@@ -11,9 +12,7 @@
 <Script file = "Modules\Bars\Bars.lua"/>
 <Script file = "Modules\Histograms\Histograms.lua"/>
 <Script file = "Modules\UnitTooltip\UnitTooltip.lua"/>
-
-<!--
 <Script file = "Modules\Debug\Debug.lua"/>
--->
+<!--@end-debug@-->
 
 </Ui>
