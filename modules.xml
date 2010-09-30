@@ -1,18 +1,19 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-<Script file = "Modules\Fade.lua"/>
-<Script file = "Modules\Appearance.lua"/>
-<Script file = "Modules\Position.lua"/>
-<Script file = "Modules\PvP.lua"/>
-<Script file = "Modules\RaidIcon.lua"/>
-<Script file = "Modules\Targeting.lua"/>
+<Script file = "Modules\Fade\Fade.lua"/>
+<Script file = "Modules\Appearance\Appearance.lua"/>
+<Script file = "Modules\Position\Position.lua"/>
+<Script file = "Modules\PvP\PvP.lua"/>
+<Script file = "Modules\RaidIcon\RaidIcon.lua"/>
+<Script file = "Modules\Targeting\Targeting.lua"/>
+<Script file = "Modules\Texts\Texts.lua"/>
+<Script file = "Modules\Bars\Bars.lua"/>
+<Script file = "Modules\Histograms\Histograms.lua"/>
+<Script file = "Modules\UnitTooltip\UnitTooltip.lua"/>
 
-<Script file = "Modules\Text.lua"/>
-<Script file = "Modules\Bars.lua"/>
-<Script file = "Modules\Histograms.lua"/>
-<Script file = "Modules\UnitTooltip.lua"/>
-
-<Script file = "Modules\Debug.lua"/>
+<!--
+<Script file = "Modules\Debug\Debug.lua"/>
+-->
 
 </Ui>

@@ -6,10 +6,10 @@
 ## Version: 1.0
 ## X-Category: Interface Enhancements
 ## X-Embeds: Ace3, LibTalentQuery-1.0
-## X-License: BSD-2.0
-## X-Credits: ckknight for CowTip and DogTags, haste for oUF
+## X-License: GPL v3
+## X-Credits: ckknight for CowTip and DogTags
 ## X-StarTip-Version: @project-version@
-## OptionalDeps: Ace3, LibTalentQuery-1.0, LibMobHealth-4.0, DBM-Core, BigWigs, StarLibs-1.0, ResourceServer
+## OptionalDeps: Ace3, LibMobHealth-4.0, StarLibs-1.0, ResourceServer
 ## SavedVariables: StarTipDB
 
 Localization\enUS.lua
@@ -20,8 +20,6 @@ Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 embeds.xml
 
 StarTip.lua
-
-config.lua
 
 modules.xml
 

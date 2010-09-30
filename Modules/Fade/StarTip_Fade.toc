@@ -1,0 +1,9 @@
+## Interface: 30300
+## X-Compatible-With: 40000
+## Title: StarTip [Fade]
+## Notes: Tooltips from outerspace
+## Author: Starlon
+## Version: 1.0
+## OptionalDeps: StarTip
+
+Fade.lua

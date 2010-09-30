@@ -50,3 +50,14 @@ externals:
         tag: v1.1.4
     Libs/StarLibs-1.0:
         url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk
+move-folders:
+    StarTip/Modules/Appearance: StarTip_Appearance
+    StarTip/Modules/Bars: StarTip_Bars
+    StarTip/Modules/Fade: StarTip_Fade
+    StarTip/Modules/Histograms: StarTip_Histograms
+    StarTip/Modules/Position: StarTip_Position
+    StarTip/Modules/PvP: StarTip_PvP
+    StarTip/Modules/RaidIcon: StarTip_RaidIcon
+    StarTip/Modules/Targeting: StarTip_Targeting
+    StarTip/Modules/Texts: StarTip_Texts
+    StarTip/Modules/UnitTooltip: StarTip_UnitTooltip
