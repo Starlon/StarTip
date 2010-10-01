@@ -134,15 +134,10 @@ return Realm(unit)
         left = 'return "Level:"',
         right = [[
 local lvl = UnitLevel(unit)
-local class = " "
---if Classification(unit) then
---    class = " (" .. Classification(unit) .. ")"
---end
-
 if lvl < 0 then
-    return "*"--Classification(unit) or "Unknown"
+    return Classification(unit)
 else 
-    return format("%s", Level(unit))
+    return Level(unit)
 end
 ]],
 		enabled = true,
