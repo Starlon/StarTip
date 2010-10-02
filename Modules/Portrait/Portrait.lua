@@ -109,7 +109,7 @@ function mod:SetUnit()
 		self.texture:Show()
 		model:Hide()
 	end
-	self.text:SetFormattedText('|T%s:%d|t %s', self.texture:GetTexture(), self.db.profile.size, self.text:GetText())
+	self.text:SetFormattedText('|T%s:%d|t %s', "", self.db.profile.size, self.text:GetText()) -- we only need a blank space for the texture
 end
 
 function mod:OnHide()
