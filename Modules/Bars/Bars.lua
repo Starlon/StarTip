@@ -1,4 +1,4 @@
-local mod = StarTip:NewModule("Bars", "AceTimer-3.0")
+local mod = StarTip:NewModule("Bars")
 mod.name = "Bars"
 mod.toggled = true
 --mod.childGroup = true
@@ -11,7 +11,6 @@ local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local UnitSelectionColor = _G.UnitSelectionColor
 local UnitClass = _G.UnitClass
 local self = mod
-local timer
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetBar = LibStub("LibScriptableDisplayWidgetBar-1.0")
 local LibCore = LibStub("LibScriptableDisplayCore-1.0")
@@ -406,10 +405,6 @@ function mod:SetSpell()
 end
 
 function mod:OnHide()
-	if timer then
-		self:CancelTimer(timer)
-		timer = nil
-	end
 	for i, bar in pairs(self.bars) do
 		if not bar.config.alwaysShown then
 			bar:Stop()

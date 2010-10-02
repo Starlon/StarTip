@@ -49,7 +49,8 @@ externals:
         url: git://github.com/tekkub/libdatabroker-1-1.git
         tag: v1.1.4
     Libs/LibScriptableDisplay-1.0:
-        url: svn://svn.curseforge.net/wow/starlibs-1-0/mainline/trunk
+        url: svn://svn.curseforge.net/wow/libscriptabledisplay-1-0/mainline/trunk
+
 move-folders:
     StarTip/Modules/Appearance: StarTip_Appearance
     StarTip/Modules/Bars: StarTip_Bars
@@ -61,3 +62,4 @@ move-folders:
     StarTip/Modules/Targeting: StarTip_Targeting
     StarTip/Modules/Texts: StarTip_Texts
     StarTip/Modules/UnitTooltip: StarTip_UnitTooltip
+    StarTip/Modules/Portrait: StarTip_Portrait

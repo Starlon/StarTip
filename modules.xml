@@ -12,6 +12,7 @@
 <Script file = "Modules\Bars\Bars.lua"/>
 <Script file = "Modules\Histograms\Histograms.lua"/>
 <Script file = "Modules\UnitTooltip\UnitTooltip.lua"/>
+<Script file = "Modules\Portrait\Portrait.lua"/>
 <Script file = "Modules\Debug\Debug.lua"/>
 <!--@end-debug@-->
 
