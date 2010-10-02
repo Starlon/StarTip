@@ -98,7 +98,7 @@ function mod:GetOptions()
 end
 
 function mod:SetUnit()
-	if not self.text or luaTexts.Race(StarTip.unit) == UNKNOWN then return end
+	if not self.text then return end
 	SetPortraitTexture(self.texture, StarTip.unit)
 	if self.db.profile.animated then
 		model:SetUnit(StarTip.unit)

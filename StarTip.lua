@@ -650,7 +650,7 @@ end
 
 function StarTip.OnTooltipSetUnit(...)
 
-	local unit = GameTooltip:GetUnit()
+	local _, unit = GameTooltip:GetUnit()
 
 	hideTimer = hideTimer or LibTimer:New("StarTip.Hide", 100, false, hideTooltip, nil, StarTip.db.profile.errorLevel)
 	hideTimer:Start()
@@ -664,7 +664,8 @@ function StarTip.OnTooltipSetUnit(...)
 	lastTime = GetTime()
 	
 	StarTip.fading = false
-	StarTip.unit = "mouseover"
+	StarTip.unit = unit
+	--[[
 	if not UnitExists("mouseover") then
 		if UnitInRaid("player") then
 			for i=1, GetNumRaidMembers() do
@@ -693,7 +694,7 @@ function StarTip.OnTooltipSetUnit(...)
 			end
 		end
 	end
-	
+	]]
 	if not UnitExists(StarTip.unit) then GameTooltip:Hide(); return end
 	
 	--[[if StarTip.unit ~= "mouseover" then
