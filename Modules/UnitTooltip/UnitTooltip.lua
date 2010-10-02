@@ -146,15 +146,7 @@ return SmartRace(unit)
 ]],
 		enabled = true,
     },
-	[8] = {
-	name = "Druid Form",
-	left = 'return "Druid Form:"',
-	right = [[
-return DruidForm(unit)	
-]],
-	enabled = true
-	},
-    [9] = {
+    [10] = {
         name = "Class",
         left = 'return "Class:"',
         right = [[
@@ -169,6 +161,14 @@ return Colorize(UnitClass(unit), r, g, b)
 ]],
 		enabled = true,
     },
+	[9] = {
+	name = "Druid Form",
+	left = 'return "Druid Form:"',
+	right = [[
+return DruidForm(unit)	
+]],
+	enabled = true
+	},
     [10] = {
         name = "Faction",
         left = 'return "Faction:"',
@@ -713,7 +713,6 @@ function mod:RebuildOpts()
 						desc = "Move this line up by one",
 						type = "execute",
 						func = function()
-							StarTip:Print("up", i)
 							if i == 1 then return end
 							local tmp = self.db.profile.lines[i - 1]
 							if not v.left then v.left = "" end
