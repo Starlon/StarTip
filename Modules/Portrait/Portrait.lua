@@ -102,7 +102,11 @@ function mod:SetUnit()
 	
 	SetPortraitTexture(self.texture, StarTip.unit)
 	
-	if not self.texture:GetTexture() then return end
+	if not self.texture:GetTexture() then 
+		model:Hide()
+		self.texture:Hide()
+		return 
+	end
 	
 	if self.db.profile.animated then
 		model:SetUnit(StarTip.unit)
