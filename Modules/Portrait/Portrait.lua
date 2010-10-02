@@ -13,7 +13,7 @@ local defaults = {
 	profile = {
 		size = 36,
 		line = 1,
-		animated = true
+		animated = false
 	}
 }
 

@@ -163,7 +163,7 @@ return Colorize(UnitClass(unit), r, g, b)
     },
 	[9] = {
 	name = "Druid Form",
-	left = 'return "Druid Form:"',
+	left = 'return "Form:"',
 	right = [[
 return DruidForm(unit)	
 ]],
