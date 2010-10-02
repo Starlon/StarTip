@@ -133,12 +133,8 @@ return Realm(unit)
         name = "Level",
         left = 'return "Level:"',
         right = [[
-local lvl = UnitLevel(unit)
-if lvl < 0 then
-    return Classification(unit)
-else 
-    return Level(unit)
-end
+local classification = Classification(unit)
+return format("%s%s", Level(unit), Colorize(classification and (' ' .. classification) or '', DifficultyColor(unit)))
 ]],
 		enabled = true,
     },
@@ -146,11 +142,19 @@ end
         name = "Race",
         left = 'return "Race:"',
         right = [[
-return Race(unit)
+return SmartRace(unit)
 ]],
 		enabled = true,
     },
-    [8] = {
+	[8] = {
+	name = "Druid Form",
+	left = 'return "Druid Form:"',
+	right = [[
+return DruidForm(unit)	
+]],
+	enabled = true
+	},
+    [9] = {
         name = "Class",
         left = 'return "Class:"',
         right = [[
@@ -165,7 +169,7 @@ return Colorize(UnitClass(unit), r, g, b)
 ]],
 		enabled = true,
     },
-    [9] = {
+    [10] = {
         name = "Faction",
         left = 'return "Faction:"',
         right = [[
@@ -173,7 +177,7 @@ return Faction(unit)
 ]],
 		enabled = true,
     },
-    [10] = {
+    [11] = {
         name = "Status",
         left = 'return "Status:"',
         right = [[
@@ -196,7 +200,7 @@ return "Alive"
 		update = 1000,
 		rightUpdating = true
     },
-    [11] = {
+    [12] = {
         name = "Health",
         left = 'return "Health:"',
         right = [[
@@ -214,7 +218,7 @@ return value
 		update = 1000,
 		enabled = true
     },
-    [12] = {
+    [13] = {
         name = "Mana",
         left = [[
 return PowerName(unit)
@@ -235,13 +239,13 @@ return value
 		enabled = true,
 		update = 1000
     },
-    [13] = {
+    [14] = {
         name = "Location",
         left = 'return "Location:"',
         right = "return nil",
 		enabled = true
     },
-	[14] = {
+	[15] = {
 		name = "Marquee",
 		left = 'return "StarTip " .. _G.StarTip.version',
 		leftUpdating = true,
@@ -255,7 +259,7 @@ return value
 		direction = WidgetText.SCROLL_LEFT,
 		dontRtrim = true
 	},
-	[15] = {
+	[16] = {
 		name = "Memory Usage",
 		left = "return 'Memory Usage:'",
 		right = [[
@@ -271,7 +275,7 @@ end
 		rightUpdating = true,
 		update = 1000
 	},
-	[16] = {
+	[17] = {
 		name = "CPU Usage",
 		desc = "Note that you must turn on CPU profiling",
 		left = 'return "CPU Usage:"',
@@ -288,7 +292,7 @@ end
 		rightUpdating = true,
 		update = 1000
 	},
-	[17] = {
+	[18] = {
 		name = "Talents",
 		left = "return 'Talents:'",
 		right = [[
@@ -298,7 +302,7 @@ return SpecText(unit)
 		enabled = true,
 		update = 1000
 	},
-	[18] = {
+	[19] = {
 		name = "Range",
 		left = [[
 local min, max = RangeCheck:GetRange(unit)
