@@ -179,13 +179,13 @@ return Faction(unit)
         right = [[
 if not UnitIsConnected(unit) then
     return "Offline"
-elseif HasAura(GetSpellInfo(19752)) then
+elseif HasAura(unit, GetSpellInfo(19752)) then
     return "Divine Intervention"
 elseif UnitIsFeignDeath(unit) then
     return "Feigned Death"
 elseif UnitIsGhost(unit) then
     return "Ghost"
-elseif UnitIsDead(unit) and HasAura(GetSpellInfo(20707)) then
+elseif UnitIsDead(unit) and HasAura(unit, GetSpellInfo(20707)) then
     return "Soulstoned"
 elseif UnitIsDead(unit) then
     return "Dead"
