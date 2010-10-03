@@ -37,11 +37,12 @@ externals:
     Libs/AceSerializer-3.0:
         url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceSerializer-3.0
         tag: latest
+    Libs/AceLocale-3.0:
+        url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceLocale-3.0
+        tag: latest
     Libs/LibSharedMedia-3.0:
         url: svn://svn.wowace.com/wow/libsharedmedia-3-0/mainline/trunk
         tag: latest
-    Libs/LibTalentQuery-1.0:
-        url: svn://svn.wowace.com/wow/libtalentquery-1-0/mainline/trunk
     Libs/LibDBIcon-1.0:
         url: svn://svn.wowace.com/wow/libdbicon-1-0/mainline/trunk/LibDBIcon-1.0
         tag: latest

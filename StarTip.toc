@@ -15,9 +15,9 @@
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 
-Localization\enUS.lua
-
 embeds.xml
+
+Localization\enUS.lua
 
 StarTip.lua
 

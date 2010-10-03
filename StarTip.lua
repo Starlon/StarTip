@@ -10,10 +10,9 @@ local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("StarTip")
 
-local LibCore = LibStub("LibScriptableDisplayCore-1.0", true)
-assert(LibCore, MAJOR .. " requires LibScriptableDisplayCore-1.0")
-local LibTimer = LibStub("LibScriptableDisplayTimer-1.0", true)
-assert(LibTimer, MAJOR .. " requires LibScriptableDisplayTimer-1.0")
+local LibCore = LibStub("LibScriptableDisplayCore-1.0")
+local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
+local PluginTalents = LibStub("LibScriptableDisplayPluginTalents-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -617,6 +616,9 @@ function StarTip.OnTooltipSetUnit(...)
 	
 	StarTip.fading = false
 	StarTip.unit = unit
+	
+	PluginTalents.SendQuery(unit)
+	
 	--[[
 	if not UnitExists("mouseover") then
 		if UnitInRaid("player") then
