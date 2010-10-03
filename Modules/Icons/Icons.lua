@@ -1,6 +1,7 @@
 local mod = StarTip:NewModule("Icons")
 mod.name = "Icons"
 mod.toggled = true
+mod.defaultOff = true
 local LibBuffer = LibStub("LibScriptableDisplayBuffer-1.0")
 local LibCore = LibStub("LibScriptableDisplayCore-1.0")
 local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
