@@ -11,7 +11,7 @@ local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
 local UIParent = _G.UIParent
-local textures = {[1] = "Interface\\Addons\\StarTip\\Media\\white.blp", [0] = "Interface\\Addons\\StarTip\\Media\\blank.tga"}
+local textures = {[0] = "Interface\\Addons\\StarTip\\Media\\blank.tga", [1] = "Interface\\Addons\\StarTip\\Media\\white.blp"}
 local environment = {}
 local update
 
@@ -25,7 +25,7 @@ local defaults = {
 		rows = 1,
 		yres = 8,
 		xres = 7,
-		size = 12,
+		size = 15,
 		update = 0,
 		icons = {
 			[1] = {
@@ -68,7 +68,6 @@ local defaults = {
 				["speed"] = foo,
 			},
 			[4] = {
-				enabled = false,
 				["bitmap"] = {
 					["row1"] = ".....|.....",
 					["row2"] = ".*.*.|.*.*.",
@@ -121,6 +120,7 @@ local defaults = {
 				["speed"] = foo,
 			},
 			[8] = {
+				enabled = true,
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|",
 					["row2"] = ".***.|.*+*.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.+++.|.+*+.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|",
@@ -134,7 +134,6 @@ local defaults = {
 				["speed"] = foo,
 			},
 			[9] = {
-				enabled = true,
 				["bitmap"] = {
 					["row1"] = "..**.|.**..|**...|*....|.....|.....|.....|.....|....*|...**",
 					["row2"] = ".*..*|*..*.|..*..|.*...|*....|.....|.....|....*|...*.|..*..",
