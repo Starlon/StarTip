@@ -8,62 +8,12 @@ local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale("StarTip")
 
 local LibCore = LibStub("LibScriptableDisplayCore-1.0", true)
 assert(LibCore, MAJOR .. " requires LibScriptableDisplayCore-1.0")
 local LibTimer = LibStub("LibScriptableDisplayTimer-1.0", true)
 assert(LibTimer, MAJOR .. " requires LibScriptableDisplayTimer-1.0")
-local LibError = LibStub("LibScriptableDisplayError-1.0", true)
-assert(LibError, MAJOR .. " requires LibScriptableDisplayError-1.0")
-local LibCFG = LibStub("LibScriptableDisplayCFG-1.0", true)
-assert(LibCFG, MAJOR .. " requires LibScriptableDisplayCFG-1.0")
-local WidgetText = LibStub("LibScriptableDisplayWidgetText-1.0", true)
-assert(WidgetText, MAJOR .. " requires LibScriptableDisplayWidgetText-1.0")
-local WidgetBar = LibStub("LibScriptableDisplayWidgetBar-1.0", true)
-assert(WidgetBar, MAJOR .. " requires LibScriptableDisplayWidgetBar-1.0")
-local WidgetIcon = LibStub("LibScriptableDisplayWidgetIcon-1.0", true)
---assert(WidgetIcon, MAJOR .. " requires LibScriptableDisplayWidgetIcon-1.0")
-local WidgetHistogram = LibStub("LibScriptableDisplayWidgetHistogram-1.0", true)
-assert(WidgetHistogram, MAJOR .. " requires LibScriptableDisplayWidgetHistogram-1.0")
-local WidgetBignums = LibStub("LibScriptableDisplayWidgetBignums-1.0", true)
---assert(WidgetBignums, MAJOR .. " requires LibScriptableDisplayWidgetBignums-1.0")
-local WidgetKey = LibStub("LibScriptableDisplayWidgetKey-1.0", true)
---assert(WidgetKey, MAJOR .. " requires LibScriptableDisplayWidgetKey-1.0")
-local WidgetTimer = LibStub("LibScriptableDisplayWidgetTimer-1.0", true)
-assert(WidgetTimer, MAJOR .. " requires LibScriptableDisplayWidgetTimer-1.0")
-local WidgetScript = LibStub("LibScriptableDisplayWidgetScript-1.0", true)
---assert(WidgetScript, MAJOR .. " requires LibScriptableDisplayWidgetScript-1.0")
-local Evaluator = LibStub("LibScriptableDisplayEvaluator-1.0", true)
-assert(Evaluator, MAJOR .. " requires LibScriptableDisplayEvaluator-1.0")
-local PluginWidgetText = LibStub("LibScriptableDisplayWidgetTextPlugin-1.0", true)
-assert(PluginWidgetText, MAJOR .. " requires LibScriptableDisplayWidgetTextPlugin-1.0")
-local PluginRangeCheck = LibStub("LibScriptableDisplayPluginRangeCheck-1.0", true)
-assert(PluginRangeCheck, MAJOR .. " requires LibScriptableDisplayRangeCheck-1.0")
-local PluginUnit = LibStub("LibScriptableDisplayPluginUnit-1.0", true)
-assert(PluginUnit, MAJOR .. " requires LibScriptableDisplayPluginUnit-1.0")
-local PluginBit = LibStub("LibScriptableDisplayPluginBit-1.0", true)
-assert(PluginBit, MAJOR .. " requires LibScriptableDisplayPluginBit-1.0")
-local PluginLua = LibStub("LibScriptableDisplayPluginLua-1.0", true)
-assert(PluginLua, MAJOR .. " requires LibScriptableDisplayPluginLua-1.0")
-local PluginMath = LibStub("LibScriptableDisplayPluginMath-1.0", true)
-assert(PluginMath, MAJOR .. " requires LibScriptableDisplayPluginMath-1.0")
-local PluginString = LibStub("LibScriptableDisplayPluginString-1.0", true)
-assert(PluginString, MAJOR .. " requires LibScriptableDisplayPluginString-1.0")
-local PluginTable = LibStub("LibScriptableDisplayPluginTable-1.0", true)
-assert(PluginTable, MAJOR .. " requires LibScriptableDisplayPluginTable-1.0")
-local PluginResourceTools = LibStub("LibScriptableDisplayPluginResourceTools-1.0", true)
-assert(PluginResourceTools, MAJOR .. " requires LibScriptableDisplayPluginResourceTools-1.0")
-local PluginCharacterStats = LibStub("LibScriptableDisplayPluginCharacterStats-1.0", true)
-assert(PluginCharacterStats, MAJOR .. " requires LibScriptableDisplayPluginCharacterStats-1.0")
-local PluginLocation = LibStub("LibScriptableDisplayPluginLocation-1.0", true)
-assert(PluginLocation, MAJOR .. " requires LibScriptableDisplayPluginLocation-1.0")
-local PluginUnitTooltipStats = LibStub("LibScriptableDisplayPluginUnitTooltipStats-1.0", true)
-assert(PluginUnitTooltipStats, MAJOR .. " requires LibScriptableDisplayPluginUnitTooltipStats-1.0")
-local PluginDBM = LibStub("LibScriptableDisplayPluginDBM-1.0", true)
-local PluginLinq = LibStub("LibScriptableDisplayPluginLinq-1.0", true)
-assert(PluginLinq, MAJOR .. " requires LibScriptableDisplayPluginLinq-1.0")
-local LibTimer = LibStub("LibScriptableDisplayTimer-1.0", true)
-assert(LibTimer, MAJOR .. " requires LibScriptableDisplaytimer-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -178,7 +128,7 @@ local defaults = {
 	}
 }
 			
-local modNames = {"None", "Ctrl", "Alt", "Shift"}
+local modNames = {L["None"], L["Ctrl"], L["Alt"], L["Shift"]}
 local modFuncs = {function() return true end, IsControlKeyDown, IsAltKeyDown, IsShiftKeyDown}
 
 local showChoices = {"Always", "Out of Combat", "Never"}
@@ -187,8 +137,8 @@ local options = {
 	type = "group",
 	args = {
 		modules = {
-			name = "Modules",
-			desc = "Modules",
+			name = L["Modules"],
+			desc = L["Modules"],
 			type = "group",
 			args = {}
 		},
@@ -198,8 +148,8 @@ local options = {
 			type = "group",
 			args = {
 				add = {
-					name = "Add Timer",
-					desc = "Add a timer widget",
+					name = L["Add Timer"],
+					desc = L["Add a timer widget"],
 					type = "input",
 					set = function(info, v)
 						tinsert(timers, v)
@@ -211,8 +161,8 @@ local options = {
 					order = 1
 				},
 				reset = {
-					name = "Restore Defaults",
-					desc = "Use this to restore the defaults",
+					name = L["Restore Defaults"],
+					desc = L["Use this to restore the defaults"],
 					type = "execute",
 					func = function()
 						StarTip.db.profile.timers = nil						
@@ -226,13 +176,13 @@ local options = {
 			}
 		},
 		settings = {
-			name = "Settings",
-			desc = "Settings",
+			name = L["Settings"],
+			desc = L["Settings"],
 			type = "group",
 			args = {
 				minimap = {
-					name = "Minimap",
-					desc = "Toggle showing minimap button",
+					name = L["Minimap"],
+					desc = L["Toggle showing minimap button"],
 					type = "toggle",
 					get = function() 
 						return not StarTip.db.profile.minimap.hide
@@ -248,17 +198,17 @@ local options = {
 					order = 1
 				},
 				modifier = {
-					name = "Modifier",
-					desc = "Whether to use a modifier key or not",
+					name = L["Modifier"],
+					desc = L["Whether to use a modifier key or not"],
 					type = "select",
-					values = {"None", "Ctrl", "Alt", "Shift"},
+					values = {L["None"], L["Ctrl"], L["Alt"], L["Shift"]},
 					get = function() return StarTip.db.profile.modifier end,
 					set = function(info, v) StarTip.db.profile.modifier = v end,
 					order = 6
 				},
 				unitShow = {
-					name = "Unit",
-					desc = "Whether to show unit tooltips",
+					name = L["Unit"],
+					desc = L["Whether to show unit tooltips"],
 					type = "select",
 					values = showChoices,
 					get = function() return StarTip.db.profile.unitShow end,
@@ -266,8 +216,8 @@ local options = {
 					order = 7
 				},
 				objectShow = {
-					name = "Object",
-					desc = "Whether to show object tooltips",
+					name = L["Object"],
+					desc = L["Whether to show object tooltips"],
 					type = "select",
 					values = showChoices,
 					get = function() return StarTip.db.profile.objectShow end,
@@ -275,8 +225,8 @@ local options = {
 					order = 8				
 				},
 				unitFrameShow = {
-					name = "Unit Frame",
-					desc = "Whether to show unit frame tooltips",
+					name = L["Unit Frame"],
+					desc = L["Whether to show unit frame tooltips"],
 					type = "select",
 					values = showChoices,
 					get = function() return StarTip.db.profile.unitFrameShow end,
@@ -284,8 +234,8 @@ local options = {
 					order = 9				
 				},
 				otherFrameShow = {
-					name = "Other Frame",
-					desc = "Whether to show other frame tooltips",
+					name = L["Other Frame"],
+					desc = L["Whether to show other frame tooltips"],
 					type = "select",
 					values = showChoices,
 					get = function() return StarTip.db.profile.otherFrameShow end,
@@ -293,8 +243,8 @@ local options = {
 					order = 10				
 				},
 				errorLevel = {
-					name = "Error Level",
-					desc = "StarTip's error level",
+					name = L["Error Level"],
+					desc = L["StarTip's error level"],
 					type = "select",
 					values = LibStub("LibScriptableDisplayError-1.0").defaultTexts,
 					get = function() return StarTip.db.profile.errorLevel end,
@@ -302,8 +252,8 @@ local options = {
 					order = 11
 				},
 				throttleVal = {
-					name = "Throttle Threshold",
-					desc = "StarTip can throttle your mouseovers, so it doesn't show a tooltip if you mouse over units really fast.",
+					name = L["Throttle Threshold"],
+					desc = L["StarTip can throttle your mouseovers, so it doesn't show a tooltip if you mouse over units really fast. There's a few bugs here, which is why it's not enabled by default."],
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(StarTip.db.profile.throttleVal) end,
@@ -311,8 +261,8 @@ local options = {
 					order = 12
 				},
 				intersectRate = {
-					name = "Intersect Checks Rate",
-					desc = "The rate at which intersecting frames will be checked",
+					name = L["Intersect Checks Rate"],
+					desc = L["The rate at which intersecting frames will be checked"],
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(StarTip.db.profile.intersectRate) end,
@@ -434,7 +384,7 @@ function StarTip:RefreshConfig()
 		end
 	end
 	self:RebuildOpts()
-	self:Print("You may need to reload your UI. I'm not sure why yet.")
+	self:Print(L["You may need to reload your UI."])
 end
 
 local checkTooltipAlphaFrame
@@ -530,7 +480,7 @@ function StarTip:OnEnable()
 	
 	local plugin = {}
 	LibStub("LibScriptableDisplayPluginColor-1.0"):New(plugin)
-	ChatFrame1:AddMessage(plugin.Colorize("Welcome to " .. StarTip.name, 0, 1, 1) .. plugin.Colorize(" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon.", 1, 1, 0))
+	ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon."], 1, 1, 0))
 end
 
 function StarTip:OnDisable()
@@ -579,7 +529,7 @@ function StarTip:RebuildOpts()
 		if v.GetOptions then
 			t = v:GetOptions()
 			t.optionsHeader = {
-				name = "Settings",
+				name = L["Settings"],
 				type = "header",
 				order = 3
 			}
@@ -597,8 +547,8 @@ function StarTip:RebuildOpts()
 				order = 1
 			}
 			t.toggle = {
-				name = "Enable",
-				desc = "Enable or disable this module",
+				name = L["Enable"],
+				desc = L["Enable or disable this module"],
 				type = "toggle",
 				set = function(info,v)
 					self.db.profile.modules[k] = v

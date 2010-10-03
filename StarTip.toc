@@ -12,10 +12,10 @@
 ## OptionalDeps: Ace3, LibMobHealth-4.0, LibScriptableDisplay-1.0, ResourceServer
 ## SavedVariables: StarTipDB
 
-Localization\enUS.lua
-
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+
+Localization\enUS.lua
 
 embeds.xml
 
