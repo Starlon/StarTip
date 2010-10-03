@@ -513,6 +513,7 @@ function StarTip:OnEnable()
 	self:SecureHook(GameTooltip, "Show", self.GameTooltipShow)
 	self:SecureHook(GameTooltip, "AddDoubleLine", self.GameTooltipAddLine)
 	self:SecureHook(GameTooltip, "AddLine", self.GameTooltipAddLine)
+	self:SecureHook(GameTooltip, "FadeOut", self.GameTooltipFade)
 	
 	for k,v in self:IterateModules() do
 		if (self.db.profile.modules[k]  == nil and not v.defaultOff) or self.db.profile.modules[k] then
@@ -540,6 +541,7 @@ function StarTip:OnDisable()
 	self:Unhook(GameTooltip, "OnHide")
 	self:Unhook(GameTooltip, "OnShow")
 	self:Unhook(GameTooltip, "Show")
+	self:Unhook(GameTooltip, "FadeOut")
 	self:UnregisterEvent("MODIFIER_STATE_CHANGED")
 	for k,v in self:IterateModules() do
 		if (self.db.profile.modules[k]  == nil and not v.defaultOff) or self.db.profile.modules[k] then
@@ -794,16 +796,22 @@ function StarTip:GameTooltipShow(...)
 	if not show then GameTooltip:Hide() end
 end
 
-function StarTip:OnTooltipShow(this, ...)
-	if not self.justShow then
-		for k, v in self:IterateModules() do
-			if v.OnShow and v:IsEnabled() then v:OnShow(this, ...) end
+function StarTip.OnTooltipShow(...)
+	if not StarTip.justShow then
+		for k, v in StarTip:IterateModules() do
+			if v.OnShow and v:IsEnabled() then v:OnShow(...) end
 		end
 	end
 	
-	self.justShow = false
+	StarTip.justShow = false
 	
-	return self.hooks[GameTooltip].OnShow(this, ...)
+	return StarTip.hooks[GameTooltip].OnShow(...)
+end
+
+function StarTip.GameTooltipFade(...) 
+	for k, v in StarTip:IterateModules() do
+		if v.OnFadeOut and v:IsEnabled() then v:OnFadeOut(...) end
+	end
 end
 
 function StarTip:GetLSMIndexByName(category, name)

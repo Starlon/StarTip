@@ -7,7 +7,6 @@ local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
 local UIParent = _G.UIParent
-local model = CreateFrame("PlayerModel", nil, GameTooltip)
 
 local defaults = {
 	profile = {
@@ -58,7 +57,7 @@ local options = {
 		get = function() return mod.db.profile.animated end,
 		set = function(info, val)
 			mod.db.profile.animated = val
-			if val then model:Show() else model:Hide() end
+			if val then mod.model:Show() else mod.model:Hide() end
 		end,
 		order = 7
 	}
@@ -69,15 +68,16 @@ function mod:OnInitialize()
 	StarTip:SetOptionsDisabled(options, true)
 	self.text = StarTip.leftLines[self.db.profile.line]
 	self.texture = GameTooltip:CreateTexture()
+	self.model = CreateFrame("PlayerModel", nil, GameTooltip)
 end
 
 function mod:OnEnable()
 	StarTip:SetOptionsDisabled(options, false)
 	
-	model:ClearAllPoints()
-	model:SetPoint("LEFT", self.text, "LEFT")
-	model:SetWidth(self.db.profile.size)
-	model:SetHeight(self.db.profile.size)
+	self.model:ClearAllPoints()
+	self.model:SetPoint("LEFT", self.text, "LEFT")
+	self.model:SetWidth(self.db.profile.size)
+	self.model:SetHeight(self.db.profile.size)
 	
 	self.texture:ClearAllPoints()
 	self.texture:SetPoint("LEFT", self.text, "LEFT")
@@ -89,8 +89,8 @@ function mod:OnDisable()
 	StarTip:SetOptionsDisabled(options, true)
 	self.texture:ClearAllPoints()
 	self.texture:Hide()
-	model:ClearAllPoints()
-	model:Hide()
+	self.model:ClearAllPoints()
+	self.model:Hide()
 end
 
 function mod:GetOptions()
@@ -103,24 +103,24 @@ function mod:SetUnit()
 	SetPortraitTexture(self.texture, StarTip.unit)
 	
 	if not self.texture:GetTexture() then 
-		model:Hide()
+		self.model:Hide()
 		self.texture:Hide()
 		return 
 	end
 	
 	if self.db.profile.animated then
-		model:SetUnit(StarTip.unit)
+		self.model:SetUnit(StarTip.unit)
 		self.texture:Hide()
-		model:Show()
-		model:SetCamera(0)
+		self.model:Show()
+		self.model:SetCamera(0)
 	else
 		self.texture:Show()
-		model:Hide()
+		self.model:Hide()
 	end
-	self.text:SetFormattedText('|T%s:%d|t %s', "", self.db.profile.size, self.text:GetText()) -- we only need a blank space for the texture
+	self.text:SetFormattedText('|T%s:%d|t %s', self.texture:GetTexture(), self.db.profile.size, self.text:GetText()) -- we only need a blank space for the texture
 end
 
 function mod:OnHide()
-	model:Hide()
+	self.model:Hide()
 	self.texture:Hide()
 end
