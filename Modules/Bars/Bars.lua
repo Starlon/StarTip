@@ -61,11 +61,10 @@ return UnitHealth(unit)
 		min = "return 0",
 		max = "assert(unit); return UnitHealthMax(unit)",
 		color1 = [[
-if true or self.visitor.visitor.db.profile.classColors then
+if UnitIsPlayer(unit) then
     return ClassColor(unit)
 else
-    local min, max = UnitHealth(unit), UnitHealthMax(unit)
-    return HPColor(min, max)
+    return UnitSelectionColor(unit)
 end
 ]],
 		height = 6,
