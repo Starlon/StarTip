@@ -11,7 +11,7 @@ local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
 local UIParent = _G.UIParent
-local textures = {[0] = "Interface\\Addons\\StarTip\\Media\\blank.tga", [1] = "Interface\\Addons\\StarTip\\Media\\white.blp"}
+local textures = {[0] = "Interface\\Addons\\StarTip\\Media\\black.blp", [1] = "Interface\\Addons\\StarTip\\Media\\white.blp"}
 local environment = {}
 local update
 
@@ -46,7 +46,7 @@ local defaults = {
 				["col"] = 1
 			},
 			[2] = {
-				["enabled"] = false,
+				["enabled"] = true,
 				["name"] = "EKG",
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....|.....|.....",
@@ -64,7 +64,7 @@ local defaults = {
 			},
 			[3] = {
 				["name"] = "Hearts",
-				["enabled"] = false,
+				["enabled"] = true,
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....",
 					["row2"] = ".*.*.|.....|.*.*.|.....|.....|.....",
@@ -177,7 +177,7 @@ function mod:OnInitialize()
 	self.core = LibCore:New(mod, environment, "StarTip.Icons", {["StarTip.Icons"] = {}}, nil, StarTip.db.profile.errorLevel)
 	self.core.lcd = {LCOLS=self.db.profile.cols, LROWS=self.db.profile.rows, XRES=self.db.profile.xres, YRES=self.db.profile.yres, specialChars = {}}
 	
-	self.buffer = LibBuffer:New("Icons", self.core.lcd.LCOLS * self.core.lcd.LROWS, 0, StarTip.db.profile.errorLevel)
+	self.buffer = LibBuffer:New("Icons", self.core.lcd.LCOLS * self.core.lcd.LROWS * self.core.lcd.YRES * self.core.lcd.XRES, 0, StarTip.db.profile.errorLevel)
 	
 	if self.db.profile.update > 0 then
 		self.timer = LibTimer:New("Icons", 100, true, update)
@@ -278,12 +278,12 @@ function draw(widget)
 		local mask = bit.lshift(1, lcd.XRES)
 		for x = 0, lcd.XRES - 1 do
 			local n = (row * lcd.YRES + y) * lcd.LCOLS * lcd.XRES + col * lcd.XRES + x
-			local n = (row + y) * lcd.LCOLS * lcd.XRES + col + x
+			--local n = (row + y) * lcd.LCOLS * lcd.XRES + col + x
 			mask = bit.rshift(mask, 1)
 			if bit.band(chr[y + 1], mask) == 0 then
-				mod.buffer.buffer[n] = 1
-			else
 				mod.buffer.buffer[n] = 0
+			else
+				mod.buffer.buffer[n] = 1
 			end
 		end
 	end
@@ -293,20 +293,21 @@ end
 
 function update()
 	local lcd = mod.core.lcd
-	local text = format('|T%s:%d|t', textures[0], mod.db.profile.size or 10)
+	local text1 = format('|T%s:%d|t', textures[0], mod.db.profile.size or 10)
 	local buffers = {}
-	for row = 0, lcd.LROWS do
-		for col = 0, lcd.LCOLS do
+	for row = 0, lcd.LROWS - 1 do
+		for col = 0, lcd.LCOLS - 1 do
 			for y = 0, lcd.YRES - 1 do
 				for x = 0, lcd.XRES - 1 do
 					local n = (row * lcd.YRES + y) * lcd.LCOLS * lcd.XRES + col * lcd.XRES + x
-					local n = (row + y) * lcd.LCOLS * lcd.XRES + col + x
+					--local n = (row + y) * lcd.LCOLS * lcd.XRES + col + x
 					local color = mod.buffer.buffer[n] or 0
 					local text = format('|T%s:%d|t', textures[color], mod.db.profile.size or 10)
-					if not buffers[row + y] then
-						buffers[row + y] = LibBuffer:New("tmp.icon", 0, text)
+					if not buffers[row * lcd.YRES + y] then
+						buffers[row * lcd.YRES + y] = LibBuffer:New("tmp.icon", lcd.LCOLS * lcd.XRES, text1)
 					end
-					buffers[row + y]:Replace(col * lcd.XRES + x, text)
+					StarTip:Print(col * lcd.XRES + x)
+					buffers[row * lcd.YRES + y]:Replace(col * lcd.XRES + x, text)
 				end
 			end
 		end
@@ -317,10 +318,12 @@ function update()
 			for y = 0, lcd.YRES - 1 do
 				for x = 0, lcd.XRES - 1 do
 					local n = (row * lcd.YRES + y) * lcd.LCOLS * lcd.XRES + col * lcd.XRES + x
-					local n = (row + y) * lcd.LCOLS * lcd.XRES + col + x
-					if StarTip.leftLines[row + y + 2] and buffers[row + y] then 
-						StarTip.leftLines[row + y + 2]:SetText(buffers[row + y]:AsString())
-					end			
+					--local n = (row + y) * lcd.LCOLS * lcd.XRES + col + x
+					if row * lcd.YRES + y + 2 > GameTooltip:NumLines() then
+						GameTooltip:AddDoubleLine(' ', ' ')
+					end
+					
+					StarTip.leftLines[row * lcd.YRES + y + 2]:SetText(buffers[row * lcd.YRES + y]:AsString())
 				end
 			end
 		end
