@@ -635,9 +635,7 @@ function StarTip.OnTooltipSetUnit(...)
 	
 	StarTip.fading = false
 	StarTip.unit = unit
-	
-	PluginTalents.SendQuery(unit)
-	
+		
 	--[[
 	if not UnitExists("mouseover") then
 		if UnitInRaid("player") then
