@@ -21,8 +21,8 @@ local options = {
 local foo = 200
 local defaults = {
 	profile = {
-		cols = 2,
-		rows = 2,
+		cols = 1,
+		rows = 1,
 		yres = 8,
 		xres = 7,
 		size = 15,
@@ -30,7 +30,7 @@ local defaults = {
 		icons = {
 			[1] = {
 				["name"] = "Blob",
-				["enabled"] = true,
+				["enabled"] = false,
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....",
 					["row2"] = ".....|.....|.***.",
@@ -64,7 +64,7 @@ local defaults = {
 			},
 			[3] = {
 				["name"] = "Hearts",
-				["enabled"] = true,
+				["enabled"] = false,
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....",
 					["row2"] = ".*.*.|.....|.*.*.|.....|.....|.....",
@@ -170,6 +170,12 @@ local defaults = {
 	}
 }
 
+local function checkUnit()
+	if not UnitExists(StarTip.unit) then
+		
+	end
+end
+
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
@@ -182,6 +188,8 @@ function mod:OnInitialize()
 	if self.db.profile.update > 0 then
 		self.timer = LibTimer:New("Icons", 100, true, update)
 	end
+	
+	self.unitTimer = LibTimer:New("Icons.unitTimer", 100, true, checkUnit)
 end
 
 local function copy(tbl)
@@ -308,13 +316,18 @@ function update()
 					end
 					StarTip:Print(col * lcd.XRES + x)
 					buffers[row * lcd.YRES + y]:Replace(col * lcd.XRES + x, text)
+					--StarTip.leftLines[row * lcd.YRES + y]:SetText(mod.lines[row * lcd.YRES])
 				end
 			end
 		end
 	end
 	
+	for row = 0, lcd.LROWS * lcd.YRES - 1 do
+		--buffers[row]:Replace(lcd.LCOLS, StarTip.leftLines[row + 2]:GetText() or "")
+	end
+	
 	for row = 0, lcd.LROWS - 1 do
-		for col = 0, lcd.LCOLS - 1 do		
+		for col = 0, lcd.LCOLS do		
 			for y = 0, lcd.YRES - 1 do
 				for x = 0, lcd.XRES - 1 do
 					local n = (row * lcd.YRES + y) * lcd.LCOLS * lcd.XRES + col * lcd.XRES + x
@@ -346,6 +359,13 @@ function mod:SetUnit()
 	if self.timer then
 		self.timer:Start()
 	end
+	mod.lines = mod.lines or {}
+	wipe(mod.lines)
+	for i = 0, mod.core.lcd.LCOLS * mod.core.lcd.YRES do
+		mod.lines[i] = StarTip.leftLines[i + 1]:GetText()
+	end
+	
+	self.unitTimer:Start()
 end
 
 function mod:OnHide()
@@ -355,4 +375,6 @@ function mod:OnHide()
 	if self.timer then
 		self.timer:Stop()
 	end
+	
+	self.unitTimer:Stop()
 end
