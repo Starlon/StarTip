@@ -425,6 +425,24 @@ function StarTip:OnInitialize()
 		self.lastConfig = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("StarTip", "Profiles", "StarTip", "Profiles")
 	end
 	
+	local leftGameTooltipStrings, rightGameTooltipStrings = {}, {}
+	--[[self.leftLines = {}
+	self.rightLines = {}
+	setmetatable(self.leftLines, {__index=function(self, key)
+		if type(key) ~= "number" then return self[key] end
+		assert(type(key) == "number")
+		for i = #self, key + 1 do
+			if i > GameTooltip:NumLines() then
+				GameTooltip:AddDoubleLine(' ', ' ')
+				rawset(self.leftLines, key, _G["GameTooltipTextLeft" .. i])
+				--rawset(self.rightLines, key, _G["GameTooltipTextRight" .. i])
+				StarTip:Print("add line")
+			end
+		end
+		return self[key]
+	end})
+	setmetatable(self.rightLines, getmetatable(self.leftLines))
+	]]
 	self.leftLines = {}
 	self.rightLines = {}
 	for i = 1, 50 do
@@ -432,7 +450,8 @@ function StarTip:OnInitialize()
 		self.leftLines[i] = _G["GameTooltipTextLeft" .. i]
 		self.rightLines[i] = _G["GameTooltipTextRight" .. i]
 	end
-		
+	GameTooltip:ClearLines()
+	
 	self.core = LibCore:New(StarTip, environment, "StarTip", {["StarTip"] = {}}, "text", self.db.profile.errorLevel)		
 	GameTooltip:Show()
 	GameTooltip:Hide()

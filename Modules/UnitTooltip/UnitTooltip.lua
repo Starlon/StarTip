@@ -415,22 +415,6 @@ do
 			fontString:SetText(widget.buffer)
 
 			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
-
-			if widget.bold then
-				if mod.leftLines and mod.leftLines[widget.i] then
-					mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
-				end
-				if mod.rightLines and mod.rightLines[widget.i] then
-					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeBold)
-				end
-			else
-				if mod.leftlines and mod.leftLines[widget.i] then
-					mod.leftLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-			end
-				if mod.rightLines and mod.rightLines[widget.i] then
-					mod.rightLines[widget.i]:SetFont(font, appearance.db.profile.fontSizeNormal)
-				end
-			end
 		end
 		table.wipe(widgetsToDraw)
 		if UnitExists(StarTip.unit) then

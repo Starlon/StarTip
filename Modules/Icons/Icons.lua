@@ -21,14 +21,15 @@ local options = {
 local foo = 200
 local defaults = {
 	profile = {
-		cols = 1,
-		rows = 1,
+		cols = 2,
+		rows = 2,
 		yres = 8,
 		xres = 7,
 		size = 15,
 		update = 0,
 		icons = {
 			[1] = {
+				["name"] = "Blob",
 				["enabled"] = true,
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....",
@@ -41,8 +42,12 @@ local defaults = {
 					["row8"] = ".....|.....|....."
 				},
 				["speed"] = foo,
+				["row"] = 1,
+				["col"] = 1
 			},
 			[2] = {
+				["enabled"] = false,
+				["name"] = "EKG",
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....|.....|.....",
 					["row2"] = ".....|....*|...*.|..*..|.*...|*....|.....|.....",
@@ -54,8 +59,12 @@ local defaults = {
 					["row8"] = ".....|.....|.....|.....|.....|.....|.....|....."
 				},
 				["speed"] = foo,
+				["row"] = 1,
+				["col"] = 0
 			},
 			[3] = {
+				["name"] = "Hearts",
+				["enabled"] = false,
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....",
 					["row2"] = ".*.*.|.....|.*.*.|.....|.....|.....",
@@ -67,8 +76,11 @@ local defaults = {
 					["row8"] = ".....|.....|.....|.....|.....|....."
 				},
 				["speed"] = foo,
+				["row"] = 0,
+				["col"] = 1
 			},
 			[4] = {
+				["name"] = "Heartbeat",
 				["bitmap"] = {
 					["row1"] = ".....|.....",
 					["row2"] = ".*.*.|.*.*.",
@@ -82,6 +94,7 @@ local defaults = {
 				["speed"] = foo,
 			},
 			[5] = {
+				["name"] = "Diamonds",
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|..*..|.....|.....|.....",
 					["row2"] = ".....|.....|.....|..*..|.*.*.|..*..|.....|.....",
@@ -95,6 +108,8 @@ local defaults = {
 				["speed"] = foo,
 			},
 			[6] = {
+				["name"] = "Rain",
+				["enabled"] = true,
 				["bitmap"] = {
 					["row1"] = "...*.|.....|.....|.*...|....*|..*..|.....|*....",
 					["row2"] = "*....|...*.|.....|.....|.*...|....*|..*..|.....",
@@ -106,8 +121,11 @@ local defaults = {
 					["row8"] = ".....|.....|.*...|....*|..*..|.....|*....|...*."
 				},
 				["speed"] = foo,
+				["row"] = 0,
+				["col"] = 0
 			},
 			[7] = {
+				["name"] = "Squirrel",
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....",
 					["row2"] = ".....|.....|.....|.....|.....|.....",
@@ -121,6 +139,7 @@ local defaults = {
 				["speed"] = foo,
 			},
 			[8] = {
+				["name"] = "Clock",
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|",
 					["row2"] = ".***.|.*+*.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.*++.|.+++.|.+*+.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|",
@@ -134,6 +153,7 @@ local defaults = {
 				["speed"] = foo,
 			},
 			[9] = {
+				["name"] = "Wave",
 				["bitmap"] = {
 					["row1"] = "..**.|.**..|**...|*....|.....|.....|.....|.....|....*|...**",
 					["row2"] = ".*..*|*..*.|..*..|.*...|*....|.....|.....|....*|...*.|..*..",
@@ -155,7 +175,7 @@ function mod:OnInitialize()
 	StarTip:SetOptionsDisabled(options, true)
 	
 	self.core = LibCore:New(mod, environment, "StarTip.Icons", {["StarTip.Icons"] = {}}, nil, StarTip.db.profile.errorLevel)
-	self.core.lcd = {LCOLS=1, LROWS=1, XRES=7, YRES=8, specialChars = {}}
+	self.core.lcd = {LCOLS=self.db.profile.cols, LROWS=self.db.profile.rows, XRES=self.db.profile.xres, YRES=self.db.profile.yres, specialChars = {}}
 	
 	self.buffer = LibBuffer:New("Icons", self.core.lcd.LCOLS * self.core.lcd.LROWS, 0, StarTip.db.profile.errorLevel)
 	
@@ -182,6 +202,7 @@ local function createIcons()
 	for k, icon in pairs(mod.db.profile.icons) do
 		if icon.enabled then
 			local icon = WidgetIcon:New(mod.core, "icon", copy(icon), icon.row or 0, icon.col or 0, icon.layer or 0, StarTip.db.profile.errorLevel, draw)
+			StarTip:Print(icon.row)
 			icon:SetupChars()
 			tinsert(mod.icons, icon)
 		end
@@ -246,7 +267,7 @@ function draw(widget)
 	local row = widget.row
 	local col = widget.col
 	local layer = widget.layer
-	local n = row * lcd.LCOLS + col	
+	local n = row * lcd.YRES * lcd.LCOLS + col * lcd.XRES
 	
 	local icon = widget.icon
 			
@@ -256,11 +277,13 @@ function draw(widget)
 	for y = 0 , lcd.YRES - 1 do
 		local mask = bit.lshift(1, lcd.XRES)
 		for x = 0, lcd.XRES - 1 do
+			local n = (row * lcd.YRES + y) * lcd.LCOLS * lcd.XRES + col * lcd.XRES + x
+			local n = (row + y) * lcd.LCOLS * lcd.XRES + col + x
 			mask = bit.rshift(mask, 1)
 			if bit.band(chr[y + 1], mask) == 0 then
-				mod.buffer.buffer[(row * lcd.YRES + y) * lcd.LCOLS * lcd.XRES + col * lcd.XRES + x] = 1
+				mod.buffer.buffer[n] = 1
 			else
-				mod.buffer.buffer[(row * lcd.YRES + y) * lcd.LCOLS * lcd.XRES + col * lcd.XRES + x] = 0
+				mod.buffer.buffer[n] = 0
 			end
 		end
 	end
@@ -268,41 +291,48 @@ function draw(widget)
 	update()
 end
 
-local first = true
 function update()
-		
-			local str = ""
-			local size = mod.core.lcd.LCOLS * mod.core.lcd.XRES * (strlen(format("|T%s:%d|t", textures[1], mod.db.profile.size or 10)))
-			--[[for row = 0, mod.core.lcd.LROWS - 1 do
-				for y = 0, mod.core.lcd.YRES - 1 do
-					if StarTip.leftLines[row * mod.core.lcd.YRES + y] then
-						local text = StarTip.leftLines[row * mod.core.lcd.YRES + y]:GetText() or ""
-						if text then
-							text = string.sub(text, size)
-						end
-						StarTip.leftLines[row * mod.core.lcd.YRES + y]:SetText(text)
+	local lcd = mod.core.lcd
+	local text = format('|T%s:%d|t', textures[0], mod.db.profile.size or 10)
+	local buffers = {}
+	for row = 0, lcd.LROWS do
+		for col = 0, lcd.LCOLS do
+			for y = 0, lcd.YRES - 1 do
+				for x = 0, lcd.XRES - 1 do
+					local n = (row * lcd.YRES + y) * lcd.LCOLS * lcd.XRES + col * lcd.XRES + x
+					local n = (row + y) * lcd.LCOLS * lcd.XRES + col + x
+					local color = mod.buffer.buffer[n] or 0
+					local text = format('|T%s:%d|t', textures[color], mod.db.profile.size or 10)
+					if not buffers[row + y] then
+						buffers[row + y] = LibBuffer:New("tmp.icon", 0, text)
 					end
-				end
-			end]]
-			for row = 0, mod.core.lcd.LROWS - 1 do
-				for col = 0, mod.core.lcd.LCOLS - 1 do
-					for r = 0, mod.core.lcd.YRES - 1 do
-						for c = 0, mod.core.lcd.XRES - 1 do
-						
-							local color = mod.buffer.buffer[(row * mod.core.lcd.YRES + r) * mod.core.lcd.LCOLS * mod.core.lcd.XRES + col * mod.core.lcd.XRES + c]
-							str = str .. format('|T%s:%d|t', textures[color] or "", mod.db.profile.size or 10)
-						end
-						if StarTip.leftLines[r + row + 2] then 
-							StarTip.leftLines[r + row + 2]:SetText(str)
-							str = ""
-						end
-					end
+					buffers[row + y]:Replace(col * lcd.XRES + x, text)
 				end
 			end
-			if UnitExists(StarTip.unit) then
-				GameTooltip:Show()
+		end
+	end
+	
+	for row = 0, lcd.LROWS - 1 do
+		for col = 0, lcd.LCOLS - 1 do		
+			for y = 0, lcd.YRES - 1 do
+				for x = 0, lcd.XRES - 1 do
+					local n = (row * lcd.YRES + y) * lcd.LCOLS * lcd.XRES + col * lcd.XRES + x
+					local n = (row + y) * lcd.LCOLS * lcd.XRES + col + x
+					if StarTip.leftLines[row + y + 2] and buffers[row + y] then 
+						StarTip.leftLines[row + y + 2]:SetText(buffers[row + y]:AsString())
+					end			
+				end
 			end
-			first = false
+		end
+	end
+			
+	if UnitExists(StarTip.unit) then
+		GameTooltip:Show()
+	end
+	
+	for k, buffer in pairs(buffers) do
+		buffer:Del()
+	end
 end
 
 function mod:SetUnit()
