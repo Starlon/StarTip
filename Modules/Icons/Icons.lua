@@ -46,7 +46,7 @@ local defaults = {
 				["col"] = 1
 			},
 			[2] = {
-				["enabled"] = true,
+				["enabled"] = false,
 				["name"] = "EKG",
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....|.....|.....",
@@ -109,7 +109,6 @@ local defaults = {
 			},
 			[6] = {
 				["name"] = "Rain",
-				["enabled"] = true,
 				["bitmap"] = {
 					["row1"] = "...*.|.....|.....|.*...|....*|..*..|.....|*....",
 					["row2"] = "*....|...*.|.....|.....|.*...|....*|..*..|.....",
@@ -139,6 +138,33 @@ local defaults = {
 				["speed"] = foo,
 			},
 			[8] = {
+				["enabled"] = true,
+				["name"] = "Clock",
+				["bitmap"] = {
+					["row1"] = ".....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|}",
+					["row2"] = ".+++.|.+*+.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.+**.|.***.|",
+					["row3"] = "+++++|++*++|++**+|++***|++**.|++**.|++***|++***|++***|++***|++***|*****|*****|",
+					["row4"] = "+++++|++*++|++*++|++*++|++***|++***|++***|++***|++***|++***|*****|*****|*****|",
+					["row5"] = "+++++|+++++|+++++|+++++|+++++|+++**|+++**|++***|+****|*****|*****|*****|*****|",
+					["row6"] = ".+++.|.+++.|.+++.|.+++.|.+++.|.+++.|.++*.|.+**.|.***.|.***.|.***.|.***.|.***.|",
+					["row7"] = ".....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|",
+					["row8"] = ".....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|"
+				},
+				["speed"] = foo,
+				["script"] = [[
+return Health(unit)
+]],				
+				["max"] = [[
+return MaxHealth(unit)
+]],
+				["min"] = [[
+return 0			
+]],
+				["row"] = 0,
+				["col"] = 0
+			},			
+			[9] = {
+				["enabled"] = false,
 				["name"] = "Clock",
 				["bitmap"] = {
 					["row1"] = ".....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|",
@@ -151,8 +177,10 @@ local defaults = {
 					["row8"] = ".....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|.....|"
 				},
 				["speed"] = foo,
+				["row"] = 0,
+				["col"] = 0
 			},
-			[9] = {
+			[10] = {
 				["name"] = "Wave",
 				["bitmap"] = {
 					["row1"] = "..**.|.**..|**...|*....|.....|.....|.....|.....|....*|...**",
@@ -210,7 +238,6 @@ local function createIcons()
 	for k, icon in pairs(mod.db.profile.icons) do
 		if icon.enabled then
 			local icon = WidgetIcon:New(mod.core, "icon", copy(icon), icon.row or 0, icon.col or 0, icon.layer or 0, StarTip.db.profile.errorLevel, draw)
-			StarTip:Print(icon.row)
 			icon:SetupChars()
 			tinsert(mod.icons, icon)
 		end
@@ -314,7 +341,6 @@ function update()
 					if not buffers[row * lcd.YRES + y] then
 						buffers[row * lcd.YRES + y] = LibBuffer:New("tmp.icon", lcd.LCOLS * lcd.XRES, text1)
 					end
-					StarTip:Print(col * lcd.XRES + x)
 					buffers[row * lcd.YRES + y]:Replace(col * lcd.XRES + x, text)
 					--StarTip.leftLines[row * lcd.YRES + y]:SetText(mod.lines[row * lcd.YRES])
 				end
