@@ -780,11 +780,12 @@ function StarTip:GameTooltipShow(...)
 	
 	if not show then GameTooltip:Hide(); return end
 
+	--[[
 	for k, v in StarTip:IterateModules() do
 		if v.GameTooltipShow and v:IsEnabled() then 
 			show = show and v:GameTooltipShow(...)
 		end
-	end
+	end]]
 	
 	if show then
 		StarTip.hooks[GameTooltip].Show(...)

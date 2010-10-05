@@ -18,7 +18,10 @@ local defaults = {
 				enabled = true,
 				gestures = {{type="line", pattern="right"}, {type="line", pattern="left"}, {type="line", pattern="right"}, {type="line", pattern="left"}},
 				expression = [[
---_G.GameTooltip:Hide()
+_G.GameTooltip:SetOwner(_G.UIParent, "ANCHOR_CURSOR")
+_G.GameTooltip:SetParent(_G.UIParent)
+_G.GameTooltip:SetUnit("player")
+_G.GameTooltip:Show()
 ]]
 			}
 		}

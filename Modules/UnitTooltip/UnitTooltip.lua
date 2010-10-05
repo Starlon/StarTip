@@ -589,7 +589,7 @@ function mod:OnHide()
 end
 ]]
 
-function mod.GameTooltipHide()
+function mod.OnHide()
 	for i, v in ipairs(lines) do
 		if v.leftObj then
 			v.leftObj:Stop()
