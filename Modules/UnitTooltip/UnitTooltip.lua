@@ -303,6 +303,30 @@ return SpecText(unit)
 		update = 1000
 	},
 	[19] = {
+		name = "Current Role",
+		left = [[
+return "Current Role:"		
+]],
+		right = [[
+return GetRole(unit)
+]],
+		rightUpdating = true,
+		enabled = true,
+		update = 1000
+	},
+	[20] = {
+		name = "Old Role",
+		left = [[
+return "Old Role:"
+]],
+		right = [[
+return select(2, GetRole(unit))
+]],
+		rightUpdating = true,
+		enabled = true,
+		update = 1000
+	},
+	[21] = {
 		name = "Range",
 		left = [[
 local min, max = RangeCheck:GetRange(unit)
