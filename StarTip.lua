@@ -635,53 +635,16 @@ function StarTip.OnTooltipSetUnit(...)
 	end
 	lastTime = GetTime()
 	
-	StarTip.fading = false
+	--StarTip.fading = false
 	StarTip.unit = unit
-		
-	--[[
-	if not UnitExists("mouseover") then
-		if UnitInRaid("player") then
-			for i=1, GetNumRaidMembers() do
-				for j, v in ipairs(UNIT_RAID_GROUPS) do
-					if unit == UnitName(v .. i) then
-						StarTip.unit = v .. i
-						break
-					end
-				end
-				if StarTip.unit ~= "mouseover" then break end
-			end
-		elseif UnitInParty("player") then
-			for i=1, GetNumPartyMembers() do
-				for j, v in ipairs(UNIT_PARTY_GROUPS) do
-					if unit == UnitName(v .. i) then
-						StarTip.unit = v .. i
-						break
-					end
-				end
-				if StarTip.unit ~= "mouseover" then break end
-			end
-		end
-		for i, v in ipairs(SINGLETON_CLASSIFICATIONS) do
-			if unit == UnitName(v) then
-				StarTip.unit = v
-			end
-		end
-	end
-	]]
-	if not UnitExists(StarTip.unit) then GameTooltip:Hide(); return end
-	
-	--[[if StarTip.unit ~= "mouseover" then
-		unitFrameTimer = unitFrameTimer or LibTimer:New("StarTip.Throttle", 2, false, unitFrameHide, nil, StarTip.db.profile.errorLevel)
-		unitFrameTimer:Start()
-	end]]
-	
+			
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
 		end
 	end
 	StarTip.justSetUnit = nil
-	checkTooltipAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
+	--checkTooltipAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
 end
 
 function StarTip.OnTooltipSetItem(self, ...)	
