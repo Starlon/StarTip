@@ -152,7 +152,7 @@ function mod:GameTooltipFadeOut(this, ...)
 		return true
 	end
 	local kind
-	if UnitExists(StarTip.unit or "mouseover") then
+	if self.isUnit then
 		if GameTooltip:IsOwned(UIParent) then
 			kind = self.db.profile.units
 		else
@@ -165,12 +165,14 @@ function mod:GameTooltipFadeOut(this, ...)
 			kind = self.db.profile.otherFrames
 		end
 	end
+	self.isUnit = false
 	if kind == 2 then
 		return true
 	else
 		self.justHide = true
 		GameTooltip:Hide()
 	end
+
 end
 
 function mod:GameTooltipHide(this, ...)
@@ -179,7 +181,7 @@ function mod:GameTooltipHide(this, ...)
 		return true
 	end
 	local kind
-	if UnitExists(StarTip.unit or "mouseover") then
+	if self.isUnit then
 		if GameTooltip:IsOwned(UIParent) then
 			kind = self.db.profile.units
 		else
@@ -192,6 +194,7 @@ function mod:GameTooltipHide(this, ...)
 			kind = self.db.profile.otherFrames
 		end
 	end
+	self.isUnit = false
 	if kind == 2 then
 		self.justFade = true
 		GameTooltip:FadeOut()
@@ -200,3 +203,6 @@ function mod:GameTooltipHide(this, ...)
 	end
 end
 
+function mod:SetUnit()
+	self.isUnit = true
+end
