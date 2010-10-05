@@ -418,12 +418,12 @@ function StarTip:OnInitialize()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", menuoptions)
 	AceConfigDialog:SetDefaultSize("StarTip-Addon", 800, 450)
 	self:RegisterChatCommand("startip", "OpenConfig")
-	AceConfigDialog:AddToBlizOptions("StarTip-Addons-Menu")
+	AceConfigDialog:AddToBlizOptions("StarTip")
 	LibDBIcon:Register("StarTipLDB", LDB, self.db.profile.minimap)
 
 	if not options.args.Profiles then
  		options.args.Profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-		self.lastConfig = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("StarTip", "Profiles", "StarTip", "Profiles")
+		self.lastConfig = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("StarTip-Addon", "Profiles", "StarTip-Addon", "Profiles")
 	end
 	
 	local leftGameTooltipStrings, rightGameTooltipStrings = {}, {}
