@@ -1,6 +1,7 @@
 local mod = StarTip:NewModule("Gestures")
 mod.name = "Gestures"
 mod.toggled = true
+mod.defaultOff = true
 local WidgetGestures = LibStub("LibScriptableDisplayWidgetGestures-1.0")
 local LibCore = LibStub("LibScriptableDisplayCore-1.0")
 local _G = _G
