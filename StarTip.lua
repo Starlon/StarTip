@@ -13,6 +13,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("StarTip")
 local LibCore = LibStub("LibScriptableDisplayCore-1.0")
 local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
 local PluginTalents = LibStub("LibScriptableDisplayPluginTalents-1.0")
+local WidgetTimer = LibStub("LibScriptableDisplayWidgetTimer-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
