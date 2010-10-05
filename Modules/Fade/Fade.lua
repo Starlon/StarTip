@@ -83,8 +83,6 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-	self:RawHook(GameTooltip, "FadeOut", "GameTooltipFadeOut", true)
-	self:RawHook(GameTooltip, "Hide", "GameTooltipHide", true)
 	StarTip:SetOptionsDisabled(options, false)
 end
 
@@ -151,17 +149,15 @@ end
 function mod:GameTooltipFadeOut(this, ...)
 	if self.justFade then
 		self.justFade = nil
-		self.hooks[this].FadeOut(this, ...)
-		return
+		return true
 	end
 	local kind
-	if self.isUnit then
+	if UnitExists(StarTip.unit or "mouseover") then
 		if GameTooltip:IsOwned(UIParent) then
 			kind = self.db.profile.units
 		else
 			kind = self.db.profile.unitFrames
 		end
-		self.isUnit = nil
 	else
 		if GameTooltip:IsOwned(UIParent) then
 			kind = self.db.profile.objects
@@ -170,7 +166,7 @@ function mod:GameTooltipFadeOut(this, ...)
 		end
 	end
 	if kind == 2 then
-		self.hooks[this].FadeOut(this, ...)
+		return true
 	else
 		self.justHide = true
 		GameTooltip:Hide()
@@ -180,16 +176,15 @@ end
 function mod:GameTooltipHide(this, ...)
 	if self.justHide then
 		self.justHide = nil
-		return self.hooks[this].Hide(this, ...)
+		return true
 	end
 	local kind
-	if self.isUnit then
+	if UnitExists(StarTip.unit or "mouseover") then
 		if GameTooltip:IsOwned(UIParent) then
 			kind = self.db.profile.units
 		else
 			kind = self.db.profile.unitFrames
 		end
-		self.isUnit = nil
 	else
 		if GameTooltip:IsOwned(UIParent) then
 			kind = self.db.profile.objects
@@ -199,13 +194,9 @@ function mod:GameTooltipHide(this, ...)
 	end
 	if kind == 2 then
 		self.justFade = true
-		return GameTooltip:FadeOut()
+		GameTooltip:FadeOut()
 	else
-		return self.hooks[this].Hide(this, ...)
+		return true
 	end
-end
-
-function mod:SetUnit()
-	self.isUnit = true
 end
 

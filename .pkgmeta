@@ -65,3 +65,4 @@ move-folders:
     StarTip/Modules/UnitTooltip: StarTip_UnitTooltip
     StarTip/Modules/Portrait: StarTip_Portrait
     StarTip/Modules/Icons: StarTip_Icons
+    StarTip/Modules/Gestures: StarTip_Gestures

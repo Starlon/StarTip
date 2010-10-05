@@ -573,7 +573,23 @@ function mod:CreateLines()
     end})
 end
 
+--[[
 function mod:OnHide()
+	for i, v in ipairs(lines) do
+		if v.leftObj then
+			v.leftObj:Stop()
+		end
+		if v.rightObj then
+			v.rightObj:Stop()
+		end
+	end
+	if self.timer then
+		self.timer:Stop()
+	end
+end
+]]
+
+function mod.GameTooltipHide()
 	for i, v in ipairs(lines) do
 		if v.leftObj then
 			v.leftObj:Stop()

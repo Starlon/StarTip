@@ -42,12 +42,10 @@ for i, v in ipairs(anchors) do
 end
 
 local function copy(tbl)
+	if type(tbl) ~= "table" then return tbl end
 	local newTbl = {}
 	for k, v in pairs(tbl) do
-		if type(v) == "table" then
-			v = copy(v)
-		end
-		newTbl[k] = v
+		newTbl[k] = copy(v)
 	end
 	return newTbl
 end

@@ -479,10 +479,11 @@ function StarTip:OnEnable()
 	GameTooltip:HookScript("OnTooltipSetSpell", self.OnTooltipSetSpell)
 	self:RawHookScript(GameTooltip, "OnHide", "OnTooltipHide")
 	self:RawHookScript(GameTooltip, "OnShow", "OnTooltipShow")
-	self:SecureHook(GameTooltip, "Show", self.GameTooltipShow)
+	self:RawHook(GameTooltip, "FadeOut", "GameTooltipFadeOut", true)
+	self:RawHook(GameTooltip, "Hide", "GameTooltipHide", true)
+	self:RawHook(GameTooltip, "Show", "GameTooltipShow", true)
 	self:SecureHook(GameTooltip, "AddDoubleLine", self.GameTooltipAddLine)
 	self:SecureHook(GameTooltip, "AddLine", self.GameTooltipAddLine)
-	self:SecureHook(GameTooltip, "FadeOut", self.GameTooltipFade)
 	
 	for k,v in self:IterateModules() do
 		if (self.db.profile.modules[k]  == nil and not v.defaultOff) or self.db.profile.modules[k] then
@@ -710,6 +711,20 @@ function StarTip:HideAll()
 	end
 end
 
+function StarTip:GameTooltipHide(...)
+	local hide = true
+	
+	for k, v in StarTip:IterateModules() do
+		if v.GameTooltipHide and v:IsEnabled() then 
+			hide = hide and v:GameTooltipHide(...)
+		end
+	end
+	
+	if hide then
+		StarTip.hooks[GameTooltip].Hide(...)
+	end
+end
+
 function StarTip:OnTooltipHide(...)
 	if not self.justHide then
 		for k, v in self:IterateModules() do
@@ -763,7 +778,17 @@ function StarTip:GameTooltipShow(...)
 			end
 	end
 	
-	if not show then GameTooltip:Hide() end
+	if not show then GameTooltip:Hide(); return end
+
+	for k, v in StarTip:IterateModules() do
+		if v.GameTooltipShow and v:IsEnabled() then 
+			show = show and v:GameTooltipShow(...)
+		end
+	end
+	
+	if show then
+		StarTip.hooks[GameTooltip].Show(...)
+	end
 end
 
 function StarTip.OnTooltipShow(...)
@@ -778,9 +803,15 @@ function StarTip.OnTooltipShow(...)
 	return StarTip.hooks[GameTooltip].OnShow(...)
 end
 
-function StarTip.GameTooltipFade(...) 
+function StarTip:GameTooltipFadeOut(...) 
+	local fadeOut = true
 	for k, v in StarTip:IterateModules() do
-		if v.OnFadeOut and v:IsEnabled() then v:OnFadeOut(...) end
+		if v.GameTooltipFadeOut and v:IsEnabled() then 
+			fadeOut = fadeOut and v:GameTooltipFadeOut(...)
+		end
+	end
+	if fadeOut then
+		StarTip.hooks[GameTooltip].FadeOut(...)
 	end
 end
 
