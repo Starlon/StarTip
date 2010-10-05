@@ -19,7 +19,8 @@ local defaults = {
 				enabled = true,
 				gestures = {{type="line", pattern="right"}, {type="line", pattern="left"}, {type="line", pattern="right"}, {type="line", pattern="left"}},
 				expression = [[
-_G.StarTip.unit = nil
+_G.StarTip.unit = true
+_G.GameTooltip:Hide()
 ]]
 			}
 		}
