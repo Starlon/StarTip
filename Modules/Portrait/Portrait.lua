@@ -120,6 +120,27 @@ function mod:SetUnit()
 	self.text:SetFormattedText('|T%s:%d|t %s', self.texture:GetTexture(), self.db.profile.size, self.text:GetText() or "") -- we only need a blank space for the texture
 end
 
+function mod:SetItem()
+	if not self.text then return end
+	
+	local link = select(2, GameTooltip:GetItem())
+	
+	if link then
+		--make sure the icon does not display twice on recipies, which fire OnTooltipSetItem twice
+		self.text:SetFormattedText('|T%s:%d|t%s', GetItemIcon(link), 36, self.text:GetText())
+	end
+end
+
+function mod:SetSpell()
+	if not self.text then return end
+	
+	local id = select(3, GameTooltip:GetSpell())
+	local icon = id and select(3, GetSpellInfo(id))
+	if icon then
+		self.text:SetFormattedText('|T%s:%d|t%s', icon, 36, self.text:GetText())
+	end
+end
+
 function mod:OnHide()
 	self.model:Hide()
 	self.texture:Hide()
