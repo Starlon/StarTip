@@ -213,7 +213,7 @@ local function clearBar(obj)
 end
 
 function mod:ClearBars()
-	for k, v in pairs(mod.bars) do
+	for k, v in pairs(mod.bars or {}) do
 		clearBar(v)
 	end
 	wipe(mod.bars)
@@ -312,6 +312,7 @@ function mod:ReInit()
 			self.db.profile.bars[k] = copy(v)
 		end
 	end	
+	self.bars = {}
 end
 
 function mod:OnInitialize()

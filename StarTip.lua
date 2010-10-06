@@ -122,7 +122,7 @@ local defaults = {
 		objectShow = 1,
 		unitFrameShow = 1,
 		otherFrameShow = 1,
-		errorLevel = 1,
+		errorLevel = 2,
 		throttleVal = 0,
 		intersectRate = 200
 	}

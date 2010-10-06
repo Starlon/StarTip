@@ -359,6 +359,7 @@ function mod:ReInit()
 			tinsert(self.db.profile.histograms, copy(v))
 		end
 	end
+	
 end
 
 function mod:OnInitialize()
