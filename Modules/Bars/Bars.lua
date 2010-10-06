@@ -312,7 +312,7 @@ function mod:ReInit()
 			self.db.profile.bars[k] = copy(v)
 		end
 	end	
-	self.bars = {}
+	
 end
 
 function mod:OnInitialize()
