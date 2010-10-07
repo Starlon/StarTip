@@ -609,7 +609,7 @@ end
 
 local hideTimer
 local function hideTooltip()
-	if StarTip.unit ~= "mouseover" and GetMouseFocus() == WorldFrame then StarTip.unit = nil; return end
+	if StarTip.unit ~= "mouseover" and GetMouseFocus() == WorldFrame then StarTip.unit = "mouseover"; return end
 	hideTimer:Start()
 end
 
@@ -625,6 +625,8 @@ function StarTip.OnTooltipSetUnit(...)
 
 	local _, unit = GameTooltip:GetUnit()
 
+	if not unit then return end
+	
 	hideTimer = hideTimer or LibTimer:New("StarTip.Hide", 100, false, hideTooltip, nil, StarTip.db.profile.errorLevel)
 	hideTimer:Start()
 	
