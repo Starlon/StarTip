@@ -267,7 +267,7 @@ return MaxHealth(unit)
 return 0			
 ]],
 				["fg_color"] = [[
-return MaxHealth(unit) / Health(unit)				
+return Health(unit)	/ MaxHealth(unit)
 ]],
 				["row"] = 0,
 				["col"] = 0
@@ -296,7 +296,7 @@ return MaxPower(unit)
 return 0			
 ]],
 				["fg_color"] = [[
-return MaxPower(unit) / Power(unit)			
+return Power(unit) / MaxPower(unit)
 ]],
 				["row"] = 0,
 				["col"] = 1
