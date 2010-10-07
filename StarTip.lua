@@ -9,6 +9,7 @@ local LSM = _G.LibStub("LibSharedMedia-3.0")
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("StarTip")
+StarTip.L = L
 
 local LibCore = LibStub("LibScriptableDisplayCore-1.0")
 local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
