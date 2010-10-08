@@ -146,7 +146,7 @@ return SmartRace(unit)
 ]],
 		enabled = true,
     },
-    [10] = {
+    [8] = {
         name = "Class",
         left = 'return "Class:"',
         right = [[
