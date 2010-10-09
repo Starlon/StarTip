@@ -599,12 +599,17 @@ function StarTip:OpenConfig()
 	AceConfigDialog:Open("StarTip-Addon")	
 end
 
+function StarTip:HideTooltip()
+	GameTooltip:Hide()
+	self.tooltipHidden = true
+end
+
+function StarTip:ShowTooltip()
+	self.tooltipHidden = false
+	GameTooltip:Show()
+end
+
 function StarTip.GameTooltipAddLine(...)
-	do return end
-	if StarTip.addingLine then return ... end
-	local mod = StarTip:GetModule("UnitTooltip")
-	mod.NUM_LINES = mod.NUM_LINES + 1
-	return ...
 end
 
 local hideTimer
@@ -706,6 +711,7 @@ end
 
 
 function StarTip:GameTooltipShow(...)
+	
 	local show = true
 	if StarTip.db.profile.modifier > 1 and type(modFuncs[StarTip.db.profile.modifier]) == "function" then
 		if not modFuncs[StarTip.db.profile.modifier]() then	
@@ -743,6 +749,8 @@ function StarTip:GameTooltipShow(...)
 				show = false
 			end
 	end
+
+	show = not StarTip.tooltipHidden
 	
 	if not show then GameTooltip:Hide(); return end
 
