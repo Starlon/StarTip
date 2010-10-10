@@ -625,7 +625,7 @@ function StarTip.OnTooltipSetUnit(...)
 
 	local _, unit = GameTooltip:GetUnit()
 
-	if not unit or StarTip.tooltipHidden then GameTooltip:Hide(); return end
+	if not unit or StarTip.tooltipHidden then GameTooltip:Hide() return end
 
 	hideTimer = hideTimer or LibTimer:New("StarTip.Hide", 100, false, hideTooltip, nil, StarTip.db.profile.errorLevel)
 	hideTimer:Start()
@@ -668,7 +668,6 @@ function StarTip.OnTooltipSetSpell(...)
 		end
 	end
 	StarTip.justSetSpell = nil
-	return ...
 end
 
 function StarTip:HideAll()
@@ -682,11 +681,13 @@ end
 function StarTip:GameTooltipHide(...)
 	local hide = true
 	
+	--[[
 	for k, v in StarTip:IterateModules() do
 		if v.GameTooltipHide and v:IsEnabled() then 
 			hide = hide and v:GameTooltipHide(...)
 		end
 	end
+	]]
 	
 	if hide then
 		StarTip.hooks[GameTooltip].Hide(...)
@@ -746,9 +747,7 @@ function StarTip:GameTooltipShow(...)
 				show = false
 			end
 	end
-	
-	show = StarTip.tooltipHidden and false or show
-	
+		
 	if not show or StarTip.tooltipHidden then GameTooltip:Hide(); return end
 
 	--[[
@@ -764,6 +763,7 @@ function StarTip:GameTooltipShow(...)
 end
 
 function StarTip.OnTooltipShow(...)
+
 	if not StarTip.justShow then
 		for k, v in StarTip:IterateModules() do
 			if v.OnShow and v:IsEnabled() then v:OnShow(...) end
