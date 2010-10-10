@@ -154,9 +154,7 @@ local options = {
 					type = "input",
 					set = function(info, v)
 						tinsert(timers, v)
-						StarTip:RebuildOptsions()
-						StarTip:OnDisable()
-						StarTip:OnEnable()
+						StarTip:RebuildOpts()
 						StarTip:SetupTimers()						
 					end, 
 					order = 1
@@ -168,9 +166,7 @@ local options = {
 					func = function()
 						StarTip.db.profile.timers = nil						
 						StarTip:SetupTimers()											
-						StarTip:RebuildOpts()
-						StarTip:OnDisable()
-						StarTip:OnEnable()						
+						StarTip:RebuildOpts()					
 					end,
 					order = 2
 				}

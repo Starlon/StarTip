@@ -263,7 +263,7 @@ return value
 		name = "Memory Usage",
 		left = "return 'Memory Usage:'",
 		right = [[
-local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip")
+local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip", true)
 if mem then
     local num = floor(memperc)
     if num < 1 then num = 1 end
@@ -280,7 +280,7 @@ end
 		desc = "Note that you must turn on CPU profiling",
 		left = 'return "CPU Usage:"',
 		right = [[
-local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip")
+local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip", true)
 if cpu then
     local num = floor(cpuperc)
     if num < 1 then num = 1 end
