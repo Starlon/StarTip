@@ -15,8 +15,6 @@
 <Script file = "Modules\Portrait\Portrait.lua"/>
 <Script file = "Modules\Icons\Icons.lua"/>
 <Script file = "Modules\Gestures\Gestures.lua"/>
-<Script file = "Modules\Images\Images.lua"/>
-<Script file = "Modules\AVS\AVS.lua"/>
 <Script file = "Modules\Debug\Debug.lua"/>
 <!--@end-debug@-->
 
