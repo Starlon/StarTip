@@ -1,5 +1,5 @@
 ## Interface: 40300
-## Title: StarTip_Bars
+## Title: StarTip[Bars]
 ## Notes: Tooltips from outerspace
 ## Author: Starlon
 ## Version: 1.0
