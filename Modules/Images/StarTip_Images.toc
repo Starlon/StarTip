@@ -1,9 +1,9 @@
-## Interface: 30300
+## Interface: 40300
 ## X-Compatible-With: 40000
 ## Title: StarTip [Images]
 ## Notes: Tooltips from outerspace
 ## Author: Starlon
 ## Version: 1.0
-## OptionalDeps: StarTip
+## Deps: StarTip
 
 Images.lua

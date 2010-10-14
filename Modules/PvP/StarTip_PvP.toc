@@ -1,9 +1,8 @@
-## Interface: 30300
-## X-Compatible-With: 40000
+## Interface: 40300
 ## Title: StarTip [PvP]
 ## Notes: Tooltips from outerspace
 ## Author: Starlon
 ## Version: 1.0
-## OptionalDeps: StarTip
+## Deps: StarTip
 
 PvP.lua
