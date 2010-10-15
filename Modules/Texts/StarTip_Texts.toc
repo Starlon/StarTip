@@ -1,4 +1,4 @@
-## Interface: 40300
+## Interface: 40000
 ## Title: StarTip [Texts]
 ## Notes: Tooltips from outerspace
 ## Author: Starlon

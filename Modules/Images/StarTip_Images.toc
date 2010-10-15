@@ -1,5 +1,4 @@
-## Interface: 40300
-## X-Compatible-With: 40000
+## Interface: 40000
 ## Title: StarTip [Images]
 ## Notes: Tooltips from outerspace
 ## Author: Starlon
