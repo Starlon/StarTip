@@ -2,7 +2,7 @@
 ## Title: StarTip
 ## Notes: Tooltips from outerspace
 ## Author: Starlon
-## Version: 1.0
+## Version: @project-version@
 ## X-Category: Interface Enhancements
 ## X-Embeds: Ace3, LibTalentQuery-1.0
 ## X-License: GPL v3
