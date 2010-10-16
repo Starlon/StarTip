@@ -340,7 +340,7 @@ local positionTooltip = function()
 	
 	if x ~= oldX or y ~= oldY then
 		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", (x + xoffset) / effScale, (y + yoffset) / effScale)
+		GameTooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", (x + xoffset) / effScale, (y + yoffset) / effScale + 5)
 	end
 	oldX, oldY = x, y
 end

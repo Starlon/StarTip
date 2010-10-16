@@ -138,7 +138,20 @@ return format("%s%s", Level(unit), Colorize(classification and (' ' .. classific
 ]],
 		enabled = true,
     },
-    [7] = {
+	[7] = {
+		name = "Gender",
+		left = 'return "Gender:"',
+		right = [[
+local sex = UnitSex(unit)
+if sex == 2 then
+    return "Male"
+elseif sex == 3 then
+    return "Female"
+end		
+]],
+		enabled = true
+	},
+    [8] = {
         name = "Race",
         left = 'return "Race:"',
         right = [[
@@ -146,7 +159,7 @@ return SmartRace(unit)
 ]],
 		enabled = true,
     },
-    [8] = {
+    [9] = {
         name = "Class",
         left = 'return "Class:"',
         right = [[
@@ -161,7 +174,7 @@ return Colorize(UnitClass(unit), r, g, b)
 ]],
 		enabled = true,
     },
-	[9] = {
+	[10] = {
 	name = "Druid Form",
 	left = 'return "Form:"',
 	right = [[
@@ -169,7 +182,7 @@ return DruidForm(unit)
 ]],
 	enabled = true
 	},
-    [10] = {
+    [11] = {
         name = "Faction",
         left = 'return "Faction:"',
         right = [[
@@ -177,7 +190,7 @@ return Faction(unit)
 ]],
 		enabled = true,
     },
-    [11] = {
+    [12] = {
         name = "Status",
         left = 'return "Status:"',
         right = [[
@@ -200,7 +213,7 @@ return "Alive"
 		update = 1000,
 		rightUpdating = true
     },
-    [12] = {
+    [13] = {
         name = "Health",
         left = 'return "Health:"',
         right = [[
@@ -218,7 +231,7 @@ return value
 		update = 1000,
 		enabled = true
     },
-    [13] = {
+    [14] = {
         name = "Mana",
         left = [[
 return PowerName(unit)
@@ -239,13 +252,7 @@ return value
 		enabled = true,
 		update = 1000
     },
-    [14] = {
-        name = "Location",
-        left = 'return "Location:"',
-        right = "return nil",
-		enabled = true
-    },
-	[15] = {
+	[16] = {
 		name = "Marquee",
 		left = 'return "StarTip " .. _G.StarTip.version',
 		leftUpdating = true,
@@ -259,7 +266,7 @@ return value
 		direction = WidgetText.SCROLL_LEFT,
 		dontRtrim = true
 	},
-	[16] = {
+	[17] = {
 		name = "Memory Usage",
 		left = "return 'Memory Usage:'",
 		right = [[
@@ -275,7 +282,7 @@ end
 		rightUpdating = true,
 		update = 1000
 	},
-	[17] = {
+	[18] = {
 		name = "CPU Usage",
 		desc = "Note that you must turn on CPU profiling",
 		left = 'return "CPU Usage:"',
@@ -292,7 +299,7 @@ end
 		rightUpdating = true,
 		update = 1000
 	},
-	[18] = {
+	[19] = {
 		name = "Talents",
 		left = "return 'Talents:'",
 		right = [[
@@ -302,7 +309,7 @@ return SpecText(unit)
 		enabled = true,
 		update = 1000
 	},
-	[19] = {
+	[20] = {
 		name = "Current Role",
 		left = [[
 return "Current Role:"		
@@ -314,7 +321,7 @@ return GetRole(unit)
 		enabled = true,
 		update = 1000
 	},
-	[20] = {
+	[21] = {
 		name = "Old Role",
 		left = [[
 return "Old Role:"
@@ -326,7 +333,7 @@ return select(2, GetRole(unit))
 		enabled = true,
 		update = 1000
 	},
-	[21] = {
+	[22] = {
 		name = "Range",
 		left = [[
 local min, max = RangeCheck:GetRange(unit)
