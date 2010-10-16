@@ -252,6 +252,60 @@ return value
 		enabled = true,
 		update = 1000
     },
+	[15] = {
+		name = "Effects",
+		left = "return 'Effects'",
+		right = [[
+local name = Name(unit)
+if UnitIsBanished(unit) then
+    return "Banished..."
+elseif UnitIsCharmed(unit) then
+    return "Charmed..."
+elseif UnitIsConfused(unit) then
+    return "Confused..."
+elseif UnitIsDisoriented(unit) then
+    return "Disoriented..."
+elseif UnitIsFeared(unit) then
+    return "Feared..."
+elseif UnitIsFrozen(unit) then
+    return "Frozen..."
+elseif UnitIsHorrified(unit) then
+    return "Horrified..."
+elseif UnitIsIncapacitated(unit) then
+    return "Incapacitated..." 
+elseif UnitIsPolymorphed(unit) then
+    return "Polymorphed..."
+elseif UnitIsSapped(unit) then
+    return "Sapped..."
+elseif UnitIsShackled(unit) then
+    return "Shackled..."
+elseif UnitIsAsleep(unit) then
+    return "Asleep..."
+elseif UnitIsStunned(unit) then
+    return "Stunned..."
+elseif UnitIsTurned(unit) then
+    return "Turned..."
+elseif UnitIsDisarmed(unit) then
+    return "Disarmed..."
+elseif UnitIsPacified(unit) then
+    return "Pacified..."
+elseif UnitIsRooted(unit) then
+    return "Rooted..."
+elseif UnitIsSilenced(unit) then
+    return "Silenced..."
+elseif UnitIsEnsnared(unit) then
+    return "Ensnared..."
+elseif UnitIsEnraged(unit) then
+    return "Enraged..."
+elseif UnitIsWounded(unit) then
+    return "Wounded..."
+end
+return "Has Control..."	
+]],
+		rightUpdating = true,
+		enabled = true,
+		update = 500,
+	},
 	[16] = {
 		name = "Marquee",
 		left = 'return "StarTip " .. _G.StarTip.version',
