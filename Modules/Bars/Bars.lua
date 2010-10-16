@@ -365,7 +365,7 @@ function mod:SetUnit()
 	unit = GameTooltip:GetUnit()
 	GameTooltipStatusBar:Hide()
 	createBars()
-	for i, bar in pairs(self.bars) do
+	for i, bar in pairs(self.bars or {}) do
 		bar:Start()
 		bar.bar:Show()
 		if bar.secondBar then
@@ -377,7 +377,7 @@ function mod:SetUnit()
 end
 
 function mod:SetItem()
-	for i, bar in pairs(self.bars) do
+	for i, bar in pairs(self.bars or {}) do
 		if not bar.config.alwaysShown then
 			bar:Stop()
 			bar.bar:Hide()
@@ -391,7 +391,7 @@ function mod:SetItem()
 end
 
 function mod:SetSpell()
-	for i, bar in pairs(self.bars) do
+	for i, bar in pairs(self.bars or {}) do
 		if not bar.config.alwaysShown then
 			bar:Stop()
 			bar.bar:Hide()
@@ -405,7 +405,7 @@ function mod:SetSpell()
 end
 
 function mod:OnHide()
-	for i, bar in pairs(self.bars) do
+	for i, bar in pairs(self.bars or {}) do
 		if not bar.config.alwaysShown then
 			bar:Stop()
 			bar.bar:Hide()
