@@ -258,49 +258,49 @@ return value
 		right = [[
 local name = Name(unit)
 if UnitIsBanished(unit) then
-    return "Banished..."
+    return "Banished"
 elseif UnitIsCharmed(unit) then
-    return "Charmed..."
+    return "Charmed"
 elseif UnitIsConfused(unit) then
-    return "Confused..."
+    return "Confused"
 elseif UnitIsDisoriented(unit) then
-    return "Disoriented..."
+    return "Disoriented"
 elseif UnitIsFeared(unit) then
-    return "Feared..."
+    return "Feared"
 elseif UnitIsFrozen(unit) then
-    return "Frozen..."
+    return "Frozen"
 elseif UnitIsHorrified(unit) then
-    return "Horrified..."
+    return "Horrified"
 elseif UnitIsIncapacitated(unit) then
-    return "Incapacitated..." 
+    return "Incapacitated" 
 elseif UnitIsPolymorphed(unit) then
-    return "Polymorphed..."
+    return "Polymorphed"
 elseif UnitIsSapped(unit) then
-    return "Sapped..."
+    return "Sapped"
 elseif UnitIsShackled(unit) then
-    return "Shackled..."
+    return "Shackled"
 elseif UnitIsAsleep(unit) then
-    return "Asleep..."
+    return "Asleep"
 elseif UnitIsStunned(unit) then
-    return "Stunned..."
+    return "Stunned"
 elseif UnitIsTurned(unit) then
-    return "Turned..."
+    return "Turned"
 elseif UnitIsDisarmed(unit) then
-    return "Disarmed..."
+    return "Disarmed"
 elseif UnitIsPacified(unit) then
-    return "Pacified..."
+    return "Pacified"
 elseif UnitIsRooted(unit) then
-    return "Rooted..."
+    return "Rooted"
 elseif UnitIsSilenced(unit) then
-    return "Silenced..."
+    return "Silenced"
 elseif UnitIsEnsnared(unit) then
-    return "Ensnared..."
+    return "Ensnared"
 elseif UnitIsEnraged(unit) then
-    return "Enraged..."
+    return "Enraged"
 elseif UnitIsWounded(unit) then
-    return "Wounded..."
+    return "Wounded"
 end
-return "Has Control..."	
+return "Has Control"	
 ]],
 		rightUpdating = true,
 		enabled = true,
@@ -506,36 +506,6 @@ do
 			GameTooltip:Show()
 		end
 	end
-end
-
---@debug@
-local PluginResources = ResourceServer or LibStub("LibScriptableDisplayPluginResourceTools-1.0")
-local plugin = {}
-LibStub("LibScriptableDisplayPluginString-1.0"):New(plugin)
-
-local mem2, percent2, memdiff2, totalMem2, totaldiff2
-
-local debugging = false
---@end-debug@
-
-local function debug1()
-	--@debug@
-	if debugging then
-		PluginResources.Update()
-		mem, percent, memdiff, totalMem, totaldiff = PluginResources.GetMemUsage("StarTip")
-	end
-	--@end-debug@
-end
-
-local function debug2(num)
-	--@debug@
-	if debugging then
-		if not num then num = 1 end
-		PluginResources.Update()
-		mem, percent, memdiff, totalMem, totaldiff = PluginResources.GetMemUsage("StarTip")
-		StarTip:Print(num .. ": UnitTooltip... Memory: ", plugin.memshort(mem), plugin.memshort(memdiff))
-	end
-	--@end-debug@
 end
 
 function mod:ClearLines()
