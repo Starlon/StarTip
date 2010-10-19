@@ -674,7 +674,6 @@ function StarTip.OnTooltipSetItem(self, ...)
 end
 
 function StarTip.OnTooltipSetSpell(...)	
-	StarTip:Print(GameTooltip:GetSpell())
 	if StarTip.tooltipHidden then return end
 	if not StarTip.justSetSpell then
 		for k, v in StarTip:IterateModules() do
