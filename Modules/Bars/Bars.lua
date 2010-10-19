@@ -68,7 +68,7 @@ else
 end
 ]],
 		height = 6,
-		points = {{"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
+		points = {{"BOTTOM", "GameTooltip", "TOP", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
 		layer = 1, 
@@ -87,7 +87,7 @@ return UnitMana(unit)
 return PowerColor(nil, unit)
 ]],
 		height = 6,
-		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
+		points = {{"TOP", "GameTooltip", "BOTTOM", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
 		layer = 1,
