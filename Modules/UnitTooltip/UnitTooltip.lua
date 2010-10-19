@@ -257,50 +257,75 @@ return value
 		left = "return 'Effects'",
 		right = [[
 local name = Name(unit)
+local str = ""
 if UnitIsBanished(unit) then
-    return "Banished"
-elseif UnitIsCharmed(unit) then
-    return "Charmed"
-elseif UnitIsConfused(unit) then
-    return "Confused"
-elseif UnitIsDisoriented(unit) then
-    return "Disoriented"
-elseif UnitIsFeared(unit) then
-    return "Feared"
-elseif UnitIsFrozen(unit) then
-    return "Frozen"
-elseif UnitIsHorrified(unit) then
-    return "Horrified"
-elseif UnitIsIncapacitated(unit) then
-    return "Incapacitated" 
-elseif UnitIsPolymorphed(unit) then
-    return "Polymorphed"
-elseif UnitIsSapped(unit) then
-    return "Sapped"
-elseif UnitIsShackled(unit) then
-    return "Shackled"
-elseif UnitIsAsleep(unit) then
-    return "Asleep"
-elseif UnitIsStunned(unit) then
-    return "Stunned"
-elseif UnitIsTurned(unit) then
-    return "Turned"
-elseif UnitIsDisarmed(unit) then
-    return "Disarmed"
-elseif UnitIsPacified(unit) then
-    return "Pacified"
-elseif UnitIsRooted(unit) then
-    return "Rooted"
-elseif UnitIsSilenced(unit) then
-    return "Silenced"
-elseif UnitIsEnsnared(unit) then
-    return "Ensnared"
-elseif UnitIsEnraged(unit) then
-    return "Enraged"
-elseif UnitIsWounded(unit) then
-    return "Wounded"
+	sre = sre .. "[Banished]"
 end
-return "Has Control"	
+if UnitIsCharmed(unit) then
+	str = str .. "[Charmed]"
+end
+if UnitIsConfused(unit) then
+	str = str .. "[Confused]"
+end
+if UnitIsDisoriented(unit) then
+	str = str .. "[Disoriented]"
+end
+if UnitIsFeared(unit) then
+	str = str .. "[Feared]"
+end
+if UnitIsFrozen(unit) then
+	str = str .. "[Frozen]"
+end
+if UnitIsHorrified(unit) then
+	str = str .. "[Horrified]"
+end
+if UnitIsIncapacitated(unit) then
+	str = str .. "[Incapacitated]"
+end
+if UnitIsPolymorphed(unit) then
+	str = str .. "[Polymorphed]"
+end
+if UnitIsSapped(unit) then
+	str = str .. "[Sapped]"
+end
+if UnitIsShackled(unit) then
+	str = str .. "[Shackled]"
+end
+if UnitIsAsleep(unit) then
+	str = str .. "[Asleep]"
+end
+if UnitIsStunned(unit) then
+	str = str .. "[Stunned]"
+end
+if UnitIsTurned(unit) then
+	str = str .. "[Turned]"
+end
+if UnitIsDisarmed(unit) then
+	str = str .. "[Disarmed]"
+end
+if UnitIsPacified(unit) then
+	str = str .. "[Pacified]"
+end
+if UnitIsRooted(unit) then
+	str = str .. "[Rooted]"
+end
+if UnitIsSilenced(unit) then
+	str = str .. "[Silenced]"
+end
+if UnitIsEnsnared(unit) then
+	str = str .. "[Ensnared]"
+end
+if UnitIsEnraged(unit) then
+	str = str .. "[Enraged]"
+end
+if UnitIsWounded(unit) then
+	str = str .. "[Wounded]"
+end
+if str == "" then
+	return "Has Control"	
+else
+	return str
+end
 ]],
 		rightUpdating = true,
 		enabled = true,
