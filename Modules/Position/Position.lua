@@ -333,7 +333,14 @@ local updateFrame = CreateFrame("Frame")
 local oldX, oldY
 local currentAnchor
 local xoffset, yoffset
+local oldSpell
 local positionTooltip = function()
+
+	-- When hovering over a spell on cooldwon, the UI keeps resetting the spell over and over to keep the tooltip's cooldown timer updated. This repositions the tooltip over and over, and causes bug reports.
+	local spell, id = GameTooltip:GetSpell()
+	if spell and spell == oldSpell then return end
+	oldSpell = spell
+	
 	local x, y = GetCursorPosition()
 	
 	local effScale = GameTooltip:GetEffectiveScale()
