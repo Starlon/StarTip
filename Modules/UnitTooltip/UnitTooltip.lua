@@ -388,6 +388,16 @@ return select(2, GetRole(unit))
 		update = 1000
 	},
 	[22] = {
+		name = "Location",
+		left = [[
+return "Location:"
+]],
+		right = [[
+return select(3, GetUnitTooltipStats(unit))
+]],
+		enabled = true
+	},
+	[23] = {
 		name = "Range",
 		left = [[
 local min, max = RangeCheck:GetRange(unit)

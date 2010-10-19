@@ -79,7 +79,6 @@ function mod:OnDisable()
 end
 
 function mod:SetUnit()
-	local name, guild, location = PluginUnitTooltipStats.GetUnitTooltipStats(StarTip.unit)
 end
 
 function mod:OnHide()
