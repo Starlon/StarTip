@@ -8,6 +8,7 @@ local LibBuffer = LibStub("LibScriptableDisplayBuffer-1.0")
 local WidgetText = LibStub("LibScriptableDisplayWidgetText-1.0")
 local LibProperty = LibStub("LibScriptableDisplayProperty-1.0")
 local LibCore = LibStub("LibScriptableDisplayCore-1.0")
+local PluginUnitTooltipStats = LibStub("LibScriptableDisplayPluginUnitTooltipStats-1.0")
 
 local environment = {}
 
@@ -71,73 +72,6 @@ local function update()
 end
 
 function mod:OnEnable()
-	timer = timer or LibTimer:New("Debug timer", 1000, true, update)
-	if false then
-		timer:Start()
-	end
-	do return end
-			local frame = CreateFrame("Frame")
-			frame:SetParent(UIParent)
-			frame:SetParent(UIParent)
-				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-					tile = true,
-					tileSize = 4,
-					edgeSize=4, 
-					insets = { left = 0, right = 0, top = 0, bottom = 0}})
-			frame:ClearAllPoints()
-			frame:SetAlpha(1)
-			frame:SetBackdropColor(1, 1, 0)
-			frame:SetHeight(250)
-			frame:SetWidth(250)
-			frame:Show()
-			frame:SetScale(0.2)
-			self.frame0 = frame
-			
-			local frame = CreateFrame("Frame")
-			frame:SetParent(self.frame0)
-				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-					tile = true,
-					tileSize = 4,
-					edgeSize=4, 
-					insets = { left = 0, right = 0, top = 0, bottom = 0}})
-			frame:ClearAllPoints()
-			frame:SetAlpha(1)
-			frame:SetBackdropColor(1, 1, 0)
-			frame:SetHeight(250)
-			frame:SetWidth(250)
-			frame:Show()
-			frame:SetScale(0.5)
-			self.frame1 = frame
-			
-			local frame = CreateFrame("Frame")
-			frame:SetParent(self.frame1)
-				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-					tile = true,
-					tileSize = 4,
-					edgeSize=4, 
-					insets = { left = 0, right = 0, top = 0, bottom = 0}})
-			frame:ClearAllPoints()
-			frame:SetAlpha(1)
-			frame:SetBackdropColor(1, 1, 0)
-			frame:SetHeight(250)
-			frame:SetWidth(250)
-			frame:Show()
-			self.frame2 = frame
-
-			local frame = CreateFrame("Frame")
-			frame:SetParent(UIParent)
-				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-					tile = true,
-					tileSize = 4,
-					edgeSize=4, 
-					insets = { left = 0, right = 0, top = 0, bottom = 0}})
-			frame:ClearAllPoints()
-			frame:SetAlpha(1)
-			frame:SetBackdropColor(1, 1, 0)
-			frame:SetHeight(250)
-			frame:SetWidth(250)
-			frame:Show()
-			self.frame3 = frame
 end
 
 function mod:OnDisable()
@@ -145,6 +79,7 @@ function mod:OnDisable()
 end
 
 function mod:SetUnit()
+	local name, guild, location = PluginUnitTooltipStats.GetUnitTooltipStats(StarTip.unit)
 end
 
 function mod:OnHide()
