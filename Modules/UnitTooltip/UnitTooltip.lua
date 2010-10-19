@@ -387,7 +387,7 @@ return select(2, GetRole(unit))
 		enabled = true,
 		update = 1000
 	},
-	[22] = {
+	--[[[22] = {
 		name = "Location",
 		left = [[
 return "Location:"
@@ -396,7 +396,7 @@ return "Location:"
 return select(3, GetUnitTooltipStats(unit))
 ]],
 		enabled = true
-	},
+	},]]
 	[23] = {
 		name = "Range",
 		left = [[
@@ -404,7 +404,7 @@ local min, max = RangeCheck:GetRange(unit)
 if not min then
     return "No range info"
 elseif not max then
-    return "Target is over " .. min .. " yards"
+    return format("Target is over %d yards", min)
 else
     return "Between " .. min .. " and " .. max .. " yards"
 end

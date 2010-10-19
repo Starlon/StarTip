@@ -40,35 +40,12 @@ function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 end
 
-local function new1()
-	return LibBuffer:New("Debug buffer", random(1000), " ")
-end
-
-local function updateText(widget)
-
-end
-
 local function new2()
 	return WidgetText:New(core, "Debug text", cfg, 0, 0, 0, StarTip.db.profile.errorLevel, updateText) 
 end
 
 local function new3()
 	return LibProperty:New(nil, core,	"debug property", "", "")
-end
-
-local plugin = {}
-LibStub("LibScriptableDisplayPluginUtils-1.0"):New(plugin)
-
-local function update()
-	mod.frame1:ClearAllPoints()
-	mod.frame2:ClearAllPoints()
-	local width = UIParent:GetWidth()
-	local height = UIParent:GetHeight()
-	mod.frame2:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 550 / 0.5 / 0.2, 550 / 0.5 / 0.2)
-	mod.frame3:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 550, 550)
-	if plugin.Intersect(mod.frame2, mod.frame3) then
-		StarTip:Print("---------------intersection-----------------")
-	end
 end
 
 function mod:OnEnable()
