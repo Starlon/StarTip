@@ -387,7 +387,7 @@ return select(2, GetRole(unit))
 		enabled = true,
 		update = 1000
 	},
-	[26] = {
+	[22] = {
 		name = "Location",
 		left = [[
 return "Location:"
