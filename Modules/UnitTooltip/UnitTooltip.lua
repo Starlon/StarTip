@@ -387,7 +387,7 @@ return select(2, GetRole(unit))
 		enabled = true,
 		update = 1000
 	},
-	--[[[22] = {
+	[26] = {
 		name = "Location",
 		left = [[
 return "Location:"
@@ -396,7 +396,7 @@ return "Location:"
 return select(3, GetUnitTooltipStats(unit))
 ]],
 		enabled = true
-	},]]
+	},
 	[23] = {
 		name = "Range",
 		left = [[
