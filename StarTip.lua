@@ -842,7 +842,7 @@ function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
 	elseif self.db.profile.modifier == 3 then
 		mod = (modifier == "LALT" or modifier == "RALT") and "LALT"
 		modifier = "LALT"
-	elseif self.db.profilemodifier == 4 then
+	elseif self.db.profile.modifier == 4 then
 		mod = (modifier == "LSHIFT" or modifier == "RSHIFT") and "LSHIFT"
 		modifier = "LSHIFT"
 	end
