@@ -103,10 +103,19 @@ function update()
 				local x, y = GetCursorPosition()
 				anchor:ClearAllPoints()
 				anchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - size / 2, y - size / 2)
-				if PluginUtils.Intersect(anchor, frame) then
+				if PluginUtils.Intersect(anchor, frame) and IsControlKeyDown() then
 					GameTooltip:Hide()
+					break
 				end
 			end
 		end
 	end
+end
+
+function mod:OnHide()
+	self.timer:Stop()
+end
+
+function mod:SetUnit()
+	self.timer:Start()
 end
