@@ -1,7 +1,7 @@
 local mod = StarTip:NewModule("Nameplates", "AceTimer-3.0")
 mod.name = "Hide Nameplates"
 mod.toggled = true
-mod.desc = "Toggle this module on to cause the tooltip to hide when mousing over nameplates."
+mod.desc = "Toggle this module on to cause the tooltip to hide when mousing over nameplates and the control key is down."
 mod.defaultOff = false
 local _G = _G
 local StarTip = _G.StarTip
