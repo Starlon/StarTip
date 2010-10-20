@@ -62,7 +62,6 @@ if not UnitExists(unit) then return end
 return '--' .. select(1, UnitName(unit)) .. '--'
 ]],
 		color = [[
-_G.StarTip:Print(unit)
 if UnitIsPlayer(unit) then
     return ClassColor(unit)
 else
