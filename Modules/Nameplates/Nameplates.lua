@@ -2,7 +2,7 @@ local mod = StarTip:NewModule("Nameplates", "AceTimer-3.0")
 mod.name = "Hide Nameplates"
 mod.toggled = true
 mod.desc = "Toggle this module on to cause the tooltip to hide when mousing over nameplates."
-mod.defaultOff = true
+mod.defaultOff = false
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip
@@ -90,8 +90,9 @@ local function isNameplate(frame)
 end
 
 local anchor = CreateFrame("Frame")
-anchor:SetWidth(200)
-anchor:SetHeight(200)
+local size = 50
+anchor:SetWidth(size)
+anchor:SetHeight(size)
 anchor:Show()
 local frames = {}
 function update()
@@ -101,7 +102,7 @@ function update()
 			if UnitExists("mouseover") then
 				local x, y = GetCursorPosition()
 				anchor:ClearAllPoints()
-				anchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - 100, y - 100)
+				anchor:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", x - size / 2, y - size / 2)
 				if PluginUtils.Intersect(anchor, frame) then
 					GameTooltip:Hide()
 				end
