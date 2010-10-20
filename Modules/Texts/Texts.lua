@@ -64,7 +64,7 @@ return '--' .. select(1, UnitName(unit)) .. '--'
 		color = [[
 if UnitIsPlayer(unit) then
     return ClassColor(unit)
-else
+elseif unit then
     return UnitSelectionColor(unit)
 end
 ]],
