@@ -89,7 +89,7 @@ local function isNameplate(frame)
 	return region and region:GetObjectType() == "Texture" and region:GetTexture() == "Interface\\TargetingFrame\\UI-TargetingFrame-Flash" 
 end
 
-local anchor = CreateFrame("Frame")
+local anchor = CreateFrame("Frame", "StarTipNameplateAnchor")
 local size = 50
 anchor:SetWidth(size)
 anchor:SetHeight(size)
