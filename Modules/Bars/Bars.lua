@@ -237,7 +237,9 @@ local function createBars()
 					arg5 = (arg5 or 0)
 					bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 				end
-				bar:SetWidth(v.width or 20)
+				if type(v.width) == "number" then
+					bar:SetWidth(v.width)
+				end
 				bar:SetHeight(v.height)
 				bar:SetMinMaxValues(0, 100)
 				bar:Show()
