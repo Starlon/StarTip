@@ -57,6 +57,7 @@ local defaultWidgets = {
 	[1] = {
 		name = "Name",
 		enabled = true,
+		frameName = "StarTipTextName",
 		value = [[
 if not UnitExists(unit) then return end
 return '--' .. select(1, UnitName(unit)) .. '--'
@@ -326,13 +327,13 @@ local new, del
 do
 	local pool = {}
 	local i = 0
-	function new(background)
+	function new(name, parent, background)
 		local text = next(pool)
 
 		if text then
 			pool[text] = nil
 		else
-			local frame = CreateFrame("Frame")
+			local frame = CreateFrame("Frame", name, parent)
 			frame:SetParent(UIParent)
 			if background then
 				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -405,7 +406,7 @@ function createTexts()
 			end
 			local widget = mod.texts[v]
 			if not widget then
-				local text = new(v.background)
+				local text = new(v.frameName, v.parent, v.background)
 				widget = WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)				
 				text:ClearAllPoints()
 				text:SetParent("UIParent")
