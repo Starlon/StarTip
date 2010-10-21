@@ -76,6 +76,7 @@ end
 		dontRtrim = true,
 		points = {{"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 12}},
 		parent = "GameTooltip",
+		frameName = "StarTipTextsName",
 		strata = 1,
 		level = 1,
 	},
@@ -310,7 +311,7 @@ function updateText(widget)
 	end
 	
 	widget.frame:SetBackdropColor(r, g, b, a)
-		
+	
 	if not UnitExists(StarTip.unit or "mouseover") and not widget.config.alwaysShown then
 		widget.frame:Hide()
 	end
@@ -326,14 +327,14 @@ local new, del
 do
 	local pool = {}
 	local i = 0
-	function new(background)
+	function new(background, name, parent)
 		local text = next(pool)
 
 		if text then
 			pool[text] = nil
 		else
-			local frame = CreateFrame("Frame")
-			frame:SetParent(UIParent)
+			parent = parent or UIParent
+			local frame = CreateFrame("Frame", name, parent and _G[parent])
 			if background then
 				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 					tile = true,
@@ -405,10 +406,9 @@ function createTexts()
 			end
 			local widget = mod.texts[v]
 			if not widget then
-				local text = new(v.background)
+				local text = new(v.background, v.frameName, v.parent)
 				widget = WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)				
 				text:ClearAllPoints()
-				text:SetParent("UIParent")
 				for j, point in ipairs(v.points) do
 					local arg1, arg2, arg3, arg4, arg5 = unpack(point)
 					arg4 = (arg4 or 0)
@@ -418,7 +418,6 @@ function createTexts()
 				text:SetFrameStrata(strataNameList[v.strata or 1])
 				text:SetFrameLevel(v.level or 1)
 				text:Show()
-				widget.frame = text
 				widget.frame = text
 				mod.texts[v] = widget
 			end
