@@ -82,7 +82,7 @@ function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
 	
-	self.core = LibCore:New(mod, environment, "StarTip.Images", {["StarTip.Images"] = {}}, nil, StarTip.db.profile.errorLevel)
+	self.core = LibCore:New(mod, StarTip.core.environment, "StarTip.Images", {["StarTip.Images"] = {}}, nil, StarTip.db.profile.errorLevel)
 	self.core.lcd = {LCOLS=self.db.profile.cols, LROWS=self.db.profile.rows, LAYERS=self.db.profile.layers}
 	
 	self.buffer = LibBuffer:New("StarTip.Images", self.core.lcd.LCOLS * self.core.lcd.LROWS, 0, StarTip.db.profile.errorLevel)

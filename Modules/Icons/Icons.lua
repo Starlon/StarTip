@@ -346,12 +346,7 @@ end
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
-	
-	self.core = LibCore:New(mod, environment, "StarTip.Icons", {["StarTip.Icons"] = {}}, nil, StarTip.db.profile.errorLevel)
-	self.core.lcd = {LCOLS=self.db.profile.cols, LROWS=self.db.profile.rows, XRES=self.db.profile.xres, YRES=self.db.profile.yres, specialChars = {}}
-	
-	self.buffer = LibBuffer:New("Icons", self.core.lcd.LCOLS * self.core.lcd.LROWS * self.core.lcd.YRES * self.core.lcd.XRES, 0, StarTip.db.profile.errorLevel)
-	
+		
 	if self.db.profile.update > 0 then
 		self.timer = LibTimer:New("Icons", 100, true, update)
 	end
@@ -384,6 +379,11 @@ local function createIcons()
 end
 
 function mod:OnEnable()
+	self.core = LibCore:New(mod, StarTip.core.environment, "StarTip.Icons", {["StarTip.Icons"] = {}}, nil, StarTip.db.profile.errorLevel)
+	self.core.lcd = {LCOLS=self.db.profile.cols, LROWS=self.db.profile.rows, XRES=self.db.profile.xres, YRES=self.db.profile.yres, specialChars = {}}
+	
+	self.buffer = LibBuffer:New("Icons", self.core.lcd.LCOLS * self.core.lcd.LROWS * self.core.lcd.YRES * self.core.lcd.XRES, 0, StarTip.db.profile.errorLevel)
+
 	StarTip:SetOptionsDisabled(options, false)
 	createIcons()
 	-- no need to start the timer
@@ -393,6 +393,9 @@ function mod:OnDisable()
 	StarTip:SetOptionsDisabled(options, true)
 	if self.timer then 
 		self.timer:Stop()
+	end
+	if self.core then
+		self.core:Del()
 	end
 end
 
