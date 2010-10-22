@@ -383,7 +383,7 @@ local function clearText(obj)
 end
 
 function mod:ClearTexts()
-	for k, v in pairs(mod.texts) do
+	for k, v in pairs(mod.texts or {}) do
 		clearText(v)
 	end
 	wipe(mod.texts)
@@ -459,7 +459,7 @@ function mod:OnInitialize()
 	
 	self:ReInit()
 	
-	self.core = LibCore:New(mod, environment, "StarTip.Texts", {["StarTip.Texts"] = {}}, nil, StarTip.db.profile.errorLevel)
+	self.core = StarTip.core --LibCore:New(mod, environment, "StarTip.Texts", {["StarTip.Texts"] = {}}, nil, StarTip.db.profile.errorLevel)
 
 	StarTip:SetOptionsDisabled(options, true)
 
