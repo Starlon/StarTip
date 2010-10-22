@@ -98,9 +98,9 @@ function mod:GetOptions()
 end
 
 function mod:SetUnit()
-	if not self.text then return end
+	if not self.text or not self.texture then return end
 	
-	SetPortraitTexture(self.texture, StarTip.unit)
+	SetPortraitTexture(self.texture, StarTip.unit or "mouseover")
 	
 	if not self.texture:GetTexture() then 
 		self.model:Hide()
