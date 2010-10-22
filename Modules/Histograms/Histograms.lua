@@ -367,8 +367,6 @@ function mod:OnInitialize()
 
 	self:ReInit()
 	
-	self.core = LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)
-
 	self.offset = 0
 
 	StarTip:SetOptionsDisabled(options, true)
@@ -377,6 +375,8 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()	
+	self.core = StarTip.core --LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)
+
 	StarTip:SetOptionsDisabled(options, false)
 	if StarTip.db.profile.intersectRate > 0 then
 		self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", self.db.profile.intersectRate or 200, true, intersectUpdate)
@@ -394,6 +394,7 @@ function mod:OnEnable()
 end
 
 function mod:OnDisable()
+	self.core:Del()
 	self:ClearHistograms()
 	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
