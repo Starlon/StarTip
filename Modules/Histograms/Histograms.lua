@@ -215,7 +215,7 @@ function updateHistogram(widget)
 			local r, g, b, a = widget.history[i][2], widget.history[i][3], widget.history[i][4]
 			bar:SetStatusBarColor(r, g, b, a)
 		elseif type(segment) == "number" then
-			bar:SetValue(0) --segment * 100)
+			bar:SetValue(segment * 100)
 			bar:SetStatusBarColor(0, 0, 1, 1)
 		end
 		if not UnitExists(StarTip.unit) and not widget.config.alwaysShown then bar:Hide() end
