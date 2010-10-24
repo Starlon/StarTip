@@ -100,11 +100,10 @@ end
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
-	
-	self.core = LibCore:New(mod, environment, "StarTip.Gestures", {["StarTip.Gestures"] = {}}, nil, StarTip.db.profile.errorLevel)
 end
 
 function mod:OnEnable()
+	self.core = LibCore:New(mod, environment, "StarTip.Gestures", {["StarTip.Gestures"] = {}}, nil, StarTip.db.profile.errorLevel)
 	StarTip:SetOptionsDisabled(options, false)
 	self:CreateGestures()
 end
