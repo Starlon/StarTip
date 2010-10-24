@@ -333,7 +333,7 @@ do
 		if text then
 			pool[text] = nil
 		else
-			parent = parent or UIParent
+			parent = parent or "UIParent"
 			local frame = CreateFrame("Frame", name, parent and _G[parent])
 			if background then
 				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -401,13 +401,10 @@ function createTexts()
 	local appearance = StarTip:GetModule("Appearance")
 	for i, v in ipairs(self.db.profile.texts) do
 		if v.enabled and not v.deleted then		
-			if v.alwaysShown then
-				StarTip:Print("always shown bogeyman")
-			end
 			local widget = mod.texts[v]
 			if not widget then
 				local text = new(v.background, v.frameName, v.parent)
-				widget = WidgetText:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)				
+				widget = WidgetText:New(mod.core, v.name, copy(v), v.row or 0 or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)				
 				text:ClearAllPoints()
 				for j, point in ipairs(v.points) do
 					local arg1, arg2, arg3, arg4, arg5 = unpack(point)
