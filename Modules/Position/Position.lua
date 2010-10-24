@@ -1,5 +1,6 @@
 local mod = StarTip:NewModule("Position", "AceEvent-3.0", "AceHook-3.0")
 mod.name = "Positioning"
+local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -309,6 +310,7 @@ local options = {
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
+	self.timer = LibTimer:New("Position.timer ", 100, false, positionTooltip)
 end
 
 function mod:OnEnable()
@@ -329,11 +331,17 @@ function mod:GetOptions()
 	return options
 end
 
+local isSpell
+local isItem
+local lastSpell
+
 local updateFrame = CreateFrame("Frame")
 local oldX, oldY
 local currentAnchor
 local xoffset, yoffset
+local active
 local positionTooltip = function()
+	if not active or isSpell or isItem then return end
 	
 	local x, y = GetCursorPosition()
 	
@@ -390,17 +398,9 @@ end
 local currentOwner
 local currentThis
 local delayFrame = CreateFrame("Frame")
-local odSpell
 local function delayAnchor()
 	delayFrame:SetScript("OnUpdate", nil)
-
-	local spell, id = GameTooltip:GetSpell()
-	if spell and spell == oldSpell then 
-		return 
-	end
 	
-	oldSpell = spell
-
 	local this = currentThis
 	local owner = currentOwner
 	this:ClearAllPoints()
@@ -413,6 +413,7 @@ local function delayAnchor()
 		oldX, oldY = 0, 0
 		currentAnchor = StarTip.opposites[StarTip.anchors[index]:sub(8)]
 		updateFrame:SetScript("OnUpdate", positionTooltip)
+		active = true
 		positionTooltip()
 	else
 		if updateFrame:GetScript("OnUpdate") then updateFrame:SetScript("OnUpdate", nil) end
@@ -437,4 +438,50 @@ mod.REGEN_ENABLED = mod.REGEN_DISABLED
 function mod:OnHide()
 	updateFrame:SetScript("OnUpdate", nil)
 	delayFrame:SetScript("OnUpdate", nil)
+	oldSpell = nil
+	newSpell = nil
+end
+
+local threshold = .3
+local lastTime = GetTime()
+local locked = false
+local function unlock()
+	locked = false
+end
+function mod:SetSpell()
+	if locked then return end
+	if GetTime() - lastTime < threshold then
+		locked = true
+		self.timer.callback = unlock
+		self.timer:Start(50)
+	end
+	lastTime = GetTime()
+	updateFrame:SetScript("OnUpdate", nil)
+	isSpell = false
+	isItem = false
+	positionTooltip()
+	isSpell = true
+	lastSpell = GameTooltip:GetSpell()
+end
+
+function mod:SetItem()
+	if locked then return end
+	if GetTime() - lastTime < threshold then
+		locked = true
+		self.timer.callback = unlock
+		self.timer:Start(50)
+	end
+	lastTime = GetTime()
+	updateFrame:SetScript("OnUpdate", nil)
+	isSpell = false
+	isItem = false
+	positionTooltip()
+	isItem = true
+	lastItem = GameTooltip:GetItem()
+end
+
+function mod:SetUnit()
+	isSpell = false
+	isItem = false
+	updateFrame:SetScript("OnUpdate", positionTooltip)
 end
