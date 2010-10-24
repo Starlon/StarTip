@@ -55,7 +55,27 @@ function mod:OnDisable()
 	timer:Stop()
 end
 
+local function getAllChildren(window)
+	local tbl = {}
+	for i = 1, select("#", window:GetChildren()) do
+		local child = select(i, window:GetChildren())
+		tinsert(tbl, child)
+		if child.GetChildren then
+			getAllChildren(child)
+		end
+	end
+	
+	return tbl
+end
+
 function mod:SetUnit()
+	local children = getAllChildren(SkadaBarWindowSkada)
+	StarTip:Print("children", #children)
+	for i, child in ipairs(children) do
+		if child.GetValue then
+			StarTip:Print(child:GetValue())
+		end
+	end
 end
 
 function mod:OnHide()

@@ -118,14 +118,15 @@ local defaults = {
 		modules = {},
 		timers = {},
 		minimap = {hide=true},
-		modifier = 1,
+		modifier = 4,
 		unitShow = 1,
 		objectShow = 1,
 		unitFrameShow = 1,
 		otherFrameShow = 1,
 		errorLevel = 2,
 		throttleVal = 0,
-		intersectRate = 200
+		intersectRate = 200,
+		modifierInverse = true
 	}
 }
 			
@@ -201,6 +202,14 @@ local options = {
 					values = {L["None"], L["Ctrl"], L["Alt"], L["Shift"]},
 					get = function() return StarTip.db.profile.modifier end,
 					set = function(info, v) StarTip.db.profile.modifier = v end,
+					order = 5
+				},
+				modifierInverse = {
+					name = L["Inverted Modifier"],
+					desc = L["Whether to invert what happens when a key is pressed or not, i.e. show and hide."],
+					type = "toggle",
+					get = function() return StarTip.db.profile.modifierInverse end,
+					set = function(info, v) StarTip.db.profile.modifierInverse = v end,
 					order = 6
 				},
 				unitShow = {
@@ -611,6 +620,11 @@ end
 
 function StarTip:ShowTooltip()
 	self.tooltipHidden = false
+	
+	GameTooltip:Hide()
+	GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
+	GameTooltip:SetUnit(StarTip.unit or "mouseover")
+	GameTooltip:Show()
 end
 
 function StarTip.GameTooltipAddLine(...)
@@ -760,7 +774,11 @@ function StarTip:GameTooltipShow(...)
 				show = false
 			end
 	end
-		
+
+	if self.db.profile.modifierInverse then
+		show = not show
+	end
+			
 	if not show or StarTip.tooltipHidden then GameTooltip:Hide(); return end
 
 	--[[
@@ -771,6 +789,9 @@ function StarTip:GameTooltipShow(...)
 	end]]
 	
 	if show then
+		--GameTooltip:SetOwner(WorldFrame, "ANCHOR_CURSOR")
+		--GameTooltip:SetParent(UIParent)
+		--GameTooltip:SetUnit(StarTip.unit or "mouseover")
 		StarTip.hooks[GameTooltip].Show(...)
 	end
 end
@@ -852,7 +873,11 @@ function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
 	end
 	
 	if up == 0 then
-		GameTooltip:Hide()
+		if not self.db.profile.modifierInverse then
+			StarTip:HideTooltip()
+		else
+			StarTip:ShowTooltip()
+		end
 		return
 	end
 	
@@ -865,10 +890,11 @@ function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
 			return
 		end
 		GameTooltip:Hide()
-		GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
-		GameTooltip:SetUnit(mouseover_unit)
-		GameTooltip:Show()
+		if not self.db.profile.modifierInverse then
+			StarTip:ShowTooltip()
+		end
 	else
+		-- TODO: Translate that into 4.0 standards.
 		local OnLeave, OnEnter = frame:GetScript("OnLeave"), frame:GetScript("OnEnter")
 		if OnLeave then
 			_G.this = frame
