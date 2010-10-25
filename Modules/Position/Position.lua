@@ -435,25 +435,21 @@ end
 
 mod.REGEN_ENABLED = mod.REGEN_DISABLED
 
+local locked = false
 function mod:OnHide()
 	updateFrame:SetScript("OnUpdate", nil)
 	delayFrame:SetScript("OnUpdate", nil)
 	oldSpell = nil
 	newSpell = nil
+	locked = false
 end
 
 local threshold = .3
 local lastTime = GetTime()
-local locked = false
-local function unlock()
-	locked = false
-end
 function mod:SetSpell()
 	if locked then return end
 	if GetTime() - lastTime < threshold then
 		locked = true
-		self.timer.callback = unlock
-		self.timer:Start(50)
 	end
 	lastTime = GetTime()
 	updateFrame:SetScript("OnUpdate", nil)
@@ -468,8 +464,6 @@ function mod:SetItem()
 	if locked then return end
 	if GetTime() - lastTime < threshold then
 		locked = true
-		self.timer.callback = unlock
-		self.timer:Start(50)
 	end
 	lastTime = GetTime()
 	updateFrame:SetScript("OnUpdate", nil)
