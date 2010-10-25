@@ -118,7 +118,7 @@ local defaults = {
 		modules = {},
 		timers = {},
 		minimap = {hide=true},
-		modifier = 4,
+		modifier = 1,
 		unitShow = 1,
 		objectShow = 1,
 		unitFrameShow = 1,
@@ -126,7 +126,7 @@ local defaults = {
 		errorLevel = 2,
 		throttleVal = 0,
 		intersectRate = 200,
-		modifierInverse = true
+		modifierInverse = false
 	}
 }
 			
