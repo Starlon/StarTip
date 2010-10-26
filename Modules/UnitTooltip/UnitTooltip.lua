@@ -82,7 +82,8 @@ return Colorize(Name(unit, true), r, g, b)
 ]],
         right = nil,
 		bold = true,
-		enabled = true
+		enabled = true,
+		cols = 80
     },
     [2] = {
         name = "Target",
