@@ -433,19 +433,19 @@ function mod:SetBackdropColor(reset)
 		end		
 	else -- Snagged from CowTip
 		local kind
-		if UnitExists("mouseover") then
-			if UnitIsDeadOrGhost("mouseover") then
+		if UnitExists(StarTip.unit or "mouseover") then
+			if UnitIsDeadOrGhost(StarTip.unit or "mouseover") then
 				kind = 'dead'
-			elseif UnitIsTapped("mouseover") and not UnitIsTappedByPlayer("mouseover") then
+			elseif UnitIsTapped(StarTip.unit or "mouseover") and not UnitIsTappedByPlayer(StarTip.unit or "mouseover") then
 				kind = 'tapped'
-			elseif UnitIsPlayer("mouseover") then
-				if UnitIsFriend("player", "mouseover") then
+			elseif UnitIsPlayer(StarTip.unit or "mouseover") then
+				if UnitIsFriend("player", StarTip.unit or "mouseover") then
 					local playerGuild = GetGuildInfo("player")
-					if playerGuild and playerGuild == GetGuildInfo("mouseover") or UnitIsUnit("player", "mouseover") then
+					if playerGuild and playerGuild == GetGuildInfo(StarTip.unit or "mouseover") or UnitIsUnit("player", StarTip.unit or "mouseover") then
 						kind = 'guild'
 					else
 						local friend = false
-						local name = UnitName("mouseover")
+						local name = UnitName(StarTip.unit or "mouseover")
 						for i = 1, GetNumFriends() do
 							if GetFriendInfo(i) == name then
 								friend = true
@@ -462,10 +462,10 @@ function mod:SetBackdropColor(reset)
 					kind = 'hostilePC'
 				end
 			else
-				if UnitIsFriend("player", "mouseover") then
+				if UnitIsFriend("player", StarTip.unit or "mouseover") then
 					kind = 'friendlyNPC'
 				else
-					local reaction = UnitReaction("mouseover", "player")
+					local reaction = UnitReaction(StarTip.unit or "mouseover", "player")
 					if not reaction or reaction <= 2 then
 						kind = 'hostileNPC'
 					else
