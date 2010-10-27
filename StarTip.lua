@@ -488,8 +488,7 @@ function StarTip:OnEnable()
 	self:RawHook(GameTooltip, "FadeOut", "GameTooltipFadeOut", true)
 	self:RawHook(GameTooltip, "Hide", "GameTooltipHide", true)
 	self:RawHook(GameTooltip, "Show", "GameTooltipShow", true)
-	self:SecureHook(GameTooltip, "AddDoubleLine", self.GameTooltipAddLine)
-	self:SecureHook(GameTooltip, "AddLine", self.GameTooltipAddLine)
+	self:RawHook(GameTooltip, "GetUnit", "GameTooltipGetUnit", true)
 	
 	for k,v in self:IterateModules() do
 		if (self.db.profile.modules[k]  == nil and not v.defaultOff) or self.db.profile.modules[k] then
@@ -795,6 +794,15 @@ function StarTip:GameTooltipShow(...)
 		StarTip.hooks[GameTooltip].Show(...)
 	end
 end
+
+function StarTip:GameTooltipGetUnit()
+	if StarTip.unit and UnitExists(StarTip.unit) then
+		local name = UnitName(StarTip.unit)
+		return name, StarTip.unit
+	end
+	return self.hooks[GameTooltip].GetUnit(GameTooltip)
+end
+
 
 function StarTip.OnTooltipShow(...)
 
