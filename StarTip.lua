@@ -796,11 +796,14 @@ function StarTip:GameTooltipShow(...)
 end
 
 function StarTip:GameTooltipGetUnit()
+	local name, unit = self.hooks[GameTooltip].GetUnit(GameTooltip)
+	if name then
+		return name, unit
+	end
 	if StarTip.unit and UnitExists(StarTip.unit) then
 		local name = UnitName(StarTip.unit)
 		return name, StarTip.unit
 	end
-	return self.hooks[GameTooltip].GetUnit(GameTooltip)
 end
 
 
