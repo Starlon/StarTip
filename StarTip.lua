@@ -617,12 +617,12 @@ function StarTip:HideTooltip()
 	self.tooltipHidden = true
 end
 
-function StarTip:ShowTooltip()
+function StarTip:ShowTooltip(unit)
 	self.tooltipHidden = false
-	
+	unit = unit or StarTip.unit or "mouseover"
 	GameTooltip:Hide()
 	GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
-	GameTooltip:SetUnit(StarTip.unit or "mouseover")
+	GameTooltip:SetUnit(unit)
 	GameTooltip:Show()
 end
 
@@ -780,17 +780,13 @@ function StarTip:GameTooltipShow(...)
 			
 	if not show or StarTip.tooltipHidden then GameTooltip:Hide(); return end
 
-	--[[
 	for k, v in StarTip:IterateModules() do
 		if v.GameTooltipShow and v:IsEnabled() then 
 			show = show and v:GameTooltipShow(...)
 		end
-	end]]
+	end
 	
 	if show then
-		--GameTooltip:SetOwner(WorldFrame, "ANCHOR_CURSOR")
-		--GameTooltip:SetParent(UIParent)
-		--GameTooltip:SetUnit(StarTip.unit or "mouseover")
 		StarTip.hooks[GameTooltip].Show(...)
 	end
 end
