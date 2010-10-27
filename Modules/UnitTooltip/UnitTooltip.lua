@@ -569,7 +569,6 @@ function mod:CreateLines()
     end
 	self:ClearLines()
     lines = setmetatable(llines, {__call=function(self)
-		if debuging then debug1() end
         local lineNum = 0
 		GameTooltip:ClearLines()
         for i, v in ipairs(self) do
@@ -633,7 +632,6 @@ function mod:CreateLines()
 			end
 
         end
-		if debugging then debug2(2) end
         mod.NUM_LINES = lineNum
 		draw()
 		GameTooltip:Show()
@@ -1088,15 +1086,10 @@ end
 local plugin = LibStub("LibScriptableDisplayPluginString-1.0")
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
-
-	if debugging then
-		ResourceServer.Update()
-		local mem1, percent1, memdiff1, totalMem1, totaldiff1 = ResourceServer.GetMemUsage("StarTip")
-	end
+	
+	GameTooltip:ClearLines()
 	
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
-
-	environment.unitName, environment.unitGuild, environment.unitLocation = UnitTooltipStats.GetUnitTooltipStats("mouseover")
 
 	self.NUM_LINES = 0
 	
@@ -1124,14 +1117,6 @@ function mod:SetUnit()
 
     lastLine = lastLine + 1
 
-	wipe(linesToAdd)
-	wipe(linesToAddR)
-	wipe(linesToAddG)
-	wipe(linesToAddB)
-	wipe(linesToAddRight)
-	wipe(linesToAddRightR)
-	wipe(linesToAddRightG)
-	wipe(linesToAddRightB)
     for i = lastLine, GameTooltip:NumLines() do
         local left = self.leftLines[i]
         local j = i - lastLine + 1
@@ -1153,27 +1138,20 @@ function mod:SetUnit()
 
 	lines()
 
-	GameTooltip:Show()
-
 	if self.db.profile.refreshRate > 0 and self.timer then
 		self.timer:Start()
 	end
-
-	if GameTooltip:NumLines() > mod.NUM_LINES then GameTooltip:Hide(); return end
 	
 	self:RefixEndLines()
 	
-	if debugging then
-		ResourceServer.Update()
-		local mem2, percent2, memdiff2, totalMem2, totaldiff2 = ResourceServer.GetMemUsage("StarTip")	
-		--StarTip:Print("UnitTooltip Memory", plugin.memshort(mem2), plugin.memshort(mem2 - mem1), plugin.memshort(memdiff2))
-	end
+	GameTooltip:Show()
+
 end
 
 function mod:RefixEndLines()
     -- Another part taken from CowTip
     for i, left in ipairs(linesToAdd) do
-
+		local left = linesToAdd[i]
         local right = linesToAddRight[i]
 		StarTip.addingLine = true
         if right then
@@ -1183,5 +1161,12 @@ function mod:RefixEndLines()
         end
 		StarTip.addingLine = false
     end
-    -- End
+	wipe(linesToAdd)
+	wipe(linesToAddR)
+	wipe(linesToAddG)
+	wipe(linesToAddB)
+	wipe(linesToAddRight)
+	wipe(linesToAddRightR)
+	wipe(linesToAddRightG)
+	wipe(linesToAddRightB)
 end
