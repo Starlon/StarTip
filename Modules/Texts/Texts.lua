@@ -386,7 +386,7 @@ function mod:ClearTexts()
 	for k, v in pairs(mod.texts or {}) do
 		clearText(v)
 	end
-	wipe(mod.texts)
+	wipe(mod.texts or {})
 end
 
 local fontstrings = {}
