@@ -78,7 +78,7 @@ if UnitIsPlayer(unit) then
 else
     r, g, b = UnitSelectionColor(unit)
 end
-return Colorize(Name(unit, true), r, g, b)
+return Colorize(Name(unit), r, g, b)
 ]],
         right = nil,
 		bold = true,
