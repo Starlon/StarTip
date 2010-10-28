@@ -144,7 +144,7 @@ local optionsDefaults = {
 
 local intersectTimer
 local intersectUpdate = function()
-	WidgetBar.IntersectUpdate(mod.bars)
+	WidgetBar.IntersectUpdate(mod.bars or {})
 end
 
 
@@ -216,7 +216,7 @@ function mod:ClearBars()
 	for k, v in pairs(mod.bars or {}) do
 		clearBar(v)
 	end
-	wipe(mod.bars)
+	wipe(mod.bars or {})
 end
 
 local function createBars()
@@ -474,89 +474,8 @@ function mod:RebuildOpts()
 			end,
 			order = 1
 		}
-		
+		options[db.name:gsub(" ", "_")].args.direction = nil
+		options[db.name:gsub(" ", "_")].args.style = nil
 	end
 end
 
--- Colors, snagged from oUF
-local power = {
-	[0] = { r = 48/255, g = 113/255, b = 191/255}, -- Mana
-	[1] = { r = 226/255, g = 45/255, b = 75/255}, -- Rage
-	[2] = { r = 255/255, g = 178/255, b = 0}, -- Focus
-	[3] = { r = 1, g = 1, b = 34/255}, -- Energy
-	[4] = { r = 0, g = 1, b = 1}, -- Happiness
-	[5] = {}, --Unknown
-	[6] = { r = 0.23, g = 0.12, b = 0.77 } -- Runic Power
-}
-local health = {
-	[0] = {r = 49/255, g = 207/255, b = 37/255}, -- Health
-	[1] = {r = .6, g = .6, b = .6} -- Tapped targets
-}
-local happiness = {
-	[1] = {r = 1, g = 0, b = 0}, -- need.... | unhappy
-	[2] = {r = 1 ,g = 1, b = 0}, -- new..... | content
-	[3] = {r = 0, g = 1, b = 0}, -- colors.. | happy
-}
-
---[[
-function mod:UpdateBar()
-	local unit = "mouseover"
-	if not UnitExists(unit) then return end
-	local min, max = UnitHealth(unit), UnitHealthMax(unit)
-	self.hpBar:SetMinMaxValues(0, max)
-	self.hpBar:SetValue(min)
-
-	local color
-	if self.db.profile.useGradient then
-		color = StarTip.new()
-		color.r, color.g, color.b = colorGradient(min/max)
-	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
-		color = health[1]
-	elseif UnitIsPlayer(unit) then
-		color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
-	else
-		color = StarTip.new()
-		color.r, color.g, color.b = UnitSelectionColor(unit)
-	end
-	if not color then color = health[0] end
-	self.hpBar:SetStatusBarColor(color.r, color.g, color.b)
-	StarTip.del(color)
-end
-]]
--- Logic snagged from oUF
---[[
-function mod:UpdateHealth()
-	local unit = "mouseover"
-	if not UnitExists(unit) then return end
-	local min, max = UnitHealth(unit), UnitHealthMax(unit)
-	self.hpBar:SetMinMaxValues(0, max)
-	self.hpBar:SetValue(min)
-
-	local color
-	if self.db.profile.useGradient then
-		color = StarTip.new()
-		color.r, color.g, color.b = colorGradient(min/max)
-	elseif(UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) or not UnitIsConnected(unit)) then
-		color = health[1]
-	elseif UnitIsPlayer(unit) then
-		color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
-	else
-		color = StarTip.new()
-		color.r, color.g, color.b = UnitSelectionColor(unit)
-	end
-	if not color then color = health[0] end
-	self.hpBar:SetStatusBarColor(color.r, color.g, color.b)
-	StarTip.del(color)
-end
-
-function mod:UpdateMana()
-	local unit = "mouseover"
-	if not UnitExists(unit) then return end
-	local min, max = UnitMana(unit), UnitManaMax(unit)
-	self.mpBar:SetMinMaxValues(0, max)
-	self.mpBar:SetValue(min)
-
-	local color = power[UnitPowerType(unit)]
-	self.mpBar:SetStatusBarColor(color.r, color.g, color.b)
-end
-]]
