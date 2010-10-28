@@ -414,6 +414,16 @@ return select(2, GetRole(unit))
 		update = 1000
 	},
 	[22] = {
+		name = "Zone",
+		left = [[
+return "Zone:"
+]],
+		right = [[
+return select(6, UnitGuildInfo(unit))
+]],
+		enabled = true
+	},
+	[23] = {
 		name = "Location",
 		left = [[
 return "Location:"
@@ -423,7 +433,7 @@ return select(3, GetUnitTooltipStats(unit))
 ]],
 		enabled = true
 	},
-	[23] = {
+	[24] = {
 		name = "Range",
 		left = [[
 local min, max = RangeCheck:GetRange(unit)
@@ -438,6 +448,16 @@ end
 		leftUpdating = true,
 		enabled = true,
 		update = 1000
+	},
+	[24] = {
+		name = "Guild Note",
+		left = [[
+return "Guild Note:"
+]],
+		right = [[
+return select(7, UnitGuildInfo(unit))
+]],
+		enabled = true
 	},
 }
 
