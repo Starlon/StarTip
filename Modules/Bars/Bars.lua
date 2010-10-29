@@ -474,6 +474,32 @@ function mod:RebuildOpts()
 			end,
 			order = 1
 		}
+		options[db.name:gsub(" ", "_")].args.texture1 = {
+			name = "Texture #1",
+			desc = "This bar's texture",
+			type = "select",
+			values = LSM:List("statusbar"),
+			get = function() return StarTip:GetLSMIndexByName("statusbar", db.texture1 or LSM:GetDefault("statusbar"))  end,
+			set = function(info, v)
+				db.texture1 = LSM:List("statusbar")[v]
+				db.texture1Dirty = true
+				self:ClearBars()
+			end,
+			order = 5,
+		}
+		options[db.name:gsub(" ", "_")].args.texture2 = {
+			name = "Texture #2",
+			desc = "This bar's texture",
+			type = "select",
+			values = LSM:List("statusbar"),
+			get = function() return StarTip:GetLSMIndexByName("statusbar", db.texture2 or db.texture1 or LSM:GetDefault("statusbar"))  end,
+			set = function(info, v)
+				db.texture2 = LSM:List("statusbar")[v]
+				db.texture2Dirty = true
+				self:ClearBars()
+			end,
+			order = 6,
+		}
 		options[db.name:gsub(" ", "_")].args.direction = nil
 		options[db.name:gsub(" ", "_")].args.style = nil
 	end
