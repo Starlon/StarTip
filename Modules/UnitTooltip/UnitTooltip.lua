@@ -39,7 +39,7 @@ local linesToAddRightB = {}
 local lines = {}
 
 local unit
-local environment = {}
+local environment = StarTip.environment
 
 local appearance = StarTip:GetModule("Appearance")
 
@@ -83,7 +83,8 @@ return Colorize(Name(unit), r, g, b)
         right = nil,
 		bold = true,
 		enabled = true,
-		cols = 80
+		cols = 80,
+		leftOutlined = 3
     },
     [2] = {
         name = "Target",
@@ -218,6 +219,7 @@ return "Alive"
         name = "Health",
         left = 'return "Health:"',
         right = [[
+if not UnitExists(unit) then self:Stop(); return self.lastHealth end
 local health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
 local r, g, b = HPColor(health, maxHealth)
 local value = "Unknown"
@@ -226,6 +228,7 @@ if maxHealth == 100 then
 elseif maxHealth ~= 0 then
     value = Colorize(format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100), r, g, b)
 end
+self.lastHealth = value
 return value
 ]],
         rightUpdating = true,
@@ -238,6 +241,7 @@ return value
 return PowerName(unit)
 ]],
         right = [[
+if not UnitExists(unit) then self:Stop(); return self.lastMana end
 local mana = UnitMana(unit)
 local maxMana = UnitManaMax(unit)
 local r, g, b = PowerColor(nil, unit)
@@ -247,6 +251,7 @@ if maxMana == 100 then
 elseif maxMana ~= 0 then
     value = Colorize(format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100), r, g, b)
 end
+self.lastMana = value
 return value
 ]],
         rightUpdating = true,
@@ -498,7 +503,7 @@ function mod:OnInitialize()
     self:RegisterEvent("UPDATE_FACTION")
     StarTip:SetOptionsDisabled(options, true)
 
-	self.core = LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
+	self.core = StarTip.core --LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
 	environment.core = self.core
 	
 	if ResourceServer then ResourceServer:New(environment) end
@@ -556,6 +561,14 @@ do
 			fontString:SetText(widget.buffer)
 
 			font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
+			local filename, fontHeight, flags = fontString:GetFont()
+			if widget.config.outlined and widget.config.outlined > 1 then
+				if widget.config.outlined == 2 then
+					fontString:SetFont(filename, fontHeight, "OUTLINED")
+				elseif widget.config.outlined == 3 then
+					fontString:SetFont(filename, fontHeight, "THICKOUTLINED")
+				end
+			end
 		end
 		table.wipe(widgetsToDraw)
 		if UnitExists(StarTip.unit) then
@@ -595,6 +608,7 @@ function mod:CreateLines()
 			if v.enabled and not v.deleted then
                 local left, right, c, cc = '', ''
 				environment.unit = StarTip.unit
+				environment.self = mod
 				v.config.unit = StarTip.unit
                 if v.right and v.right ~= "" then
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
@@ -604,6 +618,8 @@ function mod:CreateLines()
                     right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end
+				environment.unit = nil
+				environment.self = mod
 
                 if left and left ~= "" and right ~= "nil" then
 					StarTip.addingLine = true
@@ -613,6 +629,7 @@ function mod:CreateLines()
 
 						--if not v.leftObj or v.lineNum ~= lineNum then
 							v.config.value = v.left
+							v.config.outlined = v.leftOutlined
 							local tmp = v.update
 							if not v.leftUpdating then v.update = 0 end
 
@@ -621,6 +638,7 @@ function mod:CreateLines()
 						--end
 						--if not v.rightObj or v.lineNum ~= lineNum then
 							v.config.value = v.right
+							v.config.outlined = v.rightOutlined
 							local tmp = v.update
 							if not v.rightUpdating then v.update = 0 end
 							v.rightObj = v.rightObj or WidgetText:New(mod.core, v.name .. "right", copy(v.config), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
@@ -632,6 +650,7 @@ function mod:CreateLines()
 						GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
 
 						v.config.value = v.left
+						v.config.outlined = v.leftOutlined
 						local tmp = v.update
 						if not v.leftUpdating then v.update = 0 end
 						v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name, copy(v.config), 0, 0, 0, StarTip.db.profile.errorLevel, updateWidget)
@@ -868,6 +887,32 @@ function mod:RebuildOpts()
 						end,
 						order = 7
 					},
+					leftOutlined = {
+						name = "Left Outlined",
+						desc = "Whether the left widget is outlined or not",
+						type = "select",
+						values = {"None", "Outlined", "Thick Outlilned"},
+						get = function() return v.leftOutlined or 1 end,
+						set = function(info, val)
+							v.leftOutlined = val
+							v.leftOutlinedDirty = true
+							self:CreateLines()
+						end,
+						order = 8
+					},
+					rightOutlined = {
+						name = "Right Outlined",
+						desc = "Whether the right widget is outlined or not",
+						type = "select",
+						values = {"None", "Outlined", "Thick Outlilned"},
+						get = function() return v.rightOutlined or 1 end,
+						set = function(info, val)
+							v.rightOutlined = val
+							v.rightOutlinedDirty = true
+							self:CreateLines()
+						end,
+						order = 9					
+					},
 					delete = {
 						name = "Delete",
 						desc = "Delete this line",
@@ -891,12 +936,12 @@ function mod:RebuildOpts()
 							self:ClearLines()
 							self:CreateLines()
 						end,
-						order = 8
+						order = 10
 					},
 					linesHeader = {
 						name = "Lines",
 						type = "header",
-						order = 9
+						order = 11
 					},
 					left = {
 						name = "Left",
@@ -914,7 +959,7 @@ function mod:RebuildOpts()
 						end,]]
 						multiline = true,
 						width = "full",
-						order = 10
+						order = 12
 					},
 					right = {
 						name = "Right",
@@ -929,7 +974,7 @@ function mod:RebuildOpts()
 						end,
 						multiline = true,
 						width = "full",
-						order = 11
+						order = 13
 					},
 					marquee = {
 						name = "Enhanced Settings",
