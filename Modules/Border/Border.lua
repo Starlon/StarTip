@@ -21,10 +21,10 @@ local defaults = {
 				expression = [[
 if not UnitExists(unit) then self:Stop(); return self.oldr, self.oldg, self.oldb end
 if UnitIsPlayer(unit) then
-	self.oldr, self.oldb, self.oldg = ClassColor(unit)
+	self.oldr, self.oldg, self.oldb = ClassColor(unit)
     return ClassColor(unit)
 else
-	self.oldr, self.oldb, self.oldg = UnitSelectionColor(unit)
+	self.oldr, self.oldg, self.oldb = UnitSelectionColor(unit)
     return UnitSelectionColor(unit)
 end
 ]],
