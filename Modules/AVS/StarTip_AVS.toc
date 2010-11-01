@@ -1,8 +1,0 @@
-## Interface: 40000
-## Title: StarTip [AVS]
-## Notes: Tooltips from outerspace
-## Author: Starlon
-## Version: 1.0
-## Deps: StarTip
-
-AVS.lua
