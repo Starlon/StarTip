@@ -3,12 +3,14 @@ mod.name = "Border"
 mod.toggled = true
 mod.defaultOff = true
 local L = StarTip.L
-local WidgetBorder = LibStub("LibScriptableDisplayWidgetColor-1.0")
+local WidgetColor = LibStub("LibScriptableDisplayWidgetColor-1.0")
+local LibCore = LibStub("LibScriptableDisplayCore-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
 local UIParent = _G.UIParent
 local environment = {}
+local borders = {}
 
 local defaults = {
 	profile = {
@@ -17,8 +19,14 @@ local defaults = {
 				name = "Border",
 				enabled = true,
 				expression = [[
-return 1, 1, 0
-]]
+
+if UnitIsPlayer(unit) then
+    return ClassColor(unit)
+else
+    return UnitSelectionColor(unit)
+end
+]],
+				update = 300
 			}
 		}
 	}
@@ -64,12 +72,13 @@ local function copy(tbl)
 	return newTbl
 end
 
+local function draw(widget)
+	GameTooltip:SetBackdropBorderColor(widget.r, widget.g, widget.b, widget.a)
+end
+
 function mod:CreateBorders()
 	for i, border in ipairs(self.db.profile.borders) do
-		local widget = WidgetColor:New(self.core, border.name, copy(border), StarTip.db.profile.errorLevel) 
-		if border.enabled then
-			widget:Start()
-		end
+		local widget = WidgetColor:New(self.core, border.name, copy(border), StarTip.db.profile.errorLevel, draw)
 		tinsert(borders, widget)
 	end
 end
@@ -84,11 +93,10 @@ end
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
-	self.core = StarTip.core --LibCore:New(mod, environment, "StarTip.Border", {["StarTip.Border"] = {}}, nil, StarTip.db.profile.errorLevel)
+	self.core = LibCore:New(mod, environment, "StarTip.Border", {["StarTip.Border"] = {}}, nil, StarTip.db.profile.errorLevel)
 end
 
 function mod:OnEnable()
-	
 	StarTip:SetOptionsDisabled(options, false)
 	self:CreateBorders()
 end
@@ -102,8 +110,20 @@ function mod:GetOptions()
 	return options
 end
 
+function mod:SetUnit()
+	for k, v in pairs(borders) do
+		v:Start()
+	end
+end
+
+function mod:OnHide()
+	for k, v in pairs(borders) do
+		v:Stop()
+	end
+end
+
 function mod:RebuildOpts()
-	local defaults = WidgetBorder.defaults
+	local defaults = WidgetColor.defaults
 	self:WipeBorders()
 	self:CreateBorders()
 	wipe(options)
@@ -115,7 +135,7 @@ function mod:RebuildOpts()
 			name = db.name,
 			type="group",
 			order = i,
-			args=WidgetBorder:GetOptions(db, StarTip.RebuildOpts, StarTip)
+			args=WidgetColor:GetOptions(db, StarTip.RebuildOpts, StarTip)
 		}
 		options[db.name:gsub(" ", "_")].args.delete = {
 			name = "Delete",
