@@ -1,0 +1,8 @@
+## Interface: 40000
+## Title: StarTip [Border]
+## Notes: Tooltips from outerspace
+## Author: Starlon
+## Version: @package-version@
+## Deps: StarTip
+
+Border.lua

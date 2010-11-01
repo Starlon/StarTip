@@ -3,6 +3,7 @@
 
 <!--@debug@-->
 <Script file = "Modules\Appearance\Appearance.lua"/>
+<Script file = "Modules\Border\Border.lua"/>
 <Script file = "Modules\Fade\Fade.lua"/>
 <Script file = "Modules\Position\Position.lua"/>
 <Script file = "Modules\PvP\PvP.lua"/>
