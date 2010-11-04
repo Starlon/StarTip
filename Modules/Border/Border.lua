@@ -19,7 +19,7 @@ local defaults = {
 				name = "Border",
 				enabled = true,
 				expression = [[
-if not UnitExists(unit) then self:Stop(); return self.oldr, self.oldg, self.oldb end
+if not UnitExists(unit) then return self.oldr, self.oldg, self.oldb end
 if UnitIsPlayer(unit) then
 	self.oldr, self.oldg, self.oldb = ClassColor(unit)
     return ClassColor(unit)
