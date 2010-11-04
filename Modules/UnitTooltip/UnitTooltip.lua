@@ -454,7 +454,7 @@ end
 		enabled = true,
 		update = 1000
 	},
-	[24] = {
+	[25] = {
 		name = "Guild Note",
 		left = [[
 return "Guild Note:"
@@ -464,9 +464,10 @@ return select(7, UnitGuildInfo(unit))
 ]],
 		enabled = true
 	},
-	[24] = {
-		name = "Main Name (requires Chatter)",
+	[26] = {
+		name = "Main Name",
 		left = [[
+-- This requires Chatter
 return "Main:"
 ]],
 		right = [[
