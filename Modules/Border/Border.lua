@@ -1,7 +1,7 @@
 local mod = StarTip:NewModule("Border")
 mod.name = "Border"
 mod.toggled = true
-mod.defaultOff = true
+mod.defaultOff = false
 local L = StarTip.L
 local WidgetColor = LibStub("LibScriptableDisplayWidgetColor-1.0")
 local LibCore = LibStub("LibScriptableDisplayCore-1.0")
