@@ -219,7 +219,7 @@ return "Alive"
         name = "Health",
         left = 'return "Health:"',
         right = [[
-if not UnitExists(unit) then self:Stop(); return self.lastHealth end
+if not UnitExists(unit) and self.Stop then self:Stop(); return self.lastHealth end
 local health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
 local r, g, b = HPColor(health, maxHealth)
 local value = "Unknown"
@@ -241,7 +241,7 @@ return value
 return PowerName(unit)
 ]],
         right = [[
-if not UnitExists(unit) then self:Stop(); return self.lastMana end
+if not UnitExists(unit) and self.Stop then self:Stop(); return self.lastMana end
 local mana = UnitMana(unit)
 local maxMana = UnitManaMax(unit)
 local r, g, b = PowerColor(nil, unit)
