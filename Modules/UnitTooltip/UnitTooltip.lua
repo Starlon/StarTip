@@ -471,7 +471,7 @@ return select(7, UnitGuildInfo(unit))
 return "Main:"
 ]],
 		right = [[
-if not _G.Chatter then self:Stop(); return end
+if not _G.Chatter then return end
 local mod = _G.Chatter:GetModule("Alt Linking")
 local name = UnitName(unit)
 return mod.db.realm[name]
