@@ -1166,8 +1166,6 @@ local plugin = LibStub("LibScriptableDisplayPluginString-1.0")
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
 	
-	GameTooltip:ClearLines()
-	
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 
 	self.NUM_LINES = 0
@@ -1215,10 +1213,12 @@ function mod:SetUnit()
     end
     -- End
 
+	GameTooltip:ClearLines()
+	
 	lines()
 
 	if self.db.profile.refreshRate > 0 and self.timer then
-		self.timer:Start()
+		--self.timer:Start()
 	end
 	
 	self:RefixEndLines()
