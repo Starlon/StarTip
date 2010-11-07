@@ -1212,13 +1212,11 @@ function mod:SetUnit()
         end
     end
     -- End
-
-	GameTooltip:ClearLines()
 	
 	lines()
 
 	if self.db.profile.refreshRate > 0 and self.timer then
-		--self.timer:Start()
+		self.timer:Start()
 	end
 	
 	self:RefixEndLines()
