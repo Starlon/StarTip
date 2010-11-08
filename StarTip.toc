@@ -8,7 +8,7 @@
 ## X-License: GPL v3
 ## X-Credits: ckknight for CowTip and DogTags
 ## X-StarTip-Version: @project-version@
-## OptionalDeps: Ace3, LibScriptableDisplay-1.0, ResourceServer
+## OptionalDeps: Ace3, LibScriptableDisplay-1.0, ResourceServer, kgPanels
 ## SavedVariables: StarTipDB
 
 Libs\LibStub\LibStub.lua
