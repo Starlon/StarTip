@@ -110,8 +110,7 @@ return name and Colorize(name, r, g, b) or "None"
         name = "Guild",
         left = 'return "Guild:"',
         right = [[
-guild = Guild(unit)
-if guild then return "<" .. guild .. ">" else return unitGuild end
+return Guild(unit, true)
 ]],
 		enabled = true
     },
