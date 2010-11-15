@@ -135,7 +135,17 @@ return Realm(unit)
         left = 'return "Level:"',
         right = [[
 local classification = Classification(unit)
-return format("%s%s", Level(unit), Colorize(classification and (' ' .. classification) or '', DifficultyColor(unit)))
+local lvl = Level(unit)
+local str = ""
+local r, g, b
+if classification then
+    str = str .. classification
+end
+if lvl then
+    str = str .. " (" .. lvl .. ")"
+end
+str = Colorize(str, DifficultyColor(unit))
+return str
 ]],
 		enabled = true,
     },
