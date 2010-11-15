@@ -139,7 +139,7 @@ local lvl = Level(unit)
 local str = ""
 local r, g, b
 if classification then
-    str = str .. classification
+    str = classification
 end
 if lvl then
     str = str .. " (" .. lvl .. ")"
