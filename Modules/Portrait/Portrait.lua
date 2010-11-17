@@ -133,7 +133,7 @@ function mod:SetItem()
 		--make sure the icon does not display twice on recipies, which fire OnTooltipSetItem twice
 		self.text:SetFormattedText('|T%s:%d|t%s', GetItemIcon(link), 36, self.text:GetText())
 	end
-	lasttxt = self.text:GetGext()
+	lasttxt = self.text:GetText()
 end
 
 function mod:SetSpell()
