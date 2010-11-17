@@ -22,15 +22,12 @@ local defaults = {
 	profile = {
 		gestures = {
 			[1] = {
-				name = "Hide Tooltip",
+				name = "Wipe Data",
 				enabled = true,
 				gestures = {{type="line", pattern="right"}, {type="line", pattern="left"}, {type="line", pattern="right"}, {type="line", pattern="left"}},
 				expression = [[
-if not _G.StarTip.tooltipHidden then
-    _G.StarTip:HideTooltip()
-else
-    _G.StarTip:ShowTooltip()
-end
+WipeDPS()
+WipeNoise()
 ]]
 			},
 			[2] = {
