@@ -99,7 +99,7 @@ end
 
 function mod:SetUnit()
 	if not self.text or not self.texture then return end
-	
+		
 	SetPortraitTexture(self.texture, StarTip.unit or "mouseover")
 	
 	if not self.texture:GetTexture() then 
@@ -120,8 +120,12 @@ function mod:SetUnit()
 	self.text:SetFormattedText('|T%s:%d|t %s', "", self.db.profile.size, self.text:GetText() or "") -- we only need a blank space for the texture
 end
 
+local lasttxt = ""
 function mod:SetItem()
 	if not self.text then return end
+
+	local txt = self.text:GetText()
+	if txt == lasttxt then return end
 	
 	local link = select(2, GameTooltip:GetItem())
 	
@@ -129,16 +133,21 @@ function mod:SetItem()
 		--make sure the icon does not display twice on recipies, which fire OnTooltipSetItem twice
 		self.text:SetFormattedText('|T%s:%d|t%s', GetItemIcon(link), 36, self.text:GetText())
 	end
+	lasttxt = self.text:GetGext()
 end
 
 function mod:SetSpell()
 	if not self.text then return end
+
+	local txt = self.text:GetText()
+	if txt == lasttxt then return end
 	
 	local id = select(3, GameTooltip:GetSpell())
 	local icon = id and select(3, GetSpellInfo(id))
 	if icon then
 		self.text:SetFormattedText('|T%s:%d|t%s', icon, 36, self.text:GetText())
 	end
+	lasttxt = self.text:GetText()
 end
 
 function mod:OnHide()
