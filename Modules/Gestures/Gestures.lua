@@ -32,6 +32,24 @@ else
     _G.StarTip:ShowTooltip()
 end
 ]]
+			},
+			[2] = {
+				name = "Start Data",
+				enabled = false,
+				gestures = {{type="circle", pattern="clockwise"}},
+				expression = [[
+StartDPS()
+StartNoise()
+]]
+			},
+			[3] = {
+				name = "Stop Data",
+				enabled = false,
+				gestures = {{type="circle", pattern="counterclockwise"}},
+				expression = [[
+StopDPS()
+StopNoise()
+]]
 			}
 		}
 	}
@@ -64,8 +82,9 @@ local optionsDefaults = {
 		desc = "Restore Defaults",
 		type = "execute",
 		func = function()
-			mod.db.profile.gestures = copy(defaultWidgets);
+			mod.db.profile.gestures = {}
 			StarTip:RebuildOpts()
+			StarTip:Print("You'll need to reload your UI. Type /reload")
 		end,
 		order = 6
 	},
@@ -138,7 +157,7 @@ function mod:RebuildOpts()
 			desc = "Delete this widget",
 			type = "execute",
 			func = function()
-				self.db.profile.gestures[i] = nil
+				self.db.profile.gestures[i] = {}
 				StarTip:RebuildOpts()
 			end,
 			order = 100
