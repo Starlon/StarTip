@@ -486,6 +486,29 @@ local name = UnitName(unit)
 return mod.db.realm[name]
 ]],
 		enabled = true
+	},
+	[27] = {
+		name = "DPS",
+		left = [[
+return "DPS:"
+]],
+		right = [[
+return UnitDPS(unit)
+]],
+		enabled = true
+	},
+	[28] = {
+		name = "Skada DPS",
+		left = [[
+return "Skada DPS:"
+]],
+		right = [[
+local dps = SkadaUnitDPS(unit)
+if dps then
+    return format("%d", dps)
+end
+]],
+		enabled = true
 	}
 }
 
@@ -493,6 +516,7 @@ local options = {}
 
 function mod:ReInit()
 	self:ClearLines()
+	self.db.profile.lines = {}
 	for k, v in ipairs(defaultLines) do
 		for j, vv in ipairs(self.db.profile.lines) do
 			vv.colorLeft = nil
