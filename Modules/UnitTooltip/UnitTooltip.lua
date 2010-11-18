@@ -400,7 +400,7 @@ end
 return SpecText(unit)
 ]],
 		rightUpdating = true,
-		enabled = false,
+		enabled = true,
 		update = 1000
 	},
 	[20] = {
