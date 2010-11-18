@@ -516,7 +516,6 @@ local options = {}
 
 function mod:ReInit()
 	self:ClearLines()
-	self.db.profile.lines = {}
 	for k, v in ipairs(defaultLines) do
 		for j, vv in ipairs(self.db.profile.lines) do
 			vv.colorLeft = nil
