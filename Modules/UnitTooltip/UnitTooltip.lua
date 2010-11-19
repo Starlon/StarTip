@@ -85,7 +85,7 @@ else
 	afk = ""
 end
 local dnd = DND(unit)
-if dnd then
+if dnd and afk == "" then
 	afk = " " .. Angle(dnd)
 end
 return Colorize(Name(unit) .. afk , r, g, b)
