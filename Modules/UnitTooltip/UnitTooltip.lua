@@ -78,7 +78,17 @@ if UnitIsPlayer(unit) then
 else
     r, g, b = UnitSelectionColor(unit)
 end
-return Colorize(Name(unit), r, g, b)
+local afk = AFK(unit)
+if afk then
+	afk = " " .. Angle(afk)
+else
+	afk = ""
+end
+local dnd = DND(unit)
+if dnd then
+	afk = " " .. Angle(dnd)
+end
+return Colorize(Name(unit) .. afk , r, g, b)
 ]],
         right = nil,
 		bold = true,
