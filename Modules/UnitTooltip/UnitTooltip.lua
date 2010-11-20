@@ -284,7 +284,7 @@ return value
 local name = Name(unit)
 local str = ""
 if UnitIsBanished(unit) then
-	sre = sre .. "[Banished]"
+	srr = srr .. "[Banished]"
 end
 if UnitIsCharmed(unit) then
 	str = str .. "[Charmed]"
