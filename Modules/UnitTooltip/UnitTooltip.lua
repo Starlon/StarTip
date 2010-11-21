@@ -498,6 +498,24 @@ return mod.db.realm[name]
 		enabled = true
 	},
 	[27] = {
+		name = "Recount",
+		left = [[
+return "Recount:"
+]],
+right = [[
+local val, perc, persec, maxvalue = RecountUnitData(unit)
+if val then
+    local r, g, b = Gradient(perc / 100)
+    local prefix=""
+    if persec then
+        prefix = persec .. ", "
+    end
+    return Colorize(string.format("%d (%s%d%%)", val, prefix, perc), r, g, b)
+end
+]],
+		enabled = true
+	},
+	[28] = {
 		name = "DPS",
 		left = [[
 return "DPS:"
