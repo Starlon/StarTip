@@ -503,9 +503,10 @@ return mod.db.realm[name]
 return "Recount:"
 ]],
 right = [[
-local val, perc, persec, maxvalue = RecountUnitData(unit)
-if val then
-    local r, g, b = Gradient(perc / 100)
+local val, perc, persec, maxvalue, maxvalue, total = RecountUnitData(unit)
+if val and val ~= 0 then
+	local p = maxvalue ~= 0 and (val / maxvalue) or 1
+    local r, g, b = Gradient(p)
     local prefix=""
     if persec then
         prefix = persec .. ", "
@@ -513,7 +514,9 @@ if val then
     return Colorize(string.format("%d (%s%d%%)", val, prefix, perc), r, g, b)
 end
 ]],
-		enabled = true
+		enabled = true,
+		rightUpdating = true,
+		update = 1000
 	},
 	[28] = {
 		name = "DPS",
@@ -523,9 +526,11 @@ return "DPS:"
 		right = [[
 return UnitDPS(unit)
 ]],
-		enabled = true
+		enabled = true,
+		rightUpdating = true,
+		update = 1000
 	},
-	[28] = {
+	[29] = {
 		name = "Skada DPS",
 		left = [[
 return "Skada DPS:"
@@ -536,7 +541,9 @@ if dps then
     return format("%d", dps)
 end
 ]],
-		enabled = true
+		enabled = true,
+		rightUpdating = true,
+		update = 1000
 	}
 }
 
@@ -570,6 +577,7 @@ end
 function mod:OnInitialize()
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 
+	self.db.profile.lines = {}
 	self:ReInit()
 	
     self.leftLines = StarTip.leftLines
