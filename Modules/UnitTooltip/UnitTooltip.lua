@@ -592,7 +592,7 @@ function mod:OnInitialize()
 	--self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
 	--self.core.lcd = self.lcd
 
-	self.evaluator = LibEvaluator:New(environment, StarTip.db.profile.errorLevel)
+	self.evaluator = LibEvaluator
 end
 
 local draw
