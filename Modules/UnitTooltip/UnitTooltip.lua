@@ -503,9 +503,9 @@ return mod.db.realm[name]
 return "Recount:"
 ]],
 right = [[
-local val, perc, persec, maxvalue, maxvalue, total = RecountUnitData(unit)
+local val, perc, persec, maxvalue, total = RecountUnitData(unit)
 if val and val ~= 0 then
-	local p = maxvalue ~= 0 and (val / maxvalue) or 1
+	local p = total ~= 0 and (val / maxvalue) or 1
     local r, g, b = Gradient(p)
     local prefix=""
     if persec then
