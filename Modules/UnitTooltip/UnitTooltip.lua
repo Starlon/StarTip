@@ -577,7 +577,6 @@ end
 function mod:OnInitialize()
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 
-	self.db.profile.lines = {}
 	self:ReInit()
 	
     self.leftLines = StarTip.leftLines
