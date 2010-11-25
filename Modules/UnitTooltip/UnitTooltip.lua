@@ -168,7 +168,7 @@ if sex == 2 then
     return "Male"
 elseif sex == 3 then
     return "Female"
-end		
+end
 ]],
 		enabled = true
 	},
@@ -199,7 +199,7 @@ return Colorize(UnitClass(unit), r, g, b)
 	name = "Druid Form",
 	left = 'return "Form:"',
 	right = [[
-return DruidForm(unit)	
+return DruidForm(unit)
 ]],
 	enabled = true
 	},
@@ -347,7 +347,7 @@ if UnitIsWounded(unit) then
 	str = str .. "[Wounded]"
 end
 if str == "" then
-	return "Has Control"	
+	return "Has Control"
 else
 	return str
 end
@@ -416,7 +416,7 @@ return SpecText(unit)
 	[20] = {
 		name = "Current Role",
 		left = [[
-return "Current Role:"		
+return "Current Role:"
 ]],
 		right = [[
 return GetRole(unit)
@@ -577,7 +577,7 @@ end
 function mod:OnInitialize()
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 
-	
+
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
@@ -585,7 +585,7 @@ function mod:OnInitialize()
 
 	self.core = StarTip.core --LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
 	environment.core = self.core
-	
+
 	if ResourceServer then ResourceServer:New(environment) end
 	--self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
 	--self.core.lcd = self.lcd
@@ -684,16 +684,15 @@ function mod:CreateLines()
 			llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. "left", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 			v.value = v.right
 			v.outlined = v.rightOutlined
-			llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. "right", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)			
+			llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. "right", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 		end
     end
 	self:ClearLines()
     lines = setmetatable(llines, {__call=function(self)
-        local lineNum = 0
-		GameTooltip:ClearLines()
-        for i, v in ipairs(self) do
-			if v.enabled and not v.deleted then
-                local left, right, c, cc = '', ''
+			local lineNum = 0
+			GameTooltip:ClearLines()
+			for i, v in ipairs(self) do
+                local left, right = '', ''
 				environment.unit = StarTip.unit
 				environment.self = mod
 				v.config.unit = StarTip.unit
@@ -734,12 +733,10 @@ function mod:CreateLines()
 					v.lineNum = lineNum
 				end
 			end
-
-        end
-        mod.NUM_LINES = lineNum
-		draw()
-		GameTooltip:Show()
-    end})
+			mod.NUM_LINES = lineNum
+			draw()
+			GameTooltip:Show()
+	end})
 end
 
 --[[
@@ -976,7 +973,7 @@ function mod:RebuildOpts()
 							v.rightOutlinedDirty = true
 							self:CreateLines()
 						end,
-						order = 9					
+						order = 9
 					},
 					delete = {
 						name = "Delete",
@@ -1216,11 +1213,11 @@ end
 local plugin = LibStub("LibScriptableDisplayPluginString-1.0")
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
-	
+
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
 
 	self.NUM_LINES = 0
-	
+
     -- Taken from CowTip
     local lastLine = 2
     local text2 = self.leftLines[2]:GetText()
@@ -1263,15 +1260,15 @@ function mod:SetUnit()
         end
     end
     -- End
-	
+
 	lines()
 
 	if self.db.profile.refreshRate > 0 and self.timer then
 		self.timer:Start()
 	end
-	
+
 	self:RefixEndLines()
-	
+
 	GameTooltip:Show()
 
 end
