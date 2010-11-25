@@ -154,9 +154,9 @@ function updateBar(widget, bar)
 	local r, g, b = 0, 0, 1
 
 	if widget.color1 and widget.bar1 then
-		r, g, b = widget.color1.res1, widget.color1.res2, widget.color1.res3
+		r, g, b = widget.color1.ret1, widget.color1.ret2, widget.color1.ret3
 	elseif widget.color2 and widget.color2.is_valid then
-		r, g, b = widget.color2.res1, widget.color2.res2, widget.color2.res3
+		r, g, b = widget.color2.ret1, widget.color2.ret2, widget.color2.ret3
 	end
 
 	if type(r) == "number" then

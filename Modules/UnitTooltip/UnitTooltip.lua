@@ -694,7 +694,6 @@ function mod:CreateLines()
 			for i, v in ipairs(self) do
                 local left, right = '', ''
 				environment.unit = StarTip.unit
-				environment.self = mod
 				v.config.unit = StarTip.unit
                 if v.right and v.right ~= "" then
 					environment.self = v.rightObj
