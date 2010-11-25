@@ -577,7 +577,6 @@ end
 function mod:OnInitialize()
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 
-	self:ReInit()
 	
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
@@ -592,6 +591,7 @@ function mod:OnInitialize()
 	--self.core.lcd = self.lcd
 
 	self.evaluator = LibEvaluator
+	self:ReInit()
 end
 
 local draw
@@ -675,10 +675,16 @@ function mod:CreateLines()
     local llines = {}
 	local j = 0
     for i, v in ipairs(self.db.profile.lines) do
-		if not v.deleted then
+		if not v.deleted and v.enabled then
 			j = j + 1
 			llines[j] = copy(v)
 			llines[j].config = copy(v)
+			v.value = v.left
+			v.outlined = v.leftOutlined
+			llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. "left", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
+			v.value = v.right
+			v.outlined = v.rightOutlined
+			llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. "right", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)			
 		end
     end
 	self:ClearLines()
@@ -692,11 +698,14 @@ function mod:CreateLines()
 				environment.self = mod
 				v.config.unit = StarTip.unit
                 if v.right and v.right ~= "" then
+					environment.self = v.rightObj
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
+					environment.self = v.leftObj
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
 					if right == "" then right = "nil" end
                 else
                     right = ''
+					environment.self = v.leftObj
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end
 				environment.unit = nil
@@ -707,35 +716,10 @@ function mod:CreateLines()
                     lineNum = lineNum + 1
                     if v.right then
 						GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
-
-						--if not v.leftObj or v.lineNum ~= lineNum then
-							v.config.value = v.left
-							v.config.outlined = v.leftOutlined
-							local tmp = v.update
-							if not v.leftUpdating then v.update = 0 end
-
-							v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name .. "left", copy(v.config), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
-							v.update = tmp
-						--end
-						--if not v.rightObj or v.lineNum ~= lineNum then
-							v.config.value = v.right
-							v.config.outlined = v.rightOutlined
-							local tmp = v.update
-							if not v.rightUpdating then v.update = 0 end
-							v.rightObj = v.rightObj or WidgetText:New(mod.core, v.name .. "right", copy(v.config), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
-							v.update = tmp
-						--end
 						v.leftObj.fontString = mod.leftLines[lineNum]
 						v.rightObj.fontString = mod.rightLines[lineNum]
                     else
 						GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
-
-						v.config.value = v.left
-						v.config.outlined = v.leftOutlined
-						local tmp = v.update
-						if not v.leftUpdating then v.update = 0 end
-						v.leftObj = v.leftObj or WidgetText:New(mod.core, v.name, copy(v.config), 0, 0, 0, StarTip.db.profile.errorLevel, updateWidget)
-						v.update = tmp
 						v.leftObj.fontString = mod.leftLines[lineNum]
                     end
 					if v.rightObj then
