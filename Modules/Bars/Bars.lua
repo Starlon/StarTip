@@ -68,6 +68,7 @@ else
 end
 ]],
 		height = 6,
+		width = 6,
 		points = {{"BOTTOM", "GameTooltip", "TOP", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
@@ -87,13 +88,35 @@ return UnitMana(unit)
 return PowerColor(nil, unit)
 ]],
 		height = 6,
+		width = 6,
 		points = {{"TOP", "GameTooltip", "BOTTOM", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
 		layer = 1,
 		level = 100
 	},
-
+	[3] = {
+		name = "Threat Bar",
+		type = "bar",
+		expression = [[
+local _,_,threatpct = UnitDetailedThreatSituation(unit, "target")
+return threatpct or 0
+]],
+		color1 = [[
+local _, status = UnitDetailedThreatSituation(unit, "target")
+return GetThreatStatusColor(status)
+]],
+		width = 6,
+		height = 0,
+		points = {{"LEFT", "GameTooltip", "RIGHT", 0, 0}, {"TOP", "GameTooltip", "TOP", 0, -5}, {"BOTTOM", "GameTooltip", "BOTTOM", 0, 5}},
+		texture = LSM:GetDefault("statusbar"),
+		min = "return 0",
+		max = "return 100",
+		enabled = true,
+		layer = 1,
+		level = 100,
+		orientation = WidgetBar.ORIENTATION_VERTICAL
+	}
 
 }
 
@@ -228,9 +251,14 @@ local function createBars()
 			local widget = mod.bars[v]
 			if not widget then
 				local bar = new()
-				widget = WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
+				widget = WidgetBar:New(mod.core, v.name, copy(v), v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
+				if widget.orientation == WidgetBar.ORIENTATION_VERTICAL then
+					bar:SetOrientation("VERTICAL")
+				else
+					bar:SetOrientation("HORIZONTAL")
+				end
 				for j, point in ipairs(v.points) do
 					local arg1, arg2, arg3, arg4, arg5 = unpack(point)
 					arg4 = (arg4 or 0)
