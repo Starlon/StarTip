@@ -12,11 +12,11 @@ local LSM = _G.LibStub("LibSharedMedia-3.0")
 local defaults = {
 	profile = {
 		scale = 1,
-		font = StarTip:GetLSMIndexByName("font", LSM:GetDefault("font")),
+		font = "Friz Quadrata TT",
 		fontSizeNormal = 12,
 		fontSizeBold = 14,		
-		edgeFile = StarTip:GetLSMIndexByName("border", "Blizzard Tooltip"),
-		background = StarTip:GetLSMIndexByName("background", "Blizzard Tooltip"),
+		edgeFile = "Blizzard Tooltip",
+		background = "Blizzard Tooltip",
 		bgColor = { -- Default colors from CowTip
 			guild = {0, 0.15, 0, 1},
 			hostilePC = {0.25, 0, 0, 1},
@@ -75,8 +75,13 @@ local options = {
 		desc = "Set the tooltip's font",
 		type = "select",
 		values = LSM:List("font"),
-		get = get,
-		set = set,
+		get = function() 
+			return StarTip:GetLSMIndexByName("font", mod.db.profile.font)
+		end,
+		set = function(info, val)
+			local list = LSM:List("font")
+			mod.db.profile.font = list[val]
+		end,
 		order = 5
 	},
 	fontSizeNormal = {
@@ -103,8 +108,13 @@ local options = {
 		desc = "Set the tooltip's border style",
 		type = "select",
 		values = LSM:List("border"),
-		get = get,
-		set = set,
+		get = function()
+			return StarTip:GetLSMIndexByName("border", mod.db.profile.edgeFile)
+		end,
+		set = function(info, val)
+			local list = LSM:List("border")
+			mod.db.profile.edgeFile = list[val]
+		end,
 		order = 8
 	},
 	background = {
@@ -112,8 +122,13 @@ local options = {
 		desc = "Set the tooltip's background style",
 		type = "select",
 		values = LSM:List("background"),
-		get = get,
-		set = set,
+		get = function() 
+			return StarTip:GetLSMIndexByName("background", mod.db.profile.background)
+		end,
+		set = function(info, val)
+			local list = LSM:List("background")
+			mod.db.profile.background = list[val]
+		end,
 		order = 9
 	},
 	borderColor = {
@@ -299,6 +314,33 @@ function mod:OnInitialize()
 	ShoppingTooltip1:Hide()
 	ShoppingTooltip2:Show()
 	ShoppingTooltip2:Hide()
+	
+	if type(self.db.profile.edgeFile) == "number" then
+		local list = LSM:List("border")
+		if list[self.db.profile.edgeFile] then
+			self.db.profile.edgeFile = list[self.db.profile.edgeFile]
+		else
+			self.db.profile.edgeFile = LSM:GetDefault("border")
+		end
+	end
+	
+	if type(self.db.profile.background) == "number" then
+		local list = LSM:List("background")
+		if list[self.db.profile.background] then
+			self.db.profile.background = list[self.db.profile.background]
+		else
+			self.db.profile.background = LSM:GetDefault("background")
+		end
+	end
+	
+	if type(self.db.profile.font) == "number" then
+		local list = LSM:List("font")
+		if list[self.db.profile.font] then
+			self.db.profile.font = list[self.db.profile.font]
+		else
+			self.db.profile.font = LSM:GetDefault("font")
+		end
+	end
 end
 
 function mod:OnEnable()
@@ -356,7 +398,7 @@ function mod:SetFont(reset)
 	if reset then 
 		font = "Friz Quadrata TT"
 	else
-		font = LSM:Fetch('font', LSM:List("font")[self.db.profile.font])
+		font = LSM:Fetch('font', self.db.profile.font)
 	end
 
 	if StarTip.leftLines[1]:GetFont() == font then
@@ -396,8 +438,8 @@ function mod:SetBackdrop()
 	else
 		local bd = GameTooltip:GetBackdrop()
 		local changed = false
-		local bgFile = LSM:Fetch('background', LSM:List('background')[self.db.profile.background])
-		local edgeFile = LSM:Fetch('border', LSM:List('border')[self.db.profile.edgeFile])
+		local bgFile = LSM:Fetch('background', self.db.profile.background)
+		local edgeFile = LSM:Fetch('border', self.db.profile.edgeFile)
 
 		if bd.bgFile ~= bgFile or bd.edgeFile ~= edgeFile or bd.edgeSize ~= self.db.profile.edgeSize or bd.insets.left ~= self.db.profile.padding then
 			changed = true
