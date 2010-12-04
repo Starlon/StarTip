@@ -548,6 +548,12 @@ end
 	[30] = {
 		name = "Spell Cast",
 		left = [[
+local cast_data = CastData(unit)
+if cast_data then
+	if cast_data.channeling then
+		return "Channeling:"
+	end
+end
 return "Casting:"
 ]],
 		right = [[
