@@ -564,7 +564,6 @@ if cast_data then
     i = (end_time - GetTime()) / (end_time - cast_data.start_time) * 100
   end
 
-  _G.StarTip:Print(i)
   local icon = Texture(format("Interface\\Addons\\StarTip\\Media\\gradient\\gradient-%d.blp", i), 12) .. " "
   
   if stop_time then
