@@ -544,6 +544,48 @@ end
 		enabled = true,
 		rightUpdating = true,
 		update = 1000
+	},
+	[30] = {
+		name = "Spell Cast",
+		left = [[
+return "Casting:"
+]],
+		right = [[
+local cast_data = CastData(unit)
+if cast_data then
+  local spell,stop_message,target = cast_data.spell,cast_data.stop_message,cast_data.target
+  local stop_time,stop_duration = cast_data.stop_time
+  local i = -1
+  if cast_data.casting then
+    local start_time = cast_data.start_time
+    i = (GetTime() - start_time) / (cast_data.end_time - start_time) * 100
+  elseif cast_data.channeling then	
+    local end_time = cast_data.end_time
+    i = (end_time - GetTime()) / (end_time - cast_data.start_time) * 100
+  end
+
+  _G.StarTip:Print(i)
+  local icon = Texture(format("Interface\\Addons\\StarTip\\Media\\gradient\\gradient-%d.blp", i), 12) .. " "
+  
+  if stop_time then
+    stop_duration = GetTime() - stop_time
+  end
+  Alpha(-(stop_duration or 0) + 1)
+  
+  if stop_message then
+    return stop_message
+  elseif target then
+    return icon .. format("%s (%s)",spell,target)
+  else
+    return icon .. spell 
+  end
+end
+return Texture("Interface\\Addons\\StarTip\\Media\\happy_face.blp", 20)
+]],
+		enabled = true,
+		cols = 100,
+		rightUpdating = true,
+		update = 100
 	}
 }
 
