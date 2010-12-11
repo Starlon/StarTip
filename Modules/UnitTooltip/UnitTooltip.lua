@@ -76,7 +76,11 @@ local r, g, b
 if UnitIsPlayer(unit) then
     r, g, b = ClassColor(unit)
 else
-    r, g, b = UnitSelectionColor(unit)
+	if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
+		r, g, b = .5, .5, .5
+	else
+		r, g, b = UnitSelectionColor(unit)
+	end
 end
 local afk = AFK(unit)
 if afk then
@@ -440,12 +444,13 @@ return select(2, GetRole(unit))
 	[22] = {
 		name = "Zone",
 		left = [[
+-- This doesn't work. Leaving it here for now.
 return "Zone:"
 ]],
 		right = [[
 return select(6, UnitGuildInfo(unit))
 ]],
-		enabled = true
+		enabled = false
 	},
 	[23] = {
 		name = "Location",
