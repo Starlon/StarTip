@@ -64,7 +64,7 @@ return UnitHealth(unit)
 if UnitIsPlayer(unit) then
     return ClassColor(unit)
 else
-	if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit)
+	if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
 		return .5, .5, .5
 	else
 		return UnitSelectionColor(unit)
