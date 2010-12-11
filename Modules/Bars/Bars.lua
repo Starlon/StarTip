@@ -64,7 +64,11 @@ return UnitHealth(unit)
 if UnitIsPlayer(unit) then
     return ClassColor(unit)
 else
-    return UnitSelectionColor(unit)
+	if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit)
+		return .5, .5, .5
+	else
+		return UnitSelectionColor(unit)
+	end
 end
 ]],
 		height = 6,
