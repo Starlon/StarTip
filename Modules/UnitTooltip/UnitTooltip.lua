@@ -476,9 +476,30 @@ end
 ]],
 		leftUpdating = true,
 		enabled = true,
-		update = 1000
+		update = 300
 	},
 	[25] = {
+		name = "Movement",
+		left = [[
+local pitch = GetUnitPitch(unit)
+local speed = GetUnitSpeed(unit)
+local str = ""
+if abs(pitch) > .01 then
+	str = format("Pitch: %.1f", pitch)
+end
+if speed > 0 then
+	if str ~= "" then
+		str = str .. " - "
+	end
+	str = str .. format("Speed: %.1f", speed)
+end
+return str
+]],
+		leftUpdatinge = true,
+		enabled = true,
+		update = 100
+	},
+	[26] = {
 		name = "Guild Note",
 		left = [[
 return "Guild Note:"
@@ -488,7 +509,7 @@ return select(7, UnitGuildInfo(unit))
 ]],
 		enabled = true
 	},
-	[26] = {
+	[27] = {
 		name = "Main Name",
 		left = [[
 -- This requires Chatter
@@ -502,7 +523,7 @@ return mod.db.realm[name]
 ]],
 		enabled = true
 	},
-	[27] = {
+	[28] = {
 		name = "Recount",
 		left = [[
 return "Recount:"
@@ -523,7 +544,7 @@ end
 		rightUpdating = true,
 		update = 1000
 	},
-	[28] = {
+	[29] = {
 		name = "DPS",
 		left = [[
 return "DPS:"
@@ -535,7 +556,7 @@ return UnitDPS(unit)
 		rightUpdating = true,
 		update = 1000
 	},
-	[29] = {
+	[30] = {
 		name = "Skada DPS",
 		left = [[
 return "Skada DPS:"
@@ -550,7 +571,7 @@ end
 		rightUpdating = true,
 		update = 1000
 	},
-	[30] = {
+	[31] = {
 		name = "Spell Cast",
 		left = [[
 local cast_data = CastData(unit)
