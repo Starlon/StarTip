@@ -481,6 +481,7 @@ end
 	[25] = {
 		name = "Movement",
 		left = [[
+if not UnitExists(unit) then return lastMovement end
 local pitch = GetUnitPitch(unit)
 local speed = GetUnitSpeed(unit)
 local str = ""
@@ -493,6 +494,7 @@ if speed > 0 then
 	end
 	str = str .. format("Speed: %.1f", speed)
 end
+lastMovement = str
 return str
 ]],
 		leftUpdatinge = true,
