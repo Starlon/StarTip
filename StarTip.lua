@@ -126,7 +126,8 @@ local defaults = {
 		errorLevel = 2,
 		throttleVal = 0,
 		intersectRate = 200,
-		modifierInverse = false
+		modifierInverse = false,
+		message = true
 	}
 }
 			
@@ -266,6 +267,14 @@ local options = {
 					set = function(info, v) StarTip.db.profile.throttleVal = tonumber(v) end,
 					order = 12
 				},
+				message = {
+					name = L["Greetings"],
+					desc = L["Whether the greetings message should be shown or not"],
+					type = "toggle",
+					get = function() return StarTip.db.profile.message end,
+					set = function(info, v) StarTip.db.profile.message = v end,
+					order = 13
+				},--[[
 				intersectRate = {
 					name = L["Intersect Checks Rate"],
 					desc = L["The rate at which intersecting frames will be checked"],
@@ -274,7 +283,7 @@ local options = {
 					get = function() return tostring(StarTip.db.profile.intersectRate) end,
 					set = function(info, v) StarTip.db.profile.intersectRate = tonumber(v) end,
 					order = 13
-				}
+				}]]
 			}
 		}
 	}
@@ -459,7 +468,7 @@ function StarTip:OnInitialize()
 	end
 	GameTooltip:ClearLines()
 	
-	self.core = LibCore:New(StarTip, environment, "StarTip", {["StarTip"] = {}}, "text", self.db.profile.errorLevel)		
+	self.core = LibCore:New(StarTip, environment, "StarTip", {["StarTip"] = {}}, "text", self.db.profile.errorLevel)
 	GameTooltip:Show()
 	GameTooltip:Hide()
 end
@@ -505,7 +514,9 @@ function StarTip:OnEnable()
 	
 	local plugin = {}
 	LibStub("LibScriptableDisplayPluginColor-1.0"):New(plugin)
-	ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon."], 1, 1, 0))
+	if self.db.profile.message then
+		ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon."], 1, 1, 0))
+	end
 end
 
 function StarTip:OnDisable()
