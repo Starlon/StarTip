@@ -613,6 +613,7 @@ if cast_data then
     return icon .. spell 
   end
 end
+do return end -- maybe the constant smiley face is annoying
 return Texture("Interface\\Addons\\StarTip\\Media\\happy_face.blp", 20)
 ]],
 		enabled = true,
