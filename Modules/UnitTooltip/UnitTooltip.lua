@@ -581,8 +581,9 @@ if cast_data then
 	if cast_data.channeling then
 		return "Channeling:"
 	end
+	return "Casting:"
 end
-return "Casting:"
+return ""
 ]],
 		right = [[
 local cast_data = CastData(unit)
@@ -612,9 +613,9 @@ if cast_data then
   else
     return icon .. spell 
   end
+  return Texture("Interface\\Addons\\StarTip\\Media\\happy_face.blp", 20)
 end
-do return end -- maybe the constant smiley face is annoying
-return Texture("Interface\\Addons\\StarTip\\Media\\happy_face.blp", 20)
+do return "" end
 ]],
 		enabled = true,
 		cols = 100,
@@ -776,16 +777,15 @@ function mod:CreateLines()
                     right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
 					environment.self = v.leftObj
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
-					if right == "" then right = "nil" end
                 else
-                    right = ''
 					environment.self = v.leftObj
+					right = ''
                     left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end
 				environment.unit = nil
 				environment.self = mod
 
-                if left and left ~= "" and right ~= "nil" then
+                if type(left) == "string" and type(right) == "string" then
 					StarTip.addingLine = true
                     lineNum = lineNum + 1
                     if v.right then
