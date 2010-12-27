@@ -104,6 +104,7 @@ return Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
         name = "Target",
         left = 'return "Target:"',
         right = [[
+if not UnitExists(unit) then return lastTarget or "None" end
 local r, g, b
 local unit = (unit or "mouseover") .. "target"
 if UnitIsPlayer(unit) then
@@ -114,7 +115,9 @@ end
 local name = UnitName(unit)
 local name2 = UnitName("player")
 if name == name2 and Realm(unit) == Realm("player") then name = "<<YOU>>" end
-return name and Colorize(name, r, g, b) or "None"
+local str = name and Colorize(name, r, g, b) or "None"
+lastTarget = str
+return str
 ]],
         rightUpdating = true,
 		update = 1000,
@@ -235,8 +238,6 @@ end
 return "Alive"
 ]],
 		enabled = true,
-		update = 1000,
-		rightUpdating = true
     },
     [13] = {
         name = "Health",
@@ -411,7 +412,10 @@ end
 		name = "Talents",
 		left = "return 'Talents:'",
 		right = [[
-return SpecText(unit)
+if not UnitExists(unit) then return lastTalents end
+local str = SpecText(unit)
+lastTalents = str
+return str
 ]],
 		rightUpdating = true,
 		enabled = true,
