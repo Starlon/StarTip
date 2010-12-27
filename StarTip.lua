@@ -259,7 +259,7 @@ local options = {
 				},
 				throttleVal = {
 					name = L["Throttle Threshold"],
-					desc = L["StarTip can throttle your mouseovers, so it doesn't show a tooltip if you mouse over units really fast. There's a few bugs here, which is why it's not enabled by default."],
+					desc = L["StarTip can throttle your mouseovers, so it doesn't show a tooltip if you mouse over units really fast. There are a few bugs, which is why it's not enabled by default."],
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(StarTip.db.profile.throttleVal) end,
@@ -514,7 +514,7 @@ function StarTip:OnEnable()
 	local plugin = {}
 	LibStub("LibScriptableDisplayPluginColor-1.0"):New(plugin)
 	if self.db.profile.message then
-		ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon."], 1, 1, 0))
+		ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon. You can turn off this message under Settings."], 1, 1, 0))
 	end
 end
 
