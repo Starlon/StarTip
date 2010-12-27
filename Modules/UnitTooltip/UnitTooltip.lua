@@ -288,7 +288,7 @@ return value
 local name = Name(unit)
 local str = ""
 if UnitIsBanished(unit) then
-	srr = srr .. "[Banished]"
+	str = str .. "[Banished]"
 end
 if UnitIsCharmed(unit) then
 	str = str .. "[Charmed]"
@@ -465,14 +465,18 @@ return select(3, GetUnitTooltipStats(unit))
 	[24] = {
 		name = "Range",
 		left = [[
+if not UnitExists(unit) then self:Stop(); return lastRange end
 local min, max = RangeCheck:GetRange(unit)
+local str
 if not min then
-    return "No range info"
+    str = ""
 elseif not max then
-    return format("Target is over %d yards", min)
+    str = format("Target is over %d yards", min)
 else
-    return "Between " .. min .. " and " .. max .. " yards"
+    str = "Between " .. min .. " and " .. max .. " yards"
 end
+lastRange = str
+return str
 ]],
 		leftUpdating = true,
 		enabled = true,
