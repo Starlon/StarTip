@@ -465,7 +465,7 @@ return select(3, GetUnitTooltipStats(unit))
 	[24] = {
 		name = "Range",
 		left = [[
-if not UnitExists(unit) then self:Stop(); return lastRange end
+if not UnitExists(unit) then return lastRange end
 local min, max = RangeCheck:GetRange(unit)
 local str
 if not min then
