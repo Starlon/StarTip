@@ -76,21 +76,21 @@ local r, g, b
 if UnitIsPlayer(unit) then
     r, g, b = ClassColor(unit)
 else
-	if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
-		r, g, b = .5, .5, .5
-	else
-		r, g, b = UnitSelectionColor(unit)
-	end
+    if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
+        r, g, b = .5, .5, .5
+    else
+        r, g, b = UnitSelectionColor(unit)
+    end
 end
 local afk = AFK(unit)
 if afk then
-	afk = " " .. Angle(afk)
+    afk = " " .. Angle(afk)
 else
-	afk = ""
+    afk = ""
 end
 local dnd = DND(unit)
 if dnd and afk == "" then
-	afk = " " .. Angle(dnd)
+    afk = " " .. Angle(dnd)
 end
 return Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 ]],
@@ -203,12 +203,12 @@ return Colorize(UnitClass(unit), r, g, b)
 		enabled = true,
     },
 	[10] = {
-	name = "Druid Form",
-	left = 'return "Form:"',
-	right = [[
+		name = "Druid Form",
+		left = 'return "Form:"',
+		right = [[
 return DruidForm(unit)
 ]],
-	enabled = true
+		enabled = true
 	},
     [11] = {
         name = "Faction",
@@ -289,81 +289,81 @@ return value
 local name = Name(unit)
 local str = ""
 if UnitIsBanished(unit) then
-	str = str .. "[Banished]"
+    str = str .. "[Banished]"
 end
 if UnitIsCharmed(unit) then
-	str = str .. "[Charmed]"
+    str = str .. "[Charmed]"
 end
 if UnitIsConfused(unit) then
-	str = str .. "[Confused]"
+    str = str .. "[Confused]"
 end
 if UnitIsDisoriented(unit) then
-	str = str .. "[Disoriented]"
+    str = str .. "[Disoriented]"
 end
 if UnitIsFeared(unit) then
-	str = str .. "[Feared]"
+    str = str .. "[Feared]"
 end
 if UnitIsFrozen(unit) then
-	str = str .. "[Frozen]"
+    str = str .. "[Frozen]"
 end
 if UnitIsHorrified(unit) then
-	str = str .. "[Horrified]"
+    str = str .. "[Horrified]"
 end
 if UnitIsIncapacitated(unit) then
-	str = str .. "[Incapacitated]"
+    str = str .. "[Incapacitated]"
 end
 if UnitIsPolymorphed(unit) then
-	str = str .. "[Polymorphed]"
+    str = str .. "[Polymorphed]"
 end
 if UnitIsSapped(unit) then
-	str = str .. "[Sapped]"
+    str = str .. "[Sapped]"
 end
 if UnitIsShackled(unit) then
-	str = str .. "[Shackled]"
+    str = str .. "[Shackled]"
 end
 if UnitIsAsleep(unit) then
-	str = str .. "[Asleep]"
+    str = str .. "[Asleep]"
 end
 if UnitIsStunned(unit) then
-	str = str .. "[Stunned]"
+    str = str .. "[Stunned]"
 end
 if UnitIsTurned(unit) then
-	str = str .. "[Turned]"
+    str = str .. "[Turned]"
 end
 if UnitIsDisarmed(unit) then
-	str = str .. "[Disarmed]"
+    str = str .. "[Disarmed]"
 end
 if UnitIsPacified(unit) then
-	str = str .. "[Pacified]"
+    str = str .. "[Pacified]"
 end
 if UnitIsRooted(unit) then
-	str = str .. "[Rooted]"
+    str = str .. "[Rooted]"
 end
 if UnitIsSilenced(unit) then
-	str = str .. "[Silenced]"
+    str = str .. "[Silenced]"
 end
 if UnitIsEnsnared(unit) then
-	str = str .. "[Ensnared]"
+    str = str .. "[Ensnared]"
 end
 if UnitIsEnraged(unit) then
-	str = str .. "[Enraged]"
+    str = str .. "[Enraged]"
 end
 if UnitIsWounded(unit) then
-	str = str .. "[Wounded]"
+    str = str .. "[Wounded]"
 end
 if str == "" then
-	return "Has Control"
+    return "Has Control"
 else
-	return str
+    return str
 end
 ]],
-		rightUpdating = true,
-		enabled = true,
-		update = 500,
-	},
-	[16] = {
-		name = "Marquee",
-		left = 'return "StarTip " .. _G.StarTip.version',
+        rightUpdating = true,
+        enabled = true,
+        update = 500,
+    },
+    [16] = {
+        name = "Marquee",
+    	left = 'return "StarTip " .. _G.StarTip.version',
 		leftUpdating = true,
 		enabled = false,
 		marquee = true,
@@ -446,6 +446,21 @@ return select(2, GetRole(unit))
 		update = 1000
 	},
 	[22] = {
+		name = "Avg Item Level",
+		left = [[
+return "Average ILevel:"		
+]],
+		right = [[
+if not UnitExists(unit) then return oldILevel end
+local str = UnitILevel(unit)
+oldILevel = str
+return str
+]],
+		rightUpdating = true,
+		enabled = true,
+		update = 1000
+	},
+	[23] = {
 		name = "Zone",
 		left = [[
 -- This doesn't work. Leaving it here for now.
@@ -456,7 +471,7 @@ return select(6, UnitGuildInfo(unit))
 ]],
 		enabled = false
 	},
-	[23] = {
+	[24] = {
 		name = "Location",
 		left = [[
 return "Location:"
@@ -466,7 +481,7 @@ return select(3, GetUnitTooltipStats(unit))
 ]],
 		enabled = true
 	},
-	[24] = {
+	[25] = {
 		name = "Range",
 		left = [[
 if not UnitExists(unit) then return lastRange end
@@ -486,7 +501,7 @@ return str
 		enabled = true,
 		update = 300
 	},
-	[25] = {
+	[26] = {
 		name = "Movement",
 		left = [[
 if not UnitExists(unit) then return lastMovement end
@@ -494,13 +509,13 @@ local pitch = GetUnitPitch(unit)
 local speed = GetUnitSpeed(unit)
 local str = ""
 if abs(pitch) > .01 then
-	str = format("Pitch: %.1f", pitch)
+    str = format("Pitch: %.1f", pitch)
 end
 if speed > 0 then
-	if str ~= "" then
-		str = str .. " - "
-	end
-	str = str .. format("Speed: %.1f", speed)
+    if str ~= "" then
+        str = str .. " - "
+    end
+    str = str .. format("Speed: %.1f", speed)
 end
 lastMovement = str
 return str
@@ -509,7 +524,7 @@ return str
 		enabled = true,
 		update = 100
 	},
-	[26] = {
+	[27] = {
 		name = "Guild Note",
 		left = [[
 return "Guild Note:"
@@ -519,7 +534,7 @@ return select(7, UnitGuildInfo(unit))
 ]],
 		enabled = true
 	},
-	[27] = {
+	[28] = {
 		name = "Main Name",
 		left = [[
 -- This requires Chatter
@@ -533,7 +548,7 @@ return mod.db.realm[name]
 ]],
 		enabled = true
 	},
-	[28] = {
+	[29] = {
 		name = "Recount",
 		left = [[
 return "Recount:"
@@ -541,7 +556,7 @@ return "Recount:"
 right = [[
 local val, perc, persec, maxvalue, total = RecountUnitData(unit)
 if val and val ~= 0 then
-	local p = total ~= 0 and (val / maxvalue) or 1
+    local p = total ~= 0 and (val / maxvalue) or 1
     local r, g, b = Gradient(p)
     local prefix=""
     if persec then
@@ -554,7 +569,7 @@ end
 		rightUpdating = true,
 		update = 1000
 	},
-	[29] = {
+	[30] = {
 		name = "DPS",
 		left = [[
 return "DPS:"
@@ -566,7 +581,7 @@ return UnitDPS(unit)
 		rightUpdating = true,
 		update = 1000
 	},
-	[30] = {
+	[31] = {
 		name = "Skada DPS",
 		left = [[
 return "Skada DPS:"
@@ -581,15 +596,15 @@ end
 		rightUpdating = true,
 		update = 1000
 	},
-	[31] = {
+	[32] = {
 		name = "Spell Cast",
 		left = [[
 local cast_data = CastData(unit)
 if cast_data then
-	if cast_data.channeling then
-		return "Channeling:"
-	end
-	return "Casting:"
+    if cast_data.channeling then
+        return "Channeling:"
+    end
+    return "Casting:"
 end
 return ""
 ]],
@@ -602,7 +617,7 @@ if cast_data then
   if cast_data.casting then
     local start_time = cast_data.start_time
     i = (GetTime() - start_time) / (cast_data.end_time - start_time) * 100
-  elseif cast_data.channeling then	
+  elseif cast_data.channeling then
     local end_time = cast_data.end_time
     i = (end_time - GetTime()) / (end_time - cast_data.start_time) * 100
   end
