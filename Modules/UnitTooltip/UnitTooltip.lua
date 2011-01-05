@@ -66,7 +66,7 @@ local function copy(src, dst)
 end
 
 
-local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500, color = {r = 1, g = 1, b = 1}}}
+local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 300, color = {r = 1, g = 1, b = 1}}}
 
 local defaultLines={
     [1] = {
