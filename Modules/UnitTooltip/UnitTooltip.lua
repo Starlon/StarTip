@@ -448,7 +448,7 @@ return select(2, GetRole(unit))
 	[22] = {
 		name = "Avg Item Level",
 		left = [[
-return "Average ILevel:"		
+return "Item Level:"		
 ]],
 		right = [[
 if not UnitExists(unit) then return oldILevel end
