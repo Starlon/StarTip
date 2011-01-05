@@ -448,13 +448,12 @@ return select(2, GetRole(unit))
 	[22] = {
 		name = "Avg Item Level",
 		left = [[
+if not UnitExists(unit) then return "" end
 return "Item Level:"		
 ]],
 		right = [[
-if not UnitExists(unit) then return oldILevel end
-local str = UnitILevel(unit)
-oldILevel = str
-return str
+if not UnitExists(unit) then return "" end
+return UnitILevel(unit)
 ]],
 		rightUpdating = true,
 		enabled = true,
