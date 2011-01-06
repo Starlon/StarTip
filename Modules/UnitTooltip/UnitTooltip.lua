@@ -874,6 +874,14 @@ local function unescape(text)
 	return text:replace("||", "|")
 end
 
+function mod:GetNames()
+	local new = {}
+	for i, v in ipairs(self.db.profile.lines) do
+		new[i] = v.name
+	end
+	return new
+end
+
 function mod:RebuildOpts()
     options = {
 		add = {
