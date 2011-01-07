@@ -66,7 +66,7 @@ local function copy(src, dst)
 end
 
 
-local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 300, color = {r = 1, g = 1, b = 1}}}
+local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500, color = {r = 1, g = 1, b = 1}}}
 
 local defaultLines={
     [1] = {
@@ -371,7 +371,7 @@ end
 		bold = true,
 		align = WidgetText.ALIGN_MARQUEE,
 		update = 1000,
-		speed = 100,
+		speed = 200,
 		direction = WidgetText.SCROLL_LEFT,
 		dontRtrim = true
 	},
@@ -498,7 +498,7 @@ return str
 ]],
 		leftUpdating = true,
 		enabled = true,
-		update = 300
+		update = 500
 	},
 	[26] = {
 		name = "Movement",
@@ -521,7 +521,7 @@ return str
 ]],
 		leftUpdatinge = true,
 		enabled = true,
-		update = 100
+		update = 500
 	},
 	[27] = {
 		name = "Guild Note",
@@ -642,7 +642,7 @@ do return "" end
 		enabled = true,
 		cols = 100,
 		rightUpdating = true,
-		update = 100
+		update = 500
 	}
 }
 
