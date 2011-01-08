@@ -14,8 +14,6 @@ local LibTimer = LibStub("LibScriptableDisplayTimer-1.0", true)
 assert(LibTimer, mod.name .. " requires LibScriptableDisplayTimer-1.0")
 local LibEvaluator = LibStub("LibScriptableDisplayEvaluator-1.0", true)
 assert(LibEvaluator, mod.name .. " requires LibScriptableDisplayEvaluator-1.0")
-local UnitTooltipStats = LibStub("LibScriptableDisplayPluginUnitTooltipStats-1.0", true)
-assert(UnitTooltipStats, mod.name .. " requires LibScriptableDisplayPluginUnitTooltipStats-1.0")
 
 local _G = _G
 local StarTip = _G.StarTip
