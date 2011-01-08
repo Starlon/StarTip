@@ -1,4 +1,4 @@
-﻿-- TODO: Metascripts
+﻿-- TODO: Metascripts -- dynamically reconfigure a widget
 local mod = StarTip:NewModule("UnitTooltip", "AceEvent-3.0")
 mod.name = "Unit Tooltip"
 mod.toggled = true
