@@ -1,4 +1,5 @@
-﻿local mod = StarTip:NewModule("UnitTooltip", "AceEvent-3.0")
+﻿-- TODO: Metascripts
+local mod = StarTip:NewModule("UnitTooltip", "AceEvent-3.0")
 mod.name = "Unit Tooltip"
 mod.toggled = true
 local LibProperty = LibStub("LibScriptableDisplayProperty-1.0", true)
