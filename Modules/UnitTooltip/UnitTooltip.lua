@@ -418,6 +418,7 @@ return str
 ]],
 		rightUpdating = true,
 		enabled = true,
+		cols = 80,
 		update = 1000
 	},
 	[20] = {
