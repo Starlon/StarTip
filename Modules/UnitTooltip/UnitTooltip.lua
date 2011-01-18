@@ -190,16 +190,18 @@ return SmartRace(unit)
         name = "Class",
         left = 'return "Class:"',
         right = [[
-if UnitClass(unit) == UnitName(unit) then return end
+local class, tag = UnitClass(unit)
+if class == UnitName(unit) then return end
 local r, g, b
 if UnitIsPlayer(unit) then
     r, g, b = ClassColor(unit)
 else
     r, g, b = 1, 1, 1
 end
-return Colorize(UnitClass(unit), r, g, b)
+return Texture(format("Interface\\Addons\\StarTip\\Media\\icons\\%s.tga", tag), 16) .. Colorize(" " .. class, r, g, b)
 ]],
 		enabled = true,
+		cols = 80
     },
 	[10] = {
 		name = "Druid Form",

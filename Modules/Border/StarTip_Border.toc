@@ -4,5 +4,7 @@
 ## Author: Starlon
 ## Version: @package-version@
 ## Deps: StarTip
+## X-Category: Tooltip
+## X-Part-Of: StarTip
 
 Border.lua

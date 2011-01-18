@@ -4,5 +4,7 @@
 ## Author: Starlon
 ## Version: 1.0
 ## Deps: StarTip
+## X-Category: Tooltip
+## X-Part-Of: StarTip
 
 Icons.lua
