@@ -3,7 +3,7 @@
 ## Notes: Tooltips from outerspace
 ## Author: Starlon
 ## Version: @project-version@
-## X-Category: Interface Enhancements, Tooltips
+## X-Category: Tooltip
 ## X-License: GPL v3
 ## X-Credits: ckknight for CowTip and DogTags
 ## OptionalDeps: Ace3, LibScriptableDisplay-1.0, ResourceServer, kgPanels, Skada

@@ -441,23 +441,6 @@ function StarTip:OnInitialize()
 	end
 	
 	local leftGameTooltipStrings, rightGameTooltipStrings = {}, {}
-	--[[self.leftLines = {}
-	self.rightLines = {}
-	setmetatable(self.leftLines, {__index=function(self, key)
-		if type(key) ~= "number" then return self[key] end
-		assert(type(key) == "number")
-		for i = #self, key + 1 do
-			if i > GameTooltip:NumLines() then
-				GameTooltip:AddDoubleLine(' ', ' ')
-				rawset(self.leftLines, key, _G["GameTooltipTextLeft" .. i])
-				--rawset(self.rightLines, key, _G["GameTooltipTextRight" .. i])
-				StarTip:Print("add line")
-			end
-		end
-		return self[key]
-	end})
-	setmetatable(self.rightLines, getmetatable(self.leftLines))
-	]]
 	self.leftLines = {}
 	self.rightLines = {}
 	for i = 1, 50 do
@@ -785,7 +768,7 @@ function StarTip:GameTooltipShow(...)
 	end
 
 	if self.db.profile.modifierInverse then
-		show = not show
+		--show = not show
 	end
 			
 	if not show or StarTip.tooltipHidden then GameTooltip:Hide(); return end
