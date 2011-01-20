@@ -12,10 +12,10 @@ local UnitSelectionColor = _G.UnitSelectionColor
 local UnitClass = _G.UnitClass
 local self = mod
 local LSM = LibStub("LibSharedMedia-3.0")
-local WidgetBar = LibStub("LibScriptableDisplayWidgetBar-1.0")
-local LibCore = LibStub("LibScriptableDisplayCore-1.0")
-local Utils = LibStub("LibScriptableDisplayPluginUtils-1.0")
-local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
+local WidgetBar = LibStub("LibScriptableWidgetBar-1.0")
+local LibCore = LibStub("LibScriptableLCDCore-1.0")
+local Utils = LibStub("LibScriptablePluginUtils-1.0")
+local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
 
 local environment = {}
 
@@ -366,7 +366,7 @@ function mod:OnEnable()
 	StarTip:SetOptionsDisabled(options, false)
 	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
 	self:ClearBars()
-	for k, bar in pairs(self.bars) do
+	for k, bar in pairs(self.bars or {}) do
 		if bar.config.alwaysShown then
 			bar:Start()
 			bar.bar:Show()

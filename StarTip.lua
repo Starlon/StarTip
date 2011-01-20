@@ -1,4 +1,4 @@
-StarTip = LibStub("AceAddon-3.0"):NewAddon("StarTip: @project-version@", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0") 
+_G["StarTip"] = LibStub("AceAddon-3.0"):NewAddon("StarTip: @project-version@", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0") 
 StarTip.version = GetAddOnMetadata("StarTip", "Version") or ""
 StarTip.name = GetAddOnMetadata("StarTip", "Notes")
 StarTip.name = "StarTip " .. StarTip.version
@@ -10,10 +10,10 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("StarTip")
 StarTip.L = L
 
-local LibCore = LibStub("LibScriptableDisplayCore-1.0")
-local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
-local PluginTalents = LibStub("LibScriptableDisplayPluginTalents-1.0")
-local WidgetTimer = LibStub("LibScriptableDisplayWidgetTimer-1.0")
+local LibCore = LibStub("LibScriptableLCDCore-1.0")
+local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
+local PluginTalents = LibStub("LibScriptablePluginTalents-1.0")
+local WidgetTimer = LibStub("LibScriptableWidgetTimer-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -252,7 +252,7 @@ local options = {
 					name = L["Error Level"],
 					desc = L["StarTip's error level"],
 					type = "select",
-					values = LibStub("LibScriptableDisplayError-1.0").defaultTexts,
+					values = LibStub("LibScriptableUtilsError-1.0").defaultTexts,
 					get = function() return StarTip.db.profile.errorLevel end,
 					set = function(info, v) StarTip.db.profile.errorLevel = v; StarTip:Print("Note that changing error verbosity requires a UI reload.") end,
 					order = 11
@@ -356,7 +356,7 @@ PluginString:New(environment)
 PluginTable:New(environment)
 PluginResourceTools:New(environment)
 PluginLocation:New(environment)
-PluginUnitTooltipStats:New(environment)
+PluginUnitTooltipScan:New(environment)
 if PluginDBM then PluginDBM:New(environment) end
 --PluginLinq:New(environment)
 --]]
@@ -495,7 +495,7 @@ function StarTip:OnEnable()
 	self:RegisterEvent("MODIFIER_STATE_CHANGED")
 	
 	local plugin = {}
-	LibStub("LibScriptableDisplayPluginColor-1.0"):New(plugin)
+	LibStub("LibScriptablePluginColor-1.0"):New(plugin)
 	if self.db.profile.message then
 		ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon. You can turn off this message under Settings."], 1, 1, 0))
 	end

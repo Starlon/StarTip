@@ -1,6 +1,6 @@
 local mod = StarTip:NewModule("Position", "AceEvent-3.0", "AceHook-3.0")
 mod.name = "Positioning"
-local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
+local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip

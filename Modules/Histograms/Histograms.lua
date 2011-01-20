@@ -13,9 +13,9 @@ local UnitSelectionColor = _G.UnitSelectionColor
 local UnitClass = _G.UnitClass
 local self = mod
 local LSM = LibStub("LibSharedMedia-3.0")
-local WidgetHistogram = LibStub("LibScriptableDisplayWidgetHistogram-1.0")
-local LibCore = LibStub("LibScriptableDisplayCore-1.0")
-local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
+local WidgetHistogram = LibStub("LibScriptableWidgetHistogram-1.0")
+local LibCore = LibStub("LibScriptableLCDCore-1.0")
+local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
 
 local unit
 local environment = {}
@@ -405,7 +405,7 @@ function mod:GetOptions()
 	return options
 end
 
-local plugin = LibStub("LibScriptableDisplayPluginString-1.0")
+local plugin = LibStub("LibScriptablePluginString-1.0")
 function mod:SetUnit()
 
 	GameTooltipStatusBar:Hide()

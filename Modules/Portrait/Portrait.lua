@@ -2,7 +2,7 @@ local mod = StarTip:NewModule("Portrait")
 mod.name = "Portrait"
 mod.toggled = true
 local luaTexts = {}
-LibStub("LibScriptableDisplayPluginLuaTexts-1.0"):New(luaTexts)
+LibStub("LibScriptablePluginLuaTexts-1.0"):New(luaTexts)
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip

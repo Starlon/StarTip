@@ -2,18 +2,16 @@
 local mod = StarTip:NewModule("UnitTooltip", "AceEvent-3.0")
 mod.name = "Unit Tooltip"
 mod.toggled = true
-local LibProperty = LibStub("LibScriptableDisplayProperty-1.0", true)
-assert(LibProperty, "Text module requires LibScriptableDisplayProperty-1.0")
-local WidgetText = LibStub("LibScriptableDisplayWidgetText-1.0", true)
-assert(WidgetText, "Text module requires LibScriptableDisplayWidgetText-1.0")
-local LCDText = LibStub("LibScriptableDisplayLCDText-1.0", true)
-assert(LCDText, mod.name .. " requires LibScriptableDisplayLCDText-1.0")
-local LibCore = LibStub("LibScriptableDisplayCore-1.0", true)
-assert(LibCore, mod.name .. " requires LibScriptableDisplayCore-1.0")
-local LibTimer = LibStub("LibScriptableDisplayTimer-1.0", true)
-assert(LibTimer, mod.name .. " requires LibScriptableDisplayTimer-1.0")
-local LibEvaluator = LibStub("LibScriptableDisplayEvaluator-1.0", true)
-assert(LibEvaluator, mod.name .. " requires LibScriptableDisplayEvaluator-1.0")
+local WidgetText = LibStub("LibScriptableWidgetText-1.0", true)
+assert(WidgetText, "Text module requires LibScriptableWidgetText-1.0")
+local LCDText = LibStub("LibScriptableLCDText-1.0", true)
+assert(LCDText, mod.name .. " requires LibScriptableLCDText-1.0")
+local LibCore = LibStub("LibScriptableLCDCore-1.0", true)
+assert(LibCore, mod.name .. " requires LibScriptableLCDCore-1.0")
+local LibTimer = LibStub("LibScriptableUtilsTimer-1.0", true)
+assert(LibTimer, mod.name .. " requires LibScriptableUtilsTimer-1.0")
+local LibEvaluator = LibStub("LibScriptableUtilsEvaluator-1.0", true)
+assert(LibEvaluator, mod.name .. " requires LibScriptableUtilsEvaluator-1.0")
 
 local _G = _G
 local StarTip = _G.StarTip
@@ -478,7 +476,7 @@ return select(6, UnitGuildInfo(unit))
 return "Location:"
 ]],
 		right = [[
-return select(3, GetUnitTooltipStats(unit))
+return select(3, GetUnitTooltipScan(unit))
 ]],
 		enabled = true
 	},
@@ -1329,7 +1327,7 @@ function mod:RebuildOpts()
     end
 end
 
-local plugin = LibStub("LibScriptableDisplayPluginString-1.0")
+local plugin = LibStub("LibScriptablePluginString-1.0")
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
 

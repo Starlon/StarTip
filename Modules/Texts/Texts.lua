@@ -14,12 +14,12 @@ local UnitClass = _G.UnitClass
 local self = mod
 local timer
 local LSM = LibStub("LibSharedMedia-3.0")
-local WidgetText = LibStub("LibScriptableDisplayWidgetText-1.0")
-local LibCore = LibStub("LibScriptableDisplayCore-1.0")
+local WidgetText = LibStub("LibScriptableWidgetText-1.0")
+local LibCore = LibStub("LibScriptableLCDCore-1.0")
 local LibQTip = LibStub("LibQTip-1.0")
-local PluginUtils = LibStub("LibScriptableDisplayPluginUtils-1.0")
-local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
-local Widget = LibStub("LibScriptableDisplayWidget-1.0")
+local PluginUtils = LibStub("LibScriptablePluginUtils-1.0")
+local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
+local Widget = LibStub("LibScriptableWidget-1.0")
 
 local environment = {}
 

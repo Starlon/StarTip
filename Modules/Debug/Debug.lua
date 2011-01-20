@@ -3,12 +3,12 @@ local mod = StarTip:NewModule("Debug", "AceEvent-3.0")
 mod.name = "Debug"
 mod.toggled = true
 mod.defaultOff = true
-local LibTimer = LibStub("LibScriptableDisplayTimer-1.0")
-local LibBuffer = LibStub("LibScriptableDisplayBuffer-1.0")
-local WidgetText = LibStub("LibScriptableDisplayWidgetText-1.0")
-local LibProperty = LibStub("LibScriptableDisplayProperty-1.0")
-local LibCore = LibStub("LibScriptableDisplayCore-1.0")
-local PluginUnitTooltipStats = LibStub("LibScriptableDisplayPluginUnitTooltipStats-1.0")
+local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
+local LibBuffer = LibStub("LibScriptableUtilsBuffer-1.0")
+local WidgetText = LibStub("LibScriptableWidgetText-1.0")
+local LibProperty = LibStub("LibScriptableUtilsProperty-1.0")
+local LibCore = LibStub("LibScriptableLCDCore-1.0")
+local PluginUnitTooltipScan = LibStub("LibScriptablePluginUnitTooltipScan-1.0")
 
 local environment = {}
 
