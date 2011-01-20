@@ -817,7 +817,7 @@ function mod:CreateLines()
 						v.leftObj.fontString = mod.leftLines[lineNum]
 						v.rightObj.fontString = mod.rightLines[lineNum]
                     else
-						GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
+						GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, v.wordwrap)
 						v.leftObj.fontString = mod.leftLines[lineNum]
                     end
 					if v.rightObj then
@@ -1082,6 +1082,18 @@ function mod:RebuildOpts()
 						end,
 						order = 9
 					},
+					wordwrap = {
+						name = "Word Wrap",
+						desc = "Whether this line should word wrap lengthy text",
+						type = "toggle",
+						get = function() 
+							return v.wordwrap
+						end,
+						set = function(info, val)
+							v.wordwrap = val
+						end,
+						order = 10
+					},
 					delete = {
 						name = "Delete",
 						desc = "Delete this line",
@@ -1105,12 +1117,12 @@ function mod:RebuildOpts()
 							self:ClearLines()
 							self:CreateLines()
 						end,
-						order = 10
+						order = 11
 					},
 					linesHeader = {
 						name = "Lines",
 						type = "header",
-						order = 11
+						order = 12
 					},
 					left = {
 						name = "Left",
@@ -1128,7 +1140,7 @@ function mod:RebuildOpts()
 						end,]]
 						multiline = true,
 						width = "full",
-						order = 12
+						order = 13
 					},
 					right = {
 						name = "Right",
@@ -1143,7 +1155,7 @@ function mod:RebuildOpts()
 						end,
 						multiline = true,
 						width = "full",
-						order = 13
+						order = 14
 					},
 					marquee = {
 						name = "Enhanced Settings",
