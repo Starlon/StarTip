@@ -176,6 +176,8 @@ end
 
 
 function updateBar(widget, bar)
+	assert(widget and bar)
+	
 	bar:SetValue(widget.val1 * 100)
 
 	local r, g, b = 0, 0, 1
