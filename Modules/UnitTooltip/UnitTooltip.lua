@@ -199,7 +199,7 @@ end
 return Texture(format("Interface\\Addons\\StarTip\\Media\\icons\\%s.tga", tag), 16) .. Colorize(" " .. class, r, g, b)
 ]],
 		enabled = true,
-		cols = 80
+		cols = 100
     },
 	[10] = {
 		name = "Druid Form",
