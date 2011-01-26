@@ -56,20 +56,30 @@ local defaultWidgets = {
 		name = "Health Bar",
 		type = "bar",
 		expression = [[
-return UnitHealth(unit)
+if not UnitExists(unit) then return self.lastHealthBar end
+self.lastHealthBar = UnitHealth(unit)
+return self.lastHealthBar
 ]],
 		min = "return 0",
-		max = "assert(unit); return UnitHealthMax(unit)",
+		max = [[
+if not UnitExists(unit) then return self.lastHealthBarMax end
+self.lastHealthBarMax = UnitHealthMax(unit)
+return self.lastHealthBarMax
+]],
 		color1 = [[
+if not UnitExists(unit) then return self.lastR, self.lastG, self.lastB end
+local r, g, b
 if UnitIsPlayer(unit) then
-    return ClassColor(unit)
+    r, g, b = ClassColor(unit)
 else
 	if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
-		return .5, .5, .5
+		r, g, b = .5, .5, .5
 	else
-		return UnitSelectionColor(unit)
+		r, g, b = UnitSelectionColor(unit)
 	end
 end
+self.lastR, self.lastG, self.lastB = r, g, b
+return r, g, b
 ]],
 		height = 6,
 		width = 0,
@@ -83,13 +93,20 @@ end
 		name = "Mana Bar",
 		type = "bar",
 		expression = [[
-if not UnitExists(unit) then return end
-return UnitMana(unit)
+if not UnitExists(unit) then return self.lastManaBar end
+self.lastManaBar = UnitPower(unit)
+return self.lastManaBar
 ]],
 		min = "return 0",
-		max = "return UnitManaMax('mouseover')",
+		max = [[
+if not self.lastManaMax then return self.lastManaMax end
+self.lastManaMax = UnitManaMax('mouseover')
+return self.lastManaMax
+]],
 		color1 = [[
-return PowerColor(nil, unit)
+if not UnitExists(unit) then return self.lastR, self.lastG, self.lastB end
+self.lastR, self.lastG, self.lastB = PowerColor(nil, unit)
+return self.lastR, self.lastG, self.lastB
 ]],
 		height = 6,
 		width = 0,
@@ -103,12 +120,16 @@ return PowerColor(nil, unit)
 		name = "Threat Bar",
 		type = "bar",
 		expression = [[
+if not UnitExists(unit) then return self.lastthreatpct end
 local _,_,threatpct = UnitDetailedThreatSituation(unit, "target")
-return threatpct or 0
+self.lastthreatpct = threatpct or 0
+return self.lastthreatpct
 ]],
 		color1 = [[
+if not UnitExists(unit) then return self.lastStatus end
 local _, status = UnitDetailedThreatSituation(unit, "target")
-return GetThreatStatusColor(status)
+self.lastStatus = status 
+return status
 ]],
 		width = 6,
 		height = 0,
