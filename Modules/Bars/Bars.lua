@@ -99,7 +99,7 @@ return self.lastManaBar
 ]],
 		min = "return 0",
 		max = [[
-if not self.lastManaMax then return self.lastManaMax end
+if not UnitExists(unit) then return self.lastManaMax end
 self.lastManaMax = UnitManaMax('mouseover')
 return self.lastManaMax
 ]],
