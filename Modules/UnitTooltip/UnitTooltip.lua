@@ -643,6 +643,16 @@ do return "" end
 		cols = 100,
 		rightUpdating = true,
 		update = 500
+	},
+	[33] = {
+		name = "Fails",
+		left = [[
+local fails = NumFails(unit)
+if fails and fails > 0 then
+  return "Fails: " .. fails
+end
+]],
+		enabled = true
 	}
 }
 
