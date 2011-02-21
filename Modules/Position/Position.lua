@@ -452,11 +452,18 @@ function mod:SetSpell()
 		locked = true
 	end
 	lastTime = GetTime()
-	updateFrame:SetScript("OnUpdate", nil)
-	isSpell = false
-	isItem = false
-	positionTooltip()
-	isSpell = true
+	
+	local index = getIndex(currentOwner)
+	if StarTip.anchors[index]:find("^CURSOR_")  then
+		isSpell = false
+		isItem = false
+		updateFrame:SetScript("OnUpdate", nil)
+		positionTooltip()
+		isSpell = true
+	else
+		GameTooltip:ClearAllPoints()
+		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
+	end
 	lastSpell = GameTooltip:GetSpell()
 end
 
@@ -466,11 +473,17 @@ function mod:SetItem()
 		locked = true
 	end
 	lastTime = GetTime()
-	updateFrame:SetScript("OnUpdate", nil)
-	isSpell = false
-	isItem = false
-	positionTooltip()
-	isItem = true
+	local index = getIndex(currentOwner)
+	if StarTip.anchors[index]:find("^CURSOR_")  then
+		isSpell = false
+		isItem = false
+		updateFrame:SetScript("OnUpdate", nil)
+		positionTooltip()
+		isItem = true
+	else
+		GameTooltip:ClearAllPoints()
+		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
+	end
 	lastItem = GameTooltip:GetItem()
 end
 
