@@ -33,7 +33,7 @@ local options = {
 		end,
 		order = 5
 	},
-	line = {
+	--[[line = {
 		name = "Line",
 		desc = "Which line to place the portrait on",
 		type = "input",
@@ -49,7 +49,7 @@ local options = {
 			model:SetPoint("LEFT", mod.text, "LEFT")
 		end,
 		order = 6
-	},
+	},]]
 	animated = {
 		name = "3d Model",
 		desc = "Whether to show the portrait as a 3d model (toggled true) or a 2d model (toggled false)",
@@ -131,7 +131,7 @@ function mod:SetItem()
 	
 	if link then
 		--make sure the icon does not display twice on recipies, which fire OnTooltipSetItem twice
-		self.text:SetFormattedText('|T%s:%d|t%s', GetItemIcon(link), 36, self.text:GetText())
+		self.text:SetFormattedText('|T%s:%d|t %s', GetItemIcon(link), 36, self.text:GetText())
 	end
 	lasttxt = self.text:GetText()
 end
@@ -145,7 +145,7 @@ function mod:SetSpell()
 	local id = select(3, GameTooltip:GetSpell())
 	local icon = id and select(3, GetSpellInfo(id))
 	if icon then
-		self.text:SetFormattedText('|T%s:%d|t%s', icon, 36, self.text:GetText())
+		self.text:SetFormattedText('|T%s:%d|t %s', icon, 36, self.text:GetText())
 	end
 	lasttxt = self.text:GetText()
 end
