@@ -89,6 +89,10 @@ local dnd = DND(unit)
 if dnd and afk == "" then
     afk = " " .. Angle(dnd)
 end
+local offline = Offline(unit)
+if offline then
+    afk = " " .. Angle(offline)
+end
 return Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 ]],
         right = nil,
