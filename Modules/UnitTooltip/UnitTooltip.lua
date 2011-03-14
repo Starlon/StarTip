@@ -665,7 +665,9 @@ local isTanking, status, threatpct, rawthreatpct, threatvalue = UnitDetailedThre
 
 if not threatpct then return "" end
 
-return format("Threat: %d%% (%.2f%%)", threatpct, rawthreatpct)
+isTanking = isTanking and 0 or 1
+
+return Colorize(format("Threat: %d%% (%.2f%%)", threatpct, rawthreatpct), 1, isTanking, isTanking)
 ]],
 		enabled = true,
 		update = 300,
