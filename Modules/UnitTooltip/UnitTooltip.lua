@@ -653,7 +653,20 @@ if fails and fails > 0 then
 end
 ]],
 		enabled = true
-	}
+	},
+	[34] = {
+		name = "Threat",
+		left = [[
+local isTanking, status, threatpct, rawthreatpct, threatvalue = UnitDetailedThreatSituation(unit, "target")
+
+if not threatpct then return "" end
+
+return format("Threat: %d%% (%.2f%%)", threatpct, rawthreatpct)
+]],
+		enabled = true,
+		update = 300,
+		leftUpdating = true
+	}	
 }
 
 local options = {}
