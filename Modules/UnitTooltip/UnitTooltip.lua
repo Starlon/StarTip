@@ -427,7 +427,7 @@ return str
 ]],
 		rightUpdating = true,
 		enabled = true,
-		cols = 80,
+		cols = 180,
 		update = 1000
 	},
 	[20] = {
@@ -440,7 +440,8 @@ return GetRole(unit)
 ]],
 		rightUpdating = true,
 		enabled = true,
-		update = 1000
+		update = 1000,
+		deleted = true
 	},
 	[21] = {
 		name = "Old Role",
@@ -452,7 +453,8 @@ return select(2, GetRole(unit))
 ]],
 		rightUpdating = true,
 		enabled = true,
-		update = 1000
+		update = 1000,
+		deleted = true
 	},
 	[22] = {
 		name = "Avg Item Level",
@@ -461,13 +463,11 @@ local mod = _G.StarTip:GetModule("UnitTooltip")
 if mod then
     for i = 1, #mod.db.profile.lines do
         local line = mod.db.profile.lines[i]
-        if line then
-        if line.name == "Avg Item Level" and line.default then
+        if line and line.name == "Avg Item Level" and line.default then
              line.deleted = true
              mod:ClearLines()
              mod:CreateLines()
              break
-        end
         end
     end 
 end
@@ -480,7 +480,8 @@ return UnitILevel(unit)
 ]],
 		rightUpdating = true,
 		enabled = true,
-		update = 1000
+		update = 1000,
+		deleted = true
 	},
 	[23] = {
 		name = "Zone",
