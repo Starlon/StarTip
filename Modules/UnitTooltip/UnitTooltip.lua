@@ -34,6 +34,7 @@ local linesToAddRightR = {}
 local linesToAddRightG = {}
 local linesToAddRightB = {}
 local lines = {}
+mod.lines = lines
 
 local unit
 local environment = StarTip.environment
@@ -417,6 +418,10 @@ end
 		right = [[
 if not UnitExists(unit) then return lastTalents end
 local str = SpecText(unit)
+local ilvl = UnitILevel(unit, true)
+if ilvl then
+    str = format("%s (%s ilvl)", str, ilvl)
+end
 lastTalents = str
 return str
 ]],
@@ -452,8 +457,22 @@ return select(2, GetRole(unit))
 	[22] = {
 		name = "Avg Item Level",
 		left = [[
+local mod = _G.StarTip:GetModule("UnitTooltip")
+if mod then
+    for i = 1, #mod.db.profile.lines do
+        local line = mod.db.profile.lines[i]
+        if line then
+        if line.name == "Avg Item Level" and line.default then
+             line.deleted = true
+             mod:ClearLines()
+             mod:CreateLines()
+             break
+        end
+        end
+    end 
+end
 if not UnitExists(unit) then return "" end
-return "Item Level:"		
+return "Item Level:"
 ]],
 		right = [[
 if not UnitExists(unit) then return "" end
@@ -675,6 +694,10 @@ return Colorize(format("Threat: %d%% (%.2f%%)", threatpct, rawthreatpct), 1, isT
 	}	
 }
 
+for i, v in ipairs(defaultLines) do
+	v.default = true
+end
+
 local options = {}
 
 function mod:ReInit()
@@ -690,16 +713,18 @@ function mod:ReInit()
 					end
 				end
 				v.tagged = true
+				v.default = true
 			end
 		end
 	end
 
 	for k, v in ipairs(defaultLines) do
-		if not v.tagged and not v.deleted then
+		if not v.tagged then
 			tinsert(self.db.profile.lines, copy(v))
 		end
 	end
 	self:CreateLines()
+	self:CreateLines() -- We do this twice because some lines may self destruct.
 end
 
 function mod:OnInitialize()
@@ -809,10 +834,10 @@ function mod:CreateLines()
 			llines[j].config = copy(v)
 			v.value = v.left
 			v.outlined = v.leftOutlined
-			llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. "left", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
+			llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. " (left)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 			v.value = v.right
 			v.outlined = v.rightOutlined
-			llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. "right", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
+			llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 		end
     end
 	self:ClearLines()
