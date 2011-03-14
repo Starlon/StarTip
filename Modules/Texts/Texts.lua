@@ -467,7 +467,6 @@ end
 function mod:OnEnable()
 	self:ClearTexts()
 	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
-	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 	createTexts()
 	for k, text in pairs(self.texts) do
@@ -484,7 +483,6 @@ function mod:OnDisable()
 	if type(intersectTimer) == "table" then
 		intersectTimer:Stop()
 	end
-	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
 end
 

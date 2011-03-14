@@ -33,7 +33,11 @@ local defaults = {
 		paddingBottom = 4,
 		paddingLeft = 4,
 		paddinRight = 4,
-		edgeSize = 16
+		edgeSize = 16,
+		clampLeft = 0,
+		clampRight = 10,
+		clampTop = 10,
+		clampBottom = 10
 	}
 }
 
@@ -200,11 +204,51 @@ local options = {
 		set = set,
 		order = 15
 	},
+	clampLeft = {
+		name = "Clamp Left",
+		type = "range",
+		min = -200,
+		max = 200,
+		step = 5,
+		get = get,
+		set = set,
+		order = 16
+	},
+	clampRight = {
+		name = "Clamp Right",
+		type = "range",
+		min = -200,
+		max = 200,
+		step = 5,
+		get = get,
+		set = set,
+		order = 17	
+	},
+	clampTop = {
+		name = "Clamp Top",
+		type = "range",
+		min = -200,
+		max = 200,
+		step = 5,
+		get = get,
+		set = set,
+		order = 18	
+	},
+	clampBottom = {
+		name = "Clamp Bottom",
+		type = "range",
+		min = -200,
+		max = 200,
+		step = 5,
+		get = get,
+		set = set,
+		order = 19	
+	},
 	bgColor = {
 		name = "Background Color",
 		desc = "Set options for background color",
 		type = "group",
-		order = 16,
+		order = 100,
 		get = function(info) 
 			return unpack(self.db.profile.bgColor[info[#info]]) 
 		end,
@@ -350,6 +394,11 @@ function mod:OnEnable()
 	self:SetBorderColor()
 	self:SetBackdropColor(true)
 	StarTip:SetOptionsDisabled(options, false)
+	local cleft = self.db.profile.clampLeft
+	local cright = self.db.profile.clampRight
+	local ctop = self.db.profile.clampTop
+	local cbottom = self.db.profile.clampBottom
+	GameTooltip:SetClampRectInsets(cleft, cright, ctop, cbottom)
 end
 
 function mod:OnDisable()
@@ -359,6 +408,7 @@ function mod:OnDisable()
 	self:SetBackdrop(true)
 	self:SetBackdropColor(true)
 	StarTip:SetOptionsDisabled(options, true)
+	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 end
 
 function mod:GetOptions()

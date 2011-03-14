@@ -385,7 +385,6 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()
-	GameTooltip:SetClampRectInsets(0, 0, 10, 10)
 	StarTip:SetOptionsDisabled(options, false)
 	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
 	self:ClearBars()
@@ -403,7 +402,6 @@ end
 
 function mod:OnDisable()
 	self:ClearBars()
-	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
 	if type(intersectTimer) == "table" then intersectTimer:Stop() end
 end

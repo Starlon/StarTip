@@ -396,7 +396,6 @@ end
 function mod:OnDisable()
 	self.core:Del()
 	self:ClearHistograms()
-	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
 	StarTip:SetOptionsDisabled(options, true)
 	if self.intersectTimer then self.intersectTimer:Stop() end
 end
