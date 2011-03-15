@@ -10,7 +10,7 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("StarTip")
 StarTip.L = L
 
-local LibCore = LibStub("LibScriptableLCDCore-1.0")
+local LibCore = LibStub("LibScriptableLCDCoreLite-1.0")
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
 local PluginTalents = LibStub("LibScriptablePluginTalents-1.0")
 local WidgetTimer = LibStub("LibScriptableWidgetTimer-1.0")
@@ -450,7 +450,7 @@ function StarTip:OnInitialize()
 	end
 	GameTooltip:ClearLines()
 	
-	self.core = LibCore:New(StarTip, environment, "StarTip", {["StarTip"] = {}}, "text", self.db.profile.errorLevel)
+	self.core = LibCore:New(environment, "StarTip", self.db.profile.errorLevel)
 	GameTooltip:Show()
 	GameTooltip:Hide()
 end
