@@ -72,10 +72,10 @@ local r, g, b
 if UnitIsPlayer(unit) then
     r, g, b = ClassColor(unit)
 else
-	if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
-		r, g, b = .5, .5, .5
+    if UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) then
+        r, g, b = .5, .5, .5
 	else
-		r, g, b = UnitSelectionColor(unit)
+        r, g, b = UnitSelectionColor(unit)
 	end
 end
 self.lastR, self.lastG, self.lastB = r, g, b
