@@ -28,7 +28,6 @@ local defaults = {
 			dead = {0.15, 0.15, 0.15, 1},
 			tapped = {0.25, 0.25, 0.25, 1},
 		},
-		borderColor = { 1, 1, 1, 1 },
 		paddingTop = 4,
 		paddingBottom = 4,
 		paddingLeft = 4,
@@ -135,7 +134,7 @@ local options = {
 		end,
 		order = 9
 	},
-	borderColor = {
+	--[[borderColor = {
 		name = "Tooltip Border Color",
 		desc = "Set the color of the tooltip's border",
 		type = "color",
@@ -148,7 +147,7 @@ local options = {
 			self.db.profile.borderColor[4] = a
 		end,
 		order = 10
-	},
+	},]]
 	paddingTop = {
 		name = "Tooltip Top Padding",
 		desc = "Set the tooltip's top side padding",
@@ -391,7 +390,6 @@ function mod:OnEnable()
 	self:SetScale()
 	self:SetFont()
 	self:SetBackdrop()
-	self:SetBorderColor()
 	self:SetBackdropColor(true)
 	StarTip:SetOptionsDisabled(options, false)
 	local cleft = self.db.profile.clampLeft
@@ -573,18 +571,6 @@ function mod:SetBackdropColor(reset)
 			ShoppingTooltip1:SetBackdropColor(unpack(self.db.profile.bgColor[kind]))
 			ShoppingTooltip2:SetBackdropColor(unpack(self.db.profile.bgColor[kind]))
 		end
-	end
-end
-
-function mod:SetBorderColor(reset)
-	if reset then
-		GameTooltip:SetBackdropBorderColor(1,1,1,1)
-		ShoppingTooltip1:SetBackdropBorderColor(1,1,1,1)
-		ShoppingTooltip2:SetBackdropBorderColor(1,1,1,1)
-	else
-		GameTooltip:SetBackdropBorderColor(unpack(self.db.profile.borderColor))
-		ShoppingTooltip1:SetBackdropBorderColor(unpack(self.db.profile.borderColor))
-		ShoppingTooltip2:SetBackdropBorderColor(unpack(self.db.profile.borderColor))
 	end
 end
 
