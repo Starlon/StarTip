@@ -737,12 +737,7 @@ function mod:OnInitialize()
     self:RegisterEvent("UPDATE_FACTION")
     StarTip:SetOptionsDisabled(options, true)
 
-	self.core = StarTip.core --LibCore:New(mod, environment, self:GetName(), {[self:GetName()] = {}}, "text", StarTip.db.profile.errorLevel)
-	environment.core = self.core
-
-	if ResourceServer then ResourceServer:New(environment) end
-	--self.lcd = LCDText:New(self.core, 1, 40, 0, 0, 0, StarTip.db.profile.errorLevel)
-	--self.core.lcd = self.lcd
+	self.core = StarTip.core
 
 	self.evaluator = LibEvaluator
 	self:ReInit()
@@ -850,18 +845,22 @@ function mod:CreateLines()
 				environment.unit = StarTip.unit
 				v.config.unit = StarTip.unit
                 if v.right and v.right ~= "" then
-					environment.self = v.rightObj
-                    right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
-					environment.self = v.leftObj
-                    left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+					if v.rightObj then
+						environment.self = v.rightObj
+						right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
+					end
+					if v.leftObj then
+						environment.self = v.leftObj
+						left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+					end
                 else
-					environment.self = v.leftObj
+					if v.leftObj then
+						environment.self = v.leftObj
+						left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+					end
 					right = ''
-                    left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                 end
-				environment.unit = nil
-				environment.self = mod
-
+				
                 if type(left) == "string" and type(right) == "string" then
 					StarTip.addingLine = true
                     lineNum = lineNum + 1
