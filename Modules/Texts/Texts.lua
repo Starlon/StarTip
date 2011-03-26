@@ -20,6 +20,7 @@ local LibQTip = LibStub("LibQTip-1.0")
 local PluginUtils = LibStub("LibScriptablePluginUtils-1.0")
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
 local Widget = LibStub("LibScriptableWidget-1.0")
+local L = StarTip.L
 
 local environment = {}
 
@@ -251,8 +252,8 @@ local defaults = {
 local options = {}
 local optionsDefaults = {
 	add = {
-		name = "Add Text",
-		desc = "Add a text widget",
+		name = L["Add Text"],
+		desc = L["Add a text widget"],
 		type = "input",
 		set = function(info, v)
 			local widget = {
@@ -275,8 +276,8 @@ local optionsDefaults = {
 		order = 5
 	},
 	defaults = {
-		name = "Restore Defaults",
-		desc = "Restore Defaults",
+		name = L["Restore Defaults"],
+		desc = L["Restore Defaults"],
 		type = "execute",
 		func = function()
 			mod.db.profile.texts = copy(defaultWidgets);
@@ -575,8 +576,8 @@ function mod:RebuildOpts()
 			order = 100
 		}
 		options[db.name:gsub(" ", "_")].args.enabled = {
-			name = "Enabled",
-			desc = "Whether the histogram's enabled or not",
+			name = L["Enabled"],
+			desc = L["Whether the histogram is enabled or not"],
 			type = "toggle",
 			get = function() return db.enabled end,
 			set = function(info, v) 

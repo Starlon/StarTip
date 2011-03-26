@@ -55,8 +55,8 @@ StopNoise()
 local options = {}
 local optionsDefaults = {
 	add = {
-		name = "Add Gesture",
-		desc = "Add a gesture",
+		name = L["Add Gesture"],
+		desc = L["Add a gesture"],
 		type = "input",
 		set = function(info, v)
 			local widget = {
@@ -75,13 +75,13 @@ local optionsDefaults = {
 		order = 5
 	},
 	defaults = {
-		name = "Restore Defaults",
-		desc = "Restore Defaults",
+		name = L["Restore Defaults"],
+		desc = L["Restore Defaults"],
 		type = "execute",
 		func = function()
 			mod.db.profile.gestures = {}
 			StarTip:RebuildOpts()
-			StarTip:Print("You'll need to reload your UI. Type /reload")
+			StarTip:Print(L["You'll need to reload your UI. Type /reload"])
 		end,
 		order = 6
 	},
@@ -150,8 +150,8 @@ function mod:RebuildOpts()
 			args=WidgetGestures:GetOptions(db, StarTip.RebuildOpts, StarTip)
 		}
 		options[db.name:gsub(" ", "_")].args.delete = {
-			name = "Delete",
-			desc = "Delete this widget",
+			name = L["Delete"],
+			desc = L["Delete this widget"],
 			type = "execute",
 			func = function()
 				self.db.profile.gestures[i] = {}

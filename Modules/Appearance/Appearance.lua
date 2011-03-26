@@ -8,6 +8,7 @@ local ShoppingTooltip1 = _G.ShoppingTooltip1
 local ShoppingTooltip2 = _G.ShoppingTooltip2
 local self = mod
 local LSM = _G.LibStub("LibSharedMedia-3.0")
+local L = StarTip.L
 
 local defaults = {
 	profile = {
@@ -61,8 +62,8 @@ end
 
 local options = {
 	scale = {
-		name = "Scale Slider",
-		desc = "Adjust tooltip scale",
+		name = L["Scale Slider"],
+		desc = L["Adjust tooltip scale"],
 		type = "range",
 		min = 0.25,
 		max = 4,
@@ -74,8 +75,8 @@ local options = {
 		order = 4
 	},
 	font = {
-		name = "Tooltip Font",
-		desc = "Set the tooltip's font",
+		name = L["Tooltip Font"],
+		desc = L["Set the tooltip's font"],
 		type = "select",
 		values = LSM:List("font"),
 		get = function() 
@@ -88,8 +89,8 @@ local options = {
 		order = 5
 	},
 	fontSizeNormal = {
-		name = "Normal font size",
-		desc = "Set the normal font size",
+		name = L["Normal font size"],
+		desc = L["Set the normal font size"],
 		type = "input",
 		pattern = "%d",
 		get = function() return tostring(mod.db.profile.fontSizeNormal) end,
@@ -97,8 +98,8 @@ local options = {
 		order = 6
 	},
 	fontSizeBold = {
-		name = "Bold font size",
-		desc = "Set the bold font size",
+		name = L["Bold font size"],
+		desc = L["Set the bold font size"],
 		type = "input",
 		pattern = "%d",
 		get = function() return tostring(mod.db.profile.fontSizeBold) end,
@@ -107,8 +108,8 @@ local options = {
 		order = 7
 	},
 	edgeFile = {
-		name = "Tooltip Border",
-		desc = "Set the tooltip's border style",
+		name = L["Tooltip Border"],
+		desc = L["Set the tooltip's border style"],
 		type = "select",
 		values = LSM:List("border"),
 		get = function()
@@ -121,8 +122,8 @@ local options = {
 		order = 8
 	},
 	background = {
-		name = "Tooltip Background",
-		desc = "Set the tooltip's background style",
+		name = L["Tooltip Background"],
+		desc = L["Set the tooltip's background style"],
 		type = "select",
 		values = LSM:List("background"),
 		get = function() 
@@ -149,8 +150,8 @@ local options = {
 		order = 10
 	},]]
 	paddingTop = {
-		name = "Tooltip Top Padding",
-		desc = "Set the tooltip's top side padding",
+		name = L["Tooltip Top Padding"],
+		desc = L["Set the tooltip's top side padding"],
 		type = "range",
 		min = -20,
 		max = 20,
@@ -160,8 +161,8 @@ local options = {
 		order = 11
 	},
 	paddingBottom = {
-		name = "Tooltip Bottom Padding",
-		desc = "Set the tooltip's bottom side padding",
+		name = L["Tooltip Bottom Padding"],
+		desc = L["Set the tooltip's bottom side padding"],
 		type = "range",
 		min = -20,
 		max = 20,
@@ -171,8 +172,8 @@ local options = {
 		order = 12
 	},
 	paddingLeft = {
-		name = "Tooltip Left Padding",
-		desc = "Set the tooltip's left side padding",
+		name = L["Tooltip Left Padding"],
+		desc = L["Set the tooltip's left side padding"],
 		type = "range",
 		min = -20,
 		max = 20,
@@ -182,8 +183,8 @@ local options = {
 		order = 13
 	},
 	paddingRight = {
-		name = "Tooltip Right Padding",
-		desc = "Set the tooltip's right side padding",
+		name = L["Tooltip Right Padding"],
+		desc = L["Set the tooltip's right side padding"],
 		type = "range",
 		min = -20,
 		max = 20,
@@ -193,8 +194,8 @@ local options = {
 		order = 14
 	},
 	edgeSize = {
-		name = "Tooltip Edge Size",
-		desc = "Set the tooltip's edge size",
+		name = L["Tooltip Edge Size"],
+		desc = L["Set the tooltip's edge size"],
 		type = "range",
 		min = 0,
 		max = 20,
@@ -204,7 +205,7 @@ local options = {
 		order = 15
 	},
 	clampLeft = {
-		name = "Clamp Left",
+		name = L["Clamp Left"],
 		type = "range",
 		min = -200,
 		max = 200,
@@ -214,7 +215,7 @@ local options = {
 		order = 16
 	},
 	clampRight = {
-		name = "Clamp Right",
+		name = L["Clamp Right"],
 		type = "range",
 		min = -200,
 		max = 200,
@@ -224,7 +225,7 @@ local options = {
 		order = 17	
 	},
 	clampTop = {
-		name = "Clamp Top",
+		name = L["Clamp Top"],
 		type = "range",
 		min = -200,
 		max = 200,
@@ -234,7 +235,7 @@ local options = {
 		order = 18	
 	},
 	clampBottom = {
-		name = "Clamp Bottom",
+		name = L["Clamp Bottom"],
 		type = "range",
 		min = -200,
 		max = 200,
@@ -244,8 +245,8 @@ local options = {
 		order = 19	
 	},
 	bgColor = {
-		name = "Background Color",
-		desc = "Set options for background color",
+		name = L["Background Color"],
+		desc = L["Set options for background color"],
 		type = "group",
 		order = 100,
 		get = function(info) 
@@ -260,77 +261,77 @@ local options = {
 		end,
 		args = {
 			header = {
-				name = "Background Color",
+				name = L["Background Color"],
 				type = "header",
 				order = 1
 			},
 			guild = {
-				name = "Guild and friends",
-				desc = "Background color for your guildmates and friends.",
+				name = L["Guild and friends"],
+				desc = L["Background color for your guildmates and friends."],
 				type = "color",
 				hasAlpha = true,
 				width = "full",
 				order = 2
 			},
 			hostilePC = {
-				name = "Hostile players",
-				desc = "Background color for hostile players.",
+				name = L["Hostile players"],
+				desc = L["Background color for hostile players."],
 				type = "color",
 				hasAlpha = true,
 				width = "full",
 				order = 3
 			},
 			hostileNPC = {
-				name = "Hostile non-player characters",
-				desc = "Background color for hostile non-player characters.",
+				name = L["Hostile non-player characters"],
+				desc = L["Background color for hostile non-player characters."],
 				type = "color",
 				hasAlpha = true,
 				width = "full",
 				order = 4
 			},
 			neutralNPC = {
-				name = "Neutral non-player characters",
-				desc = "Background color for neutral non-player characters.",
+				name = L["Neutral non-player characters"],
+				desc = L["Background color for neutral non-player characters."],
 				type = "color",
 				hasAlpha = true,
 				width = "full",
 				order = 5
 			},
 			friendlyPC = {
-				name = "Friendly players",
-				desc = "Background color for friendly players.",
+				name = L["Friendly players"],
+				desc = L["Background color for friendly players."],
 				type = "color",
 				hasAlpha = true,
 				width = "full",
 				order = 6
 			},
 			friendlyNPC = {
-				name = "Friendly non-player characters",
-				desc = "Background color for friendly non-player characters.",
+				name = L["Friendly non-player characters"],
+				desc = L["Background color for friendly non-player characters."],
 				type = "color",
 				hasAlpha = true,
 				width = "full",
 				order = 7
 			},
 			dead = {
-				name = "Dead",
-				desc = "Background color for dead units.",
+				name = L["Dead"],
+				desc = L["Background color for dead units."],
 				type = "color",
 				hasAlpha = true,
 				width = "full",
 				order = 8
 			},
 			tapped = {
-				name = "Tapped",
-				desc = "Background color for when a unit is tapped by another.",
+				name = L["Tapped"],
+				desc = L["Background color for when a unit is tapped by another."],
 				type = "color",
 				hasAlpha = true,
 				width = "full",
 				order = 9
 			},
 			other = {
-				name = "Other Tooltips",
-				desc = "Background color for other tooltips.",
+				name = L["Other Tooltips"],
+				desc = L["Background color for other tooltips."],
 				type = "color",
 				hasAlpha = true,
 				width = "full",

@@ -5,6 +5,7 @@ local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
 local UnitExists = _G.UnitExists
 local self = mod
+local L = StarTip.L
 
 local defaults = {
 	profile = {
@@ -30,8 +31,8 @@ end
 
 local options = {
 	units = {
-		name = "World Units",
-		desc = "What to do with tooltips for world frames",
+		name = L["World Units"],
+		desc = L["What to do with tooltips for world frames"],
 		type = "select",
 		values = choices,
 		get = get,
@@ -39,8 +40,8 @@ local options = {
 		order = 4
 	},
 	unitFrames = {
-		name = "Unit Frames",
-		desc = "What to do with tooltips for unit frames",
+		name = L["Unit Frames"],
+		desc = L["What to do with tooltips for unit frames"],
 		type = "select",
 		values = choices,
 		get = get,
@@ -48,8 +49,8 @@ local options = {
 		order = 5
 	},
 	otherFrames = {
-		name = "Other Frames",
-		desc = "What to do with tooltips for other frames (spells, macros, items, etc..)",
+		name = L["Other Frames"],
+		desc = L["What to do with tooltips for other frames (spells, macros, items, etc..)"],
 		type = "select",
 		values = choices,
 		get = get,
@@ -57,23 +58,13 @@ local options = {
 		order = 6
 	},
 	objects = {
-		name = "World Objects",
-		desc = "What to do with tooltips for world objects (mailboxes, portals, etc..)",
+		name = L["World Objects"],
+		desc = L["What to do with tooltips for world objects (mailboxes, portals, etc..)"],
 		type = "select",
 		values = choices,
 		get = get,
 		set = set,
 		order = 7
-	},
-	test = {
-		name = "test",
-		type = "group",
-		args = {
-			test = {
-				name = "Test",
-				type = "toggle"
-			}
-		}
 	}
 }
 

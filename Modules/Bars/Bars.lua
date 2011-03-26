@@ -16,6 +16,7 @@ local WidgetBar = LibStub("LibScriptableWidgetBar-1.0")
 local LibCore = LibStub("LibScriptableLCDCore-1.0")
 local Utils = LibStub("LibScriptablePluginUtils-1.0")
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
+local L = StarTip.L
 
 local environment = {}
 
@@ -155,8 +156,8 @@ local defaults = {
 local options = {}
 local optionsDefaults = {
 	add = {
-		name = "Add Bar",
-		desc = "Add a bar",
+		name = L["Add Bar"],
+		desc = L["Add a bar"],
 		type = "input",
 		set = function(info, v)
 			local widget = {
@@ -179,8 +180,8 @@ local optionsDefaults = {
 		order = 5
 	},
 	defaults = {
-		name = "Restore Defaults",
-		desc = "Restore Defaults",
+		name = L["Restore Defaults"],
+		desc = L["Restore Defaults"],
 		type = "execute",
 		func = function()
 			mod.db.profile.bars = copy(defaultWidgets);
@@ -497,7 +498,7 @@ function mod:RebuildOpts()
 			args = WidgetBar:GetOptions(db, StarTip.RebuildOpts, StarTip),
 		}
 		options[db.name:gsub(" ", "_")].args.delete = {
-			name = "Delete",
+			name = L["Delete"],
 			type = "execute",
 			func = function()
 				local delete = true
@@ -516,8 +517,8 @@ function mod:RebuildOpts()
 			order = 100
 		}
 		options[db.name:gsub(" ", "_")].args.enabled = {
-			name = "Enabled",
-			desc = "Whether the histogram's enabled or not",
+			name = L["Enabled"],
+			desc = L["Whether the bar is enabled or not"],
 			type = "toggle",
 			get = function() return db.enabled end,
 			set = function(info, v) 
@@ -528,8 +529,8 @@ function mod:RebuildOpts()
 			order = 1
 		}
 		options[db.name:gsub(" ", "_")].args.texture1 = {
-			name = "Texture #1",
-			desc = "This bar's texture",
+			name = L["Texture #1"],
+			desc = L["This bar's texture"],
 			type = "select",
 			values = LSM:List("statusbar"),
 			get = function() return StarTip:GetLSMIndexByName("statusbar", db.texture1 or LSM:GetDefault("statusbar"))  end,
@@ -541,8 +542,8 @@ function mod:RebuildOpts()
 			order = 5,
 		}
 		options[db.name:gsub(" ", "_")].args.texture2 = {
-			name = "Texture #2",
-			desc = "This bar's texture",
+			name = L["Texture #2"],
+			desc = L["This bar's texture"],
 			type = "select",
 			values = LSM:List("statusbar"),
 			get = function() return StarTip:GetLSMIndexByName("statusbar", db.texture2 or db.texture1 or LSM:GetDefault("statusbar"))  end,

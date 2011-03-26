@@ -6,16 +6,11 @@ mod.defaultOff = true
 local _G = _G
 local StarTip = _G.StarTip
 local GameTooltip = _G.GameTooltip
-local GameTooltipStatusBar = _G.GameTooltipStatusBar
-local UnitIsPlayer = _G.UnitIsPlayer
-local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
-local UnitSelectionColor = _G.UnitSelectionColor
-local UnitClass = _G.UnitClass
-local self = mod
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetHistogram = LibStub("LibScriptableWidgetHistogram-1.0")
 local LibCore = LibStub("LibScriptableLCDCore-1.0")
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
+local L = StarTip.L
 
 local unit
 local environment = {}
@@ -163,8 +158,8 @@ local defaults = {
 local options = {}
 local optionsDefaults = {
 	add = {
-		name = "Add Histogram",
-		desc = "Add a histogram",
+		name = L["Add Histogram"],
+		desc = L["Add a histogram"],
 		type = "input",
 		set = function(info, v)
 			local widget = {
@@ -188,8 +183,8 @@ local optionsDefaults = {
 		order = 5
 	},
 	defaults = {
-		name = "Restore Defaults",
-		desc = "Restore Defaults",
+		name = L["Restore Defaults"],
+		desc = L["Restore Defaults"],
 		type = "execute",
 		func = function()
 			mod.db.profile.histograms = copy(defaultWidgets);
@@ -493,8 +488,8 @@ function mod:RebuildOpts()
 			args=WidgetHistogram:GetOptions(db, StarTip.RebuildOpts, StarTip)
 		}
 		options[db.name:gsub(" ", "_")].args.delete = {
-			name = "Delete",
-			desc = "Delete this widget",
+			name = L["Delete"],
+			desc = L["Delete this widget"],
 			type = "execute",
 			func = function()
 				local delete = true
@@ -513,8 +508,8 @@ function mod:RebuildOpts()
 			order = 13
 		}
 		options[db.name:gsub(" ", "_")].args.enabled = {
-			name = "Enable",
-			desc = "Toggle whether this histogram is enabled or not",
+			name = L["Enable"],
+			desc = L["Toggle whether this histogram is enabled or not."],
 			type = "toggle",
 			get = function() return db.enabled end,
 			set = function(info, v)

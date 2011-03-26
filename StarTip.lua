@@ -21,6 +21,13 @@ local ipairs, pairs = _G.ipairs, _G.pairs
 local timers = {}
 local widgets = {}
 
+local environment = {}
+StarTip.environment = environment
+environment.StarTip = StarTip
+environment._G = _G
+environment.L = L
+
+
 local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("StarTip", {
 	type = "data source",
 	text = "StarTip",
@@ -338,12 +345,9 @@ do
 	end
 end
 
-local environment = {}
-StarTip.environment = environment
 environment.new = StarTip.new
 environment.newDict = StarTip.newDict
 environment.del = StarTip.del
-environment._G = _G
 
 --[[
 PluginRangeCheck:New(environment)

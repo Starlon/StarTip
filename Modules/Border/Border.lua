@@ -37,8 +37,8 @@ end
 local options = {}
 local optionsDefaults = {
 	add = {
-		name = "Add Gesture",
-		desc = "Add a border",
+		name = L["Add Border"],
+		desc = L["Add a border"],
 		type = "input",
 		set = function(info, v)
 			local widget = {
@@ -54,8 +54,8 @@ local optionsDefaults = {
 		order = 5
 	},
 	defaults = {
-		name = "Restore Defaults",
-		desc = "Restore Defaults",
+		name = L["Restore Defaults"],
+		desc = L["Restore Defaults"],
 		type = "execute",
 		func = function()
 			mod.db.profile.borders = copy(defaultWidgets);
@@ -140,8 +140,8 @@ function mod:RebuildOpts()
 			args=WidgetColor:GetOptions(db, StarTip.RebuildOpts, StarTip)
 		}
 		options[db.name:gsub(" ", "_")].args.delete = {
-			name = "Delete",
-			desc = "Delete this widget",
+			name = L["Delete"],
+			desc = L["Delete this widget"],
 			type = "execute",
 			func = function()
 				self.db.profile.borders[i] = nil

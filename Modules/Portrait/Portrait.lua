@@ -7,6 +7,7 @@ local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
 local UIParent = _G.UIParent
+local L = StarTip.L
 
 local defaults = {
 	profile = {
@@ -18,8 +19,8 @@ local defaults = {
 
 local options = {
 	size = {
-		name = "Size",
-		desc = "The texture's width and height",
+		name = L["Size"],
+		desc = L["The square portrait's width and height"],
 		type = "input",
 		pattern = "%d",
 		get = function() return tostring(mod.db.profile.size) end,
@@ -33,26 +34,9 @@ local options = {
 		end,
 		order = 5
 	},
-	--[[line = {
-		name = "Line",
-		desc = "Which line to place the portrait on",
-		type = "input",
-		pattern = "%d",
-		get = function() return tostring(mod.db.profile.line) end,
-		set = function(info, val)
-			val = tonumber(val)
-			mod.db.profile.line = val
-			mod.text = StarTip.leftLines[val]
-			mod.texture:ClearAllPoints()
-			mod.texture:SetPoint("LEFT", mod.text, "LEFT")
-			model:ClearAllPoints()
-			model:SetPoint("LEFT", mod.text, "LEFT")
-		end,
-		order = 6
-	},]]
 	animated = {
-		name = "3d Model",
-		desc = "Whether to show the portrait as a 3d model (toggled true) or a 2d model (toggled false)",
+		name = L["3d Model"],
+		desc = L["Whether to show the portrait as a 3d model (toggled true) or a 2d model (toggled false)"],
 		type = "toggle",
 		get = function() return mod.db.profile.animated end,
 		set = function(info, val)

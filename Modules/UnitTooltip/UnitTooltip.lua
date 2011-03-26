@@ -15,6 +15,7 @@ assert(LibEvaluator, mod.name .. " requires LibScriptableUtilsEvaluator-1.0")
 
 local _G = _G
 local StarTip = _G.StarTip
+local L = StarTip.L
 local self = mod
 local GameTooltip = _G.GameTooltip
 local tinsert = _G.tinsert
@@ -104,7 +105,7 @@ return Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
     },
     [2] = {
         name = "Target",
-        left = 'return "Target:"',
+        left = 'return L["Target:"]',
         right = [[
 if not UnitExists(unit) then return lastTarget or "None" end
 local r, g, b
@@ -126,32 +127,32 @@ return str
 		enabled = true
     },
     [3] = {
-        name = "Guild",
-        left = 'return "Guild:"',
+        name = L["Guild"],
+        left = 'return L["Guild:"]',
         right = [[
 return Guild(unit, true)
 ]],
 		enabled = true
     },
     [4] = {
-        name = "Rank",
-        left = 'return "Rank:"',
+        name = L["Rank"],
+        left = 'return L["Rank:"]',
         right = [[
 return Rank(unit)
 ]],
 		enabled = true,
     },
     [5] = {
-        name = "Realm",
-        left = 'return "Realm:"',
+        name = L["Realm"],
+        left = 'return L["Realm:"]',
         right = [[
 return Realm(unit)
 ]],
 		enabled = true
     },
     [6] = {
-        name = "Level",
-        left = 'return "Level:"',
+        name = L["Level"],
+        left = 'return L["Level:"]',
         right = [[
 local classification = Classification(unit)
 local lvl = Level(unit)
@@ -169,21 +170,21 @@ return str
 		enabled = true,
     },
 	[7] = {
-		name = "Gender",
-		left = 'return "Gender:"',
+		name = L["Gender"],
+		left = 'return L["Gender:"]',
 		right = [[
 local sex = UnitSex(unit)
 if sex == 2 then
-    return "Male"
+    return L["Male"]
 elseif sex == 3 then
-    return "Female"
+    return L["Female"]
 end
 ]],
 		enabled = true
 	},
     [8] = {
-        name = "Race",
-        left = 'return "Race:"',
+        name = L["Race"],
+        left = 'return L["Race:"]',
         right = [[
 return SmartRace(unit)
 ]],
@@ -191,7 +192,7 @@ return SmartRace(unit)
     },
     [9] = {
         name = "Class",
-        left = 'return "Class:"',
+        left = 'return L["Class:"]',
         right = [[
 local class, tag = UnitClass(unit)
 if class == UnitName(unit) then return end
@@ -207,50 +208,50 @@ return Texture(format("Interface\\Addons\\StarTip\\Media\\icons\\%s.tga", tag), 
 		cols = 100
     },
 	[10] = {
-		name = "Druid Form",
-		left = 'return "Form:"',
+		name = L["Druid Form"],
+		left = 'return L["Form:"]',
 		right = [[
 return DruidForm(unit)
 ]],
 		enabled = true
 	},
     [11] = {
-        name = "Faction",
-        left = 'return "Faction:"',
+        name = L["Faction"],
+        left = 'return L["Faction:"]',
         right = [[
 return Faction(unit)
 ]],
 		enabled = true,
     },
     [12] = {
-        name = "Status",
-        left = 'return "Status:"',
+        name = L["Status"],
+        left = 'return L["Status:"]',
         right = [[
 if not UnitIsConnected(unit) then
-    return "Offline"
+    return L["Offline"]
 elseif HasAura(unit, GetSpellInfo(19752)) then
-    return "Divine Intervention"
+    return L["Divine Intervention"]
 elseif UnitIsFeignDeath(unit) then
-    return "Feigned Death"
+    return L["Feigned Death"]
 elseif UnitIsGhost(unit) then
-    return "Ghost"
+    return L["Ghost"]
 elseif UnitIsDead(unit) and HasAura(unit, GetSpellInfo(20707)) then
-    return "Soulstoned"
+    return L["Soulstoned"]
 elseif UnitIsDead(unit) then
-    return "Dead"
+    return L["Dead"]
 end
-return "Alive"
+return L["Alive"]
 ]],
 		enabled = true,
     },
     [13] = {
-        name = "Health",
-        left = 'return "Health:"',
+        name = L["Health"],
+        left = 'return L["Health:"]',
         right = [[
-if not UnitExists(unit) and self.Stop then self:Stop(); return self.lastHealth end
+if not UnitExists(unit) then self:Stop(); return self.lastHealth end
 local health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
 local r, g, b = HPColor(health, maxHealth)
-local value = "Unknown"
+local value = L["Unknown"]
 if maxHealth == 100 then
     value = Colorize(health .. "%", r, g, b)
 elseif maxHealth ~= 0 then
@@ -264,16 +265,16 @@ return value
 		enabled = true
     },
     [14] = {
-        name = "Mana",
+        name = L["Mana"],
         left = [[
 return PowerName(unit)
 ]],
         right = [[
-if not UnitExists(unit) and self.Stop then self:Stop(); return self.lastMana end
+if not UnitExists(unit) then self:Stop(); return self.lastMana end
 local mana = UnitMana(unit)
 local maxMana = UnitManaMax(unit)
 local r, g, b = PowerColor(nil, unit)
-local value = "Unknown"
+local value = L["Unknown"]
 if maxMana == 100 then
     value = Colorize(tostring(mana), r, g, b)
 elseif maxMana ~= 0 then
@@ -287,76 +288,76 @@ return value
 		update = 1000
     },
 	[15] = {
-		name = "Effects",
-		left = "return 'Effects'",
+		name = L["Effects"],
+		left = 'return L["Effects:"]',
 		right = [[
 local name = Name(unit)
 local str = ""
 if UnitIsBanished(unit) then
-    str = str .. "[Banished]"
+    str = str .. Angle(L["Banished"])
 end
 if UnitIsCharmed(unit) then
-    str = str .. "[Charmed]"
+    str = str .. Angle(L["Charmed"])
 end
 if UnitIsConfused(unit) then
-    str = str .. "[Confused]"
+    str = str .. Angle(L["Confused"])
 end
 if UnitIsDisoriented(unit) then
-    str = str .. "[Disoriented]"
+    str = str .. Angle(L["Disoriented"])
 end
 if UnitIsFeared(unit) then
-    str = str .. "[Feared]"
+    str = str .. Angle(L["Feared"])
 end
 if UnitIsFrozen(unit) then
-    str = str .. "[Frozen]"
+    str = str .. Angle(L["Frozen"])
 end
 if UnitIsHorrified(unit) then
-    str = str .. "[Horrified]"
+    str = str .. Angle(L["Horrified"])
 end
 if UnitIsIncapacitated(unit) then
-    str = str .. "[Incapacitated]"
+    str = str .. Angle(L["Incapacitated"])
 end
 if UnitIsPolymorphed(unit) then
-    str = str .. "[Polymorphed]"
+    str = str .. Angle(L["Polymorphed"])
 end
 if UnitIsSapped(unit) then
-    str = str .. "[Sapped]"
+    str = str .. Angle(L["Sapped"])
 end
 if UnitIsShackled(unit) then
-    str = str .. "[Shackled]"
+    str = str .. Angle(L["Shackled"])
 end
 if UnitIsAsleep(unit) then
-    str = str .. "[Asleep]"
+    str = str .. Angle(L["Asleep"])
 end
 if UnitIsStunned(unit) then
-    str = str .. "[Stunned]"
+    str = str .. Angle(L["Stunned"])
 end
 if UnitIsTurned(unit) then
-    str = str .. "[Turned]"
+    str = str .. Angle(L["Turned"])
 end
 if UnitIsDisarmed(unit) then
-    str = str .. "[Disarmed]"
+    str = str .. Angle(L["Disarmed"])
 end
 if UnitIsPacified(unit) then
-    str = str .. "[Pacified]"
+    str = str .. Angle(L["Pacified"])
 end
 if UnitIsRooted(unit) then
-    str = str .. "[Rooted]"
+    str = str .. Angle(L["Rooted"])
 end
 if UnitIsSilenced(unit) then
-    str = str .. "[Silenced]"
+    str = str .. Angle(L["Silenced"])
 end
 if UnitIsEnsnared(unit) then
-    str = str .. "[Ensnared]"
+    str = str .. Angle(L["Ensnared"])
 end
 if UnitIsEnraged(unit) then
-    str = str .. "[Enraged]"
+    str = str .. Angle(L["Enraged"])
 end
 if UnitIsWounded(unit) then
-    str = str .. "[Wounded]"
+    str = str .. Angle(L["Wounded"])
 end
 if str == "" then
-    return "Has Control"
+    return L["Has Control"]
 else
     return str
 end
@@ -366,8 +367,8 @@ end
         update = 500,
     },
     [16] = {
-        name = "Marquee",
-    	left = 'return "StarTip " .. _G.StarTip.version',
+        name = L["Marquee"],
+    	left = 'return "StarTip " .. StarTip.version',
 		leftUpdating = true,
 		enabled = false,
 		marquee = true,
@@ -380,8 +381,8 @@ end
 		dontRtrim = true
 	},
 	[17] = {
-		name = "Memory Usage",
-		left = "return 'Memory Usage:'",
+		name = L["Memory Usage"],
+		left = "return L['Memory Usage:']",
 		right = [[
 local mem, percent, memdiff, totalMem, totaldiff, memperc = GetMemUsage("StarTip", true)
 if mem then
@@ -396,8 +397,8 @@ end
 		update = 1000
 	},
 	[18] = {
-		name = "CPU Usage",
-		desc = "Note that you must turn on CPU profiling",
+		name = L["CPU Usage"],
+		desc = L["Note that you must turn on CPU profiling"],
 		left = 'return "CPU Usage:"',
 		right = [[
 local cpu, percent, cpudiff, totalCPU, totaldiff, cpuperc = GetCPUUsage("StarTip", true)
@@ -413,8 +414,8 @@ end
 		update = 1000
 	},
 	[19] = {
-		name = "Talents",
-		left = "return 'Talents:'",
+		name = L["Talents"],
+		left = "return L['Talents:']",
 		right = [[
 if not UnitExists(unit) then return lastTalents end
 local str = SpecText(unit)
@@ -484,10 +485,10 @@ return UnitILevel(unit)
 		deleted = true
 	},
 	[23] = {
-		name = "Zone",
+		name = L["Zone"],
 		left = [[
 -- This doesn't work. Leaving it here for now.
-return "Zone:"
+return L["Zone:"]
 ]],
 		right = [[
 return select(6, UnitGuildInfo(unit))
@@ -495,9 +496,9 @@ return select(6, UnitGuildInfo(unit))
 		enabled = false
 	},
 	[24] = {
-		name = "Location",
+		name = L["Location"],
 		left = [[
-return "Location:"
+return L["Location:"]
 ]],
 		right = [[
 return select(3, GetUnitTooltipScan(unit))
@@ -505,7 +506,7 @@ return select(3, GetUnitTooltipScan(unit))
 		enabled = true
 	},
 	[25] = {
-		name = "Range",
+		name = L["Range"],
 		left = [[
 if not UnitExists(unit) then return lastRange end
 local min, max = RangeCheck:GetRange(unit)
@@ -513,9 +514,9 @@ local str
 if not min then
     str = ""
 elseif not max then
-    str = format("Target is over %d yards", min)
+    str = format(L["Target is over %d yards"], min)
 else
-    str = "Between " .. min .. " and " .. max .. " yards"
+    str = format(L["Between %s and %s yards"], min, max)
 end
 lastRange = str
 return str
@@ -525,7 +526,7 @@ return str
 		update = 500
 	},
 	[26] = {
-		name = "Movement",
+		name = L["Movement"],
 		left = [[
 if not UnitExists(unit) then return lastMovement end
 local pitch = GetUnitPitch(unit)
@@ -548,9 +549,9 @@ return str
 		update = 500
 	},
 	[27] = {
-		name = "Guild Note",
+		name = L["Guild Note"],
 		left = [[
-return "Guild Note:"
+return L["Guild Note:"]
 ]],
 		right = [[
 return select(7, UnitGuildInfo(unit))
@@ -558,10 +559,10 @@ return select(7, UnitGuildInfo(unit))
 		enabled = true
 	},
 	[28] = {
-		name = "Main Name",
+		name = L["Main"],
 		left = [[
 -- This requires Chatter
-return "Main:"
+return L["Main:"]
 ]],
 		right = [[
 if not _G.Chatter then return end
@@ -620,14 +621,14 @@ end
 		update = 1000
 	},
 	[32] = {
-		name = "Spell Cast",
+		name = L["Spell Cast"],
 		left = [[
 local cast_data = CastData(unit)
 if cast_data then
     if cast_data.channeling then
-        return "Channeling:"
+        return L["Channeling:"]
     end
-    return "Casting:"
+    return L["Casting:"]
 end
 return ""
 ]],
@@ -659,9 +660,7 @@ if cast_data then
   else
     return icon .. spell 
   end
-  return Texture("Interface\\Addons\\StarTip\\Media\\happy_face.blp", 20)
 end
-do return "" end
 ]],
 		enabled = true,
 		cols = 100,
@@ -669,17 +668,17 @@ do return "" end
 		update = 500
 	},
 	[33] = {
-		name = "Fails",
+		name = L["Fails"],
 		left = [[
 local fails = NumFails(unit)
 if fails and fails > 0 then
-  return "Fails: " .. fails
+  return format(L["Fails: %d"], fails)
 end
 ]],
 		enabled = true
 	},
 	[34] = {
-		name = "Threat",
+		name = L["Threat"],
 		left = [[
 local isTanking, status, threatpct, rawthreatpct, threatvalue = UnitDetailedThreatSituation(unit, "target")
 
@@ -687,7 +686,7 @@ if not threatpct then return "" end
 
 isTanking = isTanking and 0 or 1
 
-return Colorize(format("Threat: %d%% (%.2f%%)", threatpct, rawthreatpct), 1, isTanking, isTanking)
+return Colorize(format("%s: %d%% (%.2f%%)", L["Threat"], threatpct, rawthreatpct), 1, isTanking, isTanking)
 ]],
 		enabled = true,
 		update = 300,
@@ -939,8 +938,8 @@ end
 function mod:RebuildOpts()
     options = {
 		add = {
-			name = "Add Line",
-			desc = "Give the line a name",
+			name = L["Add Line"],
+			desc = L["Give the line a name"],
 			type = "input",
 			set = function(info, v)
 				if v == "" then return end
@@ -953,8 +952,8 @@ function mod:RebuildOpts()
 			order = 5
 		},
 		refreshRate = {
-			name = "Refresh Rate",
-			desc = "The rate at which the tooltip will be refreshed",
+			name = L["Refresh Rate"],
+			desc = L["The rate at which the tooltip will be refreshed"],
 			type = "input",
 			pattern = "%d",
 			get = function() return tostring(self.db.profile.refreshRate) end,
@@ -966,8 +965,8 @@ function mod:RebuildOpts()
 			order = 6
 		},
 		color = {
-			name = "Default Color",
-			desc = "The default color for tooltip lines",
+			name = L["Default Color"],
+			desc = L["The default color for tooltip lines"],
 			type = "color",
 			get = function() return self.db.profile.color.r, self.db.profile.color.g, self.db.profile.color.b end,
 			set = function(info, r, g, b)
@@ -978,8 +977,8 @@ function mod:RebuildOpts()
 			order = 7
 		},
 		defaults = {
-			name = "Restore Defaults",
-			desc = "Roll back to defaults.",
+			name = L["Restore Defaults"],
+			desc = L["Roll back to defaults."],
 			type = "execute",
 			func = function()
 				local replace = {}
@@ -1016,8 +1015,8 @@ function mod:RebuildOpts()
 			}
 			options["line" .. i].args = {
 					enabled = {
-						name = "Enabled",
-						desc = "Whether to show this line or not",
+						name = L["Enabled"],
+						desc = L["Whether to show this line or not"],
 						type = "toggle",
 						get = function() return self.db.profile.lines[i].enabled end,
 						set = function(info, val)
@@ -1028,8 +1027,8 @@ function mod:RebuildOpts()
 						order = 2
 					},
 					leftUpdating = {
-						name = "Left Updating",
-						desc = "Whether this segment refreshes",
+						name = L["Left Updating"],
+						desc = L["Whether this line's left segment refreshes"],
 						type = "toggle",
 						get = function() return v.leftUpdating end,
 						set = function(info, val)
@@ -1043,8 +1042,8 @@ function mod:RebuildOpts()
 						order = 3
 					},
 					rightUpdating = {
-						name = "Right Updating",
-						desc = "Whether this segment refreshes",
+						name = L["Right Updating"],
+						desc = L["Whether this line's right segment refreshes"],
 						type = "toggle",
 						get = function() return v.rightUpdating end,
 						set = function(info, val)
@@ -1058,8 +1057,8 @@ function mod:RebuildOpts()
 						order = 4
 					},
 					up = {
-						name = "Move Up",
-						desc = "Move this line up by one",
+						name = L["Move Up"],
+						desc = L["Move this line up by one"],
 						type = "execute",
 						func = function()
 							if i == 1 then return end
@@ -1077,8 +1076,8 @@ function mod:RebuildOpts()
 						order = 5
 					},
 					down = {
-						name = "Move Down",
-						desc = "Move this line down by one",
+						name = L["Move Down"],
+						desc = L["Move this line down by one"],
 						type = "execute",
 						func = function()
 							if i == #self.db.profile.lines then return end
@@ -1096,7 +1095,7 @@ function mod:RebuildOpts()
 						end,
 						order = 6
 					},
-					bold = {
+					--[[bold = {
 						name = "Bold",
 						desc = "Whether to bold this line or not",
 						type = "toggle",
@@ -1107,12 +1106,12 @@ function mod:RebuildOpts()
 							self:CreateLines()
 						end,
 						order = 7
-					},
+					},]]
 					leftOutlined = {
-						name = "Left Outlined",
-						desc = "Whether the left widget is outlined or not",
+						name = L["Left Outlined"],
+						desc = L["Whether the left widget is outlined or not"],
 						type = "select",
-						values = {"None", "Outlined", "Thick Outlilned"},
+						values = {L["None"], L["Outlined"], L["Thick Outlilned"]},
 						get = function() return v.leftOutlined or 1 end,
 						set = function(info, val)
 							v.leftOutlined = val
@@ -1122,10 +1121,10 @@ function mod:RebuildOpts()
 						order = 8
 					},
 					rightOutlined = {
-						name = "Right Outlined",
-						desc = "Whether the right widget is outlined or not",
+						name = L["Right Outlined"],
+						desc = L["Whether the right widget is outlined or not"],
 						type = "select",
-						values = {"None", "Outlined", "Thick Outlilned"},
+						values = {L["None"], L["Outlined"], L["Thick Outlilned"]},
 						get = function() return v.rightOutlined or 1 end,
 						set = function(info, val)
 							v.rightOutlined = val
@@ -1135,8 +1134,8 @@ function mod:RebuildOpts()
 						order = 9
 					},
 					wordwrap = {
-						name = "Word Wrap",
-						desc = "Whether this line should word wrap lengthy text",
+						name = L["Word Wrap"],
+						desc = L["Whether this line should word wrap lengthy text"],
 						type = "toggle",
 						get = function() 
 							return v.wordwrap
@@ -1147,8 +1146,8 @@ function mod:RebuildOpts()
 						order = 10
 					},
 					delete = {
-						name = "Delete",
-						desc = "Delete this line",
+						name = L["Delete"],
+						desc = L["Delete this line"],
 						type = "execute",
 						func = function()
 							local name = v.name
@@ -1172,14 +1171,14 @@ function mod:RebuildOpts()
 						order = 11
 					},
 					linesHeader = {
-						name = "Lines",
+						name = L["Lines"],
 						type = "header",
 						order = 12
 					},
 					left = {
-						name = "Left",
+						name = L["Left Segment"],
 						type = "input",
-						desc = "Left text code",
+						desc = L["Enter code for this line's left segment."],
 						get = function() return escape(v.left or "") end,
 						set = function(info, val)
 							v.left = unescape(val)
@@ -1195,9 +1194,9 @@ function mod:RebuildOpts()
 						order = 13
 					},
 					right = {
-						name = "Right",
+						name = L["Right Segment"],
 						type = "input",
-						desc = "Right text code",
+						desc = L["Enter code for this line's right segment."],
 						get = function() return escape(v.right or "") end,
 						set = function(info, val)
 							v.right = unescape(val);
@@ -1210,28 +1209,17 @@ function mod:RebuildOpts()
 						order = 14
 					},
 					marquee = {
-						name = "Enhanced Settings",
+						name = "Marquee Settings",
 						type = "group",
 						args = {
 							header = {
-								name = "Note that only the left line script is used for marquee text",
+								name = L["Note that only the left line script is used for marquee text"],
 								type = "header",
 								order = 1
 							},
-							marquee = {
-								name = "Enabled",
-								desc = "Enable marquee. Note that this just makes marquees use the left line only. Technically all segments on the tooltip are marquee widgets.",
-								type = "toggle",
-								get = function() return v.marquee end,
-								set = function(info, val)
-									v.marquee = val
-									v.marqueeDirty = true
-									self:CreateLines()
-								end
-							},
 							prefix = {
-								name = "Prefix",
-								desc = "The prefix for this marquee",
+								name = L["Prefix"],
+								desc = L["The prefix for this marquee"],
 								type = "input",
 								width = "full",
 								multiline = true,
@@ -1247,7 +1235,7 @@ function mod:RebuildOpts()
 							},
 							postfix = {
 								name = "Postfix",
-								desc = "The postfix for this marquee",
+								desc = L["The postfix for this marquee"],
 								type = "input",
 								width = "full",
 								multiline = true,
@@ -1261,9 +1249,9 @@ function mod:RebuildOpts()
 								end,
 								order = 3
 							},
-							precision = {
+							--[[precision = {
 								name = "Precision",
-								desc = "How precise displayed numbers are",
+								desc = L["How precise displayed numbers are"],
 								type = "input",
 								pattern = "%d",
 								get = function()
@@ -1275,14 +1263,14 @@ function mod:RebuildOpts()
 									self:CreateLines()
 								end,
 								order = 4
-							},
+							},]]
 							align = {
-								name = "Alignment",
-								desc = "The alignment information",
+								name = L["Alignment"],
+								desc = L["The alignment information"],
 								type = "select",
 								values = WidgetText.alignmentList,
 								get = function()
-									return v.align
+									return v.align or WidgetText.defaults.alignment
 								end,
 								set = function(info, val)
 									v.align = val
@@ -1292,8 +1280,8 @@ function mod:RebuildOpts()
 								order = 5
 							},
 							update = {
-								name = "Text Update",
-								desc = "How often to update the text. Use this option if you want your line to update.",
+								name = L["Text Update"],
+								desc = L["How often to update the text. A value of zero means the text won't repeatedly update."],
 								type = "input",
 								pattern = "%d",
 								get = function()
@@ -1307,8 +1295,8 @@ function mod:RebuildOpts()
 								order = 6
 							},
 							speed = {
-								name = "Scroll Speed",
-								desc = "How fast to scroll the marquee",
+								name = L["Scroll Speed"],
+								desc = L["How fast to scroll the marquee."],
 								type = "input",
 								pattern = "%d",
 								get = function()
@@ -1322,8 +1310,8 @@ function mod:RebuildOpts()
 								order = 7
 							},
 							direction = {
-								name = "Direction",
-								desc = "Which direction to scroll",
+								name = L["Direction"],
+								desc = L["Which direction to scroll."],
 								type = "select",
 								values = WidgetText.directionList,
 								get = function()
@@ -1337,8 +1325,8 @@ function mod:RebuildOpts()
 								order = 8
 							},
 							cols = {
-								name = "Columns",
-								desc = "How wide the marquee is",
+								name = L["Columns"],
+								desc = L["How wide the marquee is. If your text is cut short then increase this value."],
 								type = "input",
 								pattern = "%d",
 								get = function()
@@ -1352,8 +1340,8 @@ function mod:RebuildOpts()
 								order = 9
 							},
 							dontRtrim = {
-								name = "Don't right trim",
-								desc = "Prevent trimming white space to the right of text",
+								name = L["Don't right trim"],
+								desc = L["Prevent trimming white space to the right of text"],
 								type = "toggle",
 								get = function()
 									return v.dontRtrim or WidgetText.defaults.dontRtrim
