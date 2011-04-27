@@ -384,15 +384,6 @@ end
 StarTip:SetDefaultModuleState(false)
 
 local defaultTimers = {
-	["widget_resources_timer"] = {
-        type = "timer",
-		update = 0,
-		repeating = true,
-		expression = [[
-if ResourceServer then self.timer:Stop() return end
-Update()
-]]
-	},	
 }
 
 function StarTip:RefreshConfig()
