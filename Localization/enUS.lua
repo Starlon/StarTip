@@ -187,6 +187,8 @@ L["Columns"] = true
 L["How wide the marquee is. If your text is cut short then increase this value."] = true
 L["Don't right trim"] = true
 L["Prevent trimming white space to the right of text"] = true
+L["Feats"] = true
+L["Feats:"] = true
 
 -- Mouse Gestures
 L["Left Button"] = true

@@ -691,7 +691,23 @@ return Colorize(format("%s: %d%% (%.2f%%)", L["Threat"], threatpct, rawthreatpct
 		enabled = true,
 		update = 300,
 		leftUpdating = true
-	}	
+	},
+	[35] = {
+		name = L["Feats"],
+		left = [[return L["Feats:"]; ]],
+		right = [[
+if not UnitIsPlayer(unit) then return end
+local feats = UnitFeats(unit)
+if feats and feats > 0 then
+    return feats
+else
+    return "Loading Achievements..."
+end
+]],
+		enabled = true,
+		update = 500,
+		rightUpdating = true
+	}
 }
 
 for i, v in ipairs(defaultLines) do
@@ -847,15 +863,18 @@ function mod:CreateLines()
 					if v.rightObj then
 						environment.self = v.rightObj
 						right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
+						if type(right) == "number" then right = right .. "" end
 					end
 					if v.leftObj then
 						environment.self = v.leftObj
 						left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+						if type(left) == "number" then left = left .. "" end
 					end
                 else
 					if v.leftObj then
 						environment.self = v.leftObj
 						left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+						if type(left) == "number" then left = left .. "" end
 					end
 					right = ''
                 end

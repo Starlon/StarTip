@@ -162,8 +162,9 @@ local options = {
 					type = "input",
 					set = function(info, v)
 						tinsert(timers, v)
-						StarTip:RebuildOpts()
+						tinsert(StarTip.db.profile.timers, v)
 						StarTip:SetupTimers()						
+						StarTip:RebuildOpts()
 					end, 
 					order = 1
 				},
@@ -172,7 +173,7 @@ local options = {
 					desc = L["Use this to restore the defaults"],
 					type = "execute",
 					func = function()
-						StarTip.db.profile.timers = nil						
+						StarTip.db.profile.timers = nil -- this is replaced in SetupTimers
 						StarTip:SetupTimers()											
 						StarTip:RebuildOpts()					
 					end,
@@ -450,6 +451,9 @@ function StarTip:OnInitialize()
 	GameTooltip:Hide()
 end
 
+local defaultTimers = {
+}
+
 function StarTip:SetupTimers()
 	if not self.db.profile.timers then
 		self.db.profile.timers = {}
@@ -634,7 +638,7 @@ end
 function StarTip.OnTooltipSetUnit(...)
 
 	local _, unit = GameTooltip:GetUnit()
-
+	
 	if not unit or StarTip.tooltipHidden then GameTooltip:Hide() return end
 
 	hideTimer = hideTimer or LibTimer:New("StarTip.Hide", 100, false, hideTooltip, nil, StarTip.db.profile.errorLevel)
@@ -654,7 +658,7 @@ function StarTip.OnTooltipSetUnit(...)
 		
 	--StarTip.fading = false
 	StarTip.unit = unit
-			
+		
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
@@ -903,3 +907,4 @@ function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
 		end
 	end
 end
+
