@@ -1,5 +1,5 @@
-local mod = StarTip:NewModule("Border")
-mod.name = "Border"
+local mod = _G.StarTip:NewModule("Borders")
+mod.name = "Borders"
 mod.toggled = true
 mod.defaultOff = false
 local L = StarTip.L
@@ -36,7 +36,7 @@ end
 
 local options = {}
 local optionsDefaults = {
-	add = {
+--[[	add = {
 		name = L["Add Border"],
 		desc = L["Add a border"],
 		type = "input",
@@ -63,6 +63,7 @@ local optionsDefaults = {
 		end,
 		order = 6
 	},
+]]
 }
 
 local function copy(tbl)
@@ -75,7 +76,7 @@ local function copy(tbl)
 end
 
 local function draw(widget)
-	GameTooltip:SetBackdropBorderColor(widget.r, widget.g, widget.b, widget.a)
+	GameTooltip:SetBackdropBorderColor(widget.r or 1, widget.g or 1, widget.b or 1, widget.a or 1)
 end
 
 function mod:CreateBorders()

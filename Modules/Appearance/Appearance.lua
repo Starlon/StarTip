@@ -358,7 +358,7 @@ function mod:OnInitialize()
 	ShoppingTooltip1:Hide()
 	ShoppingTooltip2:Show()
 	ShoppingTooltip2:Hide()
-	
+
 	if type(self.db.profile.edgeFile) == "number" then
 		local list = LSM:List("border")
 		if list[self.db.profile.edgeFile] then

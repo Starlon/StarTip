@@ -6,7 +6,7 @@
 ## X-Category: Tooltip
 ## X-License: GPL v3
 ## X-Credits: ckknight for CowTip and DogTags
-## OptionalDeps: Ace3, LibScriptable-1.0, ResourceServer, kgPanels, Skada
+## OptionalDeps: Ace3, LibScriptable-1.0, kgPanels, Skada, Chatter, Recount
 ## SavedVariables: StarTipDB
 
 Libs\LibStub\LibStub.lua
