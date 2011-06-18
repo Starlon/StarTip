@@ -490,7 +490,7 @@ function mod:SetBackdrop()
 		local bgFile = LSM:Fetch('background', self.db.profile.background)
 		local edgeFile = LSM:Fetch('border', self.db.profile.edgeFile)
 
-		if bd.bgFile ~= bgFile or bd.edgeFile ~= edgeFile or bd.edgeSize ~= self.db.profile.edgeSize or bd.insets.left ~= self.db.profile.padding then
+		if bd and (bd.bgFile ~= bgFile or bd.edgeFile ~= edgeFile or bd.edgeSize ~= self.db.profile.edgeSize or bd.insets.left ~= self.db.profile.padding) then
 			changed = true
 		end
 
