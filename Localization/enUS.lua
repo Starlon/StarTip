@@ -189,6 +189,15 @@ L["Don't right trim"] = true
 L["Prevent trimming white space to the right of text"] = true
 L["Feats"] = true
 L["Feats:"] = true
+L["PVP Rank"] = true
+L["PVP Rank:"] = true
+L["Fetching..."] = true
+L["n00b {-1)"] = true
+L["Alliance"] = true
+L["Horde"] = true
+L["Arena 2s"] = true
+L["Arena 3s"] = true
+L["Arena 5s"] = true
 
 -- Mouse Gestures
 L["Left Button"] = true

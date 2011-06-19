@@ -699,6 +699,7 @@ return Colorize(format("%s: %d%% (%.2f%%)", L["Threat"], threatpct, rawthreatpct
 if not UnitIsPlayer(unit) then return end
 local feats = UnitFeats(unit)
 if feats and feats > 0 then
+	self:Stop()
     return feats
 else
     return "Loading Achievements..."
@@ -707,7 +708,89 @@ end
 		enabled = true,
 		update = 500,
 		rightUpdating = true
-	}
+	},
+	[36] = {
+		name = L["PVP Rank"],
+		left = [[return L["PVP Rank:"]; ]],
+		right = [[
+if not UnitIsPlayer(unit) then return end
+local pvp = UnitPVPStats(unit);
+if pvp then
+  self:Stop()
+  local fctn = Faction(unit)
+  if fctn == L["Alliance"] then
+    fctn = L["Horde"]
+  elseif fctn == L["Horde"] then
+    fctn = L["Alliance"]
+  end
+  return (pvp.text and Texture(pvp.texture, 12) .. pvp.text or Texture("Interface\\PvPRankBadges\\PvPRank"..fctn..".blp", 12) .. L["n00b (-1)"]) .. " HKs " .. pvp.lifetimeHK
+else
+  return L["Fetching..."]
+end
+]],
+		enabled = true,
+		update = 300,
+		rightUpdating = true,
+		cols = strlen("Interface\\PvPRankBadges\\PvPRank06.blp") + 50
+	},
+	[37] = {
+		name = L["Arena 2s"],
+		left = [[
+local pvp = UnitPVPStats(unit);
+if not pvp then return "" end
+local team = pvp.teams[2]
+if not team then return "" end
+local text = ""
+if team and type(team.teamSize) == "number" and team.teamSize > 0 then
+    local points = CalculateArenaPoints(team.teamRating or 0, team.teamSize)
+    text = format("2v2 %s %s (%d pts)", Texture("Interface\\PVPFrame\\PVP-Banner-2.blp", 12), team.teamName or "Error", points)
+end
+return text
+]],
+		enabled = true,
+		update = 300,
+		leftUpdating = true,
+		cols = 100
+	},
+	[38] = {
+		name = L["Arena 3s"],
+		left = [[
+local pvp = UnitPVPStats(unit);
+if not pvp then return "" end
+local team = pvp.teams[3]
+if not team then return "" end
+local text = ""
+if team and type(team.teamSize) == "number" and team.teamSize > 0 then
+    local points = CalculateArenaPoints(team.teamRating, team.teamSize)
+    text = format("3v3 %s %s (%d pts)", Texture("Interface\\PVPFrame\\PVP-Banner-3.blp", 12), team.teamName or "Error", points)
+end
+return text
+]],
+		enabled = true,
+		update = 300,
+		leftUpdating = true,
+		cols = 100
+	},
+	[39] = {
+		name = L["Arena 5s"],
+		left = [[
+local pvp = UnitPVPStats(unit);
+if not pvp then return "" end
+local team = pvp.teams[5]
+if not team then return "" end
+local text = ""
+if team and type(team.teamSize) == "number" and team.teamSize > 0 then
+    local points = CalculateArenaPoints(team.teamRating, team.teamSize) or 0
+    text = format("5v5 %s %s (%d pts)", Texture("Interface\\PVPFrame\\PVP-Banner-5.blp", 12), team.teamName or "Error", points)
+end
+return text
+]],
+		enabled = true,
+		update = 300,
+		leftUpdating = true,
+		cols = 100
+	},
+	
 }
 
 for i, v in ipairs(defaultLines) do
@@ -1371,6 +1454,20 @@ function mod:RebuildOpts()
 									self:CreateLines()
 								end,
 								order = 10
+							},
+							limited = {
+								name = L["Clip length"],
+								desc = L["Whether to clip the string's length when it is longer than the value of Columns."],
+								type = "toggle",
+								get = function()
+									return v.limited or WigetText.defaults.limited
+								end,
+								set = function(info, val)
+									v.limited = val
+									v.limitedDirty = true
+									sel:CreateLines()
+								end,
+								order = 11
 							}
 						},
 						order = 9
