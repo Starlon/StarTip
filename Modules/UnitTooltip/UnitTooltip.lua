@@ -752,7 +752,11 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local perc = team.teamRating / 3500
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
     local banner = Texture("Interface\\PVPFrame\\PVP-Banner-2.blp", 12)
-    text = format("%s 2v2 %s %s %s (%.1f pts)", banner, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
+	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
+	local r, g, b = Color2RGBA(max(embcol, bkgcol))
+    local tag = Colorize("2v2", r, g, b)
+    text = format("%s %s %s %s %s (%.1f pts)", banner, tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
 end
 return text
 ]],
@@ -774,7 +778,11 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local perc = team.teamRating / 3500
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
     local banner = Texture("Interface\\PVPFrame\\PVP-Banner-3.blp", 12)
-    text = format("%s 3v3 %s %s %s (%.1f pts)", banner, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
+	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
+	local r, g, b = Color2RGBA(max(embcol, bkgcol))	
+    local tag = Colorize("3v3", r, g, b)
+    text = format("%s %s %s %s %s (%.1f pts)", banner, tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
 end
 return text
 ]],
@@ -796,7 +804,11 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local perc = team.teamRating / 3500
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
     local banner = Texture("Interface\\PVPFrame\\PVP-Banner-5.blp", 12)	
-    text = format("%s 5v5 %s %s %s (%.1f pts)", banner, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
+	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
+	local r, g, b = Color2RGBA(max(embcol, bkgcol))	
+    local tag = Colorize("5v5", r, g, b)
+    text = format("%s %s %s %s %s (%.1f pts)", banner, tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
 end
 return text
 ]],
