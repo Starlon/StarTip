@@ -727,7 +727,9 @@ if pvp then
   elseif fctn == L["Horde"] then
     fctn = L["Alliance"]
   end
-  return (pvp.text and Texture(pvp.texture, 12) .. pvp.text or Texture("Interface\\PvPRankBadges\\PvPRank"..fctn..".blp", 12) .. L["n00b (-1)"]) .. " * " .. pvp.lifetimeHK .. " HKs"
+  local rankIcon = Texture(pvp.texture, 12)
+  local factIcon = Texture("Interface\\PvPRankBadges\\PvPRank"..fctn..".blp", 12)
+  return format("%s %s %d HKs", rankIcon, pvp.text or factIcon..L["nOOb (-1)"], pvp.lifetimeHK)
 else
   return L["Fetching..."]
 end
@@ -748,7 +750,9 @@ local text = ""
 if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local points = CalculateArenaPoints(team.teamRating, team.teamSize)
     local perc = team.teamRating / 3500
-    text = format("2v2 %s %s %s (%.1f pts)", Texture("Interface\\PVPFrame\\PVP-Banner-2.blp", 12), team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+    local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
+    local banner = Texture("Interface\\PVPFrame\\PVP-Banner-2.blp", 12)
+    text = format("%s 2v2 %s %s %s (%.1f pts)", banner, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
 end
 return text
 ]],
@@ -768,7 +772,9 @@ local text = ""
 if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local points = CalculateArenaPoints(team.teamRating, team.teamSize)
     local perc = team.teamRating / 3500
-    text = format("3v3 %s %s %s (%.1f pts)", Texture("Interface\\PVPFrame\\PVP-Banner-3.blp", 12), team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+    local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
+    local banner = Texture("Interface\\PVPFrame\\PVP-Banner-3.blp", 12)
+    text = format("%s 3v3 %s %s %s (%.1f pts)", banner, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
 end
 return text
 ]],
@@ -788,7 +794,9 @@ local text = ""
 if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local points = CalculateArenaPoints(team.teamRating, team.teamSize) or 0
     local perc = team.teamRating / 3500
-    text = format("5v5 %s %s %s (%.1f pts)", Texture("Interface\\PVPFrame\\PVP-Banner-5.blp", 12), team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+    local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
+    local banner = Texture("Interface\\PVPFrame\\PVP-Banner-5.blp", 12)	
+    text = format("%s 5v5 %s %s %s (%.1f pts)", banner, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
 end
 return text
 ]],
