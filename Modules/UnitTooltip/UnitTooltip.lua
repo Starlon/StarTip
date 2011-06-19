@@ -723,7 +723,7 @@ if pvp then
   elseif fctn == L["Horde"] then
     fctn = L["Alliance"]
   end
-  return (pvp.text and Texture(pvp.texture, 12) .. pvp.text or Texture("Interface\\PvPRankBadges\\PvPRank"..fctn..".blp", 12) .. L["n00b (-1)"]) .. " HKs " .. pvp.lifetimeHK
+  return (pvp.text and Texture(pvp.texture, 12) .. pvp.text or Texture("Interface\\PvPRankBadges\\PvPRank"..fctn..".blp", 12) .. L["n00b (-1)"]) .. " - " .. pvp.lifetimeHK .. " HKs"
 else
   return L["Fetching..."]
 end
