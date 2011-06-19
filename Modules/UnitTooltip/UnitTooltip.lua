@@ -138,7 +138,11 @@ return Guild(unit, true)
         name = L["Rank"],
         left = 'return L["Rank:"]',
         right = [[
-return Rank(unit)
+local rank = Rank(unit)
+local index = RankIndex(unit)
+if rank then
+  return format("%s (%d)", rank, index)
+end
 ]],
 		enabled = true,
     },
