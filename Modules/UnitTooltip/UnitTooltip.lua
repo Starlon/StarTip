@@ -753,9 +753,17 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
 	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
 	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
-	local r, g, b = Color2RGBA(max(embcol, bkgcol))
+    local r, g, b = Color2RGBA(max(embcol, bkgcol))
     local tag = Colorize("2v2", max(r, .2), max(g, .2), max(b, .2))
-    text = format("%s %s %s %s (%.1f pts)", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+	local wins, played = team.teamWins, team.playerPlayed
+	local losses = played - wins
+    local winlost = ""
+	if wins >= losses then
+        winlost = Colorize(format("%d/%d", wins, losses), 0, 1, 1)
+    else
+        winlost = Colorize(format("%d/%d", wins, losses), 1, 0, 0)
+    end	
+    text = format("%s %s %s %s (%.1f pts) %s", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points, winlost)
 end
 self:Stop()
 return text
@@ -779,9 +787,17 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
 	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
 	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
-	local r, g, b = Color2RGBA(max(embcol, bkgcol))	
+	local r, g, b = Color2RGBA(max(embcol, bkgcol))
     local tag = Colorize("3v3", max(r, .2), max(g, .2), max(b, .2))
-    text = format("%s %s %s %s (%.1f pts)", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+	local wins, played = team.teamWins, team.playerPlayed
+	local losses = played - wins
+    local winlost = ""
+	if wins >= losses then
+        winlost = Colorize(format("%d/%d", wins, losses), 0, 1, 1)
+    else
+        winlost = Colorize(format("%d/%d", wins, losses), 1, 0, 0)
+    end
+    text = format("%s %s %s %s (%.1f pts) %s", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points, winlost)
 end
 self:Stop()
 return text
@@ -805,9 +821,17 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
 	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
 	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
-	local r, g, b = Color2RGBA(max(embcol, bkgcol))	
+	local r, g, b = Color2RGBA(max(embcol, bkgcol))		
     local tag = Colorize("5v5", max(r, .2), max(g, .2), max(b, .2))
-    text = format("%s %s %s %s (%.1f pts)", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+	local wins, played = team.teamWins, team.playerPlayed
+	local losses = played - wins	
+    local winlost = ""
+	if wins >= losses then
+        winlost = Colorize(format("%d/%d", wins, losses), 0, 1, 1)
+    else
+        winlost = Colorize(format("%d/%d", wins, losses), 1, 0, 0)
+    end
+    text = format("%s %s %s %s (%.1f pts) %s", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points, winlost)
 end
 self:Stop()
 return text
