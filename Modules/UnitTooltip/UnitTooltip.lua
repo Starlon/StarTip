@@ -720,7 +720,6 @@ end
 if not UnitIsPlayer(unit) then return end
 local pvp = UnitPVPStats(unit);
 if pvp then
-  self:Stop()
   local fctn = Faction(unit)
   if fctn == L["Alliance"] then
     fctn = L["Horde"]
@@ -729,6 +728,7 @@ if pvp then
   end
   local rankIcon = Texture(pvp.texture, 12)
   local factIcon = Texture("Interface\\PvPRankBadges\\PvPRank"..fctn..".blp", 12)
+  self:Stop()
   return format("%s %s %d HKs", rankIcon, pvp.text or factIcon..L["nOOb (-1)"], pvp.lifetimeHK)
 else
   return L["Fetching..."]
@@ -751,13 +751,13 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local points = CalculateArenaPoints(team.teamRating, team.teamSize)
     local perc = team.teamRating / 3500
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
-    local banner = Texture("Interface\\PVPFrame\\PVP-Banner-2.blp", 12)
 	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
 	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
 	local r, g, b = Color2RGBA(max(embcol, bkgcol))
-    local tag = Colorize("2v2", r, g, b)
-    text = format("%s %s %s %s %s (%.1f pts)", banner, tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+    local tag = Colorize("2v2", max(r, .2), max(g, .2), max(b, .2))
+    text = format("%s %s %s %s (%.1f pts)", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
 end
+self:Stop()
 return text
 ]],
 		enabled = true,
@@ -777,13 +777,13 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local points = CalculateArenaPoints(team.teamRating, team.teamSize)
     local perc = team.teamRating / 3500
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
-    local banner = Texture("Interface\\PVPFrame\\PVP-Banner-3.blp", 12)
 	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
 	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
 	local r, g, b = Color2RGBA(max(embcol, bkgcol))	
-    local tag = Colorize("3v3", r, g, b)
-    text = format("%s %s %s %s %s (%.1f pts)", banner, tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+    local tag = Colorize("3v3", max(r, .2), max(g, .2), max(b, .2))
+    text = format("%s %s %s %s (%.1f pts)", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
 end
+self:Stop()
 return text
 ]],
 		enabled = true,
@@ -803,13 +803,13 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local points = CalculateArenaPoints(team.teamRating, team.teamSize) or 0
     local perc = team.teamRating / 3500
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
-    local banner = Texture("Interface\\PVPFrame\\PVP-Banner-5.blp", 12)	
 	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
 	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
 	local r, g, b = Color2RGBA(max(embcol, bkgcol))	
-    local tag = Colorize("5v5", r, g, b)
-    text = format("%s %s %s %s %s (%.1f pts)", banner, tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
+    local tag = Colorize("5v5", max(r, .2), max(g, .2), max(b, .2))
+    text = format("%s %s %s %s (%.1f pts)", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points)
 end
+self:Stop()
 return text
 ]],
 		enabled = true,
