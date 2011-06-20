@@ -720,6 +720,7 @@ end
 if not UnitIsPlayer(unit) then return end
 local pvp = UnitPVPStats(unit);
 if pvp then
+  self:Stop()
   local fctn = Faction(unit)
   if fctn == L["Alliance"] then
     fctn = L["Horde"]
@@ -728,7 +729,6 @@ if pvp then
   end
   local rankIcon = Texture(pvp.texture, 12)
   local factIcon = Texture("Interface\\PvPRankBadges\\PvPRank"..fctn..".blp", 12)
-  self:Stop()
   return format("%s %s %d HKs", rankIcon, pvp.text or factIcon..L["nOOb (-1)"], pvp.lifetimeHK)
 else
   return L["Fetching..."]
