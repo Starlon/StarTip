@@ -753,9 +753,9 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
 	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
 	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
-	local brighest = ColorBrightest(embcol, bkgcol)
+	local brightest = ColorBrightest(embcol, bkgcol)
 	local r, g, b = Color2RGBA(brightest)
-    local tag = Colorize("2v2", max(r, .2), max(g, .2), max(b, .2))
+    local tag = Colorize("2v2", r, g, b)
 	local wins, played = team.teamWins, team.teamPlayed
 	local losses = played - wins
     local winlost = ""
@@ -788,9 +788,9 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
 	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
 	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
-	local brighest = ColorBrightest(embcol, bkgcol)
+	local brightest = ColorBrightest(embcol, bkgcol)
 	local r, g, b = Color2RGBA(brightest)
-    local tag = Colorize("3v3", max(r, .2), max(g, .2), max(b, .2))
+    local tag = Colorize("3v3", r, g, b)
 	local wins, played = team.teamWins, team.teamPlayed
 	local losses = played - wins
     local winlost = ""
@@ -823,9 +823,9 @@ if team and type(team.teamSize) == "number" and team.teamSize > 0 then
     local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
 	local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
 	local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
-	local brighest = ColorBrightest(embcol, bkgcol)
+	local brightest = ColorBrightest(embcol, bkgcol)
 	local r, g, b = Color2RGBA(brightest)
-    local tag = Colorize("5v5", max(r, .2), max(g, .2), max(b, .2))
+    local tag = Colorize("5v5", r, g, b)
 	local wins, played = team.teamWins, team.teamPlayed
 	local losses = played - wins	
     local winlost = ""
