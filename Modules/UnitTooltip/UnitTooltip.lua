@@ -700,14 +700,17 @@ return Colorize(format("%s: %d%% (%.2f%%)", L["Threat"], threatpct, rawthreatpct
         name = L["Feats"],
         left = [[return L["Feats:"]; ]],
         right = [[
-if not UnitIsPlayer(unit) then return "..." end
+if not UnitIsPlayer(unit) then self:Stop(); return lastFeats end
 local feats = UnitFeats(unit)
+local txt
 if feats and feats > 0 then
     self:Stop()
-    return feats
+    txt = feats
 else
-    return "Loading Achievements..."
+    txt = "Loading Achievements..."
 end
+lastFeats = txt
+return txt
 ]],
         enabled = true,
         update = 500,
@@ -717,8 +720,9 @@ end
         name = L["PVP Rank"],
         left = [[return L["PVP Rank:"]; ]],
         right = [[
-if not UnitIsPlayer(unit) then return "..." end
+if not UnitIsPlayer(unit) then self:Stop(); return lastPVPRank end
 local pvp = UnitPVPStats(unit);
+local txt;
 if pvp then
   self:Stop()
   local fctn = Faction(unit)
@@ -729,10 +733,12 @@ if pvp then
   end
   local rankIcon = Texture(pvp.texture, 12)
   local factIcon = Texture("Interface\\PvPRankBadges\\PvPRank"..fctn..".blp", 12)
-  return format("%s %s %d HKs", rankIcon, pvp.text or factIcon..L["nOOb (-1)"], pvp.lifetimeHK)
+  txt = format("%s %s %d HKs", rankIcon, pvp.text or factIcon..L["nOOb (-1)"], pvp.lifetimeHK)
 else
-  return L["Fetching..."]
+  txt = L["Fetching..."]
 end
+lastPVPRank = txt
+return txt
 ]],
         enabled = true,
         update = 300,
