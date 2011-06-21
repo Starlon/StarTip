@@ -189,6 +189,7 @@ L["Don't right trim"] = true
 L["Prevent trimming white space to the right of text"] = true
 L["Feats"] = true
 L["Feats:"] = true
+L["Loading Achievements..."] = true
 L["PVP Rank"] = true
 L["PVP Rank:"] = true
 L["Fetching..."] = true

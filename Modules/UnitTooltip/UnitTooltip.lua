@@ -699,11 +699,11 @@ return Colorize(format("%s: %d%% (%.2f%%)", L["Threat"], threatpct, rawthreatpct
     [35] = {
         name = L["Feats"],
         left = [[
-if not UnitIsPlayer(unit) then return end
 return L["Feats:"]; 
 ]],
         right = [[
-if not UnitIsPlayer(unit) then return lastFeats end
+if UnitExists(unit) and not UnitIsPlayer(unit) then return end
+if not UnitExists(unit) then return lastFeats end
 local feats = UnitFeats(unit)
 local txt
 if feats and feats > 0 then
@@ -722,29 +722,13 @@ return txt
     [36] = {
         name = L["PVP Rank"],
         left = [[
-if not UnitExists(unit) or not UnitIsPlayer(unit) then lastPVPRank = nil; return end
 return L["PVP Rank:"]; 
 ]],
-        right = [[
-if not UnitExists(unit) or not UnitIsPlayer(unit) then return lastPVPRank end
-local pvp = UnitPVPStats(unit);
-local txt;
-if pvp then
-  self:Stop()
-  local fctn = Faction(unit)
-  if fctn == L["Alliance"] then
-    fctn = L["Horde"]
-  elseif fctn == L["Horde"] then
-    fctn = L["Alliance"]
-  end
-  local rankIcon = Texture(pvp.texture, 12)
-  local factIcon = Texture("Interface\\PvPRankBadges\\PvPRank"..fctn..".blp", 12)
-  txt = format("%s %s %d HKs", rankIcon, pvp.text or factIcon..L["nOOb (-1)"], pvp.lifetimeHK)
-else
-  txt = L["Fetching..."]
-end
-lastPVPRank = txt
-return txt
+		right = [[
+if UnitExists(unit) and not UnitIsPlayer(unit) then return end
+if not UnitExists(unit) then return lastPVPRank end
+lastPVPRank = PVPRank(unit)
+return lastPVPRank	
 ]],
         enabled = true,
         update = 300,
@@ -753,33 +737,8 @@ return txt
     },
     [37] = {
         name = L["Arena 2s"],
-        left = [[
-local pvp = UnitPVPStats(unit);
-if not pvp then return "" end
-local team = pvp.teams[2]
-if not team then return "" end
-local text = ""
-if team and type(team.teamSize) == "number" and team.teamSize > 0 then
-    local points = CalculateArenaPoints(team.teamRating, team.teamSize)
-    local perc = team.teamRating / 3500
-    local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
-    local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
-    local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
-    local brightest = ColorBrightest(embcol, bkgcol)
-    local r, g, b = Color2RGBA(brightest)
-    local tag = Colorize("2v2", r, g, b)
-    local wins, played = team.teamWins, team.teamPlayed
-    local losses = played - wins
-    local winlost = ""
-    if wins >= losses then
-        winlost = Colorize(format("%d/%d", wins, losses), 0, 1, 1)
-    else
-        winlost = Colorize(format("%d/%d", wins, losses), 1, 0, 0)
-    end    
-    text = format("%s %s %s %s (%.1f pts) %s", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points, winlost)
-end
-self:Stop()
-return text
+		left = [[
+return ArenaTeam(unit, 2)	
 ]],
         enabled = true,
         update = 300,
@@ -788,33 +747,8 @@ return text
     },
     [38] = {
         name = L["Arena 3s"],
-        left = [[
-local pvp = UnitPVPStats(unit);
-if not pvp then return "" end
-local team = pvp.teams[3]
-if not team then return "" end
-local text = ""
-if team and type(team.teamSize) == "number" and team.teamSize > 0 then
-    local points = CalculateArenaPoints(team.teamRating, team.teamSize)
-    local perc = team.teamRating / 3500
-    local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
-    local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
-    local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
-    local brightest = ColorBrightest(embcol, bkgcol)
-    local r, g, b = Color2RGBA(brightest)
-    local tag = Colorize("3v3", r, g, b)
-    local wins, played = team.teamWins, team.teamPlayed
-    local losses = played - wins
-    local winlost = ""
-    if wins >= losses then
-        winlost = Colorize(format("%d/%d", wins, losses), 0, 1, 1)
-    else
-        winlost = Colorize(format("%d/%d", wins, losses), 1, 0, 0)
-    end
-    text = format("%s %s %s %s (%.1f pts) %s", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points, winlost)
-end
-self:Stop()
-return text
+		left = [[
+return ArenaTeam(unit, 3)	
 ]],
         enabled = true,
         update = 300,
@@ -823,33 +757,8 @@ return text
     },
     [39] = {
         name = L["Arena 5s"],
-        left = [[
-local pvp = UnitPVPStats(unit);
-if not pvp then return "" end
-local team = pvp.teams[5]
-if not team then return "" end
-local text = ""
-if team and type(team.teamSize) == "number" and team.teamSize > 0 then
-    local points = CalculateArenaPoints(team.teamRating, team.teamSize) or 0
-    local perc = team.teamRating / 3500
-    local emblem = Texture("Interface\\PVPFrame\\Icons\\PVP-Banner-Emblem-"..team.emblem, 12)
-    local embcol = RGBA2Color(team.emblemR, team.emblemG, team.emblemB)
-    local bkgcol = RGBA2Color(team.backR, team.backG, team.backB)
-    local brightest = ColorBrightest(embcol, bkgcol)
-    local r, g, b = Color2RGBA(brightest)
-    local tag = Colorize("5v5", r, g, b)
-    local wins, played = team.teamWins, team.teamPlayed
-    local losses = played - wins    
-    local winlost = ""
-    if wins >= losses then
-        winlost = Colorize(format("%d/%d", wins, losses), 0, 1, 1)
-    else
-        winlost = Colorize(format("%d/%d", wins, losses), 1, 0, 0)
-    end
-    text = format("%s %s %s %s (%.1f pts) %s", tag, emblem, team.teamName or "Name?", Colorize(team.teamRating, perc, 0.5, 1), points, winlost)
-end
-self:Stop()
-return text
+		left = [[
+return ArenaTeam(unit, 5)
 ]],
         enabled = true,
         update = 300,
