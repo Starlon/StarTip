@@ -698,16 +698,19 @@ return Colorize(format("%s: %d%% (%.2f%%)", L["Threat"], threatpct, rawthreatpct
     },
     [35] = {
         name = L["Feats"],
-        left = [[return L["Feats:"]; ]],
+        left = [[
+if not UnitIsPlayer(unit) then return end
+return L["Feats:"]; 
+]],
         right = [[
-if not UnitIsPlayer(unit) then self:Stop(); return lastFeats end
+if not UnitIsPlayer(unit) then return lastFeats end
 local feats = UnitFeats(unit)
 local txt
 if feats and feats > 0 then
     self:Stop()
     txt = feats
 else
-    txt = "Loading Achievements..."
+    txt = L["Loading Achievements..."]
 end
 lastFeats = txt
 return txt
@@ -718,9 +721,12 @@ return txt
     },
     [36] = {
         name = L["PVP Rank"],
-        left = [[return L["PVP Rank:"]; ]],
+        left = [[
+if not UnitExists(unit) or not UnitIsPlayer(unit) then lastPVPRank = nil; return end
+return L["PVP Rank:"]; 
+]],
         right = [[
-if not UnitIsPlayer(unit) then self:Stop(); return lastPVPRank end
+if not UnitExists(unit) or not UnitIsPlayer(unit) then return lastPVPRank end
 local pvp = UnitPVPStats(unit);
 local txt;
 if pvp then
@@ -849,8 +855,7 @@ return text
         update = 300,
         leftUpdating = true,
         cols = 100
-    },
-    
+    }
 }
 
 for i, v in ipairs(defaultLines) do
@@ -989,9 +994,11 @@ function mod:CreateLines()
             v.value = v.left
             v.outlined = v.leftOutlined
             llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. " (left)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
+			if v.left and not v.leftUpdating then llines[j].leftObj.timer:Set(0) end
             v.value = v.right
             v.outlined = v.rightOutlined
             llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
+			if v.right and not v.rightUpdating then llines[j].rightObj.timer:Set(0) end
         end
     end
     self:ClearLines()
