@@ -5,8 +5,8 @@
 ## Version: @project-version@
 ## X-Category: Tooltip
 ## X-License: GPL v3
-## X-Credits: ckknight for CowTip and DogTags
-## OptionalDeps: Ace3, LibScriptable-1.0, kgPanels, Skada, Chatter, Recount
+## X-Credits: ckknight for CowTip and DogTags. Shefki for LuaTexts.
+## OptionalDeps: Ace3, LibScriptable-1.0, kgPanels, Skada, Chatter, Recount, LibTalentQuery-1.0, LibGroupTalents-1.0, LibQTip-1.0, LibRangeCheck-2.0, LibBossIDs-1.0, LibQTip-1.0, LibUnitControl-1.0, LibNameplate-1.0, LibTransition-1.0, LibAlts-1.0, LibLinq-1.0, LibFail-2.0, LibBossIDs-1.0, LibLinq-1.0, LibMouseGestures-1.0, LibNameplate-1.0
 ## SavedVariables: StarTipDB
 
 Libs\LibStub\LibStub.lua
