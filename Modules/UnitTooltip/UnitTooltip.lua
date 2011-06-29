@@ -733,7 +733,7 @@ return lastPVPRank
         enabled = true,
         update = 300,
         rightUpdating = true,
-        cols = strlen("Interface\\PvPRankBadges\\PvPRank06.blp") + 50
+        cols = 50
     },
     [37] = {
         name = L["Arena 2s"],
