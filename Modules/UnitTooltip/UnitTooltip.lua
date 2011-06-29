@@ -998,11 +998,11 @@ function mod.OnHide()
 end
 
 local function escape(text)
-    return text:replace("|","||")
+    return string.gsub(text, "|","||")
 end
 
 local function unescape(text)
-    return text:replace("||", "|")
+    return string.gsub(text, "||", "|")
 end
 
 function mod:GetNames()

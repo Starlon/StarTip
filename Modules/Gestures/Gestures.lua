@@ -28,6 +28,7 @@ local defaults = {
 				expression = [[
 WipeDPS()
 WipeNoise()
+WipeInspect()
 ]]
 			},
 			[2] = {
