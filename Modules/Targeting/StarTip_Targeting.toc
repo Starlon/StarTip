@@ -1,6 +1,6 @@
-## Interface: 40000
+## Interface: 40200
 ## Title: StarTip [Targeting]
-## Notes: Tooltips from outerspace
+## Notes: Tooltips from Outerspace
 ## Author: Starlon
 ## Version: 1.0
 ## Deps: StarTip

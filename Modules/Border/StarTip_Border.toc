@@ -1,6 +1,6 @@
-## Interface: 40000
+## Interface: 40200
 ## Title: StarTip [Border]
-## Notes: Tooltips from outerspace
+## Notes: Tooltips from Outerspace
 ## Author: Starlon
 ## Version: @package-version@
 ## Deps: StarTip
