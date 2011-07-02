@@ -738,7 +738,9 @@ return lastPVPRank
     [37] = {
         name = L["Arena 2s"],
 		left = [[
-return ArenaTeam(unit, 2)	
+if not UnitExists(unit) then return lastArena2 end
+lastArena2 =  ArenaTeam(unit, 2)	
+return lastArena2
 ]],
         enabled = true,
         update = 300,
@@ -748,7 +750,9 @@ return ArenaTeam(unit, 2)
     [38] = {
         name = L["Arena 3s"],
 		left = [[
-return ArenaTeam(unit, 3)	
+if not UnitExists(unit) then return lastArena3 end
+lastArena3 = ArenaTeam(unit, 3)	
+return lastArena3
 ]],
         enabled = true,
         update = 300,
@@ -758,7 +762,9 @@ return ArenaTeam(unit, 3)
     [39] = {
         name = L["Arena 5s"],
 		left = [[
-return ArenaTeam(unit, 5)
+if not UnitExists(unit) then return lastArena5 end
+lastArena5 = ArenaTeam(unit, 5)
+return lastArena5
 ]],
         enabled = true,
         update = 300,
