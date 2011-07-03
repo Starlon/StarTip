@@ -54,12 +54,13 @@ local defaultWidgets = {
 		enabled = true,
 		width = 10,
 		height = 50,
-		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -12}},
+		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -12}},
 		color = [[
 return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 ]],
 		layer = 1,
-		update = 1000
+		update = 1000,
+		parent = "StarTipQTipMain"
 	},
 	[2] = {
 		name = "Power",
@@ -69,12 +70,13 @@ return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 		enabled = true,
 		width = 10,
 		height = 50,
-		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -12}},
+		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", -100, -12}},
 		color = [[
 return PowerColor("RAGE", unit)
 ]],
 		layer = 1,
-		update = 1000
+		update = 1000,
+		parent = "StarTipQTipMain"
 	},
 	[3] = {
 		name = "Mem",
@@ -103,12 +105,13 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -77}},
+		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -77}},
 		layer = 1,
 		update = 1000,
 		persistent = true,
 		intersect = true,
 		intersectPad = 1000,
+		parent = "StarTipQTipMain"
 	},
 	[4] = {
 		name = "CPU",
@@ -137,7 +140,7 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", -100, -77}},
+		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", -100, -77}},
 		layer = 1,
 		update = 1000,
 		persistent = true,
@@ -170,7 +173,7 @@ local optionsDefaults = {
 				height = WidgetHistogram.defaults.height,
 				width = WidgetHistogram.defaults.width,
 				enabled = true,
-				points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -50}},
+				points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -50}},
 				texture = LSM:GetDefault("statusbar"),
 				expression = "return random(100)",
 				color = "return 0, 0, 1",
@@ -222,13 +225,19 @@ local textureDict = {}
 local new, del
 do
 	local pool = {}
-	function new()
+	function new(parent)
+		if type(parent) == "string" then
+			parent = _G[parent]
+		end
+		if type(parent) ~= "table" then
+			parent = _G["StarTipQTipMain"]
+		end
 		local histogram = next(pool)
 
 		if histogram then
 			pool[histogram] = nil
 		else
-			histogram = CreateFrame("StatusBar", nil, GameTooltip)
+			histogram = CreateFrame("StatusBar", nil, parent)
 		end
 
 		return histogram
@@ -276,7 +285,7 @@ local function createHistograms()
 		end
 	end
 
-	for k, v in pairs(self.db.profile.histograms) do
+	for k, v in pairs(mod.db.profile.histograms) do
 		if v.enabled and not v.deleted then
 			v.width = v.width or WidgetHistogram.defaults.width
 			local widget = mod.histograms[v]
@@ -307,8 +316,8 @@ local function createHistograms()
 							bar:SetWidth(v.width or 6)
 						end
 					else
-					bar:SetPoint("TOPLEFT", GameTooltip, "TOPLEFT")
-						bar:SetPoint("BOTTOMLEFT", GameTooltip, "BOTTOMLEFT")
+					bar:SetPoint("TOPLEFT", v.parent or _G["StarTipQTipMain"], "TOPLEFT")
+						bar:SetPoint("BOTTOMLEFT", v.parent or _G["StarTipQTipMain"], "BOTTOMLEFT")
 					end
 					bar:SetHeight(v.height)
 					bar:SetMinMaxValues(0, 100)
