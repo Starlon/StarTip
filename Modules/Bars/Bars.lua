@@ -20,8 +20,6 @@ local L = StarTip.L
 
 local environment = {}
 
-local unit
-
 local anchors = {
 	"TOP",
 	"TOPRIGHT",
@@ -84,11 +82,12 @@ return r, g, b
 ]],
 		height = 6,
 		length = 0,
-		points = {{"BOTTOM", "GameTooltip", "TOP", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
+		points = {{"BOTTOM", "StarTipQTipMain", "TOP", 0, 0}, {"LEFT", "StarTipQTipMain", "LEFT", 5, 0}, {"RIGHT", "StarTipQTipMain", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
 		layer = 1, 
-		level = 100
+		level = 100,
+		parent = "StarTipQTipMain"
 	},
 	[2] = {
 		name = "Mana Bar",
@@ -111,17 +110,17 @@ return self.lastR, self.lastG, self.lastB
 ]],
 		height = 6,
 		length = 0,
-		points = {{"TOP", "GameTooltip", "BOTTOM", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
+		points = {{"TOP", "StarTipQTipMain", "BOTTOM", 0, 0}, {"LEFT", "StarTipQTipMain", "LEFT", 5, 0}, {"RIGHT", "StarTipQTipMain", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
 		layer = 1,
-		level = 100
+		level = 100,
+		parent = "StarTipQTipMain"
 	},
 	[3] = {
 		name = "Threat Bar",
 		type = "bar",
 		expression = [[
-do return 50 end
 if not UnitExists(unit) then return self.lastthreatpct end
 local _,_,threatpct = UnitDetailedThreatSituation(unit, "target")
 self.lastthreatpct = threatpct or 0
@@ -134,14 +133,15 @@ self.lastStatus = status
 return status
 ]],
 		length = 6,
-		height = 6,
-		points = {{"LEFT", "GameTooltip", "RIGHT", 0, 0}, {"TOP", "GameTooltip", "TOP", 0, -5}, {"BOTTOM", "GameTooltip", "BOTTOM", 0, 5}},
+		height = 0,
+		points = {{"LEFT", "StarTipQTipMain", "RIGHT", 0, 0}, {"TOP", "StarTipQTipMain", "TOP", 0, -5}, {"BOTTOM", "StarTipQTipMain", "BOTTOM", 0, 5}},
 		texture = LSM:GetDefault("statusbar"),
 		min = "return 0",
 		max = "return 100",
 		enabled = true,
 		layer = 1,
 		level = 100,
+		parent = "StarTipQTipMain",
 		orientation = WidgetBar.ORIENTATION_VERTICAL
 	}
 
@@ -168,7 +168,7 @@ local optionsDefaults = {
 				max = "return 100",
 				length = 12,
 				height = 0,
-				points = {{"RIGHT", "GameTooltip", "LEFT", 0, 0}, {"TOP", "GameTooltip", "TOP", 0, -5}, {"BOTTOM", "GameTooltip", "BOTTOM", 0, 5}},
+				points = {{"RIGHT", "StarTipQTipMain", "LEFT", 0, 0}, {"TOP", "StarTipQTipMain", "TOP", 0, -5}, {"BOTTOM", "StarTipQTipMain", "BOTTOM", 0, 5}},
 				level = 100,
 				layer = 1,
 				texture = LSM:GetDefault("statusbar"),
@@ -176,7 +176,8 @@ local optionsDefaults = {
 				color1 = "return .5, 1, .8",
 				orientation = WidgetBar.ORIENTATION_VERTICAL,
 				custom = true,
-				enabled = true
+				enabled = true,
+				parent = "StarTipQTipMain"
 			}
 			tinsert(mod.db.profile.bars, widget)
 			StarTip:RebuildOpts()
@@ -228,13 +229,19 @@ local textureDict = {}
 local new, del
 do
 	local pool = {}
-	function new()
+	function new(parent)
 		local bar = next(pool)
-
+		if type(parent) == "string" then
+			parent = _G[parent]
+		end
+		if type(parent) ~= "table" then
+			parent = _G["StarTipQTipMain"]
+		end
 		if bar then
 			pool[bar] = nil
+			bar:SetParent(parent)
 		else
-			bar = CreateFrame("StatusBar", nil, GameTooltip)
+			bar = CreateFrame("StatusBar", nil, parent)
 		end
 
 		return bar
@@ -244,7 +251,7 @@ do
 	end
 end
 
-local defaultPoint = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}
+local defaultPoint = {"BOTTOMLEFT", "StarTipQTipMain", "TOPLEFT"}
 
 local strataNameList = {
 	"TOOLTIP", "FULLSCREEN_DIALOG", "FULLSCREEN", "DIALOG", "HIGH", "MEDIUM", "LOW", "BACKGROUND"
@@ -281,7 +288,7 @@ local function createBars()
 		if v.enabled and not v.deleted then
 			local widget = mod.bars[v]
 			if not widget then
-				local bar = new()
+				local bar = new(v.parent)
 				widget = WidgetBar:New(mod.core, v.name, copy(v), v.row or 0, v.col or 0, v.layer or 1, StarTip.db.profile.errorLevel, updateBar, bar)
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
@@ -308,7 +315,7 @@ local function createBars()
 				v.bar = bar
 
 				if v.expression2 then
-					bar = new()
+					bar = new(v.parent)
 					widget = WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
 					bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
 					bar:ClearAllPoints()
@@ -331,7 +338,6 @@ local function createBars()
 					mod.bars[v].secondBar = widget
 				end
 			end
-			widget.config.unit = StarTip.unit
 		end
 	end
 end
@@ -419,7 +425,6 @@ function mod:GetOptions()
 end
 
 function mod:SetUnit()
-	unit = GameTooltip:GetUnit()
 	GameTooltipStatusBar:Hide()
 	createBars()
 	for i, bar in pairs(self.bars or {}) do
