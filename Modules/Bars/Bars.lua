@@ -296,10 +296,8 @@ local function createBars()
 					arg5 = (arg5 or 0)
 					bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 				end
-				if type(v.length) == "number" then
-					bar:SetWidth(v.length)
-				end
-				bar:SetHeight(v.height)
+				bar:SetWidth(v.length or 10)
+				bar:SetHeight(v.height or 10)
 				bar:SetMinMaxValues(0, 100)
 				bar:Show()
 				bar:SetFrameStrata(strataNameList[v.layer or 1])
