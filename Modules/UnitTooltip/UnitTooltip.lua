@@ -849,24 +849,29 @@ end
 
 local widgetsToDraw = {}
 local function updateWidget(widget)
+    do return end
     tinsert(widgetsToDraw, widget)
-    if mod.db.profile.refreshRate == 0 then
-        draw(UnitExists(StarTip.unit))
-    end
 end
 
 do
     local fontsList = LSM:List("font")
     local widget, fontString
-    function draw(show)
-        if StarTip.fading then
-            table.wipe(widgetsToDraw)
-            return
-        end
+    function draw()
+        if not UnitExists(StarTip.unit) then StarTip.tooltipMain:Hide() return end
         for k, v in pairs(lines) do
             
-            tinsert(widgetsToDraw, v.leftObj)
-            tinsert(widgetsToDraw, v.rightObj)
+            if v.leftObj then
+		if v.config.leftUpdating or v.buffer == nil then
+                    v.leftObj:Update()
+                end
+                tinsert(widgetsToDraw, v.leftObj)
+            end
+            if v.rightObj then
+                if v.config.rightUpdating or v.buffer == nil then
+		    v.rightObj:Update()
+                end
+                tinsert(widgetsToDraw, v.rightObj)
+            end
         end
         for i, widget in ipairs(widgetsToDraw) do
             local font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
@@ -874,9 +879,21 @@ do
             if widget.x == 2 then
                 justification = "RIGHT"
             end
-	if(widget.y) then
-            StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, GameTooltipText, justification)
-	end
+            local fontObj = GameTooltipText
+            local size = 12
+            if widget.y == 1 then
+                fontObj = GameTooltipHeaderText
+                size = 16
+            end
+            --fontObj:SetFont(font, size)
+            local colSpan = 1
+            if not widget.config.right then 
+               colSpan = 2
+            end
+            
+            if widget.y and widget.buffer ~= "" then
+                StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, fontObj, justification, colSpan)
+            end
 
 --[[
             if widget.config.outlined and widget.config.outlined > 1 then
@@ -890,8 +907,8 @@ do
         end
         table.wipe(widgetsToDraw)
         if UnitExists(StarTip.unit) then
-            GameTooltip:Show()
-            StarTip.tooltipMain:Show()
+            --GameTooltip:Show()
+            --StarTip.tooltipMain:Show()
         end
     end
 end
@@ -995,10 +1012,12 @@ function mod:CreateLines()
                         --v.leftObj.fontString = mod.leftLines[lineNum]
                     end
                     if v.rightObj then
-                        v.rightObj:Start()
+                        v.rightObj.buffer = nil
+                        --v.rightObj:Start()
                     end
                     if v.leftObj then
-                        v.leftObj:Start()
+                        v.leftObj.buffer = nil
+                        --v.leftObj:Start()
                     end
                     v.lineNum = lineNum
                 end
@@ -1561,6 +1580,7 @@ function mod:SetUnit()
         self.timer:Start()
     end
 
+do return end
     self:RefixEndLines()
 
     GameTooltip:Show()
