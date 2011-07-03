@@ -83,7 +83,7 @@ self.lastR, self.lastG, self.lastB = r, g, b
 return r, g, b
 ]],
 		height = 6,
-		width = 0,
+		length = 0,
 		points = {{"BOTTOM", "GameTooltip", "TOP", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
@@ -110,7 +110,7 @@ self.lastR, self.lastG, self.lastB = PowerColor(nil, unit)
 return self.lastR, self.lastG, self.lastB
 ]],
 		height = 6,
-		width = 0,
+		length = 0,
 		points = {{"TOP", "GameTooltip", "BOTTOM", 0, 0}, {"LEFT", "GameTooltip", "LEFT", 5, 0}, {"RIGHT", "GameTooltip", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
@@ -121,6 +121,7 @@ return self.lastR, self.lastG, self.lastB
 		name = "Threat Bar",
 		type = "bar",
 		expression = [[
+do return 50 end
 if not UnitExists(unit) then return self.lastthreatpct end
 local _,_,threatpct = UnitDetailedThreatSituation(unit, "target")
 self.lastthreatpct = threatpct or 0
@@ -132,8 +133,8 @@ local _, status = UnitDetailedThreatSituation(unit, "target")
 self.lastStatus = status 
 return status
 ]],
-		width = 6,
-		height = 0,
+		length = 6,
+		height = 6,
 		points = {{"LEFT", "GameTooltip", "RIGHT", 0, 0}, {"TOP", "GameTooltip", "TOP", 0, -5}, {"BOTTOM", "GameTooltip", "BOTTOM", 0, 5}},
 		texture = LSM:GetDefault("statusbar"),
 		min = "return 0",
@@ -165,13 +166,17 @@ local optionsDefaults = {
 				type = "bar",
 				min = "return 0",
 				max = "return 100",
-				height = 6,
-				points = {{"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 0}},
+				length = 12,
+				height = 0,
+				points = {{"RIGHT", "GameTooltip", "LEFT", 0, 0}, {"TOP", "GameTooltip", "TOP", 0, -5}, {"BOTTOM", "GameTooltip", "BOTTOM", 0, 5}},
 				level = 100,
-				strata = 1,
+				layer = 1,
 				texture = LSM:GetDefault("statusbar"),
-				expression = "",
-				custom = true
+				expression = "return random() * 100",
+				color1 = "return .5, 1, .8",
+				orientation = WidgetBar.ORIENTATION_VERTICAL,
+				custom = true,
+				enabled = true
 			}
 			tinsert(mod.db.profile.bars, widget)
 			StarTip:RebuildOpts()
@@ -250,7 +255,6 @@ local strataLocaleList = {
 }
 
 local function clearBar(obj)
-	obj = mod.bars and mod.bars[obj]
 	if not obj then return end
 	obj.bar:ClearAllPoints()
 	obj.bar:Hide()
@@ -275,11 +279,10 @@ local function createBars()
 
 	for k, v in pairs(self.db.profile.bars) do
 		if v.enabled and not v.deleted then
-
 			local widget = mod.bars[v]
 			if not widget then
 				local bar = new()
-				widget = WidgetBar:New(mod.core, v.name, copy(v), v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
+				widget = WidgetBar:New(mod.core, v.name, copy(v), v.row or 0, v.col or 0, v.layer or 1, StarTip.db.profile.errorLevel, updateBar, bar)
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
 				if widget.orientation == WidgetBar.ORIENTATION_VERTICAL then
@@ -293,13 +296,13 @@ local function createBars()
 					arg5 = (arg5 or 0)
 					bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 				end
-				if type(v.width) == "number" then
-					bar:SetWidth(v.width)
+				if type(v.length) == "number" then
+					bar:SetWidth(v.length)
 				end
 				bar:SetHeight(v.height)
 				bar:SetMinMaxValues(0, 100)
 				bar:Show()
-				bar:SetFrameStrata(strataNameList[v.layer])
+				bar:SetFrameStrata(strataNameList[v.layer or 1])
 				bar:SetFrameLevel(v.level)
 				widget.bar1 = true
 				widget.bar = bar
@@ -321,11 +324,11 @@ local function createBars()
 						end
 						bar:SetPoint(arg1, arg2, arg3, arg4, arg5)
 					end
-					bar:SetWidth(v.width or 10)
+					bar:SetWidth(v.length or 10)
 					bar:SetHeight(v.height)
 					bar:SetMinMaxValues(0, 100)
 					bar:Show()
-					bar:SetFrameStrata(strataNameList[widget.layer])
+					bar:SetFrameStrata(strataNameList[widget.layer or 1])
 					bar:SetFrameLevel(v.level)
 					mod.bars[v].secondBar = widget
 				end
@@ -387,7 +390,7 @@ end
 
 function mod:OnEnable()
 	StarTip:SetOptionsDisabled(options, false)
-	intersectTimer = intersectTimer or LibTimer:New("Texts.intersectTimer", 100, true, intersectUpdate)
+	intersectTimer = intersectTimer or LibTimer:New("Bars.intersectTimer", 100, true, intersectUpdate)
 	self:ClearBars()
 	for k, bar in pairs(self.bars or {}) do
 		if bar.config.alwaysShown then
@@ -511,7 +514,7 @@ function mod:RebuildOpts()
 				if delete then
 					tremove(self.db.profile.bars, i)
 				end
-				self:ClearTexts()
+				self:ClearBars()
 				StarTip:RebuildOpts()
 			end,
 			order = 100
