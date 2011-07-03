@@ -75,8 +75,8 @@ end
 		speed = 100,
 		direction = SCROLL_LEFT,
 		dontRtrim = true,
-		points = {{"BOTTOMLEFT", "GameTooltip", "TOPLEFT", 0, 12}},
-		parent = "GameTooltip",
+		points = {{"BOTTOMLEFT", "StarTipQTipMain", "TOPLEFT", 0, 12}},
+		parent = "StarTipQTipMain",
 		frameName = "StarTipTextsName",
 		strata = 1,
 		level = 1,
@@ -97,8 +97,8 @@ return Gradient(health / max)
 ]],
 		cols = 20,
 		update = 1000,
-		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, 1}},
-		parent = "GameTooltip",
+		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, 1}},
+		parent = "StarTipQTipMain",
 		strata = 1,
 		level = 1
 	},
@@ -119,8 +119,8 @@ return Gradient(mana / max)
 		cols = 20,
 		update = 1000,
 		align = WidgetText.ALIGN_RIGHT,
-		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, 1}},
-		parent = "GameTooltip",
+		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", 0, 1}},
+		parent = "StarTipQTipMain",
 		strata = 1,
 		level = 1
 	},
@@ -151,8 +151,8 @@ end
 		cols = 20,
 		update = 1000,
 		dontRtrim = true,
-		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -62}},
-		parent = "GameTooltip",
+		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -62}},
+		parent = "StarTipQTipMain",
 		strata = 1,
 		level = 1,
 		intersect = true,
@@ -175,8 +175,8 @@ return Color2RGBA(0xffff00)
 		cols = 20,
 		update = 1000,
 		dontRtrim = true,
-		points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -124}},
-		parent = "GameTooltip",
+		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -124}},
+		parent = "StarTipQTipMain",
 		strata = 1,
 		level = 1,
 		intersect = true,
@@ -207,8 +207,8 @@ end
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
-		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -62}},
-		parent = "GameTooltip",
+		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", 0, -62}},
+		parent = "StarTipQTipMain",
 		strata = 1,
 		level = 1,
 		intersect = true,
@@ -233,8 +233,8 @@ return 1, 1, 0
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
-		points = {{"TOPRIGHT", "GameTooltip", "BOTTOMRIGHT", 0, -124}},
-		parent = "GameTooltip",
+		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", 0, -124}},
+		parent = "StarTipQTipMain",
 		strata = 1,
 		level = 1,
 		intersect = true,
@@ -262,7 +262,7 @@ local optionsDefaults = {
 				min = "return 0",
 				max = "return 100",
 				height = 6,
-				points = {{"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}},
+				points = {{"BOTTOMLEFT", "StarTipQTipMain", "TOPLEFT"}},
 				texture = LSM:GetDefault("statustext"),
 				expression = "",
 				strata = 1,
@@ -331,11 +331,17 @@ do
 	function new(background, name, parent)
 		local text = next(pool)
 
+		if type(parent) == "string" then
+
+		end
+		if type(parent) ~= "table" then
+			parent = _G["StarTipQTipMain"]
+		end
 		if text then
 			pool[text] = nil
 		else
 			parent = parent or "UIParent"
-			local frame = CreateFrame("Frame", name, parent and _G[parent])
+			local frame = CreateFrame("Frame", name, parent)
 			if background then
 				frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 					tile = true,
@@ -364,7 +370,7 @@ do
 	end
 end
 
-local defaultPoint = {"BOTTOMLEFT", "GameTooltip", "TOPLEFT"}
+local defaultPoint = {"BOTTOMLEFT", "StarTipQTipMain", "TOPLEFT"}
 
 local strataNameList = {
 	"TOOLTIP", "FULLSCREEN_DIALOG", "FULLSCREEN", "DIALOG", "HIGH", "MEDIUM", "LOW", "BACKGROUND"
