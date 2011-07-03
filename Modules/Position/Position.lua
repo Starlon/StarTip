@@ -332,29 +332,6 @@ function mod:GetOptions()
 	return options
 end
 
-local isSpell
-local isItem
-local lastSpell
-
-local updateFrame = CreateFrame("Frame")
-local oldX, oldY
-local currentAnchor
-local xoffset, yoffset
-local active
-local positionTooltip = function()
-	if not active or isSpell or isItem then return end
-	
-	local x, y = GetCursorPosition()
-	
-	local effScale = GameTooltip:GetEffectiveScale()
-	
-	if x ~= oldX or y ~= oldY then
-		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", (x + xoffset) / effScale, (y + yoffset) / effScale + 5)
-	end
-	oldX, oldY = x, y
-end
-
 local getIndex = function(owner)
 	local index
 	if UnitExists("mouseover") then
@@ -370,6 +347,59 @@ local getIndex = function(owner)
 	end
 	return index
 end
+
+local isSpell
+local isItem
+local lastSpell
+
+local updateFrame = CreateFrame("Frame")
+local fakeUpdateFrame = CreateFrame("Frame")
+local oldX, oldY = -1, -1
+local currentAnchor = "BOTTOM"
+local xoffset, yoffset = 0, 0
+local active
+local positionTooltip = function()
+	if not active or isSpell or isItem then return end
+	
+	local x, y = GetCursorPosition()
+	
+	local effScale = GameTooltip:GetEffectiveScale()
+	
+	if x ~= oldX or y ~= oldY then
+		GameTooltip:ClearAllPoints()
+		GameTooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", (x + xoffset) / effScale, (y + yoffset) / effScale + 5)
+	end
+	oldX, oldY = x, y
+end
+
+local oldX, oldY
+local positionMainTooltip = function()
+	local index = getIndex(UIParent)
+	local currentAnchor = StarTip.opposites[StarTip.anchors[index]:sub(8)]
+	local x, y = GetCursorPosition()
+	local tooltip = StarTip.tooltipMain
+	local effScale = tooltip:GetEffectiveScale()
+	local height = tooltip:GetHeight() or 0
+	local width = tooltip:GetWidth() or 0
+	local screenWidth = UIParent:GetWidth() * effScale
+	local screenHeight = UIParent:GetHeight() * effScale
+	local myOffsetX, myOffsetY = 0, 0
+	if x + width / 2 + xoffset > screenWidth then
+		myOffsetX = (screenWidth - (x + width / 2 + xoffset)) * effScale
+	end
+	if y + height + yoffset > screenHeight then
+		myOffsetY = (screenHeight - (y + height + yoffset) + 1) * effScale
+	end
+	if x - width / 2 < 0 then
+		myOffsetX = (x - width / 2 + 1) * -1 * effScale
+	end
+	if x ~= oldX or y ~= oldY then
+		tooltip:ClearAllPoints()
+		tooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", 
+			(x + xoffset + myOffsetX) / effScale, (y + yoffset + myOffsetY) / effScale + 5)
+	end
+end
+
 
 local setOffsets = function(owner)
 	if owner == UIParent then
@@ -414,8 +444,10 @@ local function delayAnchor()
 		oldX, oldY = 0, 0
 		currentAnchor = StarTip.opposites[StarTip.anchors[index]:sub(8)]
 		updateFrame:SetScript("OnUpdate", positionTooltip)
+		fakeUpdateFrame:SetScript("OnUPdate", positionMainTooltip)
 		active = true
 		positionTooltip()
+		positionMainTooltip()
 	else
 		if updateFrame:GetScript("OnUpdate") then updateFrame:SetScript("OnUpdate", nil) end
 		this:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
@@ -492,4 +524,5 @@ function mod:SetUnit()
 	isSpell = false
 	isItem = false
 	updateFrame:SetScript("OnUpdate", positionTooltip)
+	fakeUpdateFrame:SetScript("OnUpdate", positionMainTooltip)
 end

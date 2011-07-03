@@ -106,8 +106,10 @@ local checkExistence = function()
 		end
 		if kind == 2 then
 			GameTooltip:FadeOut()
+			StarTip.tooltipMain:Hide()
 		else
 			GameTooltip:Hide()
+			StarTip.tooltipMain:Hide()
 		end
 	end
 end

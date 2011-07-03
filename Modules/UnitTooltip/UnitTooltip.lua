@@ -863,13 +863,22 @@ do
             table.wipe(widgetsToDraw)
             return
         end
+        for k, v in pairs(lines) do
+            
+            tinsert(widgetsToDraw, v.leftObj)
+            tinsert(widgetsToDraw, v.rightObj)
+        end
         for i, widget in ipairs(widgetsToDraw) do
-            if not widget.fontString then break end
-            local fontString = widget.fontString
-            fontString:SetText(widget.buffer)
+            local font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
+            local justification = "LEFT"
+            if widget.x == 2 then
+                justification = "RIGHT"
+            end
+	if(widget.y) then
+            StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, GameTooltipText, justification)
+	end
 
-            font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
-            local filename, fontHeight, flags = fontString:GetFont()
+--[[
             if widget.config.outlined and widget.config.outlined > 1 then
                 if widget.config.outlined == 2 then
                     fontString:SetFont(filename, fontHeight, "OUTLINED")
@@ -877,10 +886,12 @@ do
                     fontString:SetFont(filename, fontHeight, "THICKOUTLINED")
                 end
             end
+]]
         end
         table.wipe(widgetsToDraw)
         if UnitExists(StarTip.unit) then
             GameTooltip:Show()
+            StarTip.tooltipMain:Show()
         end
     end
 end
@@ -919,8 +930,17 @@ function mod:CreateLines()
     self:ClearLines()
     lines = setmetatable(llines, {__call=function(self)
             local lineNum = 0
-            GameTooltip:ClearLines()
+            StarTip.tooltipMain:Clear()
+            --GameTooltip:ClearLines()
             for i, v in ipairs(self) do
+                if v.leftObj then
+                    v.leftObj.x = nil
+                    v.leftObj.y = nil
+                end
+                if v.rightObj then
+                    v.rightObj.x = nil
+                    v.rightObj.y = nil
+                end
                 local left, right = '', ''
                 environment.unit = StarTip.unit
                 v.config.unit = StarTip.unit
@@ -945,31 +965,48 @@ function mod:CreateLines()
                 end
                 
                 if type(left) == "string" and type(right) == "string" then
-                    StarTip.addingLine = true
                     lineNum = lineNum + 1
                     if v.right then
-                        GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
-                        v.leftObj.fontString = mod.leftLines[lineNum]
-                        v.rightObj.fontString = mod.rightLines[lineNum]
+                        --GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
+			local y, x
+                        if lineNum == 1 then
+                            y, x = StarTip.tooltipMain:AddHeader('', '')
+                        else 
+                            y, x = StarTip.tooltipMain:AddLine('', '')
+                        end
+                        --v.leftObj.fontString = mod.leftLines[lineNum]
+                        --v.rightObj.fontString = mod.rightLines[lineNum]
+			--v.leftObj.fontString = StarTip.qtipLines[y][1]
+			--v.rightObj.fontString = StarTip.qtipLines[y][2]
+			v.leftObj.y = y
+			v.leftObj.x = 1
+			v.rightObj.y = y
+			v.rightObj.x = 2
                     else
-                        GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, v.wordwrap)
-                        v.leftObj.fontString = mod.leftLines[lineNum]
+                        local y, x
+                        if lineNum == 1 then
+                            y, x = StarTip.tooltipMain:AddHeader('')
+                        else
+                            y, x = StarTip.tooltipMain:AddLine('')
+                        end
+                        v.leftObj.y = y
+                        v.leftObj.x = 1
+                        --GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, v.wordwrap)
+                        --v.leftObj.fontString = mod.leftLines[lineNum]
                     end
                     if v.rightObj then
-                        v.rightObj.config.unit = StarTip.unit
                         v.rightObj:Start()
                     end
                     if v.leftObj then
-                        v.leftObj.config.unit = StarTip.unit
                         v.leftObj:Start()
                     end
-                    StarTip.addingLine = false
                     v.lineNum = lineNum
                 end
             end
             mod.NUM_LINES = lineNum
             draw()
-            GameTooltip:Show()
+            --GameTooltip:Show()
+            StarTip.tooltipMain:Show()
     end})
 end
 

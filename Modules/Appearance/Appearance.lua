@@ -397,7 +397,7 @@ function mod:OnEnable()
 	local cright = self.db.profile.clampRight
 	local ctop = self.db.profile.clampTop
 	local cbottom = self.db.profile.clampBottom
-	GameTooltip:SetClampRectInsets(cleft, cright, ctop, cbottom)
+	StarTip.tooltipMain:SetClampRectInsets(cleft, cright, ctop, cbottom)
 end
 
 function mod:OnDisable()

@@ -7,6 +7,9 @@ local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("StarTip")
 StarTip.L = L
+local LQT = LibStub:GetLibrary("LibQTip-1.0")
+StarTip.LQT = LQT
+
 
 local LibCore = LibStub("LibScriptableLCDCoreLite-1.0")
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
@@ -24,6 +27,7 @@ StarTip.environment = environment
 environment.StarTip = StarTip
 environment._G = _G
 environment.L = L
+
 
 
 local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("StarTip", {
@@ -437,6 +441,7 @@ function StarTip:OnInitialize()
 	local leftGameTooltipStrings, rightGameTooltipStrings = {}, {}
 	self.leftLines = {}
 	self.rightLines = {}
+	self.qtipLines = {}
 	for i = 1, 50 do
 		GameTooltip:AddDoubleLine(' ', ' ')
 		self.leftLines[i] = _G["GameTooltipTextLeft" .. i]
@@ -461,12 +466,47 @@ function StarTip:SetupTimers()
 	end
 end
 
+StarTip.cellProvider, StarTip.cellPrototype = LQT:CreateCellProvider()
+
+function StarTip.cellPrototype:InitializeCell()
+	self.fontString = self:CreateFontString()
+	self.fontString:SetAllPoints(self)
+	self.fontString:SetFontObject(GameTooltipText)
+	self.r, self.g, self.b = 1, 1, 1
+	local x, y = self:GetPosition()
+	if not StarTip.qtipLines[y] then
+		StarTip.qtipLines[y] = {}
+	end 
+	StarTip.qtipLines[y][x] = self.fontString
+end
+
+function StarTip.cellPrototype:SetupCell(tooltip, value, justification, font, r, g, b)
+	local fs = self.fontString
+	fs:SetFontObject(font or tooltip:GetFont())
+	fs:SetJustifyH(justification)
+	fs:SetText(tostring(value))
+	self.r, self.g, self.b = r or self.r, g or self.g, b or self.b
+	fs:SetTextColor(self.r, self.g, self.b)
+	fs:Show()
+	return fs:GetStringWidth(), fs:GetStringHeight()
+end
+
+function StarTip.cellPrototype:ReleaseCell()
+	self.r, self.g, self.b = 1, 1, 1
+end
+
 function StarTip:OnEnable()
 	if self.db.profile.minimap.hide then
 		LibDBIcon:Hide("StarTipLDB")
 	else
 		LibDBIcon:Show("StarTipLDB")
 	end
+
+
+	StarTip.tooltipMain = LQT:Acquire("StarTipQTipMain", 2)
+	--StarTip.tooltipMain:SetDefaultProvider(StarTip.cellProvider)
+	StarTip.tooltipMain:SetParent(UIParent)
+	_G["StarTipQTipMain"] = StarTip.tooltipMain
 
 	GameTooltip:HookScript("OnTooltipSetUnit", self.OnTooltipSetUnit)
 	GameTooltip:HookScript("OnTooltipSetItem", self.OnTooltipSetItem)
@@ -664,6 +704,8 @@ function StarTip.OnTooltipSetUnit(...)
 	end
 	StarTip.justSetUnit = nil
 	--checkTooltipAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
+	GameTooltip:Hide()
+	StarTip.tooltipMain:Show()
 end
 
 function StarTip.OnTooltipSetItem(self, ...)	
@@ -705,6 +747,7 @@ function StarTip:GameTooltipHide(...)
 	end
 	]]
 	
+	self.tooltipMain:Hide()
 	if hide then
 		StarTip.hooks[GameTooltip].Hide(...)
 	end
