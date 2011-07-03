@@ -6,7 +6,6 @@ local L = StarTip.L
 local WidgetColor = LibStub("LibScriptableWidgetColor-1.0")
 local LibCore = LibStub("LibScriptableLCDCore-1.0")
 local _G = _G
-local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
 local UIParent = _G.UIParent
 local environment = {}
@@ -76,7 +75,7 @@ local function copy(tbl)
 end
 
 local function draw(widget)
-	GameTooltip:SetBackdropBorderColor(widget.r or 1, widget.g or 1, widget.b or 1, widget.a or 1)
+	_G["StarTipQTipMain"]:SetBackdropBorderColor(widget.r or 1, widget.g or 1, widget.b or 1, widget.a or 1)
 end
 
 function mod:CreateBorders()
