@@ -348,7 +348,13 @@ L["Y axis offset from attached point."]  = true
 L["Delete"] = true
 L["Delete this point"] = true
 
-
+-- Raid Icon
+L["Raid Icon"] = true
+L["Icon Width"] = true
+L["How wide to make the raid icon."] = true
+L["Icon Height"] = true
+L["How tall to make the raid icon."] = true
+L["Icon Height"] = true
 
 
 
