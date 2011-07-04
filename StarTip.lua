@@ -495,18 +495,17 @@ function StarTip.cellPrototype:ReleaseCell()
 	self.r, self.g, self.b = 1, 1, 1
 end
 
+StarTip.tooltipMain = LQT:Acquire("StarTipQTipMain", 2)
+--StarTip.tooltipMain:SetDefaultProvider(StarTip.cellProvider)
+StarTip.tooltipMain:SetParent(UIParent)
+_G["StarTipQTipMain"] = StarTip.tooltipMain
+
 function StarTip:OnEnable()
 	if self.db.profile.minimap.hide then
 		LibDBIcon:Hide("StarTipLDB")
 	else
 		LibDBIcon:Show("StarTipLDB")
 	end
-
-
-	StarTip.tooltipMain = LQT:Acquire("StarTipQTipMain", 2)
-	--StarTip.tooltipMain:SetDefaultProvider(StarTip.cellProvider)
-	StarTip.tooltipMain:SetParent(UIParent)
-	_G["StarTipQTipMain"] = StarTip.tooltipMain
 
 	GameTooltip:HookScript("OnTooltipSetUnit", self.OnTooltipSetUnit)
 	GameTooltip:HookScript("OnTooltipSetItem", self.OnTooltipSetItem)

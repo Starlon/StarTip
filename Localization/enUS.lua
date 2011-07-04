@@ -333,8 +333,20 @@ L["Add a text widget"] = true
 L["Restore Defaults"] = true
 L["Restore Defaults"] = true
 
-
-
+-- PVP icon
+L["PvP Icon"] = true
+L["Add Point"] = true
+L["Add a new point"] = true
+L["Icon Point"] = true
+L["Which point of the PvP icon is attached at the relative point."] = true
+L["Relative Point"] = true
+L["Which point of StarTip's tooltip should the PvP icon be attached."] = true
+L["X Offset"] = true
+L["X axis offset from attached point."] = true
+L["Y Offset"] = true
+L["Y axis offset from attached point."]  = true
+L["Delete"] = true
+L["Delete this point"] = true
 
 
 
