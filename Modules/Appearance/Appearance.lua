@@ -3,7 +3,6 @@ mod.name = "Appearance"
 mod.noToggle = true
 local _G = _G
 local StarTip = _G.StarTip
-local GameTooltip = _G.GameTooltip
 local ShoppingTooltip1 = _G.ShoppingTooltip1
 local ShoppingTooltip2 = _G.ShoppingTooltip2
 local self = mod
@@ -407,7 +406,7 @@ function mod:OnDisable()
 	self:SetBackdrop(true)
 	self:SetBackdropColor(true)
 	StarTip:SetOptionsDisabled(options, true)
-	GameTooltip:SetClampRectInsets(0, 0, 0, 0)
+	StarTip.tooltipMain:SetClampRectInsets(0, 0, 0, 0)
 end
 
 function mod:GetOptions()
@@ -415,8 +414,8 @@ function mod:GetOptions()
 end
 
 function mod:SetUnit()
-	self.origBackdrop = self.origBackdrop or GameTooltip:GetBackdrop()
-	self.origBackdropColor = self.origBackdropColor or {GameTooltip:GetBackdropColor()}
+	self.origBackdrop = self.origBackdrop or _G["StarTipQTipMain"]:GetBackdrop()
+	self.origBackdropColor = self.origBackdropColor or {_G["StarTipQTipMain"]:GetBackdropColor()}
 	self:SetBackdropColor()
 end
 
@@ -430,12 +429,12 @@ end
 
 function mod:SetScale(reset)
 	if reset then
-		GameTooltip:SetScale(1)
+		_G["StarTipQTipMain"]:SetScale(1)
 		ShoppingTooltip1:SetScale(1)
 		ShoppingTooltip2:SetScale(1)
 
 	else
-		GameTooltip:SetScale(self.db.profile.scale)
+		_G["StarTipQTipMain"]:SetScale(self.db.profile.scale)
 		ShoppingTooltip1:SetScale(self.db.profile.scale)
 		ShoppingTooltip2:SetScale(self.db.profile.scale)
 
@@ -481,11 +480,11 @@ end
 local tmp, tmp2 = {}, {}
 function mod:SetBackdrop()
 	if reset then
-		GameTooltip:SetBackdrop(self.origBackdrop)
+		_G["StarTipQTipMain"]:SetBackdrop(self.origBackdrop)
 		ShoppingTooltip1:SetBackdrop(self.origBackdrop)
 		ShoppingTooltip2:SetBackdrop(self.origBackdrop)
 	else
-		local bd = GameTooltip:GetBackdrop()
+		local bd = _G["StarTipQTipMain"]:GetBackdrop()
 		local changed = false
 		local bgFile = LSM:Fetch('background', self.db.profile.background)
 		local edgeFile = LSM:Fetch('border', self.db.profile.edgeFile)
@@ -504,7 +503,7 @@ function mod:SetBackdrop()
 			tmp2.right = self.db.profile.paddingRight
 			tmp2.top = self.db.profile.paddingTop
 			tmp2.bottom = self.db.profile.paddingBottom
-			GameTooltip:SetBackdrop(tmp)
+			_G["StarTipQTipMain"]:SetBackdrop(tmp)
 			ShoppingTooltip1:SetBackdrop(tmp)
 			ShoppingTooltip2:SetBackdrop(tmp)
 		end
@@ -514,11 +513,11 @@ end
 function mod:SetBackdropColor(reset)
 	if reset then
 		if self.origBackdropColor then 
-			GameTooltip:SetBackdropColor(unpack(self.origBackdropColor))
+			_G["StarTipQTipMain"]:SetBackdropColor(unpack(self.origBackdropColor))
 			ShoppingTooltip1:SetBackdropColor(unpack(self.origBackdropColor))
 			ShoppingTooltip2:SetBackdropColor(unpack(self.origBackdropColor))
 		else
-			GameTooltip:SetBackdropColor(0,0,0,1)
+			_G["StarTipQTipMain"]:SetBackdropColor(0,0,0,1)
 			ShoppingTooltip1:SetBackdropColor(0,0,0,1)
 			ShoppingTooltip2:SetBackdropColor(0,0,0,1)
 		end		
@@ -567,7 +566,7 @@ function mod:SetBackdropColor(reset)
 		else
 			kind = 'other'
 		end
-		GameTooltip:SetBackdropColor(unpack(self.db.profile.bgColor[kind]))
+		_G["StarTipQTipMain"]:SetBackdropColor(unpack(self.db.profile.bgColor[kind]))
 		if kind == 'other' then
 			ShoppingTooltip1:SetBackdropColor(unpack(self.db.profile.bgColor[kind]))
 			ShoppingTooltip2:SetBackdropColor(unpack(self.db.profile.bgColor[kind]))

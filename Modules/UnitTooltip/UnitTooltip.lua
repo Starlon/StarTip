@@ -95,7 +95,15 @@ local offline = Offline(unit)
 if offline then
     afk = " " .. Angle(offline)
 end
-return Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
+local port = StarTip:GetModule("Portrait")
+local texture  = ""
+if port and port.texture then
+	texture = port.texture:GetTexture()	
+end
+if texture ~= "" then
+	texture = Texture("", port.db.profile.size) .. " "
+end
+return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 ]],
         right = nil,
         bold = true,
@@ -905,6 +913,14 @@ do
             end
 ]]
         end
+	for cell in StarTip.tooltipMain:GetDefaultProvider():IterateCells() do
+		local y, x = cell:GetPosition()
+		if y == 1 and x == 1 then
+			cell.fontString.isHeader = true
+		else
+			cell.fontString.isHeader = false
+		end
+	end
         table.wipe(widgetsToDraw)
         if UnitExists(StarTip.unit) then
             --GameTooltip:Show()
