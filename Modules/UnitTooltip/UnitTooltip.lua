@@ -109,7 +109,8 @@ return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
         bold = true,
         enabled = true,
         cols = 80,
-        leftOutlined = 3
+        leftOutlined = 3,
+	leftUpdating = true
     },
     [2] = {
         name = "Target",
@@ -855,29 +856,26 @@ function mod:UPDATE_FACTION()
     end
 end
 
-local widgetsToDraw = {}
-local function updateWidget(widget)
-    do return end
-    tinsert(widgetsToDraw, widget)
-end
-
+local widgetUpdate
 do
+    local widgetsToDraw = {}
+    function widgetUpdate(widget)
+	tinsert(widgetsToDraw, widget)
+    end
     local fontsList = LSM:List("font")
     function draw()
         if not UnitExists(StarTip.unit) then StarTip.tooltipMain:Hide() return end
-        for k, v in pairs(lines) do
-            
-            if v.leftObj then
-		if v.config.leftUpdating or v.buffer == nil then
-                    v.leftObj:Update()
+        if GetMouseFocus() ~= "WorldFrame" then
+            wipe(widgetsToDraw)
+            for k, v in pairs(lines) do
+                if v.leftObj then
+    	             v.leftObj:Update()
+            	     tinsert(widgetsToDraw, v.leftObj)
                 end
-                tinsert(widgetsToDraw, v.leftObj)
-            end
-            if v.rightObj then
-                if v.config.rightUpdating or v.buffer == nil then
-		    v.rightObj:Update()
+                if v.rightObj then
+    		    v.rightObj:Update()
+                    tinsert(widgetsToDraw, v.rightObj)
                 end
-                tinsert(widgetsToDraw, v.rightObj)
             end
         end
         for i, widget in ipairs(widgetsToDraw) do
@@ -941,11 +939,14 @@ function mod:CreateLines()
             llines[j].config = copy(v)
             v.value = v.left
             v.outlined = v.leftOutlined
-            llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. " (left)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
+            local update = v.update
+            if v.left and v.leftUpdating then v.update = 0 end
+            llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. " (left)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
 			if v.left and not v.leftUpdating then llines[j].leftObj.timer:Set(0) end
             v.value = v.right
             v.outlined = v.rightOutlined
-            llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
+            if v.right and not v.rightUpdating then v.update = update end
+            llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
 			if v.right and not v.rightUpdating then llines[j].rightObj.timer:Set(0) end
            if v.left then
                llines[j].leftObj.fontObj = _G[v.name .. "Left"] or CreateFont(v.name .. "Left")
@@ -971,7 +972,6 @@ function mod:CreateLines()
                 end
                 local left, right = '', ''
                 environment.unit = StarTip.unit
-                v.config.unit = StarTip.unit
                 if v.right and v.right ~= "" then
                     if v.rightObj then
                         environment.self = v.rightObj
@@ -1013,12 +1013,12 @@ function mod:CreateLines()
                         --v.leftObj.fontString = mod.leftLines[lineNum]
                     end
                     if v.rightObj then
-                        v.rightObj.buffer = nil
-                        --v.rightObj:Start()
+			v.rightObj.buffer = nil
+                        v.rightObj:Start()
                     end
                     if v.leftObj then
-                        v.leftObj.buffer = nil
-                        --v.leftObj:Start()
+			v.leftObj.buffer = nil
+                        v.leftObj:Start()
                     end
                     v.lineNum = lineNum
                 end
@@ -1084,7 +1084,7 @@ function mod:RebuildOpts()
             type = "input",
             set = function(info, v)
                 if v == "" then return end
-                tinsert(self.db.profile.lines, {name = v, left = "", right = "", rightUpdating = false, enabled = true})
+                tinsert(self.db.profile.lines, {name = v, left = "", right = "", update=500, enabled = true})
                 self:RebuildOpts()
                 StarTip:RebuildOpts()
                 self:ClearLines()
@@ -1411,7 +1411,7 @@ function mod:RebuildOpts()
                                 type = "select",
                                 values = WidgetText.alignmentList,
                                 get = function()
-                                    return v.align or WidgetText.defaults.alignment
+                                    return v.align or WidgetText.defaults.align
                                 end,
                                 set = function(info, val)
                                     v.align = val
@@ -1437,7 +1437,7 @@ function mod:RebuildOpts()
                             },
                             speed = {
                                 name = L["Scroll Speed"],
-                                desc = L["How fast to scroll the marquee."],
+                                desc = L["How fast to scroll marquee text."],
                                 type = "input",
                                 pattern = "%d",
                                 get = function()
@@ -1499,7 +1499,7 @@ function mod:RebuildOpts()
                                 desc = L["Whether to clip the string's length when it is longer than the value of Columns."],
                                 type = "toggle",
                                 get = function()
-                                    return v.limited or WigetText.defaults.limited
+                                    return v.limited or WidgetText.defaults.limited
                                 end,
                                 set = function(info, val)
                                     v.limited = val

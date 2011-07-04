@@ -6,6 +6,7 @@ local GameTooltip = _G.GameTooltip
 local GetRaidTargetIndex = _G.GetRaidTargetIndex
 local SetRaidTargetIconTexture = _G.SetRaidTargetIconTexture
 local self = mod
+local L = StarTip.L
 
 local defaults = {
 	profile = {
