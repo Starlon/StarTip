@@ -912,6 +912,14 @@ do
                 StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, widget.fontObj, justification, colSpan)
             end
         end
+	for i, v in ipairs(StarTip.trunk) do
+		if #v == 2 then
+			StarTip.tooltipMain:AddLine(v[1], v[2])
+		else
+			StarTip.tooltipMain:AddLine(v[1])
+		end
+	end
+	StarTip:TrunkClear()
         table.wipe(widgetsToDraw)
     end
 end
@@ -1558,22 +1566,17 @@ function mod:SetUnit()
 
     for i = lastLine, GameTooltip:NumLines() do
         local left = self.leftLines[i]
-        local j = i - lastLine + 1
-        linesToAdd[j] = left:GetText()
-        local r, g, b = left:GetTextColor()
-        linesToAddR[j] = r
-        linesToAddG[j] = g
-        linesToAddB[j] = b
         local right = self.rightLines[i]
-        if right:IsShown() then
-            linesToAddRight[j] = right:GetText()
-            local r, g, b = right:GetTextColor()
-            linesToAddRightR[j] = r
-            linesToAddRightG[j] = g
-            linesToAddRightB[j] = b
-        end
+        local txt1 = left:GetText()
+        local r1, g1, b1 = left:GetTextColor()
+	local txt2
+	local r2, g2, b2
+	if right:IsShown() then
+		txt2 = right:GetText()
+		r2, g2, b2 = right:GetTextColor()
+	end
+	StarTip:TrunkAdd(txt1, r1, g1, b1, txt2, r2, g2, b2)
     end
-    -- End
 
     lines()
 
@@ -1581,13 +1584,9 @@ function mod:SetUnit()
         self.timer:Start()
     end
 
-do return end
-    self:RefixEndLines()
-
-    GameTooltip:Show()
-
 end
 
+--[[
 function mod:RefixEndLines()
     -- Another part taken from CowTip
     for i, left in ipairs(linesToAdd) do
@@ -1610,3 +1609,4 @@ function mod:RefixEndLines()
     wipe(linesToAddRightG)
     wipe(linesToAddRightB)
 end
+]]

@@ -319,7 +319,7 @@ do
 		end
 		t.__starref__ = true
 		newCount = newCount + 1
-		return t, newtbl
+		return t
 	end
 	function StarTip.del(...)
 		local t = select(1, ...)
@@ -500,6 +500,35 @@ StarTip.tooltipMain = LQT:Acquire("StarTipQTipMain", 2)
 StarTip.tooltipMain:SetParent(UIParent)
 _G["StarTipQTipMain"] = StarTip.tooltipMain
 
+local trunk = {}
+local trunkLines = 1
+local function trunkUpdate()
+	if GameTooltip:NumLines() > trunkLines then
+		for i = trunkLines, GameTooltip:NumLines() do
+			local r1, g1, b1 = StarTip.leftLines[i]:GetTextColor();
+			local r2, g2, b2 = StarTip.rightLines[i]:GetTextColor();
+			local txt1 = StarTip.leftLines[i]:GetText()
+			local txt2 = StarTip.rightLines[i]:GetText()
+			tinsert(trunk, {txt1, r1, g1, b1, txt2, r2, g2, b2})
+		end
+		trunkLines = GameTooltip:NumLines()
+	end	
+end
+
+function StarTip:TrunkAdd(...)
+	tinsert(trunk, StarTip.new(...))
+end
+
+function StarTip:TrunkClear()
+	for i, v in ipairs(trunk) do
+		StarTip.del(v)
+	end
+	wipe(trunk)
+end
+
+StarTip.trunk = trunk
+StarTip.trunkTimer = LibTimer:New("Trunk Timer", 100, false, trunkUpdate)
+
 function StarTip:OnEnable()
 	if self.db.profile.minimap.hide then
 		LibDBIcon:Hide("StarTipLDB")
@@ -678,6 +707,9 @@ function StarTip.OnTooltipSetUnit(...)
 	
 	if not unit or StarTip.tooltipHidden then GameTooltip:Hide() return end
 
+	StarTip:TrunkClear()
+	trunkLines = GameTooltip:NumLines()
+
 	hideTimer = hideTimer or LibTimer:New("StarTip.Hide", 100, false, hideTooltip, nil, StarTip.db.profile.errorLevel)
 	hideTimer:Start()
 	
@@ -704,6 +736,7 @@ function StarTip.OnTooltipSetUnit(...)
 	StarTip.justSetUnit = nil
 	--checkTooltipAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
 	StarTip.tooltipMain:Show()
+	StarTip.trunkTimer:Start()
 end
 
 function StarTip.OnTooltipSetItem(self, ...)	
