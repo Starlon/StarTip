@@ -13,8 +13,9 @@ local defaults = {
 	profile = {
 		scale = 1,
 		font = "Friz Quadrata TT",
+		headerFont = "Friz Quadrata TT",
 		fontSizeNormal = 12,
-		fontSizeBold = 14,		
+		fontSizeHeader = 16,		
 		edgeFile = "Blizzard Tooltip",
 		background = "Blizzard Tooltip",
 		bgColor = { -- Default colors from CowTip
@@ -41,7 +42,7 @@ local defaults = {
 }
 
 local backdropParts = {bgFile = true, edgeFile = true, edgeSize = true, background = true}
-local otherParts = {scale = "SetScale", font = "SetFont"}
+local otherParts = {scale = "SetScale"}
 
 local get = function(info)
 	return self.db.profile[info[#info]]
@@ -54,8 +55,6 @@ local set = function(info, v)
 		self:SetBackdrop() 
 	elseif info[#info] == "scale" then
 		self:SetScale()
-	else
-		self:SetFont()
 	end
 end
 
@@ -87,6 +86,20 @@ local options = {
 		end,
 		order = 5
 	},
+	headerFont = {
+		name = L["Bold Font"],
+		desc = L["Set the tooltip's bold font"],
+		type = "select",
+		values = LSM:List("font"),
+		get = function()
+			return StarTip:GetLSMIndexByName("font", mod.db.profile.headerFont)
+		end,
+		set = function(info, val)
+			local list = LSM:List("font")
+			mod.db.profile.headerFont = list[val]
+		end,
+		order = 6
+	},
 	fontSizeNormal = {
 		name = L["Normal font size"],
 		desc = L["Set the normal font size"],
@@ -94,17 +107,17 @@ local options = {
 		pattern = "%d",
 		get = function() return tostring(mod.db.profile.fontSizeNormal) end,
 		set = function(info, v) mod.db.profile.fontSizeNormal = tonumber(v) end,
-		order = 6
+		order = 7
 	},
-	fontSizeBold = {
+	fontSizeHeader = {
 		name = L["Bold font size"],
 		desc = L["Set the bold font size"],
 		type = "input",
 		pattern = "%d",
-		get = function() return tostring(mod.db.profile.fontSizeBold) end,
-		set = function(info, v) mod.db.profile.fontSizeBold = tonumber(v) end,
+		get = function() return tostring(mod.db.profile.fontSizeHeader) end,
+		set = function(info, v) mod.db.profile.fontSizeHeader = tonumber(v) end,
 		pattern = "%d",
-		order = 7
+		order = 8
 	},
 	edgeFile = {
 		name = L["Tooltip Border"],
@@ -118,7 +131,7 @@ local options = {
 			local list = LSM:List("border")
 			mod.db.profile.edgeFile = list[val]
 		end,
-		order = 8
+		order = 9
 	},
 	background = {
 		name = L["Tooltip Background"],
@@ -132,22 +145,8 @@ local options = {
 			local list = LSM:List("background")
 			mod.db.profile.background = list[val]
 		end,
-		order = 9
-	},
-	--[[borderColor = {
-		name = "Tooltip Border Color",
-		desc = "Set the color of the tooltip's border",
-		type = "color",
-		hasAlpha = true,
-		get = function() return unpack(self.db.profile.borderColor) end,
-		set = function(info, r, g, b, a)
-			self.db.profile.borderColor[1] = r
-			self.db.profile.borderColor[2] = g
-			self.db.profile.borderColor[3] = b
-			self.db.profile.borderColor[4] = a
-		end,
 		order = 10
-	},]]
+	},
 	paddingTop = {
 		name = L["Tooltip Top Padding"],
 		desc = L["Set the tooltip's top side padding"],
@@ -388,7 +387,6 @@ end
 
 function mod:OnEnable()
 	self:SetScale()
-	self:SetFont()
 	self:SetBackdrop()
 	self:SetBackdropColor(true)
 	StarTip:SetOptionsDisabled(options, false)
@@ -401,7 +399,6 @@ end
 
 function mod:OnDisable()
 	self:SetScale(true)
-	self:SetFont(true)
 	self:SetBorderColor(true)
 	self:SetBackdrop(true)
 	self:SetBackdropColor(true)
@@ -440,42 +437,6 @@ function mod:SetScale(reset)
 
 	end
 end
-
-function mod:SetFont(reset)
-	local font
-	if reset then 
-		font = "Friz Quadrata TT"
-	else
-		font = LSM:Fetch('font', self.db.profile.font)
-	end
-
-	if StarTip.leftLines[1]:GetFont() == font then
-		return
-	end
-	for i = 1, 50 do
-		local left = StarTip.leftLines[i]
-		local right = StarTip.rightLines[i]
-		local _, size, style = left:GetFont()
-		left:SetFont(font, size, style)
-		_, size, style = right:GetFont()
-		right:SetFont(font, size, style)
-
-		left = self.st1left[i]
-		right = self.st1right[i]
-		_, size, style = left:GetFont()
-		left:SetFont(font, size, style)
-		_, size, style = right:GetFont()
-		right:SetFont(font, size, style)
-
-		left = self.st2left[i]
-		right = self.st2right[i]
-		_, size, style = left:GetFont()
-		left:SetFont(font, size, style)
-		_, size, style = right:GetFont()
-		right:SetFont(font, size, style)		
-	end	
-end
-
 
 local tmp, tmp2 = {}, {}
 function mod:SetBackdrop()

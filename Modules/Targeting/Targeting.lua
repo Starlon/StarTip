@@ -2,7 +2,6 @@ local mod = StarTip:NewModule("Targeting", "AceEvent-3.0")
 mod.name = "Targeting"
 mod.toggled = true
 local _G = _G
-local GameTooltip = _G.GameTooltip
 local UnitFactionGroup = _G.UnitFactionGroup
 local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local StarTip = _G.StarTip
@@ -48,7 +47,10 @@ function mod:SetUnit()
 			end
 		end
 		if txt ~= '' then
-			GameTooltip:AddLine("Targeting: " .. txt, .5, .5, 1, 1)
+			local width = StarTip.tooltipMain:GetWidth()
+			local line = StarTip.tooltipMain:AddLine("")
+			StarTip.tooltipMain:SetCell(line, 1, "Targeting: " .. txt, nil, "LEFT", 2, nil, nil, nil, width)
+			StarTip.tooltipMain:SetLineColor(line, .5, .5, 1, 1)
 		end
 	end
 end

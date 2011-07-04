@@ -863,7 +863,6 @@ end
 
 do
     local fontsList = LSM:List("font")
-    local widget, fontString
     function draw()
         if not UnitExists(StarTip.unit) then StarTip.tooltipMain:Hide() return end
         for k, v in pairs(lines) do
@@ -883,49 +882,39 @@ do
         end
         for i, widget in ipairs(widgetsToDraw) do
             local font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
+            local headerFont = LSM:Fetch("font", fontsList[appearance.db.profile.headerFont])
+
             local justification = "LEFT"
             if widget.x == 2 then
                 justification = "RIGHT"
             end
-            local fontObj = GameTooltipText
-            local size = 12
-            if widget.y == 1 then
-                fontObj = GameTooltipHeaderText
-                size = 16
+
+            local outlined = ""
+            if widget.config.outlined and widget.config.outlined > 1 then
+                if widget.config.outlined == 2 then
+			outlined = "OUTLINE"
+                elseif widget.config.outlined == 3 then
+			outline = "THICKOUTLINE"
+                end
             end
-            --fontObj:SetFont(font, size)
+
+
+            if widget.y == 1 then
+		widget.fontObj:SetFont(font, appearance.db.profile.fontSizeHeader, outlined)
+            else
+                widget.fontObj:SetFont(headerFont, appearance.db.profile.fontSizeNormal, outlined)
+            end
+
             local colSpan = 1
             if not widget.config.right then 
                colSpan = 2
             end
-            
-            if widget.y and widget.buffer ~= "" then
-                StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, fontObj, justification, colSpan)
-            end
 
---[[
-            if widget.config.outlined and widget.config.outlined > 1 then
-                if widget.config.outlined == 2 then
-                    fontString:SetFont(filename, fontHeight, "OUTLINED")
-                elseif widget.config.outlined == 3 then
-                    fontString:SetFont(filename, fontHeight, "THICKOUTLINED")
-                end
+            if widget.y and widget.buffer ~= "" then
+                StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, widget.fontObj, justification, colSpan)
             end
-]]
         end
-	for cell in StarTip.tooltipMain:GetDefaultProvider():IterateCells() do
-		local y, x = cell:GetPosition()
-		if y == 1 and x == 1 then
-			cell.fontString.isHeader = true
-		else
-			cell.fontString.isHeader = false
-		end
-	end
         table.wipe(widgetsToDraw)
-        if UnitExists(StarTip.unit) then
-            --GameTooltip:Show()
-            --StarTip.tooltipMain:Show()
-        end
     end
 end
 
@@ -958,6 +947,12 @@ function mod:CreateLines()
             v.outlined = v.rightOutlined
             llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, updateWidget)
 			if v.right and not v.rightUpdating then llines[j].rightObj.timer:Set(0) end
+           if v.left then
+               llines[j].leftObj.fontObj = _G[v.name .. "Left"] or CreateFont(v.name .. "Left")
+           end
+           if v.right then
+               llines[j].rightObj.fontObj = _G[v.name .. "Right"] or CreateFont(v.name .. "Right")
+           end
         end
     end
     self:ClearLines()
@@ -1001,12 +996,7 @@ function mod:CreateLines()
                     lineNum = lineNum + 1
                     if v.right then
                         --GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
-			local y, x
-                        if lineNum == 1 then
-                            y, x = StarTip.tooltipMain:AddHeader('', '')
-                        else 
-                            y, x = StarTip.tooltipMain:AddLine('', '')
-                        end
+                        local y, x = StarTip.tooltipMain:AddLine('', '')
                         --v.leftObj.fontString = mod.leftLines[lineNum]
                         --v.rightObj.fontString = mod.rightLines[lineNum]
 			--v.leftObj.fontString = StarTip.qtipLines[y][1]
@@ -1016,12 +1006,7 @@ function mod:CreateLines()
 			v.rightObj.y = y
 			v.rightObj.x = 2
                     else
-                        local y, x
-                        if lineNum == 1 then
-                            y, x = StarTip.tooltipMain:AddHeader('')
-                        else
-                            y, x = StarTip.tooltipMain:AddLine('')
-                        end
+                        local y, x = StarTip.tooltipMain:AddLine('')
                         v.leftObj.y = y
                         v.leftObj.x = 1
                         --GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, v.wordwrap)
