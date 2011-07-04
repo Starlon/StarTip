@@ -398,11 +398,8 @@ local positionTooltip = function()
 
 end
 
-local oldX, oldY
 local positionMainTooltip = function()
 	local x, y = GetCursorPosition()
-	if oldX == x and oldY == y then return end
-	oldX, oldY = x, y
 
 	local index = getIndex(UIParent)
 	local currentAnchor = StarTip.opposites[StarTip.anchors[index]:sub(8)]
