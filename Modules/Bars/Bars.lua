@@ -13,7 +13,6 @@ local UnitClass = _G.UnitClass
 local self = mod
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetBar = LibStub("LibScriptableWidgetBar-1.0")
-local LibCore = LibStub("LibScriptableLCDCore-1.0")
 local Utils = LibStub("LibScriptablePluginUtils-1.0")
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
 local L = StarTip.L
@@ -289,7 +288,7 @@ local function createBars()
 			local widget = mod.bars[v]
 			if not widget then
 				local bar = new(v.parent)
-				widget = WidgetBar:New(mod.core, v.name, copy(v), v.row or 0, v.col or 0, v.layer or 1, StarTip.db.profile.errorLevel, updateBar, bar)
+				widget = WidgetBar:New(StarTip.core, v.name, copy(v), v.row or 0, v.col or 0, v.layer or 1, StarTip.db.profile.errorLevel, updateBar, bar)
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
 				if widget.orientation == WidgetBar.ORIENTATION_VERTICAL then
@@ -316,7 +315,7 @@ local function createBars()
 
 				if v.expression2 then
 					bar = new(v.parent)
-					widget = WidgetBar:New(mod.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
+					widget = WidgetBar:New(StarTip.core, v.name, v, v.row or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateBar, bar)
 					bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture2 or v.texutre1 or "Blizzard"))
 					bar:ClearAllPoints()
 					for i, point in ipairs(v.points) do
@@ -385,8 +384,6 @@ function mod:OnInitialize()
 
 	self:ReInit()
 	
-	self.core = LibCore:New(mod, environment, "StarTip.Bars", {["StarTip.Bars"] = {}}, nil, StarTip.db.profile.errorLevel)
-
 	StarTip:SetOptionsDisabled(options, true)
 
 	self.bars = {}
