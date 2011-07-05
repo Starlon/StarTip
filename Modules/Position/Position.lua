@@ -350,7 +350,7 @@ end
 
 local getIndex = function(owner)
 	local index
-	if UnitExists("mouseover") then
+	if UnitExists(StarTip.unit) then
 		if InCombatLockdown() then
 			index = self.db.profile.inCombat
 		elseif owner == UIParent then
@@ -364,16 +364,18 @@ local getIndex = function(owner)
 	return index
 end
 
+local function hideGameTooltip()
+	GameTooltip:ClearAllPoints()
+	GameTooltip:SetClampRectInsets(10000, 0, 0, 0)
+	GameTooltip:SetPoint("RIGHT", UIParent, "LEFT")
+end
 
-local isTrouble
 local isUnitTooltip
 local updateFrame = CreateFrame("Frame")
 local fakeUpdateFrame = CreateFrame("Frame")
 local currentAnchor = "BOTTOM"
 local xoffset, yoffset = 0, 0
-local active
 local positionTooltip = function()
-	if isTrouble or not active then return end
 	local x, y = GetCursorPosition()
 	
 	local effScale = GameTooltip:GetEffectiveScale()
@@ -385,10 +387,7 @@ local positionTooltip = function()
 
 	if isUnitTooltip then
 		if mod.db.profile.defaultUnitTooltipPos == 5 then
-	
-			GameTooltip:ClearAllPoints()
-			GameTooltip:SetClampRectInsets(10000, 0, 0, 0)
-			GameTooltip:SetPoint("RIGHT", UIParent, "LEFT")
+			hideGameTooltip()	
 		else
 			local pos = squareNames[self.db.profile.defaultUnitTooltipPos]
 			GameTooltip:ClearAllPoints()
@@ -445,7 +444,7 @@ end
 
 local setOffsets = function(owner)
 	if owner == UIParent then
-		if UnitExists("mouseover") then
+		if UnitExists(StarTip.unit) then
 			if InCombatLockdown() then
 				xoffset = self.db.profile.inCombatXOffset
 				yoffset = self.db.profile.inCombatYOffset
@@ -458,7 +457,7 @@ local setOffsets = function(owner)
 			yoffset = self.db.profile.otherYOffset
 		end
 	else
-		if UnitExists("mouseover") then
+		if UnitExists(StarTip.unit) then
 			xoffset = self.db.profile.unitFramesXOffset
 			yoffset = self.db.profile.unitFramesYOffset
 		else
@@ -468,7 +467,6 @@ local setOffsets = function(owner)
 	end
 end
 
-local locked = false
 local currentOwner
 local currentThis
 local delayFrame = CreateFrame("Frame")
@@ -477,7 +475,6 @@ local function delayAnchor()
 	
 	local this = currentThis
 	local owner = currentOwner
-	this:ClearAllPoints()
 	setOffsets(owner)
 	local index = getIndex(owner)
 	if index == #selections then
@@ -489,18 +486,18 @@ local function delayAnchor()
 		isUnitTooltip = false
 		if GameTooltip:GetUnit() then
 			isUnitTooltip = true
-		end
-		active = true
-		if isUnitTooltip then
-			updateFrame:SetScript("OnUpdate", positionTooltip)
 			fakeUpdateFrame:SetScript("OnUPdate", positionMainTooltip)
 			positionMainTooltip()
+			updateFrame:SetScript("OnUpdate", positionTooltip)
 		end
 		positionTooltip()
 		
 	else
 		if updateFrame:GetScript("OnUpdate") then updateFrame:SetScript("OnUpdate", nil) end
-		this:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
+		if fakeUpdateFrame:GetScript("OnUpdate") then fakeUpdateFrame:SetScript("OnUpdate", nil) end
+		StarTip.tooltipMain:ClearAllPoints()
+		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
+		hideGameTooltip()
 	end
 end
 
@@ -521,57 +518,28 @@ mod.REGEN_ENABLED = mod.REGEN_DISABLED
 function mod:OnHide()
 	updateFrame:SetScript("OnUpdate", nil)
 	delayFrame:SetScript("OnUpdate", nil)
-	isTrouble = false
-	locked = false
+	fakeUpdateFrame:SetScript("OnUpdate", nil)
 end
 
-local threshold = 1
-local lastTime = GetTime()
 function mod:SetSpell()
---[[
-	if locked then return end
-	if GetTime() - lastTime < threshold then
-		locked = true
-	end
-	lastTime = GetTime()
-]]	
 	local index = getIndex(currentOwner)
 	if StarTip.anchors[index]:find("^CURSOR_")  then
 		updateFrame:SetScript("OnUpdate", nil)
-		isTrouble = false
 		positionTooltip()
-		isTrouble = true
 	else
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
 	end
-	lastSpell = GameTooltip:GetSpell()
 end
 
 function mod:SetItem()
---[[
-	if locked then return end
-	if GetTime() - lastTime < threshold then
-		locked = true
-	end
-	lastTime = GetTime()
-]]
 	local index = getIndex(currentOwner)
 	if StarTip.anchors[index]:find("^CURSOR_")  then
 		updateFrame:SetScript("OnUpdate", nil)
-		isTrouble = false
 		positionTooltip()
-		isTrouble = true
 	else
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
 	end
-	lastItem = GameTooltip:GetItem()
-end
-
-function mod:SetUnit()
-	isTrouble = false
-	--updateFrame:SetScript("OnUpdate", positionTooltip)
-	--fakeUpdateFrame:SetScript("OnUpdate", positionMainTooltip)
 end
 
