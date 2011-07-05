@@ -20,7 +20,7 @@ local _G = _G
 local GameTooltip = _G.GameTooltip
 local ipairs, pairs = _G.ipairs, _G.pairs
 local timers = {}
-local widgets = {}
+local timerWidgets = {}
 
 local environment = {}
 StarTip.environment = environment
@@ -163,23 +163,29 @@ local options = {
 					desc = L["Add a timer widget"],
 					type = "input",
 					set = function(info, v)
-						tinsert(timers, v)
-						tinsert(StarTip.db.profile.timers, v)
-						StarTip:SetupTimers()						
+						tinsert(StarTip.db.profile.timers, {name = v, expression = "return", repeating = false, update = 0})
 						StarTip:RebuildOpts()
 					end, 
 					order = 1
+				},
+				restart = {
+					name = L["Restart Timers"],
+					desc = L["Would you like to restart your timers? Note that this will restart all timers."],
+					type = "execute",
+					func = function()
+						StarTip:RestartTimers()
+					end,
+					order = 2
 				},
 				reset = {
 					name = L["Restore Defaults"],
 					desc = L["Use this to restore the defaults"],
 					type = "execute",
 					func = function()
-						StarTip.db.profile.timers = nil -- this is replaced in SetupTimers
-						StarTip:SetupTimers()											
+						self.db.profile.timers = {}
 						StarTip:RebuildOpts()					
 					end,
-					order = 2
+					order = 3
 				}
 			}
 		},
@@ -454,18 +460,6 @@ function StarTip:OnInitialize()
 	GameTooltip:Hide()
 end
 
-local defaultTimers = {
-}
-
-function StarTip:SetupTimers()
-	if not self.db.profile.timers then
-		self.db.profile.timers = {}
-		for k, v in pairs(defaultTimers) do
-			self.db.profile.timers[k] = v
-		end
-	end
-end
-
 StarTip.cellProvider, StarTip.cellPrototype = LQT:CreateCellProvider()
 
 function StarTip.cellPrototype:InitializeCell()
@@ -581,21 +575,24 @@ function StarTip:OnDisable()
 			v:Disable()
 		end
 	end
-	for i, v in ipairs(widgets) do
+	for i, v in ipairs(timerWidgets) do
+		v:Stop()
 		v:Del()
 	end
-	table.wipe(widgets)
+	table.wipe(timerWidgets)
 end
 
 function StarTip:RestartTimers()
-	self:SetupTimers()
-	for i, v in ipairs(widgets) do
+	for k, v in pairs(timerWidgets) do
+		v:Stop()
 		v:Del()
 	end
-	table.wipe(widgets)
+	table.wipe(timerWidgets)
 	for k, v in pairs(self.db.profile.timers) do
-		tinsert(widgets, WidgetTimer:New(self, "StarTip.timer." .. k, v, self.db.profile.errorLevel))
-		widgets[#widgets]:Start()
+		if v.enabled then
+			tinsert(timerWidgets, WidgetTimer:New(self.core, "StarTip.timer." .. k, v, self.db.profile.errorLevel))
+			timerWidgets[#timerWidgets]:Start()
+		end
 	end
 end
 
@@ -657,11 +654,38 @@ function StarTip:RebuildOpts()
 		options.args.modules.args[v:GetName()].args = t
 	end
 	for k, v in pairs(self.db.profile.timers) do
-		options.args.timers.args[k:gsub(" ", "_")] = {
-			name = k,
+		options.args.timers.args[v.name or "Timer" .. k] = {
+			name = v.name or "Timer" .. k,
 			type = "group",
+			args = WidgetTimer:GetOptions(v, StarTip.RebuildOpts, StarTip)
 		}
-		options.args.timers.args[k:gsub(" ", "_")].args = WidgetTimer:GetOptions(self, v)
+		options.args.timers.args[v.name or "Timer" .. k].args.delete = {
+			name = L["Delete"],
+			desc = L["Delete this timer."],
+			type = "execute",
+			func = function()
+				self.db.profile.timers[k] = nil
+				self:RebuildOpts()
+			end,
+			order = 100
+		}
+		options.args.timers.args[v.name or "Timer" .. k].args.restart = {
+			name = L["Restart Timer"],
+			desc = L["Would you like to restart this timer?"],
+			type = "execute",
+			func = function()
+				for i, widget in ipairs(timerWidgets) do
+					if v.name == widget.config.name then
+						widget:Stop()
+						widget:Del()
+						wipe(widget)
+						timerWidgets[i] = WidgetTimer:New(self.core, "StarTip.timer." .. v.name, v, self.db.profile.errorLevel)
+						timerWidgets[i]:Start()
+					end
+				end
+			end,
+			order = 100
+		}
 	end
 end
 
