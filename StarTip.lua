@@ -731,6 +731,8 @@ function StarTip.OnTooltipSetUnit(...)
 	
 	if not unit or StarTip.tooltipHidden then GameTooltip:Hide() return end
 
+	environment.unit = unit
+
 	StarTip:TrunkClear()
 	trunkLines = GameTooltip:NumLines()
 
@@ -757,7 +759,9 @@ function StarTip.OnTooltipSetUnit(...)
 			if v.SetUnit and v:IsEnabled() then v:SetUnit() end
 		end
 	end
-	StarTip.justSetUnit = nil
+
+	StarTip.justSetUnit = false
+
 	--checkTooltipAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
 	StarTip.tooltipMain:Show()
 	StarTip.trunkTimer:Start()
@@ -908,13 +912,14 @@ end
 function StarTip:GameTooltipFadeOut(...) 
 	local fadeOut = true
 	for k, v in StarTip:IterateModules() do
-		if v.GameTooltipFadeOut and v:IsEnabled() then 
-			fadeOut = fadeOut and v:GameTooltipFadeOut(...)
+		if v.OnFadeOut and v:IsEnabled() then 
+			fadeOut = fadeOut and v:OnFadeOut(...)
 		end
 	end
 	if fadeOut then
 		StarTip.hooks[GameTooltip].FadeOut(...)
 	end
+	self.tooltipMain:Hide()
 end
 
 function StarTip:GetLSMIndexByName(category, name)

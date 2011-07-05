@@ -12,7 +12,6 @@ local RAID_CLASS_COLORS = _G.RAID_CLASS_COLORS
 local UnitSelectionColor = _G.UnitSelectionColor
 local UnitClass = _G.UnitClass
 local self = mod
-local timer
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetText = LibStub("LibScriptableWidgetText-1.0")
 local LibCore = LibStub("LibScriptableLCDCore-1.0")
@@ -411,7 +410,7 @@ function createTexts()
 			local widget = mod.texts[v]
 			if not widget then
 				local text = new(v.background, v.frameName, v.parent)
-				widget = WidgetText:New(mod.core, v.name, copy(v), v.row or 0 or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)				
+				widget = WidgetText:New(StarTip.core, v.name, copy(v), v.row or 0 or 0, v.col or 0, v.layer or 0, StarTip.db.profile.errorLevel, updateText)				
 				text:ClearAllPoints()
 				for j, point in ipairs(v.points) do
 					local arg1, arg2, arg3, arg4, arg5 = unpack(point)
@@ -462,8 +461,6 @@ function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	
 	self:ReInit()
-	
-	self.core = StarTip.core --LibCore:New(mod, environment, "StarTip.Texts", {["StarTip.Texts"] = {}}, nil, StarTip.db.profile.errorLevel)
 
 	StarTip:SetOptionsDisabled(options, true)
 
@@ -534,10 +531,6 @@ function mod:SetSpell()
 end
 
 function mod:OnHide()
-	if timer then
-		self:CancelTimer(timer)
-		timer = nil
-	end
 	for i, text in pairs(self.texts) do
 		if not text.config.alwaysShown then
 			text:Stop()

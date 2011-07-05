@@ -943,27 +943,25 @@ function mod:CreateLines()
                 end
                 local left, right = '', ''
                 environment.unit = StarTip.unit
-print("hmmmmm", StarTip.core.environment.unit)
                 if v.right and v.right ~= "" then
                     if v.rightObj then
                         environment.self = v.rightObj
-                        --right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
+                        right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                         if type(right) == "number" then right = right .. "" end
                     end
                     if v.leftObj then
                         environment.self = v.leftObj
-                        --left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+                        left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                         if type(left) == "number" then left = left .. "" end
                     end
                 else
                     if v.leftObj then
                         environment.self = v.leftObj
-                        --left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+                        left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                         if type(left) == "number" then left = left .. "" end
                     end
                     right = ''
                 end
-print("rawr", StarTip.core.environment.unit)
                 
                 if type(left) == "string" and type(right) == "string" then
                     lineNum = lineNum + 1
@@ -1529,9 +1527,8 @@ function mod:SetUnit()
 	StarTip:TrunkAdd(txt1, r1, g1, b1, txt2, r2, g2, b2)
     end
     lines()
-    --self.timer:Start()
     draw()
-print(UnitName(StarTip.unit))
+    self.timer:Start()
 end
 --[[
 function mod:RefixEndLines()

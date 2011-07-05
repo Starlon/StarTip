@@ -206,6 +206,10 @@ function mod:SetSpell()
 end
 
 function mod:OnHide()
-	self.model:Hide()
-	self.texture:Hide()
+	if self.model then
+		self.model:Hide()
+		self.model2:Hide()
+		self.texture:Hide()
+		self.texture2:Hide()
+	end
 end

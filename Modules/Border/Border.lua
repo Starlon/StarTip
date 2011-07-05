@@ -4,7 +4,6 @@ mod.toggled = true
 mod.defaultOff = false
 local L = StarTip.L
 local WidgetColor = LibStub("LibScriptableWidgetColor-1.0")
-local LibCore = LibStub("LibScriptableLCDCore-1.0")
 local _G = _G
 local StarTip = _G.StarTip
 local UIParent = _G.UIParent
@@ -80,7 +79,7 @@ end
 
 function mod:CreateBorders()
 	for i, border in ipairs(self.db.profile.borders) do
-		local widget = WidgetColor:New(self.core, border.name, copy(border), StarTip.db.profile.errorLevel, draw)
+		local widget = WidgetColor:New(StarTip.core, border.name, copy(border), StarTip.db.profile.errorLevel, draw)
 		tinsert(borders, widget)
 	end
 end
@@ -95,7 +94,6 @@ end
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
-	self.core = LibCore:New(mod, environment, "StarTip.Border", {["StarTip.Border"] = {}}, nil, StarTip.db.profile.errorLevel)
 end
 
 function mod:OnEnable()

@@ -292,7 +292,7 @@ local function createHistograms()
 			local newWidget
 			if not mod.histograms then mod.histograms = {} end
 			if not widget then
-				widget = WidgetHistogram:New(mod.core, v.name, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram)
+				widget = WidgetHistogram:New(StarTip.core, v.name, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram)
 				widget.persistent = v.persistent
 				newWidget = true
 				for i = 0, v.width - 1 do
@@ -379,14 +379,12 @@ function mod:OnInitialize()
 end
 
 function mod:OnEnable()	
-	self.core = StarTip.core --LibCore:New(mod, environment, "StarTip.Histograms", {["StarTip.Histograms"] = {}}, nil, StarTip.db.profile.errorLevel)
-
 	StarTip:SetOptionsDisabled(options, false)
 	if StarTip.db.profile.intersectRate > 0 then
 		self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", self.db.profile.intersectRate or 200, true, intersectUpdate)
 	end
 	self:ClearHistograms()
-	createHistograms()
+	self:CreateHistograms()
 	for k, histogram in pairs(self.histograms) do
 		if histogram.config.alwaysShown then
 			histogram:Start()
@@ -398,7 +396,6 @@ function mod:OnEnable()
 end
 
 function mod:OnDisable()
-	self.core:Del()
 	self:ClearHistograms()
 	StarTip:SetOptionsDisabled(options, true)
 	if self.intersectTimer then self.intersectTimer:Stop() end
@@ -413,7 +410,6 @@ function mod:SetUnit()
 
 	GameTooltipStatusBar:Hide()
 	self.offset = 0
-	createHistograms()
 	for k, widget in pairs(self.histograms) do
 		for i = 1, widget.width or WidgetHistogram.defaults.width do
 			widget.bars[i]:Show()
@@ -485,6 +481,7 @@ end
 function mod:RebuildOpts()
 	local defaults = WidgetHistogram.defaults
 	self:ClearHistograms()
+	self:CreateHistograms()
 	wipe(options)
 	for k, v in pairs(optionsDefaults) do
 		options[k] = v
