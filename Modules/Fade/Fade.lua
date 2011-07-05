@@ -139,7 +139,7 @@ function mod:OnShow()
 	end
 end
 
-function mod:GameTooltipFadeOut(this, ...)
+function mod:OnFadeOut(this, ...)
 	if self.justFade then
 		self.justFade = nil
 		return true

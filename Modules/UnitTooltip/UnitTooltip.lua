@@ -1,4 +1,3 @@
-﻿-- TODO: Metascripts -- dynamically reconfigure a widget
 local mod = StarTip:NewModule("UnitTooltip", "AceEvent-3.0")
 mod.name = "Unit Tooltip"
 mod.toggled = true
@@ -12,7 +11,6 @@ local LibTimer = LibStub("LibScriptableUtilsTimer-1.0", true)
 assert(LibTimer, mod.name .. " requires LibScriptableUtilsTimer-1.0")
 local LibEvaluator = LibStub("LibScriptableUtilsEvaluator-1.0", true)
 assert(LibEvaluator, mod.name .. " requires LibScriptableUtilsEvaluator-1.0")
-
 local _G = _G
 local StarTip = _G.StarTip
 local L = StarTip.L
@@ -36,22 +34,14 @@ local linesToAddRightG = {}
 local linesToAddRightB = {}
 local lines = {}
 mod.lines = lines
-
-local unit
 local environment = StarTip.environment
-
 local appearance = StarTip:GetModule("Appearance")
-
 local function errorhandler(err)
     return geterrorhandler()(err)
 end
-
 local ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALIGN_PINGPONG = 1, 2, 3, 4, 5, 6
-
 local SCROLL_RIGHT, SCROLL_LEFT = 1, 2
-
-mod.NUM_LINES = 0
-
+--mod.NUM_LINES = 0
 local function copy(src, dst)
     if type(src) ~= "table" then return nil end
     if type(dst) ~= "table" then dst = {} end
@@ -63,10 +53,7 @@ local function copy(src, dst)
     end
     return dst
 end
-
-
 local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500, color = {r = 1, g = 1, b = 1}}}
-
 local defaultLines={
     [1] = {
         name = "UnitName",
@@ -658,7 +645,6 @@ if cast_data then
     local end_time = cast_data.end_time
     i = (end_time - GetTime()) / (end_time - cast_data.start_time) * 100
   end
-
   local icon = Texture(format("Interface\\Addons\\StarTip\\Media\\gradient\\gradient-%d.blp", i), 12) .. " "
   
   if stop_time then
@@ -694,11 +680,8 @@ end
         name = L["Threat"],
         left = [[
 local isTanking, status, threatpct, rawthreatpct, threatvalue = UnitDetailedThreatSituation(unit, "target")
-
 if not threatpct then return "" end
-
 isTanking = isTanking and 0 or 1
-
 return Colorize(format("%s: %d%% (%.2f%%)", L["Threat"], threatpct, rawthreatpct), 1, isTanking, isTanking)
 ]],
         enabled = true,
@@ -781,13 +764,10 @@ return lastArena5
         cols = 100
     }
 }
-
 for i, v in ipairs(defaultLines) do
     v.default = true
 end
-
 local options = {}
-
 function mod:ReInit()
     self:ClearLines()
     for k, v in ipairs(defaultLines) do
@@ -805,7 +785,6 @@ function mod:ReInit()
             end
         end
     end
-
     for k, v in ipairs(defaultLines) do
         if not v.tagged then
             tinsert(self.db.profile.lines, copy(v))
@@ -814,48 +793,36 @@ function mod:ReInit()
     self:CreateLines()
     self:CreateLines() -- We do this twice because some lines may self destruct.
 end
-
 function mod:OnInitialize()
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
-
-
     self.leftLines = StarTip.leftLines
     self.rightLines = StarTip.rightLines
     self:RegisterEvent("UPDATE_FACTION")
     StarTip:SetOptionsDisabled(options, true)
-
     self.core = StarTip.core
-
     self.evaluator = LibEvaluator
     self:ReInit()
 end
-
 local draw
 local update
 function mod:OnEnable()
     StarTip:SetOptionsDisabled(options, false)
-    if self.db.profile.refreshRate > 0 then
-        self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
-    end
+    self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
 end
-
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
     if self.timer then self.timer:Del() end
 end
-
 function mod:GetOptions()
     self:RebuildOpts()
     return options
 end
-
 function mod:UPDATE_FACTION()
     for i = 1, GetNumFactions() do
         local name = GetFactionInfo(i)
         factionList[name] = true
     end
 end
-
 local widgetUpdate
 do
     local widgetsToDraw = {}
@@ -864,7 +831,11 @@ do
     end
     local fontsList = LSM:List("font")
     function draw()
-        if not UnitExists(StarTip.unit) then StarTip.tooltipMain:Hide() return end
+        if not UnitExists(StarTip.unit) then 
+		mod.timer:Stop()
+		StarTip.tooltipMain:Hide()
+		return
+	end
         if GetMouseFocus() ~= "WorldFrame" then
             wipe(widgetsToDraw)
             for k, v in pairs(lines) do
@@ -881,12 +852,10 @@ do
         for i, widget in ipairs(widgetsToDraw) do
             local font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
             local headerFont = LSM:Fetch("font", fontsList[appearance.db.profile.headerFont])
-
             local justification = "LEFT"
             if widget.x == 2 then
                 justification = "RIGHT"
             end
-
             local outlined = ""
             if widget.config.outlined and widget.config.outlined > 1 then
                 if widget.config.outlined == 2 then
@@ -895,19 +864,15 @@ do
 			outline = "THICKOUTLINE"
                 end
             end
-
-
             if widget.y == 1 then
 		widget.fontObj:SetFont(font, appearance.db.profile.fontSizeHeader, outlined)
             else
                 widget.fontObj:SetFont(headerFont, appearance.db.profile.fontSizeNormal, outlined)
             end
-
             local colSpan = 1
             if not widget.config.right then 
                colSpan = 2
             end
-
             if widget.y and widget.buffer ~= "" then
                 StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, widget.fontObj, justification, colSpan)
             end
@@ -923,7 +888,6 @@ do
         table.wipe(widgetsToDraw)
     end
 end
-
 function mod:ClearLines()
     for k, v in pairs(lines) do
         if v.leftObj then
@@ -935,7 +899,6 @@ function mod:ClearLines()
     end
     wipe(lines)
 end
-
 local tbl
 function mod:CreateLines()
     local llines = {}
@@ -980,25 +943,27 @@ function mod:CreateLines()
                 end
                 local left, right = '', ''
                 environment.unit = StarTip.unit
+print("hmmmmm", StarTip.core.environment.unit)
                 if v.right and v.right ~= "" then
                     if v.rightObj then
                         environment.self = v.rightObj
-                        right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
+                        --right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
                         if type(right) == "number" then right = right .. "" end
                     end
                     if v.leftObj then
                         environment.self = v.leftObj
-                        left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+                        --left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                         if type(left) == "number" then left = left .. "" end
                     end
                 else
                     if v.leftObj then
                         environment.self = v.leftObj
-                        left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
+                        --left = mod.evaluator.ExecuteCode(environment, v.name .. " left", v.left)
                         if type(left) == "number" then left = left .. "" end
                     end
                     right = ''
                 end
+print("rawr", StarTip.core.environment.unit)
                 
                 if type(left) == "string" and type(right) == "string" then
                     lineNum = lineNum + 1
@@ -1021,23 +986,21 @@ function mod:CreateLines()
                         --v.leftObj.fontString = mod.leftLines[lineNum]
                     end
                     if v.rightObj then
-			v.rightObj.buffer = nil
-                        v.rightObj:Start()
+			v.rightObj.buffer = false
+                        --v.rightObj:Start()
                     end
                     if v.leftObj then
-			v.leftObj.buffer = nil
-                        v.leftObj:Start()
+			v.leftObj.buffer = false
+                        --v.leftObj:Start()
                     end
                     v.lineNum = lineNum
                 end
             end
-            mod.NUM_LINES = lineNum
-            draw()
+            --mod.NUM_LINES = lineNum
             --GameTooltip:Show()
-            StarTip.tooltipMain:Show()
+            --StarTip.tooltipMain:Show()
     end})
 end
-
 --[[
 function mod:OnHide()
     for i, v in ipairs(lines) do
@@ -1053,7 +1016,6 @@ function mod:OnHide()
     end
 end
 ]]
-
 function mod.OnHide()
     for i, v in ipairs(lines) do
         if v.leftObj then
@@ -1063,19 +1025,17 @@ function mod.OnHide()
             v.rightObj:Stop()
         end
     end
-    if self.timer then
-        self.timer:Stop()
-    end
+    self.timer:Stop()
 end
-
+function mod:OnFadeOut()
+    self.timer:Stop()
+end
 local function escape(text)
     return string.gsub(text, "|","||")
 end
-
 local function unescape(text)
     return string.gsub(text, "||", "|")
 end
-
 function mod:GetNames()
     local new = {}
     for i, v in ipairs(self.db.profile.lines) do
@@ -1083,7 +1043,6 @@ function mod:GetNames()
     end
     return new
 end
-
 function mod:RebuildOpts()
     options = {
         add = {
@@ -1527,23 +1486,17 @@ function mod:RebuildOpts()
                 type = "header",
                 order = 1
             }
-
         end]]
     end
 end
-
 local plugin = LibStub("LibScriptablePluginString-1.0")
 local ff = CreateFrame("Frame")
 function mod:SetUnit()
-
     if ff:GetScript("OnUpdate") then ff:SetScript("OnUpdate", nil) end
-
-    self.NUM_LINES = 0
-
+    --self.NUM_LINES = 0
     -- Taken from CowTip
     local lastLine = 2
     local text2 = self.leftLines[2]:GetText()
-
     if not text2 then
         lastLine = lastLine - 1
     elseif not text2:find("^"..LEVEL) then
@@ -1561,9 +1514,7 @@ function mod:SetUnit()
     if not UnitIsConnected(StarTip.unit) or not UnitIsVisible(StarTip.unit) or UnitIsPVP(StarTip.unit) then
         lastLine = lastLine + 1
     end
-
     lastLine = lastLine + 1
-
     for i = lastLine, GameTooltip:NumLines() do
         local left = self.leftLines[i]
         local right = self.rightLines[i]
@@ -1577,15 +1528,11 @@ function mod:SetUnit()
 	end
 	StarTip:TrunkAdd(txt1, r1, g1, b1, txt2, r2, g2, b2)
     end
-
     lines()
-
-    if self.db.profile.refreshRate > 0 and self.timer then
-        self.timer:Start()
-    end
-
+    --self.timer:Start()
+    draw()
+print(UnitName(StarTip.unit))
 end
-
 --[[
 function mod:RefixEndLines()
     -- Another part taken from CowTip
