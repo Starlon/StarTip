@@ -879,9 +879,12 @@ do
         end
 	for i, v in ipairs(StarTip.trunk) do
 		if #v == 2 then
-			StarTip.tooltipMain:AddLine(v[1], v[2])
+			local y = StarTip.tooltipMain:AddLine('', '')
+			StarTip.tooltipMain:SetCell(y, 1, v[1])
+			StarTip.tooltipMain:SetCell(y, 2, v[2])
 		else
-			StarTip.tooltipMain:AddLine(v[1])
+			local y = StarTip.tooltipMain:AddLine('')
+			StarTip.tooltipMain:SetCell(y, 1, v[1], nil, "LEFT", 2)
 		end
 	end
 	StarTip:TrunkClear()
