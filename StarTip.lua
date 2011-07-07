@@ -7,7 +7,7 @@ local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("StarTip")
 StarTip.L = L
-local LQT = LibStub:GetLibrary("LibQTip-1.0")
+local LQT = LibStub:GetLibrary("LibQTip-1.0-fix")
 StarTip.LQT = LQT
 
 
@@ -493,6 +493,8 @@ StarTip.tooltipMain = LQT:Acquire("StarTipQTipMain", 2)
 --StarTip.tooltipMain:SetDefaultProvider(StarTip.cellProvider)
 StarTip.tooltipMain:SetParent(UIParent)
 _G["StarTipQTipMain"] = StarTip.tooltipMain
+StarTip.tooltipMain:ClearAllPoints()
+StarTip.tooltipMain:SetPoint("CENTER")
 
 local trunk = {}
 local trunkLines = 1

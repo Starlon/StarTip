@@ -874,7 +874,8 @@ do
                colSpan = 2
             end
             if widget.y and widget.buffer ~= "" then
-                StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, widget.fontObj, justification, colSpan)
+                StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, widget.fontObj, 
+			justification, colSpan, nil, nil, nil, nil, nil, 40)
             end
         end
 	for i, v in ipairs(StarTip.trunk) do
@@ -891,6 +892,7 @@ do
         table.wipe(widgetsToDraw)
     end
 end
+
 function mod:ClearLines()
     for k, v in pairs(lines) do
         if v.leftObj then
@@ -980,7 +982,8 @@ function mod:CreateLines()
 			v.rightObj.y = y
 			v.rightObj.x = 2
                     else
-                        local y, x = StarTip.tooltipMain:AddLine('')
+                        local y, x = StarTip.tooltipMain:AddLine('', '')
+			StarTip.tooltipMain:SetCell(y, 2, "", nil, nil, nil, nil, nil, nil, 1, 1)
                         v.leftObj.y = y
                         v.leftObj.x = 1
                         --GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, v.wordwrap)
