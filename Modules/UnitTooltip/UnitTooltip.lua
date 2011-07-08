@@ -792,7 +792,6 @@ function mod:ReInit()
         end
     end
     self:CreateLines()
-    self:CreateLines() -- We do this twice because some lines may self destruct.
 end
 function mod:OnInitialize()
     self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
@@ -837,6 +836,7 @@ do
 		StarTip.tooltipMain:Hide()
 		return
 	end
+--[[
         if GetMouseFocus() ~= "WorldFrame" then
             wipe(widgetsToDraw)
             for k, v in pairs(lines) do
@@ -850,6 +850,7 @@ do
                 end
             end
         end
+]]
         for i, widget in ipairs(widgetsToDraw) do
             local font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
             local headerFont = LSM:Fetch("font", fontsList[appearance.db.profile.headerFont])
@@ -916,8 +917,9 @@ local tbl
 function mod:CreateLines()
     local llines = {}
     local j = 0
+    self:ClearLines()
     for i, v in ipairs(self.db.profile.lines) do
-        if not v.deleted and v.enabled then
+        if not v.deleted and v.enabled and v.left then
             j = j + 1
             llines[j] = copy(v)
             llines[j].config = copy(v)
@@ -962,7 +964,7 @@ function mod:CreateLines()
                 end
                 local left, right = '', ''
                 environment.unit = StarTip.unit
-                if v.right and v.right ~= "" then
+                if v.right then
                     if v.rightObj then
                         environment.self = v.rightObj
                         right = mod.evaluator.ExecuteCode(environment, v.name .. " right", v.right)
@@ -984,7 +986,7 @@ function mod:CreateLines()
                 
                 if type(left) == "string" and type(right) == "string" then
                     lineNum = lineNum + 1
-                    if v.right then
+                    if v.right and v.right ~= "" then
                         --GameTooltip:AddDoubleLine(' ', ' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b)
                         local y, x = StarTip.tooltipMain:AddLine('', '')
                         --v.leftObj.fontString = mod.leftLines[lineNum]
@@ -996,7 +998,7 @@ function mod:CreateLines()
 			v.rightObj.y = y
 			v.rightObj.x = 2
                     else
-                        local y, x = StarTip.tooltipMain:AddLine('', '')
+                        local y, x = StarTip.tooltipMain:AddLine('')
                         v.leftObj.y = y
                         v.leftObj.x = 1
                         --GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, v.wordwrap)
@@ -1004,11 +1006,11 @@ function mod:CreateLines()
                     end
                     if v.rightObj then
 			v.rightObj.buffer = false
-                        --v.rightObj:Start()
+                        v.rightObj:Start()
                     end
                     if v.leftObj then
 			v.leftObj.buffer = false
-                        --v.leftObj:Start()
+                        v.leftObj:Start()
                     end
                     v.lineNum = lineNum
                 end
@@ -1068,7 +1070,7 @@ function mod:RebuildOpts()
             type = "input",
             set = function(info, v)
                 if v == "" then return end
-                tinsert(self.db.profile.lines, {name = v, left = "", right = "", update=500, enabled = true})
+                tinsert(self.db.profile.lines, {name = v, left = nil, right = nil, update=500, enabled = true})
                 self:RebuildOpts()
                 StarTip:RebuildOpts()
                 self:ClearLines()
@@ -1158,7 +1160,7 @@ function mod:RebuildOpts()
                         get = function() return v.leftUpdating end,
                         set = function(info, val)
                             v.leftUpdating = val
-                            if v.update == 0 then
+                            if (v.update or 0) == 0 then
                                 v.update = 500
                             end
                             v.leftUpdatingDirty = true
@@ -1173,7 +1175,7 @@ function mod:RebuildOpts()
                         get = function() return v.rightUpdating end,
                         set = function(info, val)
                             v.rightUpdating = val
-                            if v.update == 0 then
+                            if (v.update or 0) == 0 then
                                 v.update = 500
                             end
                             v.rightUpdatingDirty = true
@@ -1341,11 +1343,10 @@ function mod:RebuildOpts()
                         desc = L["Background color for left segment. Return r, g, b, and a."],
 			type = "input",
                         get = function()
-				return v.colorL
+				return escape(v.colorL or "")
                         end,
                         set = function(info, val)
-                            v.colorL = val
-                            self:ClearLines()
+                            v.colorL = unescape(val)
                             self:CreateLines()
                         end,
 			multiline = true,
@@ -1357,11 +1358,10 @@ function mod:RebuildOpts()
                         desc = L["Background color for right segment. Return r, g, b, and a."],
 			type = "input",
                         get = function()
-				return v.colorR
+				return escape(v.colorR or "")
                         end,
                         set = function(info, val)
-                            v.colorR = val
-                            self:ClearLines()
+                            v.colorR = unescape(val)
                             self:CreateLines()
                         end,
 			multiline = true,
