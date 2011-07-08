@@ -285,7 +285,8 @@ return value
 ]],
         rightUpdating = true,
         enabled = true,
-        update = 1000
+        update = 1000,
+	colorR = {0, 0, 0, 1},
     },
     [15] = {
         name = L["Effects"],
@@ -875,7 +876,12 @@ do
             end
             if widget.y and widget.buffer ~= "" then
                 StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, widget.fontObj, 
-			justification, colSpan, nil, nil, nil, nil, nil, 40)
+			justification, colSpan, nil, 0, 0, nil, nil, 40)
+
+		if widget.config.color then
+			StarTip.tooltipMain:SetCellColor(widget.y, widget.x, 
+        	            widget.config.color[1] or 0, widget.config.color[2] or 0, widget.config.color[3] or 0)
+		end
             end
         end
 	for i, v in ipairs(StarTip.trunk) do
@@ -917,11 +923,17 @@ function mod:CreateLines()
             v.outlined = v.leftOutlined
             local update = v.update
             if v.left and v.leftUpdating then v.update = 0 end
+            v.color = v.colorL
+            v.maxWidth = v.maxWidthL
+            v.minWidth = v.minWidthL
             llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. " (left)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
 			if v.left and not v.leftUpdating then llines[j].leftObj.timer:Set(0) end
             v.value = v.right
             v.outlined = v.rightOutlined
             if v.right and not v.rightUpdating then v.update = update end
+            v.color = v.colorR
+            v.maxWidth = v.maxWidthR
+            v.minWidth = v.minWidthR
             llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
 			if v.right and not v.rightUpdating then llines[j].rightObj.timer:Set(0) end
            if v.left then
@@ -983,7 +995,6 @@ function mod:CreateLines()
 			v.rightObj.x = 2
                     else
                         local y, x = StarTip.tooltipMain:AddLine('', '')
-			StarTip.tooltipMain:SetCell(y, 2, "", nil, nil, nil, nil, nil, nil, 1, 1)
                         v.leftObj.y = y
                         v.leftObj.x = 1
                         --GameTooltip:AddLine(' ', mod.db.profile.color.r, mod.db.profile.color.g, mod.db.profile.color.b, v.wordwrap)
@@ -1245,6 +1256,7 @@ function mod:RebuildOpts()
                         end,
                         order = 9
                     },
+--[[
                     wordwrap = {
                         name = L["Word Wrap"],
                         desc = L["Whether this line should word wrap lengthy text"],
@@ -1257,6 +1269,56 @@ function mod:RebuildOpts()
                         end,
                         order = 10
                     },
+]]
+                    colorL = {
+                        name = L["Left Color"],
+                        desc = L["Background color for left segment."],
+			type = "color",
+                        hasAlpha = true,
+                        get = function()
+                            if v.colorL then
+                                return v.colorL[1], v.colorL[2], v.colorL[3], v.colorL[4]
+                            else
+                                return 0, 0, 0, 0
+                            end
+                        end,
+                        set = function(info, r, g, b, a)
+                            if a == 0 then
+                                v.colorL = nil
+                            else
+                                v.colorL = v.colorL or {}
+                                v.colorL[1], v.colorL[2], v.colorL[3], v.colorL[4] = r, g, b, a
+                            end
+                            self:ClearLines()
+                            self:CreateLines()
+                        end,
+                        order = 11
+                    },
+                    colorR = {
+                        name = L["Right Color"],
+                        desc = L["Background color for right segment."],
+			type = "color",
+                        hasAlpha = true,
+                        get = function()
+                            if v.colorR then
+                                return v.colorR[1], v.colorR[2], v.colorR[3], v.colorR[4]
+                            else
+                                return 0, 0, 0, 0
+                            end
+                        end,
+                        set = function(info, r, g, b, a)
+                            if a == 0 then
+                                v.colorR = nil
+                            else
+                                v.colorR = v.colorR or {}
+                                v.colorR[1], v.colorR[2], v.colorR[3], v.colorR[4] = r, g, b, a
+                            end
+                            self:ClearLines()
+                            self:CreateLines()
+                        end,
+                        order = 12
+                    },
+
                     delete = {
                         name = L["Delete"],
                         desc = L["Delete this line"],
@@ -1280,12 +1342,12 @@ function mod:RebuildOpts()
                             self:ClearLines()
                             self:CreateLines()
                         end,
-                        order = 11
+                        order = 100
                     },
                     linesHeader = {
                         name = L["Lines"],
                         type = "header",
-                        order = 12
+                        order = 101
                     },
                     left = {
                         name = L["Left Segment"],
@@ -1303,7 +1365,7 @@ function mod:RebuildOpts()
                         end,]]
                         multiline = true,
                         width = "full",
-                        order = 13
+                        order = 113
                     },
                     right = {
                         name = L["Right Segment"],
@@ -1318,7 +1380,7 @@ function mod:RebuildOpts()
                         end,
                         multiline = true,
                         width = "full",
-                        order = 14
+                        order = 114
                     },
                     marquee = {
                         name = "Marquee Settings",
