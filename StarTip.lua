@@ -509,7 +509,9 @@ StarTip.tooltipMain.Hide = function()
 	StarTip.tooltipMain:HideReal()
 end
 StarTip.tooltipMain.FadeOut = function()
-	StarTip.tooltipMain.flash:FadeOut(1, 1, 0)
+	if StarTip.tooltipMain:IsShown() and StarTip.tooltipMain:GetAlpha() == 1 then
+		StarTip.tooltipMain.flash:FadeOut(1, 1, 0)
+	end
 end
 
 local trunk = {}
@@ -771,6 +773,7 @@ function StarTip.OnTooltipSetUnit(...)
 		unit = "mouseover"
 	end
 		
+	StarTip.owner = GameTooltip:GetOwner()
 	StarTip.unit = unit
 	environment.unit = unit
 		
