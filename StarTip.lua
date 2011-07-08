@@ -9,6 +9,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("StarTip")
 StarTip.L = L
 local LQT = LibStub:GetLibrary("LibQTip-1.0-fix")
 StarTip.LQT = LQT
+local LibFlash = LibStub("LibFlash")
 
 
 local LibCore = LibStub("LibScriptableLCDCoreLite-1.0")
@@ -495,6 +496,21 @@ StarTip.tooltipMain:SetParent(UIParent)
 _G["StarTipQTipMain"] = StarTip.tooltipMain
 StarTip.tooltipMain:ClearAllPoints()
 StarTip.tooltipMain:SetPoint("CENTER")
+StarTip.tooltipMain.flash = LibFlash:New(StarTip.tooltipMain)
+StarTip.tooltipMain.ShowReal = StarTip.tooltipMain.Show
+StarTip.tooltipMain.Show = function()
+	StarTip.tooltipMain.flash:Stop()
+	StarTip.tooltipMain:ShowReal()
+	StarTip.tooltipMain:SetAlpha(1)
+end
+StarTip.tooltipMain.HideReal = StarTip.tooltipMain.Hide
+StarTip.tooltipMain.Hide = function()
+	StarTip.tooltipMain.flash:Stop()
+	StarTip.tooltipMain:HideReal()
+end
+StarTip.tooltipMain.FadeOut = function()
+	StarTip.tooltipMain.flash:FadeOut(1, 1, 0)
+end
 
 local trunk = {}
 local trunkLines = 1
@@ -696,6 +712,7 @@ function StarTip:OpenConfig()
 	AceConfigDialog:Open("StarTip-Addon")	
 end
 
+--[[
 function StarTip:HideTooltip()
 	GameTooltip:Hide()
 	self.tooltipHidden = true
@@ -709,6 +726,7 @@ function StarTip:ShowTooltip(unit)
 	GameTooltip:SetUnit(unit)
 	GameTooltip:Show()
 end
+]]
 
 function StarTip.GameTooltipAddLine(...)
 end
@@ -731,13 +749,13 @@ function StarTip.OnTooltipSetUnit(...)
 
 	local _, unit = GameTooltip:GetUnit()
 	
-	if not unit or StarTip.tooltipHidden then GameTooltip:Hide() return end
+	if not unit then return end
 
-	environment.unit = unit
 
 	StarTip:TrunkClear()
 	trunkLines = GameTooltip:NumLines()
 
+--[[
 	hideTimer = hideTimer or LibTimer:New("StarTip.Hide", 100, false, hideTooltip, nil, StarTip.db.profile.errorLevel)
 	hideTimer:Start()
 	
@@ -748,13 +766,13 @@ function StarTip.OnTooltipSetUnit(...)
 		return
 	end
 	lastTime = GetTime()
-
+]]
 	if unit ~= "mouseover" and UnitIsUnit(unit, "mouseover") then
 		unit = "mouseover"
 	end
 		
-	--StarTip.fading = false
 	StarTip.unit = unit
+	environment.unit = unit
 		
 	if not StarTip.justSetUnit then
 		for k, v in StarTip:IterateModules() do
@@ -764,7 +782,6 @@ function StarTip.OnTooltipSetUnit(...)
 
 	StarTip.justSetUnit = false
 
-	--checkTooltipAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
 	StarTip.tooltipMain:Show()
 	StarTip.trunkTimer:Start()
 end
@@ -808,7 +825,6 @@ function StarTip:GameTooltipHide(...)
 	end
 	]]
 	
-	self.tooltipMain:Hide()
 	if hide then
 		StarTip.hooks[GameTooltip].Hide(...)
 	end
@@ -921,7 +937,6 @@ function StarTip:GameTooltipFadeOut(...)
 	if fadeOut then
 		StarTip.hooks[GameTooltip].FadeOut(...)
 	end
-	self.tooltipMain:Hide()
 end
 
 function StarTip:GetLSMIndexByName(category, name)

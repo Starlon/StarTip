@@ -78,13 +78,7 @@ function mod:OnEnable()
 end
 
 function mod:OnDisable()
-	self:Unhook(GameTooltip, "FadeOut")
-	self:Unhook(GameTooltip, "Hide")
 	StarTip:SetOptionsDisabled(options, true)
-	if timer then
-		self:CancelTimer(timer)
-		timer = nil
-	end
 end
 
 function mod:GetOptions()
@@ -106,7 +100,7 @@ local checkExistence = function()
 		end
 		if kind == 2 then
 			GameTooltip:FadeOut()
-			StarTip.tooltipMain:Hide()
+			StarTip.tooltipMain:FadeOut()
 		else
 			GameTooltip:Hide()
 			StarTip.tooltipMain:Hide()
@@ -125,8 +119,10 @@ local checkTooltipAlpha = function()
 		end
 		if kind == 2 then
 			GameTooltip:FadeOut()
+			StarTip.tooltipMain:FadeOut()
 		else
 			GameTooltip:Hide()
+			StarTip.tooltipMain:Hide()
 		end
 	end
 end
@@ -164,6 +160,7 @@ function mod:OnFadeOut(this, ...)
 	else
 		self.justHide = true
 		GameTooltip:Hide()
+		StarTip.tooltipMain:Hide()
 	end
 
 end
@@ -191,6 +188,7 @@ function mod:GameTooltipHide(this, ...)
 	if kind == 2 then
 		self.justFade = true
 		GameTooltip:FadeOut()
+		StarTip.tooltipMain:FadeOut()
 	else
 		return true
 	end
