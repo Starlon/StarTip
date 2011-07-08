@@ -395,6 +395,7 @@ function mod:OnEnable()
 	local ctop = self.db.profile.clampTop
 	local cbottom = self.db.profile.clampBottom
 	StarTip.tooltipMain:SetClampRectInsets(cleft, cright, ctop, cbottom)
+	StarTip.tooltipMain:SetClampedToScreen(true)
 end
 
 function mod:OnDisable()

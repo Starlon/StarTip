@@ -404,41 +404,10 @@ local positionMainTooltip = function()
 	local currentAnchor = StarTip.opposites[StarTip.anchors[index]:sub(8)]
 	local tooltip = StarTip.tooltipMain
 	local effScale = tooltip:GetEffectiveScale()
-	local height = tooltip:GetHeight() or 0
-	local width = tooltip:GetWidth() or 0
-	local realHeight = GameTooltip:GetHeight()
-	local realWidth = GameTooltip:GetWidth()
-	local screenWidth = UIParent:GetWidth() * effScale
-	local screenHeight = UIParent:GetHeight() * effScale
-        local realHeight = GameTooltip:GetHeight()
-	local realWidth = GameTooltip:GetWidth()
-	local myOffsetX, myOffsetY = 0, 0
-	local leftBottomOffset = 0
 
-        if mod.db.profile.defaultUnitTooltipPos == 1 then -- left
-		leftBottomOffset = realWidth
-	elseif mod.db.profile.defaultUnitTooltipPos == 2 then -- right
-		screenWidth = screenWidth - realWidth
-	elseif mod.db.profile.defaultUnitTooltipPos == 3 then -- top
-		screenHeight = screenHeight - realHeight
-	elseif  mod.db.profile.defaultUnitTooltipPos == 4 then -- bottom
-		leftBottomOffset = realHeight
-	end
-	if x + width / 2 + xoffset > screenWidth then
-		myOffsetX = (screenWidth - (x + width / 2 + xoffset)) * effScale
-	end
-	if y + height + yoffset > screenHeight then
-		myOffsetY = (screenHeight - (y + height + yoffset) + 1) * effScale
-	end
-	if x - width / 2 - leftBottomOffset < 0 then
-		myOffsetX = (x - width / 2 - leftBottomOffset + 2) * -1 * effScale
-	end
-	if y - height - leftBottomOffset < 0 then
-		myOffsetY = (y - height - leftBottomOffset + 2) * effScale
-	end
 	tooltip:ClearAllPoints()
 	tooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", 
-		(x + xoffset + myOffsetX) / effScale, (y + yoffset + myOffsetY) / effScale + 5)
+		x / effScale, y / effScale)
 end
 
 
