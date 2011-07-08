@@ -286,7 +286,7 @@ return value
         rightUpdating = true,
         enabled = true,
         update = 1000,
-	colorR = {0, 0, 0, 1},
+	colorR = "return 0, 0, 0, 1",
     },
     [15] = {
         name = L["Effects"],
@@ -878,9 +878,11 @@ do
                 StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, widget.fontObj, 
 			justification, colSpan, nil, 0, 0, nil, nil, 40)
 
-		if widget.config.color then
+		if type(widget.config.color) == "string" and widget.config.color ~= "" and widget.color.is_valid then
+			widget.color:Eval()
+			local r, g, b, a = widget.color:P2N()
 			StarTip.tooltipMain:SetCellColor(widget.y, widget.x, 
-        	            widget.config.color[1] or 0, widget.config.color[2] or 0, widget.config.color[3] or 0)
+        	            r or 0, g or 0, b or 0, a or 1)
 		end
             end
         end
@@ -1270,54 +1272,6 @@ function mod:RebuildOpts()
                         order = 10
                     },
 ]]
-                    colorL = {
-                        name = L["Left Color"],
-                        desc = L["Background color for left segment."],
-			type = "color",
-                        hasAlpha = true,
-                        get = function()
-                            if v.colorL then
-                                return v.colorL[1], v.colorL[2], v.colorL[3], v.colorL[4]
-                            else
-                                return 0, 0, 0, 0
-                            end
-                        end,
-                        set = function(info, r, g, b, a)
-                            if a == 0 then
-                                v.colorL = nil
-                            else
-                                v.colorL = v.colorL or {}
-                                v.colorL[1], v.colorL[2], v.colorL[3], v.colorL[4] = r, g, b, a
-                            end
-                            self:ClearLines()
-                            self:CreateLines()
-                        end,
-                        order = 11
-                    },
-                    colorR = {
-                        name = L["Right Color"],
-                        desc = L["Background color for right segment."],
-			type = "color",
-                        hasAlpha = true,
-                        get = function()
-                            if v.colorR then
-                                return v.colorR[1], v.colorR[2], v.colorR[3], v.colorR[4]
-                            else
-                                return 0, 0, 0, 0
-                            end
-                        end,
-                        set = function(info, r, g, b, a)
-                            if a == 0 then
-                                v.colorR = nil
-                            else
-                                v.colorR = v.colorR or {}
-                                v.colorR[1], v.colorR[2], v.colorR[3], v.colorR[4] = r, g, b, a
-                            end
-                            self:ClearLines()
-                            self:CreateLines()
-                        end,
-                        order = 12
-                    },
 
                     delete = {
                         name = L["Delete"],
@@ -1382,6 +1336,39 @@ function mod:RebuildOpts()
                         width = "full",
                         order = 114
                     },
+                    colorL = {
+                        name = L["Left Color"],
+                        desc = L["Background color for left segment. Return r, g, b, and a."],
+			type = "input",
+                        get = function()
+				return v.colorL
+                        end,
+                        set = function(info, val)
+                            v.colorL = val
+                            self:ClearLines()
+                            self:CreateLines()
+                        end,
+			multiline = true,
+			width = "full",
+                        order = 115
+                    },
+                    colorR = {
+                        name = L["Right Color"],
+                        desc = L["Background color for right segment. Return r, g, b, and a."],
+			type = "input",
+                        get = function()
+				return v.colorR
+                        end,
+                        set = function(info, val)
+                            v.colorR = val
+                            self:ClearLines()
+                            self:CreateLines()
+                        end,
+			multiline = true,
+			width = "full",
+                        order = 116
+                    },
+
                     marquee = {
                         name = "Marquee Settings",
                         type = "group",

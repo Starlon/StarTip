@@ -197,6 +197,10 @@ L["Horde"] = true
 L["Arena 2s"] = true
 L["Arena 3s"] = true
 L["Arena 5s"] = true
+L["Left Color"] = true
+L["Background color for left segment. Return r, g, b, and a."] = true
+L["Right Color"] = true
+L["Background color for right segment. Return r, g, b, and a."] = true
 
 -- Mouse Gestures
 L["Left Button"] = true

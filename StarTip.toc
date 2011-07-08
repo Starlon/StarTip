@@ -15,6 +15,14 @@ Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 embeds.xml
 
 Localization\enUS.lua
+Localization\deDE.lua
+Localization\esES.lua
+Localization\frFR.lua
+Localization\ruRU.lua
+Localization\zhTW.lua
+Localization\esMX.lua
+Localization\koKR.lua
+Localization\zhCN.lua
 
 StarTip.lua
 
