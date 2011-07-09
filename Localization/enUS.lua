@@ -4,6 +4,7 @@ if not L then return end
 
 L["Welcome to "] = true
 L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon. You can turn off this message under Settings."] = true
+L["StarTip disabled a tooltip line named %s due to an error in the line's %s segment."] = true
 L["None"] = true
 L["Ctrl"] = true
 L["Alt"] = true
