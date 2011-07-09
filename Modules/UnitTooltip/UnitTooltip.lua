@@ -546,7 +546,7 @@ end
 lastMovement = str
 return str
 ]],
-        leftUpdatinge = true,
+        leftUpdating = true,
         enabled = true,
         update = 500
     },
