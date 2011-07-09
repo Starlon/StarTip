@@ -379,7 +379,8 @@ end
         update = 1000,
         speed = 200,
         direction = WidgetText.SCROLL_LEFT,
-        dontRtrim = true
+        dontRtrim = true,
+	colorL = "return random(), random(), random(), 1"
     },
     [17] = {
         name = L["Memory Usage"],
