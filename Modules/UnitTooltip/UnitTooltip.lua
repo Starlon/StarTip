@@ -53,7 +53,7 @@ local function copy(src, dst)
     end
     return dst
 end
-local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 500, color = {r = 1, g = 1, b = 1}}}
+local defaults = {profile={titles=true, empty = true, lines = {}, refreshRate = 0, color = {r = 1, g = 1, b = 1}}}
 local defaultLines={
     [1] = {
         name = "UnitName",
@@ -812,7 +812,7 @@ function mod:OnEnable()
 end
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
-    if self.timer then self.timer:Del() end
+    self.timer:Del()
 end
 function mod:GetOptions()
     self:RebuildOpts()
@@ -829,6 +829,9 @@ do
     local widgetsToDraw = {}
     function widgetUpdate(widget)
 	tinsert(widgetsToDraw, widget)
+	if mod.db.profile.refreshRate == 0 then
+		draw()
+	end
     end
     local fontsList = LSM:List("font")
     function draw()
@@ -1019,12 +1022,9 @@ function mod:CreateLines()
                     v.lineNum = lineNum
                 end
             end
-            --mod.NUM_LINES = lineNum
-            --GameTooltip:Show()
-            --StarTip.tooltipMain:Show()
     end})
 end
---[[
+
 function mod:OnHide()
     for i, v in ipairs(lines) do
         if v.leftObj then
@@ -1034,31 +1034,21 @@ function mod:OnHide()
             v.rightObj:Stop()
         end
     end
-    if self.timer then
-        self.timer:Stop()
-    end
-end
-]]
-function mod.OnHide()
-    for i, v in ipairs(lines) do
-        if v.leftObj then
-            v.leftObj:Stop()
-        end
-        if v.rightObj then
-            v.rightObj:Stop()
-        end
-    end
     self.timer:Stop()
 end
+
 function mod:OnFadeOut()
-    self.timer:Stop()
+    self:OnHide()
 end
+
 local function escape(text)
     return string.gsub(text, "|","||")
 end
+
 local function unescape(text)
     return string.gsub(text, "||", "|")
 end
+
 function mod:GetNames()
     local new = {}
     for i, v in ipairs(self.db.profile.lines) do
@@ -1066,6 +1056,7 @@ function mod:GetNames()
     end
     return new
 end
+
 function mod:RebuildOpts()
     options = {
         add = {
@@ -1594,7 +1585,9 @@ function mod:SetUnit()
     end
     lines()
     draw()
-    self.timer:Start()
+    if mod.db.profile.refreshRate ~= 0 then 
+	self.timer:Start()
+    end
 end
 --[[
 function mod:RefixEndLines()
