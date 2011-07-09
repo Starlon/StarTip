@@ -359,22 +359,6 @@ environment.new = StarTip.new
 environment.newDict = StarTip.newDict
 environment.del = StarTip.del
 
---[[
-PluginRangeCheck:New(environment)
-PluginUnit:New(environment)
-PluginWidgetText:New(environment)
-PluginBit:New(environment)
-PluginLua:New(environment)
-PluginMath:New(environment)
-PluginString:New(environment)
-PluginTable:New(environment)
-PluginResourceTools:New(environment)
-PluginLocation:New(environment)
-PluginUnitTooltipScan:New(environment)
-if PluginDBM then PluginDBM:New(environment) end
---PluginLinq:New(environment)
---]]
-
 local function errorhandler(err)
     return geterrorhandler()(err)
 end
@@ -406,16 +390,6 @@ function StarTip:RefreshConfig()
 	self:Print(L["You may need to reload your UI."])
 end
 
-local checkTooltipAlphaFrame
-local checkTooltipAlpha = function()
-	if GameTooltip:GetAlpha() < 1 then
-		StarTip.fading = true
-		checkTooltipAlphaFrame:SetScript("OnUpdate", nil)
-	end
-end
-
-checkTooltipAlphaFrame = CreateFrame("Frame")
-
 local menuoptions = {
 	name = "StarTip",
 	type = "group",
@@ -427,6 +401,7 @@ local menuoptions = {
 		}
 	}
 }
+
 function StarTip:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
@@ -445,10 +420,9 @@ function StarTip:OnInitialize()
 		self.lastConfig = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("StarTip-Addon", "Profiles", "StarTip-Addon", "Profiles")
 	end
 	
-	local leftGameTooltipStrings, rightGameTooltipStrings = {}, {}
 	self.leftLines = {}
 	self.rightLines = {}
-	self.qtipLines = {}
+	--self.qtipLines = {}
 	for i = 1, 50 do
 		GameTooltip:AddDoubleLine(' ', ' ')
 		self.leftLines[i] = _G["GameTooltipTextLeft" .. i]
@@ -719,6 +693,7 @@ function StarTip:HideTooltip()
 	GameTooltip:Hide()
 	self.tooltipHidden = true
 end
+--]]
 
 function StarTip:ShowTooltip(unit)
 	self.tooltipHidden = false
@@ -728,7 +703,7 @@ function StarTip:ShowTooltip(unit)
 	GameTooltip:SetUnit(unit)
 	GameTooltip:Show()
 end
-]]
+
 
 function StarTip.GameTooltipAddLine(...)
 end
@@ -753,7 +728,6 @@ function StarTip.OnTooltipSetUnit(...)
 	
 	if not unit then return end
 
-
 	StarTip:TrunkClear()
 	trunkLines = GameTooltip:NumLines()
 
@@ -772,7 +746,7 @@ function StarTip.OnTooltipSetUnit(...)
 	if unit ~= "mouseover" and UnitIsUnit(unit, "mouseover") then
 		unit = "mouseover"
 	end
-		
+
 	StarTip.owner = GameTooltip:GetOwner()
 	StarTip.unit = unit
 	environment.unit = unit
@@ -961,6 +935,7 @@ function StarTip:SetOptionsDisabled(t, bool)
 end
 
 -- Taken from CowTip
+--[[
 function StarTip:GetMouseoverUnit()
 	local _, tooltipUnit = GameTooltip:GetUnit()
 	if not tooltipUnit or not UnitExists(tooltipUnit) or UnitIsUnit(tooltipUnit, "mouseover") then
@@ -969,6 +944,7 @@ function StarTip:GetMouseoverUnit()
 		return tooltipUnit
 	end
 end
+]]
 
 -- Taken from CowTip and modified a bit
 function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)

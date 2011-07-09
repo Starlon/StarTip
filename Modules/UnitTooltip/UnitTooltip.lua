@@ -804,44 +804,52 @@ function mod:OnInitialize()
     self.evaluator = LibEvaluator
     self:ReInit()
 end
+
 local draw
 local update
 function mod:OnEnable()
     StarTip:SetOptionsDisabled(options, false)
-    self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel, self.db.profile.durationLimit)
+    self.timer = LibTimer:New("Text module", self.db.profile.refreshRate, true, draw, nil, self.db.profile.errorLevel)
+    self.trunkTimer = LibTimer:New("Text trunk timer", 500, true, self.AppendTrunk, self, self.db.profile.errorLevel)
 end
+
 function mod:OnDisable()
     StarTip:SetOptionsDisabled(options, true)
     self.timer:Del()
+    self.trunkTimer:Del()
 end
+
 function mod:GetOptions()
     self:RebuildOpts()
     return options
 end
+
 function mod:UPDATE_FACTION()
     for i = 1, GetNumFactions() do
         local name = GetFactionInfo(i)
         factionList[name] = true
     end
 end
+
 local widgetUpdate
 do
     local widgetsToDraw = {}
     function widgetUpdate(widget)
 	tinsert(widgetsToDraw, widget)
 	if mod.db.profile.refreshRate == 0 then
-		draw()
+		draw(true)
 	end
     end
     local fontsList = LSM:List("font")
-    function draw()
+    function draw(bypass)
         if not UnitExists(StarTip.unit) then 
 		mod.timer:Stop()
+		mod.trunkTimer:Stop()
 		StarTip.tooltipMain:Hide()
 		return
 	end
 --[[
-        if GetMouseFocus() ~= "WorldFrame" then
+        if #StarTip.trunk > 0 and not bypass then
             wipe(widgetsToDraw)
             for k, v in pairs(lines) do
                 if v.leftObj then
@@ -879,7 +887,7 @@ do
             if not widget.config.right and widget.x == 1 then 
                colSpan = 2
             end
-            if widget.y and widget.buffer ~= "" then
+            if type(widget.y) == "number" and widget.y <= StarTip.tooltipMain:GetLineCount() and widget.buffer ~= "" then
                 StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, widget.fontObj, 
 			justification, colSpan, nil, 0, 0, nil, nil, 40)
 
@@ -891,6 +899,11 @@ do
 		end
             end
         end
+        table.wipe(widgetsToDraw)
+    end
+end
+
+function mod:AppendTrunk()
 	for i, v in ipairs(StarTip.trunk) do
 		if #v == 2 then
 			local y = StarTip.tooltipMain:AddLine('', '')
@@ -902,11 +915,9 @@ do
 		end
 	end
 	StarTip:TrunkClear()
-        table.wipe(widgetsToDraw)
-    end
 end
 
-function mod:ClearLines()
+function mod:StopLines()
     for k, v in pairs(lines) do
         if v.leftObj then
             v.leftObj:Stop()
@@ -915,8 +926,14 @@ function mod:ClearLines()
             v.rightObj:Stop()
         end
     end
+
+end
+
+function mod:ClearLines()
+    self:StopLines()
     wipe(lines)
 end
+
 local tbl
 function mod:CreateLines()
     local llines = {}
@@ -1026,15 +1043,9 @@ function mod:CreateLines()
 end
 
 function mod:OnHide()
-    for i, v in ipairs(lines) do
-        if v.leftObj then
-            v.leftObj:Stop()
-        end
-        if v.rightObj then
-            v.rightObj:Stop()
-        end
-    end
+    self:StopLines()
     self.timer:Stop()
+    self.trunkTimer:Stop()
 end
 
 function mod:OnFadeOut()
@@ -1583,12 +1594,17 @@ function mod:SetUnit()
 	end
 	StarTip:TrunkAdd(txt1, r1, g1, b1, txt2, r2, g2, b2)
     end
+
+    mod:StopLines()
     lines()
-    draw()
+    mod:AppendTrunk()
+
     if mod.db.profile.refreshRate ~= 0 then 
 	self.timer:Start()
     end
+    self.trunkTimer:Start()
 end
+
 --[[
 function mod:RefixEndLines()
     -- Another part taken from CowTip
