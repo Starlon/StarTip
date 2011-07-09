@@ -953,7 +953,7 @@ function mod:CreateLines()
             local update = v.update or 0
             v.update = 0
             if v.left and v.leftUpdating then v.update = update end
-            llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. " (left)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
+            llines[j].leftObj = v.left and WidgetText:New(mod.core, "StarTip.UnitTooltip:" .. v.name .. ":left:", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
 
             v.value = v.right
             v.outlined = v.rightOutlined
@@ -962,7 +962,7 @@ function mod:CreateLines()
             v.color = v.colorR
             v.maxWidth = v.maxWidthR
             v.minWidth = v.minWidthR
-            llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
+            llines[j].rightObj = v.right and WidgetText:New(mod.core, "StarTip.UnitTooltip: " .. v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
 
            if v.left then
                llines[j].leftObj.fontObj = _G[v.name .. "Left"] or CreateFont(v.name .. "Left")

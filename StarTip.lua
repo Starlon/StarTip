@@ -1,3 +1,5 @@
+local addonName, addon = ...
+
 _G["StarTip"] = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0") 
 StarTip.version = GetAddOnMetadata("StarTip", "Version") or ""
 
@@ -29,7 +31,56 @@ environment.StarTip = StarTip
 environment._G = _G
 environment.L = L
 
+local BugGrabber = BugGrabber
 
+local function disableUT(name)
+	local UT = StarTip:GetModule("UnitTooltip")
+	for k, v in pairs(UT.db.profile.lines) do
+		if(v.name == name) then
+			UT.db.profile.lines[k].enabled = false
+			UT:CreateLines()
+		end
+	end
+end
+
+local onError
+do
+	local lastError = nil
+	function onError(event, errorObject)
+		for k, v in pairs(addon:GetErrors(BugGrabber:GetSessionId())) do
+			if type(v.message) == "string" then
+				v.message:gsub('t.*StarTip\.UnitTooltip:(.*):left:.*', function(name)
+					disableUT(name)
+				end)
+				v.message:gsub('t.*StarTip\.UnitTooltip:(.*):right:.*', function(name)
+					disableUT(name)
+				end)
+			end
+		end
+	end
+end
+
+
+-- Borrowed from BugSack
+do
+        local errors = {}
+        function addon:GetErrors(sessionId)
+                -- XXX I've never liked this function, maybe a BugGrabber redesign is in order,
+                -- XXX where we have one subtable in the DB per session ID.
+                if sessionId then
+                        wipe(errors)
+                        local db = BugGrabber:GetDB()
+                        for i, e in next, db do
+                                if sessionId == e.session then
+                                        errors[#errors + 1] = e
+                                end
+                        end
+                        return errors
+                else
+                        return BugGrabber:GetDB()
+                end
+        end
+end
 
 local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("StarTip", {
 	type = "data source",
@@ -403,6 +454,12 @@ local menuoptions = {
 }
 
 function StarTip:OnInitialize()
+
+	if BugGrabber then
+		BugGrabber.RegisterCallback(addon, "BugGrabber_BugGrabbed", onError)
+		BugGrabber.RegisterCallback(addon, "BugGraabber_EventGrabbed", onError)
+	end
+
 	self.db = LibStub("AceDB-3.0"):New("StarTipDB", defaults, "Default")
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
@@ -1007,4 +1064,5 @@ function StarTip:MODIFIER_STATE_CHANGED(ev, modifier, up, ...)
 		end
 	end
 end
+
 
