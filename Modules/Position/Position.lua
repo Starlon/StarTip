@@ -385,7 +385,7 @@ local positionTooltip = function()
 		GameTooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", (x + xoffset) / effScale, (y + yoffset) / effScale + 5)
 	end
 
-	if isUnitTooltip then
+	if UnitExists(StarTip.unit or "mouseover") then
 		if mod.db.profile.defaultUnitTooltipPos == 5 then
 			hideGameTooltip()	
 		else
