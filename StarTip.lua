@@ -714,6 +714,7 @@ local function hideTooltip()
 	hideTimer:Start()
 end
 
+--[[
 local throttleTimer
 local lastTime = GetTime()
 local function endThrottle()
@@ -721,6 +722,7 @@ local function endThrottle()
 		StarTip.OnTooltipSetUnit()
 	end
 end
+]]
 
 function StarTip.OnTooltipSetUnit(...)
 
