@@ -873,7 +873,7 @@ do
                 widget.fontObj:SetFont(headerFont, appearance.db.profile.fontSizeNormal, outlined)
             end
             local colSpan = 1
-            if not widget.config.right then 
+            if not widget.config.right and widget.x == 1 then 
                colSpan = 2
             end
             if widget.y and widget.buffer ~= "" then
@@ -918,29 +918,32 @@ local tbl
 function mod:CreateLines()
     local llines = {}
     local j = 0
-    self:ClearLines()
     for i, v in ipairs(self.db.profile.lines) do
         if not v.deleted and v.enabled and v.left then
+            v = copy(v)
             j = j + 1
             llines[j] = copy(v)
             llines[j].config = copy(v)
+
             v.value = v.left
             v.outlined = v.leftOutlined
-            local update = v.update
-            if v.left and v.leftUpdating then v.update = 0 end
             v.color = v.colorL
             v.maxWidth = v.maxWidthL
             v.minWidth = v.minWidthL
+            local update = v.update or 0
+            v.update = 0
+            if v.left and v.leftUpdating then v.update = update end
             llines[j].leftObj = v.left and WidgetText:New(mod.core, v.name .. " (left)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
-			if v.left and not v.leftUpdating then llines[j].leftObj.timer:Set(0) end
+
             v.value = v.right
             v.outlined = v.rightOutlined
-            if v.right and not v.rightUpdating then v.update = update end
+            v.update = 0
+            if v.right and v.rightUpdating then v.update = update end
             v.color = v.colorR
             v.maxWidth = v.maxWidthR
             v.minWidth = v.minWidthR
             llines[j].rightObj = v.right and WidgetText:New(mod.core, v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
-			if v.right and not v.rightUpdating then llines[j].rightObj.timer:Set(0) end
+
            if v.left then
                llines[j].leftObj.fontObj = _G[v.name .. "Left"] or CreateFont(v.name .. "Left")
            end
@@ -1161,9 +1164,6 @@ function mod:RebuildOpts()
                         get = function() return v.leftUpdating end,
                         set = function(info, val)
                             v.leftUpdating = val
-                            if (v.update or 0) == 0 then
-                                v.update = 500
-                            end
                             v.leftUpdatingDirty = true
                             self:CreateLines()
                         end,
@@ -1176,9 +1176,6 @@ function mod:RebuildOpts()
                         get = function() return v.rightUpdating end,
                         set = function(info, val)
                             v.rightUpdating = val
-                            if (v.update or 0) == 0 then
-                                v.update = 500
-                            end
                             v.rightUpdatingDirty = true
                             self:CreateLines()
                         end,
@@ -1260,6 +1257,18 @@ function mod:RebuildOpts()
                             self:CreateLines()
                         end,
                         order = 9
+                    },
+                    updateAnyways = {
+			name = L["Update Anyways"],
+			desc = L["Line segments won't update if the text never changes. Enable this option to bypass this restriction"],
+			type = "toggle",
+			get = function() return v.updateAnyways end,
+			set = function(info, val)
+				v.updateAnyways = val
+				v.updateAnywayDirty = true
+				self:CreateLines()
+			end,
+			order = 10
                     },
 --[[
                     wordwrap = {
@@ -1450,6 +1459,7 @@ function mod:RebuildOpts()
                                     return tostring(v.update or WidgetText.defaults.update)
                                 end,
                                 set = function(info, val)
+print("lolol")
                                     v.update = tonumber(val)
                                     v.updateDirty = true
                                     self:CreateLines()
