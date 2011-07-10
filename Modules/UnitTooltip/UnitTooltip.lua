@@ -1074,9 +1074,26 @@ function mod:RebuildOpts()
             name = L["Add Line"],
             desc = L["Give the line a name"],
             type = "input",
+            validate = function(info, v) 
+                for k, line in pairs(self.db.profile.lines) do
+			if line.name == v and not v.deleted then 
+				StarTip:Print(format(L["A line named %s already exists."], v))
+				return false
+			end
+		end
+		return true
+            end,
             set = function(info, v)
                 if v == "" then return end
-                tinsert(self.db.profile.lines, {name = v, left = nil, right = nil, update=500, enabled = true})
+		local key
+		for k, v in pairs(self.db.profile.lines) do
+			if v.name == v then
+				key = k
+				break
+			end
+		end
+		if key then tremove(self.db.profile.lines, key) end
+                tinsert(self.db.profile.lines, {name = v, left = nil, right = nil, update=500, enabled = true, custom=true})
                 self:RebuildOpts()
                 StarTip:RebuildOpts()
                 self:ClearLines()
@@ -1528,7 +1545,7 @@ print("lolol")
                                 order = 10
                             },
                             limited = {
-                                name = L["Clip length"],
+                                name = L["Clip Length"],
                                 desc = L["Whether to clip the string's length when it is longer than the value of Columns."],
                                 type = "toggle",
                                 get = function()

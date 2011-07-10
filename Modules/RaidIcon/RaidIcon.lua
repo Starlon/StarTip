@@ -64,7 +64,7 @@ end
 
 function mod:GetOptions()
 	local options = {
-		pvp = {
+		icon = {
 			name = L["Raid Icon"],
 			type = "group",
 			args = {
@@ -107,7 +107,7 @@ function mod:GetOptions()
 	}
 	
 	for i, point in ipairs(self.db.profile.points) do
-		options.pvp.args["point" .. i] = {
+		options.icon.args["point" .. i] = {
 			name = "Point #" .. i,
 			type = "group",
 			order = i + 1,

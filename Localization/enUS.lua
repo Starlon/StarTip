@@ -1,5 +1,10 @@
+local debug = false
+--[===[@debug@
+debug = true
+--@end-debug@]===]
+
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
-local L = AceLocale:NewLocale("StarTip", "enUS", true, true)
+local L = AceLocale:NewLocale("StarTip", "enUS", true, debug)
 if not L then return end
 
 L["Welcome to "] = true
@@ -40,6 +45,8 @@ L["Inverted Modifier"] = true
 L["Whether to invert what happens when a key is pressed or not, i.e. show and hide."] = true
 L["Greetings"] = true
 L["Whether the greetings message should be shown or not"] = true
+L["Restart Timers"] = true
+L["Would you like to restart your timers? Note that this will restart all timers."] = true
 
 
 -- UnitTooltip
@@ -137,6 +144,7 @@ L["Fails: %d"] = true
 L["Threat"] = true
 -- UnitTooltip options
 L["Add Line"] = true
+L["A line named %s already exists."] = true
 L["Give the line a name"] = true
 L["Refresh Rate"] = true
 L["The rate at which the tooltip will be refreshed"] = true
@@ -202,6 +210,11 @@ L["Left Color"] = true
 L["Background color for left segment. Return r, g, b, and a."] = true
 L["Right Color"] = true
 L["Background color for right segment. Return r, g, b, and a."] = true
+L["Update Anyways"] = true
+L["Line segments won't update if the text never changes. Enable this option to bypass this restriction"] = true
+L["How fast to scroll marquee text."] = true
+L["Clip Length"] = true
+L["Whether to clip the string's length when it is longer than the value of Columns."] = true
 
 -- Mouse Gestures
 L["Left Button"] = true
@@ -219,6 +232,8 @@ L["Delete this widget"] = true
 
 
 -- Appearance
+L["Bold Font"] = true
+L["Set the tooltip's bold font"] = true
 L["Scale Slider"] = true
 L["Adjust tooltip scale"] = true
 L["Tooltip Font"] = true
@@ -300,12 +315,26 @@ L["Restore Defaults"] = true
 L["Toggle whether this histogram is enabled or not."] = true
 
 -- Portrait
+L["Whether to show a portrait on the item tooltip."] = true
+L["Whether to show a portrait on the spell tooltip."] = true
+L["Whether to show a portrait on the default unit tooltip."] = true
+L["Whether to show a portrait on the main QTip tooltip."] = true
+L["Item Tooltip"] = true
+L["Spell Tooltip"] = true
+L["Tooltip Main"] = true
+L["Whether to show the portrait as a 3d model (toggled true) or a 2d model (toggled false)"] = true
+L["Default Unit Tooltip"] = true
 L["Size"] = true
 L["The square portrait's width and height"] = true
 L["3d Model"] = true
 L["Whether to show the portrait as a 3d model (toggled true) or a 2d model (toggled false)"] = true
 
 -- Position
+L["Left"] = true
+L["Right"] = true
+L["Top"] = true
+L["Bottom"] = true
+L["Offscreen"] = true
 L["World Units"] = true
 L["Where to anchor the tooltip when mousing over world characters"] = true
 L["X-axis offset: %d-%d"] = true
