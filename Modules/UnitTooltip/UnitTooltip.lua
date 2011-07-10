@@ -96,7 +96,8 @@ return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
         enabled = true,
         cols = 80,
         leftOutlined = 3,
-	leftUpdating = true
+	leftUpdating = true,
+	update = 500
     },
     [2] = {
         name = "Target",
