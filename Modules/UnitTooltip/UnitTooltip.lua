@@ -41,7 +41,6 @@ local function errorhandler(err)
 end
 local ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_MARQUEE, ALIGN_AUTOMATIC, ALIGN_PINGPONG = 1, 2, 3, 4, 5, 6
 local SCROLL_RIGHT, SCROLL_LEFT = 1, 2
---mod.NUM_LINES = 0
 local function copy(src, dst)
     if type(src) ~= "table" then return nil end
     if type(dst) ~= "table" then dst = {} end

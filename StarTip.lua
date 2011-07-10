@@ -481,7 +481,7 @@ function StarTip:OnInitialize()
 	self.leftLines = {}
 	self.rightLines = {}
 	--self.qtipLines = {}
-	for i = 1, 50 do
+	for i = 1, 70 do
 		GameTooltip:AddDoubleLine(' ', ' ')
 		self.leftLines[i] = _G["GameTooltipTextLeft" .. i]
 		self.rightLines[i] = _G["GameTooltipTextRight" .. i]
