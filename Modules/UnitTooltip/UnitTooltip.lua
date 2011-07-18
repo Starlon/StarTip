@@ -286,7 +286,7 @@ return value
         rightUpdating = true,
         enabled = true,
         update = 1000,
-	colorR = "return 0, 0, 0, 1",
+	colorR = "",
     },
     [15] = {
         name = L["Effects"],
