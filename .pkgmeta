@@ -50,7 +50,7 @@ externals:
         url: git://github.com/tekkub/libdatabroker-1-1.git
         tag: v1.1.4
     Libs/LibScriptable-1.0:
-        url: git://github.com/Starlon/LibVisual-0.5.git
+        url: git://github.com/Starlon/LibScriptable-1.0.git
     Libs/LibFlash: 
         url: git://github.com/Starlon/LibFlash.git
 
