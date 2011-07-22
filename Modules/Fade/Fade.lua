@@ -128,7 +128,7 @@ local checkTooltipAlpha = function()
 end
 
 function mod:OnShow()
-	if UnitExists(StarTip.unit) or self.isUnit  then
+	if self.isUnit  then
 		updateExistenceFrame:SetScript("OnUpdate", checkExistence)
 	else
 		updateAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
@@ -197,4 +197,14 @@ end
 function mod:SetUnit()
 	self.isUnit = true
 	updateExistenceFrame:SetScript("OnUpdate", checkExistence)
+end
+
+function mod:SetItem()
+	self.isUnit = false
+	updateExistenceFrame:SetScript("OnUpdate", checkExistence)
+end
+
+function mod:SetSpell()
+	self.isUnit = false
+	updateExistenceFrame:SetScript("OnUpdate", nil)
 end
