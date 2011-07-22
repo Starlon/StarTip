@@ -91,7 +91,6 @@ local updateAlphaFrame = CreateFrame("Frame")
 
 local checkExistence = function()
 	if not UnitExists(StarTip.unit or "mouseover") and mod.isUnit then
-print("llolllll")
 		updateExistenceFrame:SetScript("OnUpdate", nil)
 		local kind
 		if StarTip.unit == "mousever" then
