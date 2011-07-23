@@ -215,7 +215,9 @@ L["Line segments won't update if the text never changes. Enable this option to b
 L["How fast to scroll marquee text."] = true
 L["Clip Length"] = true
 L["Whether to clip the string's length when it is longer than the value of Columns."] = true
-
+L["Dog Tags"] = true
+L["Whether to parse the return values as DogTags or not."] = true
+ 
 -- Mouse Gestures
 L["Left Button"] = true
 L["Right Button"] = true

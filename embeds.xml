@@ -37,7 +37,8 @@
 <Include file = "Libs\LibTalentQuery-1.0\lib.xml" />
 <Include file = "Libs\LibGroupTalents-1.0\lib.xml" />
 <Include file = "Libs\LibFail-2.0\lib.xml"/> 
+<Include file = "Libs\LibDogTag-3.0\lib.xml"/>
+<Include file = "Libs\LibDogTag-Unit-3.0\lib.xml"/>
 
 <Include file = "Libs\LibScriptable-1.0\LibScriptable-1.0.xml"/>
-
 </Ui>

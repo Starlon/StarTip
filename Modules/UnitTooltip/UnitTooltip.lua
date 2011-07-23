@@ -1289,6 +1289,18 @@ function mod:RebuildOpts()
 			end,
 			order = 10
                     },
+                    dogtag = {
+                        name = L["Dog Tags"],
+                        desc = L["Whether to parse the return values as DogTags or not."],
+                        type = "toggle",
+                        get = function() return v.dogtag end,
+                        set = function(info, val) 
+                            v.dogtag = val
+                            v.dogtagDIrty = true
+                            self:CreateLines()
+                        end,
+                        order = 11
+                    },
 --[[
                     wordwrap = {
                         name = L["Word Wrap"],
