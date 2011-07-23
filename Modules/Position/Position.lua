@@ -407,7 +407,7 @@ local positionMainTooltip = function()
 
 	tooltip:ClearAllPoints()
 	tooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", 
-		x / effScale, y / effScale)
+		(x + xoffset) / effScale, (y + yoffset) / effScale)
 end
 
 
