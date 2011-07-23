@@ -128,7 +128,7 @@ local checkTooltipAlpha = function()
 end
 
 function mod:OnShow()
-	if self.isUnit  then
+	if self.isUnit and UnitExists(StarTip.unit) then
 		updateExistenceFrame:SetScript("OnUpdate", checkExistence)
 	else
 		updateAlphaFrame:SetScript("OnUpdate", checkTooltipAlpha)
