@@ -457,8 +457,8 @@ local function delayAnchor()
 			isUnitTooltip = true
 			fakeUpdateFrame:SetScript("OnUPdate", positionMainTooltip)
 			positionMainTooltip()
-			updateFrame:SetScript("OnUpdate", positionTooltip)
 		end
+		updateFrame:SetScript("OnUpdate", positionTooltip)
 		positionTooltip()
 		
 	else
@@ -466,7 +466,6 @@ local function delayAnchor()
 		if fakeUpdateFrame:GetScript("OnUpdate") then fakeUpdateFrame:SetScript("OnUpdate", nil) end
 		StarTip.tooltipMain:ClearAllPoints()
 		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
-		hideGameTooltip()
 	end
 end
 
