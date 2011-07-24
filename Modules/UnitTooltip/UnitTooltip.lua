@@ -274,8 +274,11 @@ if not UnitExists(unit) then self:Stop(); return self.lastMana end
 local mana = Power(unit)
 local maxMana = MaxPower(unit)
 local r, g, b = PowerColor(nil, unit)
+local h, s, v = RGB2HSV(r, g, b)
+s = .5
+r, g, b = HSV2RGB(h, s, v)
 local value = L["Unknown"]
-if maxMana == 100 then
+if maxMana == 100 or maxMana == 120 then
     value = Colorize(tostring(mana), r, g, b)
 elseif maxMana ~= 0 then
     value = Colorize(format("%s/%s (%d%%)", Short(mana, true), Short(maxMana, true), mana/maxMana*100), r, g, b)
