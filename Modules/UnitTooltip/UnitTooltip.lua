@@ -249,13 +249,13 @@ return L["Alive"]
         left = 'return L["Health:"]',
         right = [[
 if not UnitExists(unit) then self:Stop(); return self.lastHealth end
-local health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
+local health, maxHealth = HP(unit), MaxHP(unit)
 local r, g, b = HPColor(health, maxHealth)
 local value = L["Unknown"]
 if maxHealth == 100 then
     value = Colorize(health .. "%", r, g, b)
 elseif maxHealth ~= 0 then
-    value = Colorize(format("%s/%s (%d%%)", short(health), short(maxHealth), health/maxHealth*100), r, g, b)
+    value = Colorize(format("%s/%s (%d%%)", Short(health, true), Short(maxHealth, true), health/maxHealth*100), r, g, b)
 end
 self.lastHealth = value
 return value
@@ -271,14 +271,14 @@ return PowerName(unit)
 ]],
         right = [[
 if not UnitExists(unit) then self:Stop(); return self.lastMana end
-local mana = UnitMana(unit)
-local maxMana = UnitManaMax(unit)
+local mana = Power(unit)
+local maxMana = MaxPower(unit)
 local r, g, b = PowerColor(nil, unit)
 local value = L["Unknown"]
 if maxMana == 100 then
     value = Colorize(tostring(mana), r, g, b)
 elseif maxMana ~= 0 then
-    value = Colorize(format("%s/%s (%d%%)", short(mana), short(maxMana), mana/maxMana*100), r, g, b)
+    value = Colorize(format("%s/%s (%d%%)", Short(mana, true), Short(maxMana, true), mana/maxMana*100), r, g, b)
 end
 self.lastMana = value
 return value
@@ -962,7 +962,7 @@ function mod:CreateLines()
             v.color = v.colorR
             v.maxWidth = v.maxWidthR
             v.minWidth = v.minWidthR
-            llines[j].rightObj = v.right and WidgetText:New(mod.core, "StarTip.UnitTooltip: " .. v.name .. " (right)", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
+            llines[j].rightObj = v.right and WidgetText:New(mod.core, "StarTip.UnitTooltip:" .. v.name .. ":right:", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
 
            if v.left then
                llines[j].leftObj.fontObj = _G[v.name .. "Left"] or CreateFont(v.name .. "Left")

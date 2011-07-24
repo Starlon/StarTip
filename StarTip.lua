@@ -40,7 +40,7 @@ local function disableUT(name, side)
 		if(v.name == name) then
 			UT.db.profile.lines[k].enabled = false
 			UT:CreateLines()
-			StarTip:Print(format(L["StarTip disabled a tooltip line named %s due to an error in the line's %s segment."], v.name, side))
+			error(format(L["StarTip disabled a tooltip line named %s due to an error in the line's %s segment."], v.name, side))
 		end
 	end
 end
@@ -51,10 +51,10 @@ do
 	function onError(event, errorObject)
 		for k, v in pairs(addon:GetErrors(BugGrabber:GetSessionId())) do
 			if type(v.message) == "string" then
-				v.message:gsub('t.*StarTip\.UnitTooltip:(.*):left:.*', function(name)
+				v.message:gsub('t.*StarTip\.UnitTooltip:(.-):left:.*', function(name)
 					disableUT(name, "left")
 				end)
-				v.message:gsub('t.*StarTip\.UnitTooltip:(.*):right:.*', function(name)
+				v.message:gsub('t.*StarTip\.UnitTooltip:(.-):right:.*', function(name)
 					disableUT(name, "right")
 				end)
 			end
