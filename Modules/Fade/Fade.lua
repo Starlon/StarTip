@@ -71,6 +71,7 @@ local options = {
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
+	self:SecureHook("GameTooltip_SetDefaultAnchor")
 end
 
 function mod:OnEnable()
@@ -85,15 +86,21 @@ function mod:GetOptions()
 	return options
 end
 
+function mod:GameTooltip_SetDefaultAnchor(this, owner)
+	if owner ~= UIParent and mod.isUnit then -- This is terrible. Fixes a bug, but it likely introduces another bug related to passing over unit frames. Didn't seem to bother anything in a BG test.
+		StarTip.tooltipMain:Hide()
+	end
+end
+
 -- CowTip's solution below
 local updateExistenceFrame = CreateFrame("Frame")
 local updateAlphaFrame = CreateFrame("Frame")
 
 local checkExistence = function()
-	if not UnitExists(StarTip.unit or "mouseover") and mod.isUnit then
+	if not UnitExists(StarTip.unit) and mod.isUnit then
 		updateExistenceFrame:SetScript("OnUpdate", nil)
 		local kind
-		if StarTip.unit == "mousever" then
+		if GameTooltip:GetOwner() == UIParent then
 			kind = self.db.profile.units
 		else
 			kind = self.db.profile.unitFrames
@@ -201,7 +208,7 @@ end
 
 function mod:SetItem()
 	self.isUnit = false
-	updateExistenceFrame:SetScript("OnUpdate", checkExistence)
+	updateExistenceFrame:SetScript("OnUpdate", nil)
 end
 
 function mod:SetSpell()
