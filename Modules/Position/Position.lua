@@ -350,7 +350,7 @@ end
 
 local getIndex = function(owner)
 	local index
-	if UnitExists(StarTip.unit) then
+	if GameTooltip:GetUnit() and UnitExists(StarTip.unit) then
 		if InCombatLockdown() then
 			index = self.db.profile.inCombat
 		elseif owner == UIParent then
@@ -446,33 +446,44 @@ local function delayAnchor()
 	local owner = currentOwner
 	setOffsets(owner)
 	local index = getIndex(owner)
+
 	if index == #selections then
 		this:Hide()
 		return
 	elseif StarTip.anchors[index]:find("^CURSOR_")  then
-		oldX, oldY = 0, 0
 		currentAnchor = StarTip.opposites[StarTip.anchors[index]:sub(8)]
 		isUnitTooltip = false
 		if GameTooltip:GetUnit() then
 			isUnitTooltip = true
-			fakeUpdateFrame:SetScript("OnUPdate", positionMainTooltip)
+			fakeUpdateFrame:SetScript("OnUpdate", positionMainTooltip)
 			positionMainTooltip()
 		end
 		updateFrame:SetScript("OnUpdate", positionTooltip)
 		positionTooltip()
-	else
-		if updateFrame:GetScript("OnUpdate") then updateFrame:SetScript("OnUpdate", nil) end
-		if fakeUpdateFrame:GetScript("OnUpdate") then fakeUpdateFrame:SetScript("OnUpdate", nil) end
+	elseif GameTooltip:GetUnit() then
+		updateFrame:SetScript("OnUpdate", nil)
+		fakeUpdateFrame:SetScript("OnUpdate", nil)
 		StarTip.tooltipMain:ClearAllPoints()
 		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
-		hideGameTooltip()
+	else
+		updateFrame:SetScript("OnUpdate", nil)
+		fakeUpdateFrame:SetScript("OnUpdate", nil)
+		GameTooltip:ClearAllPoints()
+		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
 	end
 end
 
 function mod:GameTooltip_SetDefaultAnchor(this, owner)
 	currentOwner = owner
 	currentThis = this
-	delayFrame:SetScript("OnUpdate", delayAnchor)
+	local index = getIndex(owner)
+	local ownername = owner:GetName()
+
+	if owner == MainMenuMicroButton then -- This one is troublesome, so single it out and anchor right away.
+		delayAnchor() 
+	else
+		delayFrame:SetScript("OnUpdate", delayAnchor)
+	end
 end
 
 function mod:REGEN_DISABLED()
@@ -511,3 +522,9 @@ function mod:SetItem()
 	end
 end
 
+function mod:SetUnit()
+	local index = getIndex(currentOwner)
+	if not StarTip.anchors[index]:find("^CURSOR_") then
+		hideGameTooltip()
+	end
+end
