@@ -843,7 +843,7 @@ do
 		draw(true)
 	end
     end
-    local fontsList = LSM:List("font")
+    --local fontsList = LSM:List("font")
     function draw(bypass)
         if not UnitExists(StarTip.unit) then 
 		mod.timer:Stop()
@@ -867,8 +867,8 @@ do
         end
 ]]
         for i, widget in ipairs(widgetsToDraw) do
-            local font = LSM:Fetch("font", fontsList[appearance.db.profile.font])
-            local headerFont = LSM:Fetch("font", fontsList[appearance.db.profile.headerFont])
+            local font = LSM:Fetch("font", appearance.db.profile.font)
+            local headerFont = LSM:Fetch("font", appearance.db.profile.headerFont)
             local justification = "LEFT"
             if widget.x == 2 then
                 justification = "RIGHT"
@@ -882,9 +882,9 @@ do
                 end
             end
             if widget.y == 1 then
-		widget.fontObj:SetFont(font, appearance.db.profile.fontSizeHeader, outlined)
+		widget.fontObj:SetFont(headerFont, appearance.db.profile.fontSizeHeader, outlined)
             else
-                widget.fontObj:SetFont(headerFont, appearance.db.profile.fontSizeNormal, outlined)
+                widget.fontObj:SetFont(font, appearance.db.profile.fontSizeNormal, outlined)
             end
             local colSpan = 1
             if not widget.config.right and widget.x == 1 then 
