@@ -129,6 +129,13 @@ else
     r, g, b = UnitSelectionColor(unit)
 end
 
+if UnitIsUnit(unit, "player") then
+	self.speed = 200
+	self.align = WidgetText.ALIGN_LEFT
+	self.direction = WidgetText.SCROLL_RIGHT
+	self.width = 500
+end
+
 return dt:format(r, g, b)
 ]],
 	unitOverride = "mouseovertarget",

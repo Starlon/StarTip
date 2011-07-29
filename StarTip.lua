@@ -19,6 +19,7 @@ local LibCore = LibStub("LibScriptableLCDCoreLite-1.0")
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
 local PluginTalents = LibStub("LibScriptablePluginTalents-1.0")
 local WidgetTimer = LibStub("LibScriptableWidgetTimer-1.0")
+local LibWidget = LibStub("LibScriptableWidget-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -187,7 +188,7 @@ local defaults = {
 		otherFrameShow = 1,
 		errorLevel = 2,
 		throttleVal = 0,
-		intersectRate = 200,
+		intersectRate = 500,
 		modifierInverse = false,
 		message = true
 	}
@@ -492,6 +493,8 @@ function StarTip:OnInitialize()
 	self.core = LibCore:New(environment, "StarTip", self.db.profile.errorLevel)
 	GameTooltip:Show()
 	GameTooltip:Hide()
+
+	self.intersectTimer = LibTimer:New("IntersectTimer", self.db.profile.intersectRate, false, LibWidget.IntersectUpdate, StarTip.tooltipMain)
 end
 
 StarTip.cellProvider, StarTip.cellPrototype = LQT:CreateCellProvider()
@@ -535,15 +538,19 @@ StarTip.tooltipMain.Show = function()
 	StarTip.tooltipMain.flash:Stop()
 	StarTip.tooltipMain:ShowReal()
 	StarTip.tooltipMain:SetAlpha(1)
+	StarTip.intersectTimer:Start()
+	StarTip:Print("ok wtf")
 end
 StarTip.tooltipMain.HideReal = StarTip.tooltipMain.Hide
 StarTip.tooltipMain.Hide = function()
 	StarTip.tooltipMain.flash:Stop()
 	StarTip.tooltipMain:HideReal()
+	StarTip.intersectTimer:Stop()
+	StarTip:Print("hmmmmm")
 end
 StarTip.tooltipMain.FadeOut = function()
-	if StarTip.tooltipMain:IsShown() and StarTip.tooltipMain:GetAlpha() == 1 then
-		StarTip.tooltipMain.flash:FadeOut(1, 1, 0)
+	if StarTip.tooltipMain:IsShown() and StarTip.tooltipMain:GetAlpha() > 0 then
+		StarTip.tooltipMain.flash:FadeOut(1, StarTip.tooltipMain:GetAlpha(), 0, StarTip.tooltipMain.Hide)
 	end
 end
 
@@ -611,6 +618,8 @@ function StarTip:OnEnable()
 	if self.db.profile.message then
 		ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon. You can turn off this message under Settings."], 1, 1, 0))
 	end
+	StarTip.widgetMain = LibWidget:New(StarTip.tooltipMain, StarTip, "tooltipMain", {}, 0, 0, 0, {"generic"}, self.db.profile.errorLevel)
+	StarTip.widgetMain.frame = StarTip.tooltipMain
 end
 
 function StarTip:OnDisable()
@@ -876,8 +885,6 @@ function StarTip:OnTooltipHide(...)
 	end
 	self.justHide = nil
 	self.unit = false
-	if hideTimer then hideTimer:Stop() end
-	if throttleTimer then throttleTimer:Stop() end
 	return self.hooks[GameTooltip].OnHide(...)  	
 end
 
