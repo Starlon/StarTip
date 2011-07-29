@@ -117,7 +117,7 @@ return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 if not UnitExists(unit) then return L["None"] end
 
 local dt = '\
-[IsPlayer and "<YOU>":ClassColor or Color(Name, %f, %f, %f)  \
+[IsUnit("player") and "<YOU>":ClassColor or Color(Name, %f, %f, %f ) \
 (if PvP then \
  "++":Red \
 end)]'
@@ -960,6 +960,7 @@ function mod:CreateLines()
             local update = v.update or 0
             v.update = 0
             if v.left and v.leftUpdating then v.update = update end
+            mod.core.environment.unit = StarTip.unit or "player"
             llines[j].leftObj = v.left and WidgetText:New(mod.core, "StarTip.UnitTooltip:" .. v.name .. ":left:", copy(v), 0, 0, v.layer or 0, StarTip.db.profile.errorLevel, widgetUpdate)
 
             v.value = v.right

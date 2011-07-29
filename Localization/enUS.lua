@@ -217,6 +217,8 @@ L["Clip Length"] = true
 L["Whether to clip the string's length when it is longer than the value of Columns."] = true
 L["Dog Tags"] = true
 L["Whether to parse the return values as DogTags or not."] = true
+L["Unit Override"] = true
+L["There's a default unit provided to each run environment, and you access it with 'unit' in your script. These \"units\" include 'mouseover', 'target', 'party1', etc... Here you can override that unit specifier."] = true
  
 -- Mouse Gestures
 L["Left Button"] = true
