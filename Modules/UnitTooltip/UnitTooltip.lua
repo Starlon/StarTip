@@ -113,6 +113,7 @@ return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 -- inside your dog tag. Do that by repeating the '\' character.
 -- Example: return "\\ FOO \\"
 -- Would print "\ FOO \"
+
 if not UnitExists(unit) then return L["None"] end
 
 local dt = '\
