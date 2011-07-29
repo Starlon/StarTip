@@ -154,7 +154,8 @@ local defaults = {
 	profile = {
 		classColors = true,
 		histograms = {},
-		intersect = true
+		intersect = true,
+		intersectRate = 500
 	}
 }
 
@@ -198,8 +199,8 @@ local optionsDefaults = {
 }
 
 local intersectUpdate = function()
-	if type(mod.histograms) == "table" then
-		WidgetHistogram.IntersectUpdate(mod.histograms)
+	for i, w in ipairs(widgets) do
+		w:IntersectUpdate()
 	end
 end
 
@@ -293,6 +294,7 @@ local function createHistograms()
 			if not mod.histograms then mod.histograms = {} end
 			if not widget then
 				widget = WidgetHistogram:New(StarTip.core, v.name, v, v.row or 0, v.col or 0, 0, StarTip.db.profile.errorLevel, updateHistogram)
+				tinsert(widgets, widget)
 				widget.persistent = v.persistent
 				newWidget = true
 				for i = 0, v.width - 1 do
@@ -381,7 +383,8 @@ end
 function mod:OnEnable()	
 	StarTip:SetOptionsDisabled(options, false)
 	if StarTip.db.profile.intersectRate > 0 then
-		self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", self.db.profile.intersectRate or 200, true, intersectUpdate)
+		self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", self.db.profile.intersectRate or 500, true, intersectUpdate)
+		self.intersectTimer:Start()
 	end
 	self:ClearHistograms()
 	self:CreateHistograms()

@@ -103,24 +103,39 @@ return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
         name = "Target",
         left = 'return L["Target:"]',
         right = [[
-if not UnitExists(unit) then return lastTarget or "None" end
+-- Here's an example of how to deal with DogTag support.
+-- Note that you have to consider which quote characters
+-- you are using to contain the entire dog tag within,
+-- as opposed what you're using inside. Here I'm using `'` surrounding 
+-- everything, and I'm using `"` within the dog tag itself.
+-- Also, each new line inside a string should end with a '\'.
+-- Also note; you'll have to "escape" where you wish to enter a '\' character
+-- inside your dog tag. Do that by repeating the '\' character.
+-- Example: return "\\ FOO \\"
+-- Would print "\ FOO \"
+if not UnitExists(unit) then return L["None"] end
+
+local dt = '\
+[IsPlayer and "<YOU>":ClassColor or Color(Name, %f, %f, %f)  \
+(if PvP then \
+ "++":Red \
+end)]'
+
 local r, g, b
-local unit = (unit or "mouseover") .. "target"
 if UnitIsPlayer(unit) then
     r, g, b = ClassColor(unit)
 else
     r, g, b = UnitSelectionColor(unit)
 end
-local name = UnitName(unit)
-local name2 = UnitName("player")
-if name == name2 and Realm(unit) == Realm("player") then name = "<<YOU>>" end
-local str = name and Colorize(name, r, g, b) or "None"
-lastTarget = str
-return str
+
+return dt:format(r, g, b)
 ]],
+	unitOverride = "mouseovertarget",
         rightUpdating = true,
-        update = 1000,
-        enabled = true
+	leftUpdating = true,
+        update = 500,
+        enabled = true,
+	dogtag = true
     },
     [3] = {
         name = L["Guild"],
@@ -144,7 +159,7 @@ end
     },
     [5] = {
         name = L["Realm"],
-        left = 'return L["Realm:"]',
+        left = 'if Realm(unit) then return L["Realm:"] end',
         right = [[
 return Realm(unit)
 ]],
@@ -465,18 +480,6 @@ return select(2, GetRole(unit))
     [22] = {
         name = "Avg Item Level",
         left = [[
-local mod = _G.StarTip:GetModule("UnitTooltip")
-if mod then
-    for i = 1, #mod.db.profile.lines do
-        local line = mod.db.profile.lines[i]
-        if line and line.name == "Avg Item Level" and line.default then
-             line.deleted = true
-             mod:ClearLines()
-             mod:CreateLines()
-             break
-        end
-    end 
-end
 if not UnitExists(unit) then return "" end
 return "Item Level:"
 ]],
@@ -990,7 +993,7 @@ function mod:CreateLines()
                     v.rightObj.y = nil
                 end
                 local left, right = '', ''
-                environment.unit = StarTip.unit
+                environment.unit = v.leftObj and v.leftObj.unitOverride or StarTip.unit or "mouseover"
                 if v.right then
                     if v.rightObj then
                         environment.self = v.rightObj
@@ -1303,6 +1306,18 @@ function mod:RebuildOpts()
                             self:CreateLines()
                         end,
                         order = 11
+                    },
+                    unitOverride = {
+                        name = L["Unit Override"],
+                        desc = L["There's a default unit provided to each run environment, and you access it with 'unit' in your script. These \"units\" include 'mouseover', 'target', 'party1', etc... Here you can override that unit specifier."],
+			type = "input",
+			get = function() return v.unitOverride end,
+			set = function(info, val)
+				v.unitOverride = val
+				v.unitOverrideDirty = true
+				self:CreateLines()
+			end,
+			order = 12
                     },
 --[[
                     wordwrap = {

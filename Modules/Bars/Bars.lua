@@ -198,7 +198,10 @@ local optionsDefaults = {
 
 local intersectTimer
 local intersectUpdate = function()
-	WidgetBar.IntersectUpdate(mod.bars or {})
+	for i, w in ipairs(widgets) do
+		assert(type(w.IntersectUpdate) == "function", "widget.IntersectUpdate should be a function.")
+		w:IntersectUpdate()
+	end
 end
 
 
@@ -289,6 +292,7 @@ local function createBars()
 			if not widget then
 				local bar = new(v.parent)
 				widget = WidgetBar:New(StarTip.core, v.name, copy(v), v.row or 0, v.col or 0, v.layer or 1, StarTip.db.profile.errorLevel, updateBar, bar)
+				tinsert(widgets, widget)
 				bar:SetStatusBarTexture(LSM:Fetch("statusbar", v.texture1))
 				bar:ClearAllPoints()
 				if widget.orientation == WidgetBar.ORIENTATION_VERTICAL then
