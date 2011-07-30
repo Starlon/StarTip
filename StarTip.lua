@@ -189,7 +189,7 @@ local defaults = {
 		otherFrameShow = 1,
 		errorLevel = 2,
 		throttleVal = 0,
-		intersectRate = 1000,
+		intersectRate = 0,
 		modifierInverse = false,
 		message = true
 	}
