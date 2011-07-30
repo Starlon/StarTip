@@ -181,7 +181,7 @@ local defaults = {
 		modules = {},
 		timers = {},
 		minimap = {hide=true},
-		widgetMain = {frameName="StarTipTooltipMain", intersectFrameName="ChatFrame1", strata=1, level=1, alwaysShown=false, intersect=true, intersectxPad1 = 0, intersectyPad1 = 0, intersectxPad2 = 0, intersectyPad2 = 0, insersectPad = 0, minStrata=5},
+		tooltipMain = {frameName="StarTipTooltipMain", intersectFrameName="ChatFrame1", strata=1, level=1, alwaysShown=false, intersect=true, intersectxPad1 = 0, intersectyPad1 = 0, intersectxPad2 = 0, intersectyPad2 = 0, insersectPad = 0, minStrata=5, scriptFrame, hideScript = "self.frame:Hide()", showScript = "self.frame:Show()", hiddenScript = "return not self.frame:IsShown()", shownScript = "return self.frame:IsShown()"},
 		modifier = 1,
 		unitShow = 1,
 		objectShow = 1,
@@ -194,6 +194,16 @@ local defaults = {
 		message = true
 	}
 }
+
+local function makeNewTooltip()
+	local self = StarTip
+	--if self.intersectTimer then self.intersectTimer:Del() end
+	self.intersectTimer = LibTimer:New("IntersectTimer", self.db.profile.intersectRate, true, LibWidget.IntersectUpdate, nil, self.db.profile.errorLevel)
+	--if self.tooltipMain.widget then self.tooltipMain.widget:Del() end
+	self.tooltipMain.widget = LibWidget:New(StarTip.tooltipMain, StarTip, "tooltipMain", StarTip.copy(self.db.profile.tooltipMain), 0, 0, 0, {"generic"}, self.db.profile.errorLevel, StarTip.tooltipMain)
+	self.intersectTimer.data = self.tooltipMain.widget
+
+end
 			
 local modNames = {L["None"], L["Ctrl"], L["Alt"], L["Shift"]}
 local modFuncs = {function() return true end, IsControlKeyDown, IsAltKeyDown, IsShiftKeyDown}
@@ -353,8 +363,8 @@ local options = {
 					pattern = "%d",
 					get = function() return tostring(StarTip.db.profile.intersectRate) end,
 					set = function(info, v) StarTip.db.profile.intersectRate = tonumber(v) end,
-					order = 13
-				}
+					order = 14
+				},
 			}
 		}
 	}
@@ -468,7 +478,10 @@ function StarTip:OnInitialize()
 	self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-	
+
+	options.args.settings.args.tooltipMain = LibWidget:GetOptions(StarTip.db.profile.tooltipMain, makeNewTooltip)
+	options.args.settings.args.tooltipMain.args.add = nil
+
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip-Addon", options)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("StarTip", menuoptions)
 	AceConfigDialog:SetDefaultSize("StarTip-Addon", 800, 450)
@@ -495,9 +508,7 @@ function StarTip:OnInitialize()
 	GameTooltip:Show()
 	GameTooltip:Hide()
 
-	self.intersectTimer = LibTimer:New("IntersectTimer", self.db.profile.intersectRate, true, LibWidget.IntersectUpdate, nil, self.db.profile.errorLevel)
-	StarTip.tooltipMain.widget = LibWidget:New(StarTip.tooltipMain, StarTip, "tooltipMain", StarTip.copy(self.db.profile.widgetMain), 0, 0, 0, {"generic"}, self.db.profile.errorLevel, StarTip.tooltipMain)
-	self.intersectTimer.data = StarTip.tooltipMain.widget
+	makeNewTooltip()
 end
 
 StarTip.cellProvider, StarTip.cellPrototype = LQT:CreateCellProvider()
