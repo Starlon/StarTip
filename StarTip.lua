@@ -189,7 +189,7 @@ local defaults = {
 		otherFrameShow = 1,
 		errorLevel = 2,
 		throttleVal = 0,
-		intersectRate = 500,
+		intersectRate = 1000,
 		modifierInverse = false,
 		message = true
 	}
@@ -345,7 +345,7 @@ local options = {
 					get = function() return StarTip.db.profile.message end,
 					set = function(info, v) StarTip.db.profile.message = v end,
 					order = 13
-				},--[[
+				},
 				intersectRate = {
 					name = L["Intersect Checks Rate"],
 					desc = L["The rate at which intersecting frames will be checked"],
@@ -354,7 +354,7 @@ local options = {
 					get = function() return tostring(StarTip.db.profile.intersectRate) end,
 					set = function(info, v) StarTip.db.profile.intersectRate = tonumber(v) end,
 					order = 13
-				}]]
+				}
 			}
 		}
 	}
