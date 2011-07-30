@@ -114,7 +114,10 @@ return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 -- Example: return "\\ FOO \\"
 -- Would print "\ FOO \"
 
-if not UnitExists(unit) then return L["None"] end
+self.unitOverride = unit .. "mouseover"
+self.clearOverride = true
+
+if not UnitExists(self.unitOverride) then return L["None"] end
 
 local dt = '\
 [IsUnit("player") and "<YOU>":ClassColor or Color(Name, %f, %f, %f ) \
@@ -123,22 +126,22 @@ local dt = '\
 end)]'
 
 local r, g, b
-if UnitIsPlayer(unit) then
+if UnitIsPlayer(self.unitOverride) then
     r, g, b = ClassColor(unit)
 else
-    r, g, b = UnitSelectionColor(unit)
+    r, g, b = UnitSelectionColor(self.unitOverride)
 end
 
-if UnitIsUnit(unit, "player") then
+if UnitIsUnit(self.unitOverride, "player") then
 	self.speed = 200
 	self.align = WidgetText.ALIGN_LEFT
 	self.direction = WidgetText.SCROLL_RIGHT
 	self.width = 500
 end
 
+
 return dt:format(r, g, b)
 ]],
-	unitOverride = "mouseovertarget",
         rightUpdating = true,
 	leftUpdating = true,
         update = 500,

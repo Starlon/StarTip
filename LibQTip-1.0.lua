@@ -99,7 +99,7 @@ function lib:Acquire(key, ...)
 	local tooltip = activeTooltips[key]
 
 	if not tooltip then
-		tooltip = AcquireTooltip()
+		tooltip = AcquireTooltip(tostring(key))
 		InitializeTooltip(tooltip, key)
 		activeTooltips[key] = tooltip
 	end
@@ -311,12 +311,28 @@ function labelPrototype:GetPosition() return self._line, self._column end
 ------------------------------------------------------------------------------
 local tooltipHeap = lib.tooltipHeap
 
+local trunk = {}
+
+local function newFrame(name)
+	for frame in pairs(trunk) do
+		if frame:GetName() == name then 
+			trunk[frame] = nil
+			return frame 
+		end
+	end
+	return CreateFrame("Frame", name, UIParent)
+end
+
+local function delFrame(frame)
+	trunk[frame] = true
+end
+
 -- Returns a tooltip
-function AcquireTooltip()
+function AcquireTooltip(name)
 	local tooltip = tremove(tooltipHeap)
 
 	if not tooltip then
-		tooltip = CreateFrame("Frame", nil, UIParent)
+		tooltip = newFrame(name) --CreateFrame("Frame", name, UIParent)
 
 		local scrollFrame = CreateFrame("ScrollFrame", nil, tooltip)
 		scrollFrame:SetPoint("TOP", tooltip, "TOP", 0, -TOOLTIP_PADDING)
@@ -379,6 +395,7 @@ function ReleaseTooltip(tooltip)
 
 	layoutCleaner.registry[tooltip] = nil
 	tinsert(tooltipHeap, tooltip)
+	delFrame(tooltip)
 	--@debug@
 	usedTooltips = usedTooltips - 1
 	--@end-debug@

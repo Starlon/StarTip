@@ -181,6 +181,7 @@ local defaults = {
 		modules = {},
 		timers = {},
 		minimap = {hide=true},
+		widgetMain = {frameName="ChatFrame1", frameParent="StarTipTooltipMain", strata=1, level=1, alwaysShown=false, intersect=true, intersectxPad1 = 0, intersectyPad1 = 0, intersectxPad2 = 0, intersectyPad2 = 0, insersectPad = 0, minStrata=5},
 		modifier = 1,
 		unitShow = 1,
 		objectShow = 1,
@@ -494,7 +495,9 @@ function StarTip:OnInitialize()
 	GameTooltip:Show()
 	GameTooltip:Hide()
 
-	self.intersectTimer = LibTimer:New("IntersectTimer", self.db.profile.intersectRate, false, LibWidget.IntersectUpdate, StarTip.tooltipMain)
+	self.intersectTimer = LibTimer:New("IntersectTimer", self.db.profile.intersectRate, true, LibWidget.IntersectUpdate, nil, self.db.profile.errorLevel)
+	StarTip.tooltipMain.widget = LibWidget:New(StarTip.tooltipMain, StarTip, "tooltipMain", StarTip.copy(self.db.profile.widgetMain), 0, 0, 0, {"generic"}, self.db.profile.errorLevel, StarTip.tooltipMain)
+	self.intersectTimer.data = StarTip.tooltipMain.widget
 end
 
 StarTip.cellProvider, StarTip.cellPrototype = LQT:CreateCellProvider()
@@ -504,7 +507,7 @@ function StarTip.cellPrototype:InitializeCell()
 	self.fontString:SetAllPoints(self)
 	self.fontString:SetFontObject(GameTooltipText)
 	self.r, self.g, self.b = 1, 1, 1
-	local x, y = self:GetPosition()
+	local y, x = self:GetPosition()
 	if not StarTip.qtipLines[y] then
 		StarTip.qtipLines[y] = {}
 	end 
@@ -526,10 +529,10 @@ function StarTip.cellPrototype:ReleaseCell()
 	self.r, self.g, self.b = 1, 1, 1
 end
 
-StarTip.tooltipMain = LQT:Acquire("StarTipQTipMain", 2)
+StarTip.tooltipMain = LQT:Acquire("StarTipTooltipMain", 2)
 --StarTip.tooltipMain:SetDefaultProvider(StarTip.cellProvider)
+_G["StarTipTooltipMain"] = StarTip.tooltipMain
 StarTip.tooltipMain:SetParent(UIParent)
-_G["StarTipQTipMain"] = StarTip.tooltipMain
 StarTip.tooltipMain:ClearAllPoints()
 StarTip.tooltipMain:SetPoint("CENTER")
 StarTip.tooltipMain.flash = LibFlash:New(StarTip.tooltipMain)
@@ -539,14 +542,12 @@ StarTip.tooltipMain.Show = function()
 	StarTip.tooltipMain:ShowReal()
 	StarTip.tooltipMain:SetAlpha(1)
 	StarTip.intersectTimer:Start()
-	StarTip:Print("ok wtf")
 end
 StarTip.tooltipMain.HideReal = StarTip.tooltipMain.Hide
 StarTip.tooltipMain.Hide = function()
 	StarTip.tooltipMain.flash:Stop()
 	StarTip.tooltipMain:HideReal()
 	StarTip.intersectTimer:Stop()
-	StarTip:Print("hmmmmm")
 end
 StarTip.tooltipMain.FadeOut = function()
 	if StarTip.tooltipMain:IsShown() and StarTip.tooltipMain:GetAlpha() > 0 then
@@ -581,7 +582,7 @@ function StarTip:TrunkClear()
 end
 
 StarTip.trunk = trunk
-StarTip.trunkTimer = LibTimer:New("Trunk Timer", 100, false, trunkUpdate)
+StarTip.trunkTimer = LibTimer:New("Trunk Timer", 300, false, trunkUpdate)
 
 function StarTip:OnEnable()
 	if self.db.profile.minimap.hide then
@@ -618,8 +619,6 @@ function StarTip:OnEnable()
 	if self.db.profile.message then
 		ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon. You can turn off this message under Settings."], 1, 1, 0))
 	end
-	StarTip.widgetMain = LibWidget:New(StarTip.tooltipMain, StarTip, "tooltipMain", {}, 0, 0, 0, {"generic"}, self.db.profile.errorLevel)
-	StarTip.widgetMain.frame = StarTip.tooltipMain
 end
 
 function StarTip:OnDisable()

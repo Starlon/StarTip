@@ -255,7 +255,7 @@ local function clearHistogram(obj)
 		del(v)
 		v:Hide()
 	end
-	obj:Del()
+	--obj:Del()
 end
 
 function mod:ClearHistograms()
@@ -384,7 +384,6 @@ function mod:OnEnable()
 	StarTip:SetOptionsDisabled(options, false)
 	if StarTip.db.profile.intersectRate > 0 then
 		self.intersectTimer = self.intersectTimer or LibTimer:New("Texts.intersectTimer", self.db.profile.intersectRate or 500, true, intersectUpdate)
-		self.intersectTimer:Start()
 	end
 	self:ClearHistograms()
 	self:CreateHistograms()

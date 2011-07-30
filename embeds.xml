@@ -29,7 +29,6 @@
 <Script file = "Libs\LibMouseGestures-1.0\LibMouseGestures-1.0.lua"/>
 <Script file = "Libs\LibUnitControl-1.0\LibUnitControl-1.0.lua"/>
 <Script file = "Libs\LibNameplate-1.0\LibNameplate-1.0.lua"/>
-<Script file = "Libs\LibTransition-1.0\LibTransition-1.0.lua"/>
 <Script file = "Libs\LibAlts-1.0\LibAlts-1.0.lua"/>
 <Include file = "Libs\LibLinq-1.0\lib.xml"/>
 <Include file = "Libs\LibBossIDs-1.0\lib.xml"/>
