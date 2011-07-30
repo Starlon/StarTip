@@ -181,7 +181,7 @@ local defaults = {
 		modules = {},
 		timers = {},
 		minimap = {hide=true},
-		widgetMain = {frameName="ChatFrame1", frameParent="StarTipTooltipMain", strata=1, level=1, alwaysShown=false, intersect=true, intersectxPad1 = 0, intersectyPad1 = 0, intersectxPad2 = 0, intersectyPad2 = 0, insersectPad = 0, minStrata=5},
+		widgetMain = {frameName="StarTipTooltipMain", intersectFrameName="ChatFrame1", strata=1, level=1, alwaysShown=false, intersect=true, intersectxPad1 = 0, intersectyPad1 = 0, intersectxPad2 = 0, intersectyPad2 = 0, insersectPad = 0, minStrata=5},
 		modifier = 1,
 		unitShow = 1,
 		objectShow = 1,
