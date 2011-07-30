@@ -81,12 +81,12 @@ return r, g, b
 ]],
 		height = 6,
 		length = 0,
-		points = {{"BOTTOM", "StarTipQTipMain", "TOP", 0, 0}, {"LEFT", "StarTipQTipMain", "LEFT", 5, 0}, {"RIGHT", "StarTipQTipMain", "RIGHT", -5, 0}},
+		points = {{"BOTTOM", "StarTipTooltipMain", "TOP", 0, 0}, {"LEFT", "StarTipTooltipMain", "LEFT", 5, 0}, {"RIGHT", "StarTipTooltipMain", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
 		layer = 1, 
 		level = 100,
-		parent = "StarTipQTipMain"
+		parent = "StarTipTooltipMain"
 	},
 	[2] = {
 		name = "Mana Bar",
@@ -109,12 +109,12 @@ return self.lastR, self.lastG, self.lastB
 ]],
 		height = 6,
 		length = 0,
-		points = {{"TOP", "StarTipQTipMain", "BOTTOM", 0, 0}, {"LEFT", "StarTipQTipMain", "LEFT", 5, 0}, {"RIGHT", "StarTipQTipMain", "RIGHT", -5, 0}},
+		points = {{"TOP", "StarTipTooltipMain", "BOTTOM", 0, 0}, {"LEFT", "StarTipTooltipMain", "LEFT", 5, 0}, {"RIGHT", "StarTipTooltipMain", "RIGHT", -5, 0}},
 		texture1 = LSM:GetDefault("statusbar"),
 		enabled = true,
 		layer = 1,
 		level = 100,
-		parent = "StarTipQTipMain"
+		parent = "StarTipTooltipMain"
 	},
 	[3] = {
 		name = "Threat Bar",
@@ -133,14 +133,14 @@ return status
 ]],
 		length = 6,
 		height = 0,
-		points = {{"LEFT", "StarTipQTipMain", "RIGHT", 0, 0}, {"TOP", "StarTipQTipMain", "TOP", 0, -5}, {"BOTTOM", "StarTipQTipMain", "BOTTOM", 0, 5}},
+		points = {{"LEFT", "StarTipTooltipMain", "RIGHT", 0, 0}, {"TOP", "StarTipTooltipMain", "TOP", 0, -5}, {"BOTTOM", "StarTipTooltipMain", "BOTTOM", 0, 5}},
 		texture = LSM:GetDefault("statusbar"),
 		min = "return 0",
 		max = "return 100",
 		enabled = true,
 		layer = 1,
 		level = 100,
-		parent = "StarTipQTipMain",
+		parent = "StarTipTooltipMain",
 		orientation = WidgetBar.ORIENTATION_VERTICAL
 	}
 
@@ -167,7 +167,7 @@ local optionsDefaults = {
 				max = "return 100",
 				length = 12,
 				height = 0,
-				points = {{"RIGHT", "StarTipQTipMain", "LEFT", 0, 0}, {"TOP", "StarTipQTipMain", "TOP", 0, -5}, {"BOTTOM", "StarTipQTipMain", "BOTTOM", 0, 5}},
+				points = {{"RIGHT", "StarTipTooltipMain", "LEFT", 0, 0}, {"TOP", "StarTipTooltipMain", "TOP", 0, -5}, {"BOTTOM", "StarTipTooltipMain", "BOTTOM", 0, 5}},
 				level = 100,
 				layer = 1,
 				texture = LSM:GetDefault("statusbar"),
@@ -176,7 +176,7 @@ local optionsDefaults = {
 				orientation = WidgetBar.ORIENTATION_VERTICAL,
 				custom = true,
 				enabled = true,
-				parent = "StarTipQTipMain"
+				parent = "StarTipTooltipMain"
 			}
 			tinsert(mod.db.profile.bars, widget)
 			StarTip:RebuildOpts()
@@ -237,7 +237,7 @@ do
 			parent = _G[parent]
 		end
 		if type(parent) ~= "table" then
-			parent = _G["StarTipQTipMain"]
+			parent = _G["StarTipTooltipMain"]
 		end
 		if bar then
 			pool[bar] = nil
@@ -253,7 +253,7 @@ do
 	end
 end
 
-local defaultPoint = {"BOTTOMLEFT", "StarTipQTipMain", "TOPLEFT"}
+local defaultPoint = {"BOTTOMLEFT", "StarTipTooltipMain", "TOPLEFT"}
 
 local strataNameList = {
 	"TOOLTIP", "FULLSCREEN_DIALOG", "FULLSCREEN", "DIALOG", "HIGH", "MEDIUM", "LOW", "BACKGROUND"

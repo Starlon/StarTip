@@ -74,8 +74,8 @@ end
 		speed = 100,
 		direction = SCROLL_LEFT,
 		dontRtrim = true,
-		points = {{"BOTTOMLEFT", "StarTipQTipMain", "TOPLEFT", 0, 12}},
-		parent = "StarTipQTipMain",
+		points = {{"BOTTOMLEFT", "StarTipTooltipMain", "TOPLEFT", 0, 12}},
+		parent = "StarTipTooltipMain",
 		frameName = "StarTipTextsName",
 		strata = 1,
 		level = 1,
@@ -96,8 +96,8 @@ return Gradient(health / max)
 ]],
 		cols = 20,
 		update = 1000,
-		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, 1}},
-		parent = "StarTipQTipMain",
+		points = {{"TOPLEFT", "StarTipTooltipMain", "BOTTOMLEFT", 0, 1}},
+		parent = "StarTipTooltipMain",
 		strata = 1,
 		level = 1
 	},
@@ -118,8 +118,8 @@ return Gradient(mana / max)
 		cols = 20,
 		update = 1000,
 		align = WidgetText.ALIGN_RIGHT,
-		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", 0, 1}},
-		parent = "StarTipQTipMain",
+		points = {{"TOPRIGHT", "StarTipTooltipMain", "BOTTOMRIGHT", 0, 1}},
+		parent = "StarTipTooltipMain",
 		strata = 1,
 		level = 1
 	},
@@ -150,8 +150,8 @@ end
 		cols = 20,
 		update = 1000,
 		dontRtrim = true,
-		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -62}},
-		parent = "StarTipQTipMain",
+		points = {{"TOPLEFT", "StarTipTooltipMain", "BOTTOMLEFT", 0, -62}},
+		parent = "StarTipTooltipMain",
 		strata = 1,
 		level = 1,
 		intersect = true,
@@ -174,8 +174,8 @@ return Color2RGBA(0xffff00)
 		cols = 20,
 		update = 1000,
 		dontRtrim = true,
-		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -124}},
-		parent = "StarTipQTipMain",
+		points = {{"TOPLEFT", "StarTipTooltipMain", "BOTTOMLEFT", 0, -124}},
+		parent = "StarTipTooltipMain",
 		strata = 1,
 		level = 1,
 		intersect = true,
@@ -206,8 +206,8 @@ end
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
-		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", 0, -62}},
-		parent = "StarTipQTipMain",
+		points = {{"TOPRIGHT", "StarTipTooltipMain", "BOTTOMRIGHT", 0, -62}},
+		parent = "StarTipTooltipMain",
 		strata = 1,
 		level = 1,
 		intersect = true,
@@ -232,8 +232,8 @@ return 1, 1, 0
 		align = WidgetText.ALIGN_RIGHT,
 		update = 1000,
 		dontRtrim = true,
-		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", 0, -124}},
-		parent = "StarTipQTipMain",
+		points = {{"TOPRIGHT", "StarTipTooltipMain", "BOTTOMRIGHT", 0, -124}},
+		parent = "StarTipTooltipMain",
 		strata = 1,
 		level = 1,
 		intersect = true,
@@ -261,7 +261,7 @@ local optionsDefaults = {
 				min = "return 0",
 				max = "return 100",
 				height = 6,
-				points = {{"BOTTOMLEFT", "StarTipQTipMain", "TOPLEFT"}},
+				points = {{"BOTTOMLEFT", "StarTipTooltipMain", "TOPLEFT"}},
 				texture = LSM:GetDefault("statustext"),
 				expression = "",
 				strata = 1,
@@ -334,7 +334,7 @@ do
 
 		end
 		if type(parent) ~= "table" then
-			parent = _G["StarTipQTipMain"]
+			parent = _G["StarTipTooltipMain"]
 		end
 		if text then
 			pool[text] = nil
@@ -369,7 +369,7 @@ do
 	end
 end
 
-local defaultPoint = {"BOTTOMLEFT", "StarTipQTipMain", "TOPLEFT"}
+local defaultPoint = {"BOTTOMLEFT", "StarTipTooltipMain", "TOPLEFT"}
 
 local strataNameList = {
 	"TOOLTIP", "FULLSCREEN_DIALOG", "FULLSCREEN", "DIALOG", "HIGH", "MEDIUM", "LOW", "BACKGROUND"

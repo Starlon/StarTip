@@ -12,7 +12,7 @@ local defaults = {
 	profile = {
 		width = 16,
 		height = 16,
-		points = {{"TOP", "StarTipQTipMain", "TOP", 0, 4}}
+		points = {{"TOP", "StarTipTooltipMain", "TOP", 0, 4}}
 	}
 }
 
@@ -74,7 +74,7 @@ function mod:GetOptions()
 					desc = L["Add a new point"],
 					type = "input",
 					set = function(info, v)
-						tinsert(db.points, {"TOP", "StarTipQTip", "TOP", 0, 0})
+						tinsert(db.points, {"TOP", "StarTipTooltipMain", "TOP", 0, 0})
 					end,
 					order = 1
 				}

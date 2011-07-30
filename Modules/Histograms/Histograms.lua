@@ -54,13 +54,13 @@ local defaultWidgets = {
 		enabled = true,
 		width = 10,
 		height = 50,
-		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -12}},
+		points = {{"TOPLEFT", "StarTipTooltipMain", "BOTTOMLEFT", 0, -12}},
 		color = [[
 return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 ]],
 		layer = 1,
 		update = 1000,
-		parent = "StarTipQTipMain"
+		parent = "StarTipTooltipMain"
 	},
 	[2] = {
 		name = "Power",
@@ -70,13 +70,13 @@ return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 		enabled = true,
 		width = 10,
 		height = 50,
-		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", -100, -12}},
+		points = {{"TOPRIGHT", "StarTipTooltipMain", "BOTTOMRIGHT", -100, -12}},
 		color = [[
 return PowerColor("RAGE", unit)
 ]],
 		layer = 1,
 		update = 1000,
-		parent = "StarTipQTipMain"
+		parent = "StarTipTooltipMain"
 	},
 	[3] = {
 		name = "Mem",
@@ -105,13 +105,13 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -77}},
+		points = {{"TOPLEFT", "StarTipTooltipMain", "BOTTOMLEFT", 0, -77}},
 		layer = 1,
 		update = 1000,
 		persistent = true,
 		intersect = true,
 		intersectPad = 1000,
-		parent = "StarTipQTipMain"
+		parent = "StarTipTooltipMain"
 	},
 	[4] = {
 		name = "CPU",
@@ -140,7 +140,7 @@ end
 		char = "0",
 		width = 10,
 		height = 50,
-		points = {{"TOPRIGHT", "StarTipQTipMain", "BOTTOMRIGHT", -100, -77}},
+		points = {{"TOPRIGHT", "StarTipTooltipMain", "BOTTOMRIGHT", -100, -77}},
 		layer = 1,
 		update = 1000,
 		persistent = true,
@@ -174,7 +174,7 @@ local optionsDefaults = {
 				height = WidgetHistogram.defaults.height,
 				width = WidgetHistogram.defaults.width,
 				enabled = true,
-				points = {{"TOPLEFT", "StarTipQTipMain", "BOTTOMLEFT", 0, -50}},
+				points = {{"TOPLEFT", "StarTipTooltipMain", "BOTTOMLEFT", 0, -50}},
 				texture = LSM:GetDefault("statusbar"),
 				expression = "return random(100)",
 				color = "return 0, 0, 1",
@@ -231,7 +231,7 @@ do
 			parent = _G[parent]
 		end
 		if type(parent) ~= "table" then
-			parent = _G["StarTipQTipMain"]
+			parent = _G["StarTipTooltipMain"]
 		end
 		local histogram = next(pool)
 
@@ -318,8 +318,8 @@ local function createHistograms()
 							bar:SetWidth(v.width or 6)
 						end
 					else
-					bar:SetPoint("TOPLEFT", v.parent or _G["StarTipQTipMain"], "TOPLEFT")
-						bar:SetPoint("BOTTOMLEFT", v.parent or _G["StarTipQTipMain"], "BOTTOMLEFT")
+					bar:SetPoint("TOPLEFT", v.parent or _G["StarTipTooltipMain"], "TOPLEFT")
+						bar:SetPoint("BOTTOMLEFT", v.parent or _G["StarTipTooltipMain"], "BOTTOMLEFT")
 					end
 					bar:SetHeight(v.height)
 					bar:SetMinMaxValues(0, 100)

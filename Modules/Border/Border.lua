@@ -74,7 +74,7 @@ local function copy(tbl)
 end
 
 local function draw(widget)
-	_G["StarTipQTipMain"]:SetBackdropBorderColor(widget.r or 1, widget.g or 1, widget.b or 1, widget.a or 1)
+	_G["StarTipTooltipMain"]:SetBackdropBorderColor(widget.r or 1, widget.g or 1, widget.b or 1, widget.a or 1)
 end
 
 function mod:CreateBorders()
