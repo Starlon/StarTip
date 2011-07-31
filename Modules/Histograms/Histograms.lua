@@ -200,7 +200,7 @@ local optionsDefaults = {
 
 local intersectUpdate = function()
 	for i, w in ipairs(widgets) do
-		w:IntersectUpdate()
+		--w:IntersectUpdate()
 	end
 end
 

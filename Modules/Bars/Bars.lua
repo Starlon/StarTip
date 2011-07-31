@@ -199,8 +199,7 @@ local optionsDefaults = {
 local intersectTimer
 local intersectUpdate = function()
 	for i, w in ipairs(widgets) do
-		assert(type(w.IntersectUpdate) == "function", "widget.IntersectUpdate should be a function.")
-		w:IntersectUpdate()
+		--w:IntersectUpdate()
 	end
 end
 
