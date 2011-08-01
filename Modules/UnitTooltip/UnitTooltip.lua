@@ -81,13 +81,17 @@ local offline = Offline(unit)
 if offline then
     afk = " " .. Angle(offline)
 end
+local dead = Dead(unit)
+if dead then
+    afk =  afk .. " " .. Angle(dead)
+end
 local port = StarTip:GetModule("Portrait")
 local texture  = ""
 if port and port.texture then
-	texture = port.texture:GetTexture()	
+    texture = port.texture:GetTexture()	
 end
 if texture ~= "" then
-	texture = Texture("", port.db.profile.size) .. " "
+    texture = Texture("", port.db.profile.size) .. " "
 end
 return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 ]],
