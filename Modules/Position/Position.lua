@@ -371,8 +371,6 @@ local function hideGameTooltip()
 end
 
 local isUnitTooltip
-local updateFrame = CreateFrame("Frame")
-local fakeUpdateFrame = CreateFrame("Frame")
 local currentAnchor = "BOTTOM"
 local xoffset, yoffset = 0, 0
 local positionTooltip = function()
@@ -410,6 +408,8 @@ local positionMainTooltip = function()
 		(x + xoffset) / effScale, (y + yoffset) / effScale)
 end
 
+local updateTimer = LibTimer:New("Position timer", 30, true, positionTooltip)
+local fakeUpdateTimer = LibTimer:New("Position fake timer", 30, true, positionMainTooltip)
 
 local setOffsets = function(owner)
 	if owner == UIParent then
@@ -438,10 +438,7 @@ end
 
 local currentOwner
 local currentThis
-local delayFrame = CreateFrame("Frame")
 local function delayAnchor()
-	delayFrame:SetScript("OnUpdate", nil)
-	
 	local this = currentThis
 	local owner = currentOwner
 	setOffsets(owner)
@@ -455,23 +452,24 @@ local function delayAnchor()
 		isUnitTooltip = false
 		if GameTooltip:GetUnit() then
 			isUnitTooltip = true
-			fakeUpdateFrame:SetScript("OnUpdate", positionMainTooltip)
+			fakeUpdateTimer:Start()
 			positionMainTooltip()
 		end
-		updateFrame:SetScript("OnUpdate", positionTooltip)
+		updateTimer:Start()
 		positionTooltip()
 	elseif GameTooltip:GetUnit() then
-		updateFrame:SetScript("OnUpdate", nil)
-		fakeUpdateFrame:SetScript("OnUpdate", nil)
+		fakeUpdateTimer:Stop()
+		updateTimer:Stop()
 		StarTip.tooltipMain:ClearAllPoints()
 		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
 	else
-		updateFrame:SetScript("OnUpdate", nil)
-		fakeUpdateFrame:SetScript("OnUpdate", nil)
+		fakeUpdateTimer:Stop()
+		updateTimer:Stop()
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
 	end
 end
+local delayTimer = LibTimer:New("Position delay timer", 30, false, delayAnchor)
 
 function mod:GameTooltip_SetDefaultAnchor(this, owner)
 	currentOwner = owner
@@ -482,7 +480,7 @@ function mod:GameTooltip_SetDefaultAnchor(this, owner)
 	if owner == MainMenuMicroButton then -- This one is troublesome, so single it out and anchor right away.
 		delayAnchor() 
 	else
-		delayFrame:SetScript("OnUpdate", delayAnchor)
+		delayTimer:Start()
 	end
 end
 
@@ -495,15 +493,15 @@ end
 mod.REGEN_ENABLED = mod.REGEN_DISABLED
 
 function mod:OnHide()
-	updateFrame:SetScript("OnUpdate", nil)
-	delayFrame:SetScript("OnUpdate", nil)
-	fakeUpdateFrame:SetScript("OnUpdate", nil)
+	updateTimer:Stop()
+	delayTimer:Stop()
+	fakeUpdateTimer:Stop()
 end
 
 function mod:SetSpell()
 	local index = getIndex(currentOwner)
 	if StarTip.anchors[index]:find("^CURSOR_")  then
-		updateFrame:SetScript("OnUpdate", nil)
+		updateTimer:Stop()
 		positionTooltip()
 	else
 		GameTooltip:ClearAllPoints()
@@ -514,7 +512,7 @@ end
 function mod:SetItem()
 	local index = getIndex(currentOwner)
 	if StarTip.anchors[index]:find("^CURSOR_")  then
-		updateFrame:SetScript("OnUpdate", nil)
+		updateTimer:Stop()
 		positionTooltip()
 	else
 		GameTooltip:ClearAllPoints()
