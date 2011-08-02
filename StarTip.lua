@@ -185,7 +185,7 @@ local defaults = {
 		timers = {},
 		keys = {},
 		minimap = {hide=true},
-		tooltipMain = {frameName="StarTipTooltipMain", intersectFrameName="ChatFrame1", strata=1, level=1, alwaysShown=false, intersect=true, intersectxPad1 = 0, intersectyPad1 = 0, intersectxPad2 = 0, intersectyPad2 = 0, insersectPad = 0, minStrata=5, scriptFrame, hideScript = "self.frame:Hide()", showScript = "self.frame:Show()", hiddenScript = "return not self.frame:IsShown()", shownScript = "return self.frame:IsShown()"},
+		tooltipMain = {frameName="StarTipTooltipMain", intersectFrameName="ChatFrame1", strata=1, level=1, alwaysShown=false, intersect=false, intersectxPad1 = 0, intersectyPad1 = 0, intersectxPad2 = 0, intersectyPad2 = 0, insersectPad = 0, minStrata=5, scriptFrame, hideScript = "self.frame:Hide()", showScript = "self.frame:Show()", hiddenScript = "return not self.frame:IsShown()", shownScript = "return self.frame:IsShown()"},
 		modifier = 1,
 		unitShow = 1,
 		objectShow = 1,
@@ -193,8 +193,7 @@ local defaults = {
 		otherFrameShow = 1,
 		errorLevel = 2,
 		throttleVal = 0,
-		intersectRate = 500,
-		intersect = false,
+		intersectRate = 300,
 		modifierInverse = false,
 		message = true,
 		backup = true
@@ -650,7 +649,7 @@ StarTip.tooltipMain.Show = function()
 	StarTip.tooltipMain.flash:Stop()
 	StarTip.tooltipMain:ShowReal()
 	StarTip.tooltipMain:SetAlpha(1)
-	StarTip.intersectTimer:Start()
+	if StarTip.widget.intersect then StarTip.intersectTimer:Start() end
 end
 StarTip.tooltipMain.HideReal = StarTip.tooltipMain.Hide
 StarTip.tooltipMain.Hide = function()
