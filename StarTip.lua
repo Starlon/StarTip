@@ -2,7 +2,7 @@
 local addonName, addon = ...
 
 _G["StarTip"] = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0") 
-StarTip.version = GetAddOnMetadata("StarTip", "Version") or ""
+StarTip.version = GetAddOnMetadata("StarTip", "Version") or addonName
 
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
@@ -193,7 +193,8 @@ local defaults = {
 		otherFrameShow = 1,
 		errorLevel = 2,
 		throttleVal = 0,
-		intersectRate = 0,
+		intersectRate = 500,
+		intersect = false,
 		modifierInverse = false,
 		message = true,
 		backup = true
@@ -465,12 +466,12 @@ local options = {
 					order = 13
 				},
 				intersectRate = {
-					name = L["Intersect Checks Rate"],
+					name = L["Intersect Check Rate"],
 					desc = L["The rate at which intersecting frames will be checked"],
 					type = "input",
 					pattern = "%d",
 					get = function() return tostring(StarTip.db.profile.intersectRate) end,
-					set = function(info, v) StarTip.db.profile.intersectRate = tonumber(v) end,
+					set = function(info, v) StarTip.db.profile.intersectRate = tonumber(v); makeNewTooltip() end,
 					order = 14
 				},
 			}

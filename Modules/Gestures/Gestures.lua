@@ -4,6 +4,7 @@ mod.toggled = true
 mod.defaultOff = true
 local L = StarTip.L
 local WidgetGestures = LibStub("LibScriptableWidgetGestures-1.0")
+local LibMouse = LibStub("LibMouseGestures-1.0")
 local LibCore = LibStub("LibScriptableLCDCore-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
@@ -11,6 +12,9 @@ local StarTip = _G.StarTip
 local UIParent = _G.UIParent
 local gestures = {}
 local environment = {}
+
+local dw,dh = 1000,1000; -- default width/height. Used for the uniform coordinate system.
+local odw,odh = 480, 320; -- default width/height for rev. 45 and older.
 
 -- LeftButtonDown
 local buttonsList = {L["Left Button"], L["Right Button"], L["Center Button"]}
@@ -24,6 +28,7 @@ local defaults = {
 			[1] = {
 				name = "Wipe Data",
 				enabled = true,
+				minGestures = 4,
 				gestures = {{type="line", pattern="right"}, {type="line", pattern="left"}, {type="line", pattern="right"}, {type="line", pattern="left"}},
 				expression = [[
 WipeDPS()
