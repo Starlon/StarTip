@@ -649,7 +649,7 @@ StarTip.tooltipMain.Show = function()
 	StarTip.tooltipMain.flash:Stop()
 	StarTip.tooltipMain:ShowReal()
 	StarTip.tooltipMain:SetAlpha(1)
-	if StarTip.widget.intersect then StarTip.intersectTimer:Start() end
+	if StarTip.tooltipMain.widget.intersect then StarTip.intersectTimer:Start() end
 end
 StarTip.tooltipMain.HideReal = StarTip.tooltipMain.Hide
 StarTip.tooltipMain.Hide = function()
@@ -779,7 +779,6 @@ function StarTip:RestartKeys()
 			local key = WidgetKey:New(self.core, "StarTip.key." .. k, copy(v), self.db.profile.errorLevel)
 			table.insert(keyWidgets, key)
 			key:Start()
-print("--------------===============")
 		end
 	end
 end
