@@ -337,6 +337,8 @@ return Power(unit) / MaxPower(unit)
 	}
 }
 
+mod.defaults = defaults
+
 local function checkUnit()
 	if not UnitExists(StarTip.unit) then
 		

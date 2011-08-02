@@ -16,6 +16,8 @@ local defaults = {
 	}
 }
 
+mod.defaults = defaults
+
 local choices = {
 	"Hide",
 	"Fade out"

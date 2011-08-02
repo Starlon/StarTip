@@ -16,6 +16,7 @@ local defaults = {
 	}
 }
 
+
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	local frame = CreateFrame("Frame", nil, StarTip.tooltipMain)

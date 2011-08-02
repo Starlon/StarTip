@@ -153,6 +153,8 @@ local defaults = {
 	}
 }
 
+mod.defaults = defaults
+
 local options = {}
 local optionsDefaults = {
 	add = {

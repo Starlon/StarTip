@@ -19,6 +19,7 @@ local defaults = {
 		animated = false
 	}
 }
+mod.defaults = defaults
 
 local options = {
 	size = {

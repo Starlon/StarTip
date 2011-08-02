@@ -383,9 +383,9 @@ if UnitIsWounded(unit) then
     str = str .. Angle(L["Wounded"])
 end
 if str == "" then
-    return L["Has Control"]
+    return L["Has Control"] .. " "
 else
-    return str
+    return str .. " "
 end
 ]],
         rightUpdating = true,
@@ -543,7 +543,7 @@ return str
     [26] = {
         name = L["Movement"],
         left = [[
-if not UnitExists(unit) then return lastMovement end
+if not UnitExists(unit) then return "" end
 local pitch = GetUnitPitch(unit)
 local speed = GetUnitSpeed(unit)
 local str = ""
@@ -556,7 +556,7 @@ if speed > 0 then
     end
     str = str .. format("Speed: %.1f", speed)
 end
-lastMovement = str
+if str == "" then return "blank()" end
 return str
 ]],
         leftUpdating = true,
@@ -900,11 +900,12 @@ do
             if not widget.config.right and widget.x == 1 then 
                colSpan = 2
             end
-            if type(widget.y) == "number" and widget.y <= StarTip.tooltipMain:GetLineCount() and widget.buffer ~= "" then
+            if type(widget.y) == "number" and widget.y <= StarTip.tooltipMain:GetLineCount() and (widget.buffer == "blank()" or widget.buffer ~= "") then
+		if widget.buffer == "blank()" then widget.buffer = "" end
                 StarTip.tooltipMain:SetCell(widget.y, widget.x, widget.buffer, widget.fontObj, 
 			justification, colSpan, nil, 0, 0, nil, nil, 40)
 
-		if type(widget.config.color) == "string" and widget.config.color ~= "" and widget.color.is_valid then
+		if type(widget.config.color) == "string" and (widget.config.color == " " or widget.config.color ~= "") and widget.color.is_valid then
 			widget.color:Eval()
 			local r, g, b, a = widget.color:P2N()
 			StarTip.tooltipMain:SetCellColor(widget.y, widget.x, 

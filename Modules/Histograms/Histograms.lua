@@ -158,6 +158,7 @@ local defaults = {
 		intersectRate = 500
 	}
 }
+mod.defaults = defaults
 
 local options = {}
 local optionsDefaults = {

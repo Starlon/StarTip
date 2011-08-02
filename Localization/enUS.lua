@@ -47,7 +47,22 @@ L["Greetings"] = true
 L["Whether the greetings message should be shown or not"] = true
 L["Restart Timers"] = true
 L["Would you like to restart your timers? Note that this will restart all timers."] = true
-
+L["Backup"] = true
+L["Click to generate a backup."] = true
+L["Revert"] = true
+L["Click this to revert to the text in the input field labeled \"Replace Database\"."] = true
+L["Current Backup"] = true
+L["Here's your currently stored backup."] = true
+L["Replace Dtatabase"] = true
+L["Enter serialized databasae string."] = true
+L["Stop Keys"] = true
+L["Would you like to stop your key widgets?"] = true
+L["Keys"] = true
+L["Add Key"] = true
+L["Add a key widget."] = true
+L["Restart Key"] = true
+L["Would you like to restart this key widget?"] = true
+L["Delete this key widget."] = true
 
 -- UnitTooltip
 L["Unit Name"] = true

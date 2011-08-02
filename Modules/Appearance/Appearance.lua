@@ -41,6 +41,8 @@ local defaults = {
 	}
 }
 
+mod.defaults = defaults
+
 local backdropParts = {bgFile = true, edgeFile = true, edgeSize = true, background = true}
 local otherParts = {scale = "SetScale"}
 

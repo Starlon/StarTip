@@ -15,6 +15,7 @@ local defaults = {
 		points = {{"TOP", "StarTipTooltipMain", "TOPRIGHT", 0, 0}}
 	}
 }
+mod.defaults = defaults
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)

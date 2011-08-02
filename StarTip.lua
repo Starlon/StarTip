@@ -19,13 +19,16 @@ local LibCore = LibStub("LibScriptableLCDCoreLite-1.0")
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
 local PluginTalents = LibStub("LibScriptablePluginTalents-1.0")
 local WidgetTimer = LibStub("LibScriptableWidgetTimer-1.0")
+local WidgetKey = LibStub("LibScriptableWidgetKey-1.0")
 local LibWidget = LibStub("LibScriptableWidget-1.0")
 
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local ipairs, pairs = _G.ipairs, _G.pairs
 local timers = {}
+local keys = {}
 local timerWidgets = {}
+local keyWidgets = {}
 
 local environment = {}
 StarTip.environment = environment
@@ -180,6 +183,7 @@ local defaults = {
 	profile = {
 		modules = {},
 		timers = {},
+		keys = {},
 		minimap = {hide=true},
 		tooltipMain = {frameName="StarTipTooltipMain", intersectFrameName="ChatFrame1", strata=1, level=1, alwaysShown=false, intersect=true, intersectxPad1 = 0, intersectyPad1 = 0, intersectxPad2 = 0, intersectyPad2 = 0, insersectPad = 0, minStrata=5, scriptFrame, hideScript = "self.frame:Hide()", showScript = "self.frame:Show()", hiddenScript = "return not self.frame:IsShown()", shownScript = "return self.frame:IsShown()"},
 		modifier = 1,
@@ -191,9 +195,71 @@ local defaults = {
 		throttleVal = 0,
 		intersectRate = 0,
 		modifierInverse = false,
-		message = true
+		message = true,
+		backup = true
 	}
 }
+
+do
+	local pool = setmetatable({},{__mode='k'})
+	local newCount, delCount = 0, 0
+	function StarTip.new(...)
+		local t = next(pool)
+		local newtbl
+		if t then
+			pool[t] = nil
+			table.wipe(t)
+			for i=1, select("#", ...) do
+				t[i] = select(i, ...)
+			end	
+		else
+			newtbl = true
+			t = {...}
+		end
+		if newtbl then
+			--StarTip:Print("new table " .. GetTime(), "new " .. newCount, "del " .. delCount)		
+		end
+		t.__starref__ = true
+		newCount = newCount + 1
+		return t
+	end
+	function StarTip.del(...)
+		local t = select(1, ...)
+		
+		if type(t) ~= "table" or not t.__starref__ then return end
+		
+		for i=2, select("#", ...) do
+			local t = select(i, ...)
+			if type(t) ~= table or t == nil then break end
+			StarTip.del(t)
+		end
+		t.__starref__ = nil
+		pool[t] = true	
+		delCount = delCount + 1
+	end
+	function StarTip.copy(src, dst)
+		local localCopy = dst or {}
+		wipe(localCopy)
+		for k, v in pairs(src) do
+			if type(v) == "table" then
+				localCopy[k] = copy(v)
+			elseif type(v) == "string" or type(v) == "number"then
+				localCopy[k] = v
+			end
+		end
+		localCopy.__starref__ = nil
+		return localCopy
+	end
+end
+
+environment.new = StarTip.new
+environment.newDict = StarTip.newDict
+environment.del = StarTip.del
+environment.copy = StarTip.copy
+local new = StarTip.new
+local newDict = StarTip.newDict
+local del = StarTip.del
+local copy = StarTip.copy
 
 local function makeNewTooltip()
 	local self = StarTip
@@ -217,7 +283,8 @@ local options = {
 			name = L["Modules"],
 			desc = L["Modules"],
 			type = "group",
-			args = {}
+			args = {},
+			order = 1
 		},
 		timers = {
 			name = "Timers",
@@ -229,7 +296,7 @@ local options = {
 					desc = L["Add a timer widget"],
 					type = "input",
 					set = function(info, v)
-						tinsert(StarTip.db.profile.timers, {name = v, expression = "return", repeating = false, update = 0})
+						tinsert(StarTip.db.profile.timers, {name = v, expression = "return noop", repeating = false, update = 0})
 						StarTip:RebuildOpts()
 					end, 
 					order = 1
@@ -243,22 +310,63 @@ local options = {
 					end,
 					order = 2
 				},
+				stop = {
+					name = L["Stop Keys"],
+					desc = L["Would you like to stop your key widgets?"],
+					type = "execute",
+					func = function()
+						StarTip:StopKeys()
+					end,
+					order = 3
+				},
 				reset = {
 					name = L["Restore Defaults"],
 					desc = L["Use this to restore the defaults"],
 					type = "execute",
 					func = function()
-						self.db.profile.timers = {}
+						StarTip.db.profile.timers = {}
+						StarTip:RestartTimers()
 						StarTip:RebuildOpts()					
 					end,
 					order = 3
 				}
-			}
+			},
+			order = 2
+		},
+		keys = {
+			name = L["Keys"],
+			desc = L["Keys"],
+			type = "group",
+			args = {
+				add = {
+					name = L["Add Key"],
+					desc = L["Add a key widget."],
+					type = "input",
+					set = function(info, v)
+						table.insert(StarTip.db.profile.keys, {name = v, expression = "return noop"})
+						StarTip:RebuildOpts()
+					end,
+					order = 1
+				},
+				reset = {
+					name = L["Restore Defaults"],
+					desc = L["Use this to restore the defaults"],
+					type = "execute",
+					func = function()
+						StarTip.db.profile.keys = {}
+						StarTip:RestartKeys()
+						StarTip:RebuildOpts()
+					end,
+					order = 2
+				},
+			},
+			order = 3
 		},
 		settings = {
 			name = L["Settings"],
 			desc = L["Settings"],
 			type = "group",
+			order = 4,
 			args = {
 				minimap = {
 					name = L["Minimap"],
@@ -370,75 +478,10 @@ local options = {
 	}
 }
 
-do
-	local pool = setmetatable({},{__mode='k'})
-	local newCount, delCount = 0, 0
-	function StarTip.new(...)
-		local t = next(pool)
-		local newtbl
-		if t then
-			pool[t] = nil
-			table.wipe(t)
-			for i=1, select("#", ...) do
-				t[i] = select(i, ...)
-			end	
-		else
-			newtbl = true
-			t = {...}
-		end
-		if newtbl then
-			--StarTip:Print("new table " .. GetTime(), "new " .. newCount, "del " .. delCount)		
-		end
-		t.__starref__ = true
-		newCount = newCount + 1
-		return t
-	end
-	function StarTip.del(...)
-		local t = select(1, ...)
-		
-		if type(t) ~= "table" or not t.__starref__ then return end
-		
-		for i=2, select("#", ...) do
-			local t = select(i, ...)
-			if type(t) ~= table or t == nil then break end
-			StarTip.del(t)
-		end
-		t.__starref__ = nil
-		pool[t] = true	
-		delCount = delCount + 1
-	end
-	function StarTip.copy(src, dst)
-		if type(src) ~= "table" then return nil end
-		if type(dst) ~= "table" then dst = StarTip.new() end
-		for k, v in pairs(src) do
-			if type(v) == "table" then
-				v = StarTip.copy(v)
-			end
-			dst[k] = v
-		end
-		return dst
-	end
-end
-
-environment.new = StarTip.new
-environment.newDict = StarTip.newDict
-environment.del = StarTip.del
-
 local function errorhandler(err)
     return geterrorhandler()(err)
 end
 
-local function copy(tbl)
-	local localCopy = {}
-	for k, v in pairs(tbl) do
-		if type(v) == "table" then
-			localCopy[k] = copy(v)
-		elseif type(v) ~= "function" then
-			localCopy[k] = v
-		end
-	end
-	return localCopy
-end
 
 StarTip:SetDefaultModuleState(false)
 
@@ -479,6 +522,60 @@ function StarTip:OnInitialize()
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 
+	options.args.settings.args.backup = {
+		name = L["Backup"],
+		desc = L["Click to generate a backup."],
+		type = "execute",
+		func = function()
+			local tbl = {}
+			tbl["StarTip"] = self:Serialize(copy(self.db.profile))
+			for k, v in self:IterateModules() do
+				if v.db then tbl[k] = self:Serialize(copy(v.db.profile)) end
+			end
+			self.db.profile.backupText = self:Serialize(tbl)
+			self:RebuildOpts()
+		end,
+		order = 50
+	}
+	options.args.settings.args.revert = {
+		name = L["Revert"],
+		desc = L["Click this to revert to the text in the input field labeled \"Replace Database\"."],
+		type = "execute",
+		func = function()
+			local db = self:Unserialize(self.db.profile.replaceDatabase or "")
+			self.db.profile.replaceDatabase = nil
+			setmetatable(self.db.profile, {__mode="v"})
+			self.db.profile = nil
+			collectgarbage()
+			self.db.profile = self:Unserialize(db["StarTip"] or "")
+			db.StarTip = nil
+			for k, v in pairs(db) do
+				local mod = self:GetModule(k)
+				setmetatable(mod.db.profile, {__mode="v"})
+				mod.db.profile = self:Unserialize(v)
+			end
+			StarTip:Print("It is recommended that you /restart the UI.")
+		end,
+		order = 51
+	}
+	options.args.settings.args.backupText = {
+		name = L["Current Backup"],
+		desc = L["Here's your currently stored backup."],
+		type = "input",
+		get = function() return self.db.profile.backupText end,
+		set = function() self.db.profile.backupText = v end,
+		order = 52
+	}
+	options.args.settings.args.replaceDatabase = {
+		name = L["Replace Dtatabase"],
+		desc = L["Enter serialized databasae string."],
+		type = "input",
+		get = function() return "" end,
+		set = function(info, val) 
+			self.db.profile.replaceDatabase = val
+		end,
+		order = 53
+	}
 	options.args.settings.args.tooltipMain = LibWidget:GetOptions(StarTip.db.profile.tooltipMain, makeNewTooltip)
 	options.args.settings.args.tooltipMain.args.add = nil
 
@@ -620,6 +717,7 @@ function StarTip:OnEnable()
 
 	
 	self:RestartTimers()
+	self:RestartKeys()
 
 	--self:RebuildOpts()
 	
@@ -652,15 +750,17 @@ function StarTip:OnDisable()
 		v:Del()
 	end
 	table.wipe(timerWidgets)
+	self:StopTimers()
+	self:StopKeys()
 end
 
 function StarTip:RestartTimers()
-	for k, v in pairs(timerWidgets) do
+	for k, v in ipairs(timerWidgets) do
 		v:Stop()
 		v:Del()
 	end
 	table.wipe(timerWidgets)
-	for k, v in pairs(self.db.profile.timers) do
+	for k, v in ipairs(self.db.profile.timers) do
 		if v.enabled then
 			tinsert(timerWidgets, WidgetTimer:New(self.core, "StarTip.timer." .. k, v, self.db.profile.errorLevel))
 			timerWidgets[#timerWidgets]:Start()
@@ -668,6 +768,33 @@ function StarTip:RestartTimers()
 	end
 end
 
+function StarTip:RestartKeys()
+	for k, v in ipairs(keyWidgets) do
+		v:Stop()
+		v:Del()
+	end
+	table.wipe(keyWidgets)
+	for k, v in ipairs(self.db.profile.keys) do
+		if v.enabled then
+			local key = WidgetKey:New(self.core, "StarTip.key." .. k, copy(v), self.db.profile.errorLevel)
+			table.insert(keyWidgets, key)
+			key:Start()
+print("--------------===============")
+		end
+	end
+end
+
+function StarTip:StopTimers()
+	for k, v in ipairs(timerWidgets) do
+		v:Stop()
+	end
+end
+
+function StarTip:StopKeys()
+	for k, v in ipairs(keyWidgets) do
+		v:Stop()
+	end
+end
 function StarTip:RebuildOpts()
 	for k, v in self:IterateModules() do
 		local t = {}
@@ -739,7 +866,7 @@ function StarTip:RebuildOpts()
 				self.db.profile.timers[k] = nil
 				self:RebuildOpts()
 			end,
-			order = 100
+			order = 101
 		}
 		options.args.timers.args[v.name or "Timer" .. k].args.restart = {
 			name = L["Restart Timer"],
@@ -751,7 +878,7 @@ function StarTip:RebuildOpts()
 						widget:Stop()
 						widget:Del()
 						wipe(widget)
-						timerWidgets[i] = WidgetTimer:New(self.core, "StarTip.timer." .. v.name, v, self.db.profile.errorLevel)
+						timerWidgets[i] = WidgetTimer:New(self.core, "StarTip.timer." .. v.name, copy(v), self.db.profile.errorLevel)
 						timerWidgets[i]:Start()
 					end
 				end
@@ -759,6 +886,40 @@ function StarTip:RebuildOpts()
 			order = 100
 		}
 	end
+	for k, v in pairs(self.db.profile.keys) do
+		options.args.keys.args[v.name or "Key" .. k] = {
+			name = v.name or "Timer" .. k,
+			type = "group",
+			args = WidgetKey:GetOptions(v, StarTip.RebuildOpts, StarTip)
+		}
+		options.args.keys.args[v.name or "Key" .. k].args.restart = {
+			name = L["Restart Key"],
+			desc = L["Would you like to restart this key widget?"],
+			type = "execute",
+			func = function()
+				for i, widget in pairs(keyWidgets) do
+					if v.name == widget.config.name then
+						widget:Stop()
+						widget:Del()
+						keyWidgets[i] = WidgetKey:New(self.core, "StarTip.key." .. v.name, copy(v), self.db.profile.errorLevel)
+						keyWidgets[i]:Start()
+					end
+				end
+			end,
+			order = 100
+		}
+		options.args.keys.args[v.name or "Key" .. k].args.delete = {
+			name = L["Delete"],
+			desc = L["Delete this key widget."],
+			type = "execute",
+			func = function()
+				self.db.profile.keys[k] = nil
+				self:RebuildOpts()
+			end,
+			order = 101
+		}
+	end
+	collectgarbage()
 end
 
 function StarTip:OpenConfig()

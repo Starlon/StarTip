@@ -30,6 +30,7 @@ local defaults = {
 		
 	}
 }
+mod.defaults = defaults
 
 local selections = {}
 for i, v in ipairs(StarTip.anchorText) do
