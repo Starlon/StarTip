@@ -69,27 +69,29 @@ StopNoise()
 		cancelBUtton = "RightButtonUp",
 		startFunc = [[
 return function(rec, a, b, c, d) 
-    local self = rec.widgetdata
+print("startFunc")
+    local self = rec.widgetData
     self.cdoodle = self.cdoodle or {}
-    wipe(self.cdoodle)
     self.cdoodle.creator = self.name
     self.dw, self.dh = 1000, 1000
+    rec.w, rec.h = self.drawLayer:GetWidth(), self.drawLayer:GetHeight()
 end
 ]],
 		updateFunc = [[
 return function(rec, a, b, c, d)
-    local self = rec.widgetdata
+print("updateFunc")
+    local self = rec.widgetData
     if #rec.cdoodle > 0 then
-        local l = rec.cdoodle[#self.cdoodle]
-        if (floor(l[1]) ~= floor(c) or floor(l[2]) ~= floor(d)) then
+        local l = rec.cdoodle[#rec.cdoodle]
+        if l and (floor(l[1]) ~= floor(c) or floor(l[2]) ~= floor(d)) then
             local dist = sqrt( pow(l[1] - c, 2) + pow(l[2] - d, 2))
             if ( dist >= 3 and (rec.x ~= c or rec.y ~= d)) then
-                tinsert(rec.cdoodle, {c*(self.dw/rec.width), d*(self.dh/rec.height), nil})
+                tinsert(rec.cdoodle, {c*(self.dw/rec.w), d*(self.dh/rec.h), nil})
                 rec.x, rec.y = c, d
             end
         end
     else
-        table.insert(rec.cdoodle, {c*(self.dw/rec.width),d*(self.dh/rec.height), nil})
+        table.insert(rec.cdoodle, {c*(self.dw/rec.w),d*(self.dh/rec.h), nil})
     end
     self:Draw()
 end
@@ -97,7 +99,8 @@ end
 		stopFunc = false,
 		stopFuncoff = [[
 return function(rec, a, b, c, d)
-    local sefl = rec.widgetdata
+print("Stop func")
+    local sefl = rec.widgetData
     self:Draw()
     self:Start()
     rec.cdoodle = {creator=self.name}
@@ -106,10 +109,12 @@ end
 
 		nextFunc = [[
 return function(rec, a, b, c, d)
+print("nextFunc")
 end
 ]],
 		cancelFunc = [[
 return function(rec, a, b, c, d)
+print("cancelFunc")
     self:Start()
 end
 ]],

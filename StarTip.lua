@@ -3,6 +3,7 @@ local addonName, addon = ...
 
 _G["StarTip"] = LibStub("AceAddon-3.0"):NewAddon("StarTip", "AceConsole-3.0", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0") 
 StarTip.version = GetAddOnMetadata("StarTip", "Version") or addonName
+StarTip.notes = GetAddOnMetadata("StarTip", "Notes")
 
 local LibDBIcon = LibStub("LibDBIcon-1.0")
 local LSM = _G.LibStub("LibSharedMedia-3.0")
@@ -726,7 +727,7 @@ function StarTip:OnEnable()
 	local plugin = {}
 	LibStub("LibScriptablePluginColor-1.0"):New(plugin)
 	if self.db.profile.message then
-		ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon. You can turn off this message under Settings."], 1, 1, 0))
+		ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.name .. " (" .. StarTip.notes .. ")", 0, 1, 1).. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon. You can turn off this message under Settings."], 1, 1, 0))
 	end
 end
 
