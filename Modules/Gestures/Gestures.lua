@@ -24,37 +24,81 @@ local directions = {"Up", "Down"}
 
 local defaults = {
 	profile = {
-		gestures = {
-			[1] = {
-				name = "Wipe Data",
-				enabled = true,
-				minGestures = 4,
-				gestures = {{type="line", pattern="right"}, {type="line", pattern="left"}, {type="line", pattern="right"}, {type="line", pattern="left"}},
-				expression = [[
+		gestures = {}
+	}
+}
+
+local defaultWidgets = {
+	[1] = {
+		name = "Wipe Data",
+		enabled = false,
+		minGestures = 4,
+		gestures = {{type="line", pattern="right"}, {type="line", pattern="left"}, {type="line", pattern="right"}, {type="line", pattern="left"}},
+		expression = [[
 WipeDPS()
 WipeNoise()
 WipeInspect()
 ]]
-			},
-			[2] = {
-				name = "Start Data",
-				enabled = false,
-				gestures = {{type="circle", pattern="clockwise"}},
-				expression = [[
+	},
+	[2] = {
+		name = "Start Data",
+		enabled = false,
+		gestures = {{type="circle", pattern="clockwise"}},
+		expression = [[
 StartDPS()
 StartNoise()
 ]]
-			},
-			[3] = {
-				name = "Stop Data",
-				enabled = false,
-				gestures = {{type="circle", pattern="counterclockwise"}},
-				expression = [[
+	},
+	[3] = {
+		name = "Stop Data",
+		enabled = false,
+		gestures = {{type="circle", pattern="counterclockwise"}},
+		expression = [[
 StopDPS()
 StopNoise()
 ]]
-			}
-		}
+	},
+	[4] = {
+		name = "Draw",
+		enabled = false,
+		gestures = {},
+		drawLayer = "ChatFrame1",
+		expression = [[
+
+]],
+		startButton = "LeftButtonDown",
+		stopButton = "LeftButtonUp",
+		nextButton = "RightButtonDown",
+		cancelBUtton = "RightButtonUp",
+		startFunc = [[
+return function(rec, a, b, c, d) 
+end
+]],
+		updateFunc = [[
+return function(rec, a, b, c, d)
+end
+]],
+		stopFunc = false,
+		stopFuncoff = [[
+return function(rec, a, b, c, d)
+   rec.widgetdata:Start()
+end
+]],
+
+		nextFunc = [[
+return function(rec, a, b, c, d)
+end
+]],
+		cancelFunc = [[
+return function(rec, a, b, c, d)
+end
+]],
+		tooltip = false,
+
+		maxGestures = 1,
+		showTrail = false
+		
+		
 	}
 }
 
@@ -99,18 +143,20 @@ local function copy(tbl)
 	if type(tbl) ~= "table" then return tbl end
 	local newTbl = {}
 	for k, v in pairs(tbl) do
-		newTbl[k] = copy(v)
+		if type(v) == "table" or type(v) == "number" or type(v) == "string" then
+			newTbl[k] = copy(v)
+		end
 	end
 	return newTbl
 end
 
 function mod:CreateGestures()
 	for i, gesture in ipairs(self.db.profile.gestures) do
-		local widget = WidgetGestures:New(self.core, gesture.name, copy(gesture), StarTip.db.profile.errorLevel, timer) 
 		if gesture.enabled then
+			local widget = WidgetGestures:New(self.core, gesture.name, copy(gesture), StarTip.db.profile.errorLevel, timer) 
 			widget:Start()
+			tinsert(gestures, widget)
 		end
-		tinsert(gestures, widget)
 	end
 end
 
@@ -121,14 +167,37 @@ function mod:WipeGestures()
 	wipe(gestures)
 end
 
+function mod:ReInit()
+    self:WipeGestures()
+    for k, v in ipairs(defaultWidgets) do
+        for j, vv in ipairs(self.db.profile.gestures) do
+            if v.name == vv.name then
+                for k, val in pairs(v) do
+                    if v[k] ~= vv[k] and not vv[k.."Dirty"] then
+                        vv[k] = v[k]
+                    end
+                end
+                v.tagged = true
+                v.default = true
+            end
+        end
+    end
+    for k, v in ipairs(defaultWidgets) do
+        if not v.tagged then
+            tinsert(self.db.profile.gestures, copy(v))
+        end
+    end
+    self:CreateGestures()
+end
+
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+	self.core = StarTip.core 
+	self:ReInit() -- initialize database if needed
 	StarTip:SetOptionsDisabled(options, true)
-	self.core = StarTip.core --LibCore:New(mod, environment, "StarTip.Gestures", {["StarTip.Gestures"] = {}}, nil, StarTip.db.profile.errorLevel)
 end
 
 function mod:OnEnable()
-	
 	StarTip:SetOptionsDisabled(options, false)
 	self:CreateGestures()
 end
