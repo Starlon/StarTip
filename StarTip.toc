@@ -1,6 +1,6 @@
 ## Interface: 40200
 ## Title: StarTip
-## Notes: Tooltips from Outerspace
+## Notes: Tooltips from |c1d1a6bffOuter|r|c751f82ffspace|r
 ## Author: Starlon
 ## Version: @project-version@
 ## X-Category: Tooltip

@@ -1,2 +1,0 @@
-
-StarTip_Environent = {}

@@ -13,9 +13,6 @@ local UIParent = _G.UIParent
 local gestures = {}
 local environment = {}
 
-local dw,dh = 1000,1000; -- default width/height. Used for the uniform coordinate system.
-local odw,odh = 480, 320; -- default width/height for rev. 45 and older.
-
 -- LeftButtonDown
 local buttonsList = {L["Left Button"], L["Right Button"], L["Center Button"]}
 local buttons = {"LeftButton", "RightButton", "CenterButton"}
@@ -72,16 +69,38 @@ StopNoise()
 		cancelBUtton = "RightButtonUp",
 		startFunc = [[
 return function(rec, a, b, c, d) 
+    local self = rec.widgetdata
+    self.cdoodle = self.cdoodle or {}
+    wipe(self.cdoodle)
+    self.cdoodle.creator = self.name
+    self.dw, self.dh = 1000, 1000
 end
 ]],
 		updateFunc = [[
 return function(rec, a, b, c, d)
+    local self = rec.widgetdata
+    if #rec.cdoodle > 0 then
+        local l = rec.cdoodle[#self.cdoodle]
+        if (floor(l[1]) ~= floor(c) or floor(l[2]) ~= floor(d)) then
+            local dist = sqrt( pow(l[1] - c, 2) + pow(l[2] - d, 2))
+            if ( dist >= 3 and (rec.x ~= c or rec.y ~= d)) then
+                tinsert(rec.cdoodle, {c*(self.dw/rec.width), d*(self.dh/rec.height), nil})
+                rec.x, rec.y = c, d
+            end
+        end
+    else
+        table.insert(rec.cdoodle, {c*(self.dw/rec.width),d*(self.dh/rec.height), nil})
+    end
+    self:Draw()
 end
 ]],
 		stopFunc = false,
 		stopFuncoff = [[
 return function(rec, a, b, c, d)
-   rec.widgetdata:Start()
+    local sefl = rec.widgetdata
+    self:Draw()
+    self:Start()
+    rec.cdoodle = {creator=self.name}
 end
 ]],
 
@@ -91,12 +110,14 @@ end
 ]],
 		cancelFunc = [[
 return function(rec, a, b, c, d)
+    self:Start()
 end
 ]],
 		tooltip = false,
 
 		maxGestures = 1,
-		showTrail = false
+		showTrail = true,
+		tooltip = "Test"
 		
 		
 	}
@@ -132,8 +153,9 @@ local optionsDefaults = {
 		type = "execute",
 		func = function()
 			mod.db.profile.gestures = {}
+			mod:WipeGestures()
+			mod:ReInit()
 			StarTip:RebuildOpts()
-			StarTip:Print(L["You'll need to reload your UI. Type /reload"])
 		end,
 		order = 6
 	},
