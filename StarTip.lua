@@ -727,7 +727,7 @@ function StarTip:OnEnable()
 	local plugin = {}
 	LibStub("LibScriptablePluginColor-1.0"):New(plugin)
 	if self.db.profile.message then
-		ChatFrame1:AddMessage(plugin.Colorize(L["Welcome to "] .. StarTip.notes, 0, 1, 1) .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon. You can turn off this message under Settings."], 1, 1, 0))
+		ChatFrame1:AddMessage("|cff202585" .. L["Welcome to "] .. "|r" .. StarTip.notes .. plugin.Colorize(L[" Type /startip to open config. Alternatively you could press escape and choose the addons menu. Or you can choose to show a minimap icon. You can turn off this message under Settings."], 1, 1, 0))
 	end
 end
 
