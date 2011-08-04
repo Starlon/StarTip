@@ -10,7 +10,10 @@ local Evaluator = LibStub("LibScriptableUtilsEvaluator-1.0")
 
 local defaults = {
 	profile = {
-		script = "return 1, 1, 1, 1",
+		script = [[
+local clampLeft, clampRight, clampTop, clampBottom = 0, 10, 10, 0
+return clampLeft, clampRight, clampTop, clampBottom
+]],
 	}
 }
 
@@ -54,7 +57,7 @@ function mod:GetOptions()
 end
 
 function mod:GameTooltip_SetDefaultAnchor(this, owner)
-	local cleft, cright, ctop, cbottom = Evaluator.Execute(StarTip.environment, "StarTip.Clamp", self.db.profile.script)
+	local cleft, cright, ctop, cbottom = Evaluator.ExecuteCode(StarTip.environment, "StarTip.Clamp", self.db.profile.script)
         StarTip.tooltipMain:SetClampRectInsets(cleft or 0, cright or 0, ctop or 0, cbottom or 0)
         StarTip.tooltipMain:SetClampedToScreen(true)
 	GameTooltip:SetClampedToScreen(true)

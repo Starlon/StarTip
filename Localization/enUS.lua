@@ -409,9 +409,9 @@ L["Icon Height"] = true
 L["How tall to make the raid icon."] = true
 L["Icon Height"] = true
 
-
-
-
+-- Clamp
+L["Script"] = true
+L["This will be ran when the tooltip shows."] = true
 
 
 
