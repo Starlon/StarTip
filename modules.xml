@@ -20,6 +20,7 @@
 <Script file = "Modules\Nameplates\Nameplates.lua"/>
 <Script file = "Modules\Debug\Debug.lua"/>
 <Script file = "Modules\Clamp\Clamp.lua"/>
+<Script file = "Modules\Background\Background.lua"/>
 
 <!--@end-debug@-->
 

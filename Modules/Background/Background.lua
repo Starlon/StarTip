@@ -11,46 +11,58 @@ local Evaluator = LibStub("LibScriptableUtilsEvaluator-1.0")
 local defaults = {
 	profile = {
 		guild = [[
+-- return r, g, b, a -- RGBA colorspace
+-- You have a host of color functions you can use.
+-- Color2RGBA(color, true) -- returns r, g, b and a, provide it with a 32bit color, i.e. 0xff77ff77 (a|r|g|b)
+-- RGBA2Color(r, g, b, a) -- Returns a 32bit color based on RGBA values.
+-- HSV2RGB(h, s, v) -- Convert HSV colorspace into RGB.
+-- RGB2HSV(r, g, b) -- Convert RGB colorspace into HSV.
 local mod = StarTip:GetModule("Appearance")
-local db = mod.db.profile
+local db = mod.db.profile.bgColor
 return unpack(db.guild)
 ]],
 		hostilePC = [[
 local mod = StarTip:GetModule("Appearance")
-local db = mod.db.profile
+local db = mod.db.profile.bgColor
 return unpack(db.hostilePC)
 ]],
 		hostileNPC = [[
 local mod = StarTip:GetModule("Appearance")
-local db = mod.db.profile
+local db = mod.db.profile.bgColor
 return unpack(db.hostileNPC)
 ]],
 		neutralNPC = [[
 local mod = StarTip:GetModule("Appearance")
-local db = mod.db.profile
+local db = mod.db.profile.bgColor
 return unpack(db.neutralNPC)
+]],
+		friendlyPC = [[
+local mod = StarTip:GetModule("Appearance")
+local db = mod.db.profile.bgColor
+return unpack(db.friendlyPC)
 ]],
 		friendlyNPC = [[
 local mod = StarTip:GetModule("Appearance")
-local db = mod.db.profile
+local db = mod.db.profile.bgColor
 return unpack(db.friendlyNPC)
 ]],
 		other = [[
 local mod = StarTip:GetModule("Appearance")
-local db = mod.db.profile
+local db = mod.db.profile.bgColor
 return unpack(db.other)
 ]],
 		dead = [[
 local mod = StarTip:GetModule("Appearance")
-local db = mod.db.profile
+local db = mod.db.profile.bgColor
 return unpack(db.dead)
 ]],
 		tapped = [[
 local mod = StarTip:GetModule("Appearance")
-local db = mod.db.profile
+local db = mod.db.profile.bgColor
 return unpack(db.tapped)
 ]]
 
+	}
 }
 
 local get = function(info)
@@ -62,16 +74,15 @@ local set = function(info, v)
 end
 
 local options = {
-	background = {
-		name = L["Background"],
+	--background = {
+		--[[name = L["Background"],
 		desc = L["One of these scripts will be ran when the tooltip shows."],
 		type = "group",
 		width = "full",
-		multiline = true,
 		get = get,
 		set = set,
-		order = 4
-		args = {
+		order = 4,
+		args = {]]
 			header = {
 				name = L["Background Color"],
 				type = "header",
@@ -83,7 +94,9 @@ local options = {
 				type = "input",
 				width = "full",
 				multiline = true,
-				order = 2
+				get = get,
+				set = set,
+				order = 50
 			},
 			hostilePC = {
 				name = L["Hostile players"],
@@ -91,7 +104,9 @@ local options = {
 				type = "input",
 				width = "full",
 				multiline = true,
-				order = 3
+				get = get,
+				set = set,
+				order = 51
 			},
 			hostileNPC = {
 				name = L["Hostile non-player characters"],
@@ -99,7 +114,9 @@ local options = {
 				type = "input",
 				width = "full",
 				multiline = true,
-				order = 4
+				get = get,
+				set = set,
+				order = 52
 			},
 			neutralNPC = {
 				name = L["Neutral non-player characters"],
@@ -107,7 +124,9 @@ local options = {
 				type = "input",
 				width = "full",
 				multiline = true,
-				order = 5
+				get = get,
+				set = set,
+				order = 53
 			},
 			friendlyPC = {
 				name = L["Friendly players"],
@@ -115,7 +134,9 @@ local options = {
 				type = "input",
 				width = "full",
 				multiline = true,
-				order = 6
+				get = get,
+				set = set,
+				order = 54
 			},
 			friendlyNPC = {
 				name = L["Friendly non-player characters"],
@@ -123,10 +144,12 @@ local options = {
 				type = "input",
 				width = "full",
 				multiline = true,
-				order = 7
+				get = get,
+				set = set,
+				order = 55
 			}
-		}
-	},
+		--}
+	--}
 }
 
 function mod:OnInitialize()
@@ -148,7 +171,7 @@ function mod:GetOptions()
 end
 
 function mod:GameTooltip_SetDefaultAnchor(this, owner)
-		local kind
+		local kind = ""
 		if UnitExists(StarTip.unit or "mouseover") then
 			if UnitIsDeadOrGhost(StarTip.unit or "mouseover") then
 				kind = 'dead'
@@ -192,7 +215,7 @@ function mod:GameTooltip_SetDefaultAnchor(this, owner)
 		else
 			kind = 'other'
 		end
-	local r, g, b, a = Evaluator.ExecuteCode(StarTip.environment, "StarTip.Background", self.db.profile[kind])
-        StarTip.tooltipMain:SetBackdropColor(r, g, b, a)
+	local r, g, b, a = Evaluator.ExecuteCode(StarTip.environment, "StarTip.Background." .. kind, self.db.profile[kind])
+        StarTip.tooltipMain:SetBackdropColor(r or 0, g or 1, b or 0, a or .5)
 end
 

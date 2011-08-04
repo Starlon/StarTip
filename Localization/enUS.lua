@@ -441,3 +441,7 @@ L["This will be ran when the tooltip shows."] = true
 
 
 
+-- Background
+L["Background"] = true
+L["One of these scripts will be ran when the tooltip shows."] = true
+

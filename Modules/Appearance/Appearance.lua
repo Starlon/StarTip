@@ -390,15 +390,15 @@ end
 function mod:OnEnable()
 	self:SetScale()
 	self:SetBackdrop()
-	self:SetBackdropColor(true)
+	--self:SetBackdropColor(true)
 	StarTip:SetOptionsDisabled(options, false)
 end
 
 function mod:OnDisable()
 	self:SetScale(true)
-	self:SetBorderColor(true)
+	--self:SetBorderColor(true)
 	self:SetBackdrop(true)
-	self:SetBackdropColor(true)
+	--self:SetBackdropColor(true)
 	StarTip:SetOptionsDisabled(options, true)
 end
 
@@ -407,9 +407,9 @@ function mod:GetOptions()
 end
 
 function mod:SetUnit()
-	self.origBackdrop = self.origBackdrop or _G["StarTipTooltipMain"]:GetBackdrop()
-	self.origBackdropColor = self.origBackdropColor or {_G["StarTipTooltipMain"]:GetBackdropColor()}
-	self:SetBackdropColor()
+	--self.origBackdrop = self.origBackdrop or _G["StarTipTooltipMain"]:GetBackdrop()
+	--self.origBackdropColor = self.origBackdropColor or {_G["StarTipTooltipMain"]:GetBackdropColor()}
+	--self:SetBackdropColor()
 end
 
 function mod:OnHide()
