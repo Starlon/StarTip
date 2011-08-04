@@ -413,11 +413,11 @@ function mod:SetUnit()
 end
 
 function mod:OnHide()
-	self:SetBackdropColor(true)
+	--self:SetBackdropColor(true)
 end
 
 function mod:OnShow()
-	self:SetBackdropColor()
+	--self:SetBackdropColor()
 end
 
 function mod:SetScale(reset)
@@ -467,6 +467,7 @@ function mod:SetBackdrop()
 	end
 end
 
+--[[
 function mod:SetBackdropColor(reset)
 	if reset then
 		if self.origBackdropColor then 
@@ -530,6 +531,6 @@ function mod:SetBackdropColor(reset)
 		end
 	end
 end
-
+]]
 
 

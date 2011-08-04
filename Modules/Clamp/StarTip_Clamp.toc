@@ -3,7 +3,7 @@
 ## Notes: Tooltips from Outerspace
 ## Author: Starlon
 ## Version: 1.0
-## Deps: StarTip
+## Deps: StarTip, StarTip_Appearance
 ## X-Category: Tooltip
 ## X-Part-Of: StarTip
 
