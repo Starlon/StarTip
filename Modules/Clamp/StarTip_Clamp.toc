@@ -1,5 +1,5 @@
 ## Interface: 40200
-## Title: StarTip [Fade]
+## Title: StarTip [Clamp]
 ## Notes: Tooltips from Outerspace
 ## Author: Starlon
 ## Version: 1.0
@@ -7,4 +7,4 @@
 ## X-Category: Tooltip
 ## X-Part-Of: StarTip
 
-Fade.lua
+Clamp.lua
