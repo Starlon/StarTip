@@ -1,0 +1,10 @@
+## Interface: 40200
+## Title: StarTip [Background]
+## Notes: Tooltips from Outerspace
+## Author: Starlon
+## Version: 1.0
+## Deps: StarTip, StarTip_Appearance
+## X-Category: Tooltip
+## X-Part-Of: StarTip
+
+Clamp.lua
