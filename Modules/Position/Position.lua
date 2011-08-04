@@ -19,6 +19,7 @@ local defaults = {
 		anchor = 1,
 		unitFrames = 1,
 		other = 1,
+		refreshRate = 50,
 		inCombatXOffset = 10,
 		inCombatYOffset = 0,
 		anchorXOffset = 10,
@@ -52,6 +53,16 @@ local mod = StarTip:GetModule("Position")
 x = x + mod.db.profile.otherXOffset
 y = y + mod.db.profile.otherYOffset
 ]],
+		animation = [[
+scale = 10
+d=0.2; 
+r=i+PI; 
+x=cos(r)*d*scale; 
+y=sin(r)*d*scale
+]],
+		animationFrame = [[
+i = 0
+]]
 		
 	}
 }
@@ -251,6 +262,14 @@ local options = {
 		end,
 		order = 20
 	},
+	refreshRate = {
+		name = "Refresh Rate",
+		type = "input",
+		pattern = "%d",
+		get = function() return tostring(mod.db.profile.refreshRate) end,
+		set = function(info, val) mod.db.profile.refreshRate = tonumber(val) end,
+		order = 21
+	},	
 	anchorScript = {
 		name = "Gametooltip Non-Unit",
 		type = "input",
@@ -260,7 +279,7 @@ local options = {
 		set = function(info, val)
 			mod.db.profile.anchorScript = val
 		end,
-		order = 21
+		order = 22
 	},
 	inCombatScript = {
 		name = "Gametooltip Is-Unit",
@@ -271,7 +290,7 @@ local options = {
 		set = function(info, val)
 			mod.db.profile.inCombatScript = val
 		end,
-		order = 22
+		order = 23
 	},
 	unitFramesScript = {
 		name = "Tooltip Main",
@@ -282,7 +301,7 @@ local options = {
 		set = function(info, val)
 			mod.db.profile.unitFramesScript = val
 		end,
-		order = 23
+		order = 24
 	},
 	otherScript = {
 		name = "Other objects",
@@ -291,10 +310,29 @@ local options = {
 		width = "full",
 		get = function() return mod.db.profile.otherScript end,
 		set = function(info, val) mod.db.profile.otherScript = val end,
-		order = 24
+		order = 25
+	},
+	animation = {
+		name = "Animation Script",
+		type = "input",
+		multiline = true,
+		width = "full",
+		get = function() return mod.db.profile.animation end,
+		set = function(info, val) mod.db.profile.animation = val end,
+		order = 26
+	},
+	animationFrame = {
+		name = "Animation Frame Script",
+		type = "input",
+		multiline = true,
+		width = "full",
+		get = function() return mod.db.profile.animationFrame end,
+		set = function(info, val) mod.db.profile.animationFrame = val end,
+		order = 27
 	}
 }
 
+local PositionTooltip, PositionMainTooltip
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
@@ -305,6 +343,8 @@ function mod:OnEnable()
 	self:RegisterEvent("REGEN_ENABLED")
 	self:SecureHook("GameTooltip_SetDefaultAnchor")
 	StarTip:SetOptionsDisabled(options, false)
+	self.updateTimer = LibTimer:New("Position timer", self.db.profile.refreshRate, true, PositionTooltip)
+	self.fakeUpdateTimer = LibTimer:New("Position fake timer", self.db.profile.refreshRate, true, PositionMainTooltip)
 end
 
 function mod:OnDisable()
@@ -368,7 +408,7 @@ end
 
 local isUnitTooltip
 local currentAnchor = "BOTTOM"
-local PositionTooltip = function()
+PositionTooltip = function()
 	local environment = StarTip.environment
 	local effScale = GameTooltip:GetEffectiveScale()
 	local x, y = GetCursorPosition()
@@ -377,6 +417,9 @@ local PositionTooltip = function()
 
 	x, y = mod:GetPosition(x, y) -- execute user script
 
+
+	local xx, yy = Evaluator.ExecuteCode(StarTip.environment, "Position.animation", mod.db.profile.animation)
+	
 	local index = getIndex(environment.anchorFrame)
 	local anchor =  environment.anchor or StarTip.opposites[StarTip.anchors[index]:sub(8)]
 	local relative = environment.relativeRelative or "BOTTOMLEFT"
@@ -399,13 +442,22 @@ local PositionTooltip = function()
 	end
 
 end
+	local minX = -math.floor(GetScreenWidth()/5 + 0.5) * 5
+	local minY = -math.floor(GetScreenHeight()/5 + 0.5) * 5
+	local maxX = math.floor(GetScreenWidth()/5 + 0.5) * 5
+	local maxY = math.floor(GetScreenHeight()/5 + 0.5) * 5
 
-local PositionMainTooltip = function()
+PositionMainTooltip = function()
 	local tooltip = StarTip.tooltipMain
 	local environment = StarTip.environment
 	environment.effScale = tooltip:GetEffectiveScale()
 	local x, y = GetCursorPosition()
 	x, y = mod:GetPosition(x, y) -- execute user script
+	StarTip.environment.i = (StarTip.environment.i or 0) + 1
+	Evaluator.ExecuteCode(StarTip.environment, "Position.animation", mod.db.profile.animation)
+	local xx, yy = StarTip.environment.x, StarTip.environment.y
+        x = x + floor((((xx or 0) + 1.0) * GetScreenWidth() * 0.01))
+        y = y + floor((((yy or 0) + 1.0) * GetScreenHeight() * 0.01))
 
 	local effScale = environment.effScale
 	local anchor =  environment.anchor or "BOTTOMRIGHT"
@@ -502,6 +554,8 @@ function mod:GameTooltip_SetDefaultAnchor(this, owner)
 	currentThis = this
 	local index = getIndex(owner)
 	local ownername = owner:GetName()
+
+	Evaluator.ExecuteCode(StarTip.environment, "StarTip.Position.animationFrame", self.db.profile.animationFrame)
 
 	if owner == MainMenuMicroButton then -- This one is troublesome, so single it out and anchor right away.
 		delayAnchor() 

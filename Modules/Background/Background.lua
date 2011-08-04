@@ -216,6 +216,8 @@ function mod:GameTooltip_SetDefaultAnchor(this, owner)
 			kind = 'other'
 		end
 	local r, g, b, a = Evaluator.ExecuteCode(StarTip.environment, "StarTip.Background." .. kind, self.db.profile[kind])
-        StarTip.tooltipMain:SetBackdropColor(r or 0, g or 1, b or 0, a or .5)
+        StarTip.tooltipMain:SetBackdropColor(r or 0, g or 0, b or 0, a or .5)
+	ShoppingTooltip1:SetBackdropColor(r or 0, g or 0, b or 0, a or .5)
+	ShoppingTooltip2:SetBackdropColor(r or 0, g or 0, b or 0, a or .5)
 end
 
