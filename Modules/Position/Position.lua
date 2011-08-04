@@ -298,7 +298,6 @@ local options = {
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
 	StarTip:SetOptionsDisabled(options, true)
-	self.timer = LibTimer:New("Position.timer ", 100, false, positionTooltip)
 end
 
 function mod:OnEnable()
@@ -369,24 +368,24 @@ end
 
 local isUnitTooltip
 local currentAnchor = "BOTTOM"
-local positionTooltip = function()
-	local envirnment = StarTip.environment
+local PositionTooltip = function()
+	local environment = StarTip.environment
 	local effScale = GameTooltip:GetEffectiveScale()
 	local x, y = GetCursorPosition()
 
-	environment.anchorFrame = UIParent
+	environment.relativeFrame = UIParent
 
 	x, y = mod:GetPosition(x, y) -- execute user script
 
 	local index = getIndex(environment.anchorFrame)
 	local anchor =  environment.anchor or StarTip.opposites[StarTip.anchors[index]:sub(8)]
-	local relative = environment.anchorRelative or "BOTTOMLEFT"
+	local relative = environment.relativeRelative or "BOTTOMLEFT"
 	environment.anchor = false
 	environment.anchorRelative = false
 
 	if not isUnitTooltip then
 		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint(anchor, environment.anchorFrame, relative, x / effScale, y / effScale)
+		GameTooltip:SetPoint(anchor, environment.relativeFrame, relative, x / effScale, y / effScale)
 	end
 
 	if UnitExists(StarTip.unit or "mouseover") then
@@ -401,27 +400,32 @@ local positionTooltip = function()
 
 end
 
-local positionMainTooltip = function()
+local PositionMainTooltip = function()
+	local tooltip = StarTip.tooltipMain
 	local environment = StarTip.environment
-
-	environment.anchorFrame = UIParent
+	environment.effScale = tooltip:GetEffectiveScale()
 	local x, y = GetCursorPosition()
 	x, y = mod:GetPosition(x, y) -- execute user script
-	local index = getIndex(environment.anchorFrame)
-	local anchor =  environment.anchor or StarTip.opposites[StarTip.anchors[index]:sub(8)]
-	local relative = environment.anchorRelative or "BOTTOMLEFT"
+
+	local effScale = environment.effScale
+	local anchor =  environment.anchor or "BOTTOMRIGHT"
+	local relativeFrame = environment.relativeFrame or GameTooltip:GetParent()
+	local anchorRelative = environment.anchorRelative or "BOTTOMLEFT"
+	local index = getIndex(relativeFrame)
 	environment.anchor = false
+	environment.relativeFrame = false
 	environment.anchorRelative = false
 
-	local tooltip = StarTip.tooltipMain
-	local effScale = tooltip:GetEffectiveScale()
+	if StarTip.anchors[index]:find("^CURSOR_")  then
+		anchor = StarTip.opposites[StarTip.anchors[index]:sub(8)]
+	end
 
 	tooltip:ClearAllPoints()
-	tooltip:SetPoint(anchor, UIParent, anchorRelative, x / effScale, y / effScale)
+	tooltip:SetPoint(anchor, relativeFrame, anchorRelative, x / effScale, y / effScale)
 end
 
-local updateTimer = LibTimer:New("Position timer", 30, true, positionTooltip)
-local fakeUpdateTimer = LibTimer:New("Position fake timer", 30, true, positionMainTooltip)
+local updateTimer = LibTimer:New("Position timer", 40, true, PositionTooltip)
+local fakeUpdateTimer = LibTimer:New("Position fake timer", 40, true, PositionMainTooltip)
 
 --[[
 mod:SetOffsets = function()
@@ -464,10 +468,10 @@ local function delayAnchor()
 		if GameTooltip:GetUnit() then
 			isUnitTooltip = true
 			fakeUpdateTimer:Start()
-			positionMainTooltip()
+			PositionMainTooltip()
 		end
 		updateTimer:Start()
-		positionTooltip()
+		PositionTooltip()
 	elseif GameTooltip:GetUnit() then
 		fakeUpdateTimer:Stop()
 		updateTimer:Stop()
@@ -524,7 +528,7 @@ function mod:SetSpell()
 	local index = getIndex(currentOwner)
 	if StarTip.anchors[index]:find("^CURSOR_")  then
 		updateTimer:Stop()
-		positionTooltip()
+		PositionTooltip()
 	else
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
@@ -535,7 +539,7 @@ function mod:SetItem()
 	local index = getIndex(currentOwner)
 	if StarTip.anchors[index]:find("^CURSOR_")  then
 		updateTimer:Stop()
-		positionTooltip()
+		PositionTooltip()
 	else
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
