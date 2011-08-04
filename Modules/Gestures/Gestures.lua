@@ -66,7 +66,7 @@ StopNoise()
 		startButton = "LeftButtonDown",
 		stopButton = "LeftButtonUp",
 		nextButton = "RightButtonDown",
-		cancelBUtton = "RightButtonUp",
+		cancelBUtton = "",
 		startFunc = [[
 return function(rec, a, b, c, d) 
 print("startFunc")
@@ -115,7 +115,12 @@ end
 		cancelFunc = [[
 return function(rec, a, b, c, d)
 print("cancelFunc")
-    self:Start()
+    if #rec.cdoodle > 1 then
+        local doodle = rec.cdoodle[#rec.cdoodle]
+        doodle[3]:Hide()
+        rec.cdoodle[#rec.cdoodle] = nil
+        self:Draw()
+    end
 end
 ]],
 		tooltip = false,
