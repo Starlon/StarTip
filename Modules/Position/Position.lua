@@ -1,6 +1,7 @@
 local mod = StarTip:NewModule("Position", "AceEvent-3.0", "AceHook-3.0")
 mod.name = "Positioning"
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
+local Evaluator = LibStub("LibScriptableUtilsEvaluator-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -26,7 +27,31 @@ local defaults = {
 		unitFramesYOffset = 0,
 		otherXOffset = 10,
 		otherYOffset = 0,
-		defaultUnitTooltipPos = 5
+		defaultUnitTooltipPos = 5,
+		anchorScript = [[
+-- Modify locals x and y.They're set to mouse cursor position to start.
+local mod = StarTip:GetModule("Position")
+x = x + mod.db.profile.anchorXOffset
+y = y + mod.db.profile.anchorYOffset
+]],
+		inCombatScript = [[
+-- Modify locals x and y.They're set to mouse cursor position to start.
+local mod = StarTip:GetModule("Position")
+x = x + mod.db.profile.inCombatXOffset
+y = y + mod.db.profile.inCombatYOffset
+]],
+		unitFramesScript = [[
+-- Modify locals x and y.They're set to mouse cursor position to start.
+local mod = StarTip:GetModule("Position")
+x = x + mod.db.profile.unitFramesXOffset
+y = y + mod.db.profile.unitFramesYOffset
+]],
+		otherScript = [[
+-- Modify locals x and y.They're set to mouse cursor position to start.
+local mod = StarTip:GetModule("Position")
+x = x + mod.db.profile.otherXOffset
+y = y + mod.db.profile.otherYOffset
+]],
 		
 	}
 }
@@ -96,31 +121,6 @@ local options = {
 		order = 6
 	
 	},
-	--[[anchorXOffset = {
-		name = "X-axis offset",
-		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
-		type = "range",
-		min = minX,
-		max = maxX,
-		step = 1,
-		bigStep = 5,
-		get = get,
-		set = set,
-		order = 5
-	},
-	anchorYOffset = {
-		name = "Y-axis offset",
-		desc = "The y-axis offset used to position the tooltip in relationship to the anchor point",
-		type = "range",
-		min = minY,
-		max = maxY,
-		step = 1,
-		bigStep = 5,
-		get = get,
-		set = set,
-		order = 6
-	
-	},]]
 	inCombatHeader = {
 		name = "",
 		type = "header",
@@ -161,30 +161,6 @@ local options = {
 		end,
 		order = 10,
 	},	
-	--[[inCombatXOffset = {
-		name = "X-axis offset",
-		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
-		type = "range",
-		min = minX,
-		max = maxX,
-		step = 1,
-		bigStep = 5,
-		get = get,
-		set = set,
-		order = 9
-	},
-	inCombatYOffset = {
-		name = "Y-axis offset",
-		desc = "The y-axis offset used to position the tooltip in relationship to the anchor point",
-		type = "range",
-		min = minY,
-		max = maxY,
-		step = 1,
-		bigStep = 5,
-		get = get,
-		set = set,
-		order = 10
-	},]]
 	unitFramesHeader = {
 		name = "",
 		type = "header",
@@ -225,30 +201,6 @@ local options = {
 		end,
 		order = 14
 	},	
-	--[[unitFramesXOffset = {
-		name = "X-axis offset",
-		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
-		type = "range",
-		min = minX,
-		max = maxX,
-		step = 1,
-		bigStep = 5,
-		get = get,
-		set = set,
-		order = 13
-	},
-	unitFramesYOffset = {
-		name = "Y-axis offset",
-		desc = "The y-axis offset used to position the tooltip in relationship to the anchor point",
-		type = "range",
-		min = minY,
-		max = maxY,
-		step = 1,
-		bigStep = 5,
-		get = get,
-		set = set,
-		order = 14
-	},]]
 	otherHeader = {
 		name = "",
 		type = "header",
@@ -289,30 +241,6 @@ local options = {
 		end,
 		order = 18
 	},	
-	--[[otherXOffset = {
-		name = "X-axis offset",
-		desc = "The x-axis offset used to position the tooltip in relationship to the anchor point",
-		type = "range",
-		min = minX,
-		max = maxX,
-		step = 1,
-		bigStep = 5,
-		get = get,
-		set = set,
-		order = 17
-	},
-	otherYOffset = {
-		name = "Y-axis offset",
-		desc = "The y-axis offset used to position the tooltip in relationship to the anchor point",
-		type = "range",
-		min = minY,
-		max = maxY,
-		step = 1,
-		bigStep = 5,
-		get = get,
-		set = set,
-		order = 18
-	}]]
 	defaultUnitTooltipPos = {
 		name = "Position UI Tooltip",
 		type = "select",
@@ -322,6 +250,48 @@ local options = {
 			mod.db.profile.defaultUnitTooltipPos = val
 		end,
 		order = 20
+	},
+	anchorScript = {
+		name = "Gametooltip Non-Unit",
+		type = "input",
+		multiline = true,
+		width = "full",
+		get = function() return mod.db.profile.anchorScript end,
+		set = function(info, val)
+			mod.db.profile.anchorScript = val
+		end,
+		order = 21
+	},
+	inCombatScript = {
+		name = "Gametooltip Is-Unit",
+		type = "input",
+		multiline = true,
+		width = "full",
+		get = function() return mod.db.profile.inCombatScript end,
+		set = function(info, val)
+			mod.db.profile.inCombatScript = val
+		end,
+		order = 22
+	},
+	unitFramesScript = {
+		name = "Tooltip Main",
+		type = "input",
+		multiline = true,
+		width = "full",
+		get = function() return mod.db.profile.unitFramesScript end,
+		set = function(info, val)
+			mod.db.profile.unitFramesScript = val
+		end,
+		order = 23
+	},
+	otherScript = {
+		name = "Other objects",
+		type = "input",
+		multiline = true,
+		width = "full",
+		get = function() return mod.db.profile.otherScript end,
+		set = function(info, val) mod.db.profile.otherScript = val end,
+		order = 24
 	}
 }
 
@@ -349,12 +319,14 @@ function mod:GetOptions()
 	return options
 end
 
-local getIndex = function(owner)
-	local index
+local currentOwner
+local currentThis
+local getIndex = function()
+	local index = self.db.profile.other
 	if GameTooltip:GetUnit() and UnitExists(StarTip.unit) then
 		if InCombatLockdown() then
 			index = self.db.profile.inCombat
-		elseif owner == UIParent then
+		elseif currentOwner == UIParent then
 			index = self.db.profile.anchor
 		else
 			index = self.db.profile.unitFrames
@@ -365,6 +337,30 @@ local getIndex = function(owner)
 	return index
 end
 
+function mod:GetPosition(x, y)
+	local environment = StarTip.environment
+	environment.x = x
+	environment.y = y
+	if currentOwner == UIParent then
+		if UnitExists(StarTip.unit) then
+			if InCombatLockdown() then
+				Evaluator.ExecuteCode(environment, "StarTip.Position.inCombat", self.db.profile.inCombatScript)
+			else
+				Evaluator.ExecuteCode(environment, "StarTip.Position.inCombat", self.db.profile.anchorScript)
+			end
+		else
+			Evaluator.ExecuteCode(environment, "StarTip.Position.other", self.db.profile.otherScript)
+		end
+	else
+		if UnitExists(StarTip.unit) then
+			Evaluator.ExecuteCode(environment, "StarTip.Position.other", self.db.profile.unitFramesScript)
+		else
+			Evaluator.ExecuteCode(environment, "StarTip.Position.other", self.db.profile.otherScript)
+		end
+	end
+	return environment.x, environment.y
+end
+
 local function hideGameTooltip()
 	GameTooltip:ClearAllPoints()
 	GameTooltip:SetClampRectInsets(10000, 0, 0, 0)
@@ -373,15 +369,24 @@ end
 
 local isUnitTooltip
 local currentAnchor = "BOTTOM"
-local xoffset, yoffset = 0, 0
 local positionTooltip = function()
-	local x, y = GetCursorPosition()
-	
+	local envirnment = StarTip.environment
 	local effScale = GameTooltip:GetEffectiveScale()
-	
+	local x, y = GetCursorPosition()
+
+	environment.anchorFrame = UIParent
+
+	x, y = mod:GetPosition(x, y) -- execute user script
+
+	local index = getIndex(environment.anchorFrame)
+	local anchor =  environment.anchor or StarTip.opposites[StarTip.anchors[index]:sub(8)]
+	local relative = environment.anchorRelative or "BOTTOMLEFT"
+	environment.anchor = false
+	environment.anchorRelative = false
+
 	if not isUnitTooltip then
 		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", (x + xoffset) / effScale, (y + yoffset) / effScale + 5)
+		GameTooltip:SetPoint(anchor, environment.anchorFrame, relative, x / effScale, y / effScale)
 	end
 
 	if UnitExists(StarTip.unit or "mouseover") then
@@ -397,23 +402,30 @@ local positionTooltip = function()
 end
 
 local positionMainTooltip = function()
-	local x, y = GetCursorPosition()
+	local environment = StarTip.environment
 
-	local index = getIndex(UIParent)
-	local currentAnchor = StarTip.opposites[StarTip.anchors[index]:sub(8)]
+	environment.anchorFrame = UIParent
+	local x, y = GetCursorPosition()
+	x, y = mod:GetPosition(x, y) -- execute user script
+	local index = getIndex(environment.anchorFrame)
+	local anchor =  environment.anchor or StarTip.opposites[StarTip.anchors[index]:sub(8)]
+	local relative = environment.anchorRelative or "BOTTOMLEFT"
+	environment.anchor = false
+	environment.anchorRelative = false
+
 	local tooltip = StarTip.tooltipMain
 	local effScale = tooltip:GetEffectiveScale()
 
 	tooltip:ClearAllPoints()
-	tooltip:SetPoint(currentAnchor, UIParent, "BOTTOMLEFT", 
-		(x + xoffset) / effScale, (y + yoffset) / effScale)
+	tooltip:SetPoint(anchor, UIParent, anchorRelative, x / effScale, y / effScale)
 end
 
 local updateTimer = LibTimer:New("Position timer", 30, true, positionTooltip)
 local fakeUpdateTimer = LibTimer:New("Position fake timer", 30, true, positionMainTooltip)
 
-local setOffsets = function(owner)
-	if owner == UIParent then
+--[[
+mod:SetOffsets = function()
+	if currentOwner == UIParent then
 		if UnitExists(StarTip.unit) then
 			if InCombatLockdown() then
 				xoffset = self.db.profile.inCombatXOffset
@@ -436,13 +448,11 @@ local setOffsets = function(owner)
 		end
 	end
 end
+]]
 
-local currentOwner
-local currentThis
 local function delayAnchor()
 	local this = currentThis
 	local owner = currentOwner
-	setOffsets(owner)
 	local index = getIndex(owner)
 
 	if index == #selections then
@@ -461,13 +471,24 @@ local function delayAnchor()
 	elseif GameTooltip:GetUnit() then
 		fakeUpdateTimer:Stop()
 		updateTimer:Stop()
+		StarTip.envirnoment.x = 0
+		StarTip.environment.y = 0
+		Evaluator.ExecuteCode(StarTip.environment, "StarTip.Position", mod.db.profile.anchorScript)
 		StarTip.tooltipMain:ClearAllPoints()
-		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
+		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], StarTip.environment.x, StarTip.environment.y)
 	else
 		fakeUpdateTimer:Stop()
 		updateTimer:Stop()
 		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
+		StarTip.environment.x = 0
+		StarTip.environment.y = 0
+		StarTip.environment.i = index
+		Evaluator.ExecuteCode(StarTip.environment, "StarTip.Position", mod.db.profile.otherScript)
+		index = StarTip.envirnment.i
+		local anchor = StarTip.anchor or StarTip.anchors[index]
+		local relative = StarTip.anchorRelative or anchor
+		GameTooltip:SetPoint(anchor, UIParent, anchorRelative, StarTip.environment.x, StarTip.environment.y)
+		StarTip.anchor = false
 	end
 end
 local delayTimer = LibTimer:New("Position delay timer", 30, false, delayAnchor)
