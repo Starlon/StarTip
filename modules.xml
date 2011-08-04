@@ -19,6 +19,7 @@
 <Script file = "Modules\Gestures\Gestures.lua"/>
 <Script file = "Modules\Nameplates\Nameplates.lua"/>
 <Script file = "Modules\Debug\Debug.lua"/>
+<Script file = "Modules\Clamp\Clamp.lua"/>
 
 <!--@end-debug@-->
 
