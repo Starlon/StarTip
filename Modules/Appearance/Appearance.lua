@@ -392,12 +392,6 @@ function mod:OnEnable()
 	self:SetBackdrop()
 	self:SetBackdropColor(true)
 	StarTip:SetOptionsDisabled(options, false)
-	local cleft = self.db.profile.clampLeft
-	local cright = self.db.profile.clampRight
-	local ctop = self.db.profile.clampTop
-	local cbottom = self.db.profile.clampBottom
-	--StarTip.tooltipMain:SetClampRectInsets(cleft, cright, ctop, cbottom)
-	--StarTip.tooltipMain:SetClampedToScreen(true)
 end
 
 function mod:OnDisable()
@@ -406,7 +400,6 @@ function mod:OnDisable()
 	self:SetBackdrop(true)
 	self:SetBackdropColor(true)
 	StarTip:SetOptionsDisabled(options, true)
-	StarTip.tooltipMain:SetClampRectInsets(0, 0, 0, 0)
 end
 
 function mod:GetOptions()

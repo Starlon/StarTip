@@ -11,8 +11,9 @@ local Evaluator = LibStub("LibScriptableUtilsEvaluator-1.0")
 local defaults = {
 	profile = {
 		script = [[
-local clampLeft, clampRight, clampTop, clampBottom = 0, 10, 10, 0
-return clampLeft, clampRight, clampTop, clampBottom
+local mod = StarTip:GetModule("Appearance")
+local db = mod.db.profile
+return db.clampLeft, db.clampRight, db.clampTop, db.clampBottom
 ]],
 	}
 }
@@ -30,7 +31,7 @@ local options = {
 		name = L["Script"],
 		desc = L["This will be ran when the tooltip shows."],
 		type = "input",
-		width = "half",
+		width = "full",
 		multiline = true,
 		get = get,
 		set = set,
