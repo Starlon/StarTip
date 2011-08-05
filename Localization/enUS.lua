@@ -157,6 +157,7 @@ L["Casting:"] = true
 L["Fails"] = true
 L["Fails: %d"] = true
 L["Threat"] = true
+L["Raid Group"] = true
 -- UnitTooltip options
 L["Add Line"] = true
 L["A line named %s already exists."] = true

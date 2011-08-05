@@ -777,6 +777,22 @@ return lastArena5
         update = 300,
         leftUpdating = true,
         cols = 100
+    },
+    [40] = {
+        name = L["Raid Group"],
+        enabled = true,
+        right = [[
+if UnitInRaid(unit) then
+ local size = GetNumRaidMembers()
+ local uname=Name(unit)
+ for i = 1, size do
+  local name,_,subgroup = GetRaidRosterInfo(i)
+  if uname==name then
+   return format("Raid Group: %s", subgroup)
+  end
+ end
+end
+]],
     }
 }
 for i, v in ipairs(defaultLines) do
