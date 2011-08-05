@@ -29,6 +29,7 @@ local defaults = {
 		otherXOffset = 10,
 		otherYOffset = 0,
 		defaultUnitTooltipPos = 5,
+		animationsOn = true,
 		anchorScript = [[
 -- Modify locals x and y.They're set to mouse cursor position to start.
 local mod = StarTip:GetModule("Position")
@@ -252,6 +253,7 @@ local options = {
 		end,
 		order = 18
 	},	
+	header1 = { name = "", type="header", order = 19},
 	defaultUnitTooltipPos = {
 		name = "Position UI Tooltip",
 		type = "select",
@@ -264,12 +266,21 @@ local options = {
 	},
 	refreshRate = {
 		name = "Refresh Rate",
+		desc = "Refresh rate at which to update the tooltip's position.",
 		type = "input",
 		pattern = "%d",
 		get = function() return tostring(mod.db.profile.refreshRate) end,
 		set = function(info, val) mod.db.profile.refreshRate = tonumber(val) end,
 		order = 21
 	},	
+	animationsOn = {
+		name = "Perform Animations?",
+		desc = "This has very little overhead as the coordinates are just added together with the mouse pointer coordinates at each refresh of the position timer. Adjusting 'Refresh Rate' will have more impact if you're worried about performance. I hope people use animations. :)",
+		type = "toggle",
+		get = function() return mod.db.profile.animationsOn end,
+		set = function(info, val) mod.db.profile.animationsOn = val end,
+		order = 22
+	},
 	anchorScript = {
 		name = "Gametooltip Non-Unit",
 		type = "input",
@@ -279,7 +290,7 @@ local options = {
 		set = function(info, val)
 			mod.db.profile.anchorScript = val
 		end,
-		order = 22
+		order = 23
 	},
 	inCombatScript = {
 		name = "Gametooltip Is-Unit",
@@ -290,7 +301,7 @@ local options = {
 		set = function(info, val)
 			mod.db.profile.inCombatScript = val
 		end,
-		order = 23
+		order = 24
 	},
 	unitFramesScript = {
 		name = "Tooltip Main",
@@ -301,7 +312,7 @@ local options = {
 		set = function(info, val)
 			mod.db.profile.unitFramesScript = val
 		end,
-		order = 24
+		order = 25
 	},
 	otherScript = {
 		name = "Other objects",
@@ -310,7 +321,7 @@ local options = {
 		width = "full",
 		get = function() return mod.db.profile.otherScript end,
 		set = function(info, val) mod.db.profile.otherScript = val end,
-		order = 25
+		order = 26
 	},
 	animationInit = {
 		name = "Animation Init Script",
@@ -319,7 +330,7 @@ local options = {
 		width = "full",
 		get = function() return mod.db.profile.animationInit end,
 		set = function(info, val) mod.db.profile.animationInit = val end,
-		order = 26
+		order = 27
 	},
 	animationFrame = {
 		name = "Animation Frame Script",
@@ -328,7 +339,7 @@ local options = {
 		width = "full",
 		get = function() return mod.db.profile.animationFrame end,
 		set = function(info, val) mod.db.profile.animationFrame = val end,
-		order = 27
+		order = 28
 	},
 	animationPoint = {
 		name = "Animation Point Script",
@@ -337,7 +348,7 @@ local options = {
 		width = "full",
 		get = function() return mod.db.profile.animationPoint end,
 		set = function(info, val) mod.db.profile.animationPoint = val end,
-		order = 28
+		order = 29
 	}
 }
 
@@ -467,12 +478,17 @@ PositionMainTooltip = function()
 	environment.effScale = tooltip:GetEffectiveScale()
 	local x, y = GetCursorPosition()
 	x, y = mod:GetPosition(x, y) -- execute user script
-	mod.environment.i = (mod.environment.i or 0) + 1
-	mod.environment.v = (mod.environment.v or 0) +  random() / 100
-	Evaluator.ExecuteCode(mod.environment, "Position.animationPoint", mod.db.profile.animationPoint)
-	local xx, yy = mod.environment.x, mod.environment.y
-        x = x + floor((((xx or 0) + 1.0) * GetScreenWidth() * 0.01))
-        y = y + floor((((yy or 0) + 1.0) * GetScreenHeight() * 0.01))
+
+	-- animation
+	if mod.db.profile.animationsOn then
+		mod.environment.i = (mod.environment.i or 0) + 1
+		mod.environment.v = (mod.environment.v or 0) +  random() / 100
+		Evaluator.ExecuteCode(mod.environment, "Position.animationPoint", mod.db.profile.animationPoint)
+		local xx, yy = mod.environment.x, mod.environment.y
+	        x = x + floor((((xx or 0) + 1.0) * GetScreenWidth() * 0.01))
+        	y = y + floor((((yy or 0) + 1.0) * GetScreenHeight() * 0.01))
+	end
+
 
 	local effScale = environment.effScale
 	local anchor =  environment.anchor or "BOTTOMRIGHT"
