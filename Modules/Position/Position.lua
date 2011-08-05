@@ -392,7 +392,7 @@ function mod:GetPosition(x, y)
 		end
 	else
 		if UnitExists(StarTip.unit) then
-			Evaluator.ExecuteCode(environment, "StarTip.Position.other", self.db.profile.unitFramesScript)
+			Evaluator.ExecuteCode(environment, "StarTip.Position.unitFrameScript", self.db.profile.unitFramesScript)
 		else
 			Evaluator.ExecuteCode(environment, "StarTip.Position.other", self.db.profile.otherScript)
 		end
