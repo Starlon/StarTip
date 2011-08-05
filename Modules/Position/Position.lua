@@ -2,6 +2,7 @@ local mod = StarTip:NewModule("Position", "AceEvent-3.0", "AceHook-3.0")
 mod.name = "Positioning"
 local LibTimer = LibStub("LibScriptableUtilsTimer-1.0")
 local Evaluator = LibStub("LibScriptableUtilsEvaluator-1.0")
+local LibCore = LibStub("LibScriptableLCDCoreLite-1.0")
 local _G = _G
 local GameTooltip = _G.GameTooltip
 local StarTip = _G.StarTip
@@ -53,15 +54,14 @@ local mod = StarTip:GetModule("Position")
 x = x + mod.db.profile.otherXOffset
 y = y + mod.db.profile.otherYOffset
 ]],
-		animation = [[
-scale = 10
-d=0.2; 
-r=i+PI; 
-x=cos(r)*d*scale; 
-y=sin(r)*d*scale
+		animationInit = [[
+t = 0
 ]],
 		animationFrame = [[
-i = 0
+t = t - 5
+]],
+		animationPoint = [[
+d=(v*0.3); r=t+i*PI*0.02; x=cos(r)*d; y=sin(r)*d
 ]]
 		
 	}
@@ -312,13 +312,13 @@ local options = {
 		set = function(info, val) mod.db.profile.otherScript = val end,
 		order = 25
 	},
-	animation = {
-		name = "Animation Script",
+	animationInit = {
+		name = "Animation Init Script",
 		type = "input",
 		multiline = true,
 		width = "full",
-		get = function() return mod.db.profile.animation end,
-		set = function(info, val) mod.db.profile.animation = val end,
+		get = function() return mod.db.profile.animationInit end,
+		set = function(info, val) mod.db.profile.animationInit = val end,
 		order = 26
 	},
 	animationFrame = {
@@ -329,6 +329,15 @@ local options = {
 		get = function() return mod.db.profile.animationFrame end,
 		set = function(info, val) mod.db.profile.animationFrame = val end,
 		order = 27
+	},
+	animationPoint = {
+		name = "Animation Point Script",
+		type = "input",
+		multiline = true,
+		width = "full",
+		get = function() return mod.db.profile.animationPoint end,
+		set = function(info, val) mod.db.profile.animationPoint = val end,
+		order = 28
 	}
 }
 
@@ -345,6 +354,11 @@ function mod:OnEnable()
 	StarTip:SetOptionsDisabled(options, false)
 	self.updateTimer = LibTimer:New("Position timer", self.db.profile.refreshRate, true, PositionTooltip)
 	self.fakeUpdateTimer = LibTimer:New("Position fake timer", self.db.profile.refreshRate, true, PositionMainTooltip)
+	self.environment = {}
+	for k, v in pairs(StarTip.environment) do
+		self.environment[k] = v
+	end
+        Evaluator.ExecuteCode(self.environment, "StarTip.Position.animationInit", mod.db.profile.animationInit)
 end
 
 function mod:OnDisable()
@@ -377,7 +391,7 @@ local getIndex = function()
 end
 
 function mod:GetPosition(x, y)
-	local environment = StarTip.environment
+	local environment = self.environment
 	environment.x = x
 	environment.y = y
 	if currentOwner == UIParent then
@@ -409,7 +423,7 @@ end
 local isUnitTooltip
 local currentAnchor = "BOTTOM"
 PositionTooltip = function()
-	local environment = StarTip.environment
+	local environment = mod.environment
 	local effScale = GameTooltip:GetEffectiveScale()
 	local x, y = GetCursorPosition()
 
@@ -418,7 +432,7 @@ PositionTooltip = function()
 	x, y = mod:GetPosition(x, y) -- execute user script
 
 
-	local xx, yy = Evaluator.ExecuteCode(StarTip.environment, "Position.animation", mod.db.profile.animation)
+	local xx, yy = Evaluator.ExecuteCode(mod.environment, "Position.animation", mod.db.profile.animation)
 	
 	local index = getIndex(environment.anchorFrame)
 	local anchor =  environment.anchor or StarTip.opposites[StarTip.anchors[index]:sub(8)]
@@ -449,13 +463,14 @@ end
 
 PositionMainTooltip = function()
 	local tooltip = StarTip.tooltipMain
-	local environment = StarTip.environment
+	local environment = mod.environment
 	environment.effScale = tooltip:GetEffectiveScale()
 	local x, y = GetCursorPosition()
 	x, y = mod:GetPosition(x, y) -- execute user script
-	StarTip.environment.i = (StarTip.environment.i or 0) + 1
-	Evaluator.ExecuteCode(StarTip.environment, "Position.animation", mod.db.profile.animation)
-	local xx, yy = StarTip.environment.x, StarTip.environment.y
+	mod.environment.i = (mod.environment.i or 0) + 1
+	mod.environment.v = (mod.environment.v or 0) +  random() / 100
+	Evaluator.ExecuteCode(mod.environment, "Position.animationPoint", mod.db.profile.animationPoint)
+	local xx, yy = mod.environment.x, mod.environment.y
         x = x + floor((((xx or 0) + 1.0) * GetScreenWidth() * 0.01))
         y = y + floor((((yy or 0) + 1.0) * GetScreenHeight() * 0.01))
 
@@ -528,22 +543,22 @@ local function delayAnchor()
 		fakeUpdateTimer:Stop()
 		updateTimer:Stop()
 		StarTip.envirnoment.x = 0
-		StarTip.environment.y = 0
-		Evaluator.ExecuteCode(StarTip.environment, "StarTip.Position", mod.db.profile.anchorScript)
+		mod.environment.y = 0
+		Evaluator.ExecuteCode(mod.environment, "StarTip.Position", mod.db.profile.anchorScript)
 		StarTip.tooltipMain:ClearAllPoints()
-		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], StarTip.environment.x, StarTip.environment.y)
+		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], mod.environment.x, mod.environment.y)
 	else
 		fakeUpdateTimer:Stop()
 		updateTimer:Stop()
 		GameTooltip:ClearAllPoints()
-		StarTip.environment.x = 0
-		StarTip.environment.y = 0
-		StarTip.environment.i = index
-		Evaluator.ExecuteCode(StarTip.environment, "StarTip.Position", mod.db.profile.otherScript)
+		mod.environment.x = 0
+		mod.environment.y = 0
+		mod.environment.i = index
+		Evaluator.ExecuteCode(mod.environment, "StarTip.Position", mod.db.profile.otherScript)
 		index = StarTip.envirnment.i
 		local anchor = StarTip.anchor or StarTip.anchors[index]
 		local relative = StarTip.anchorRelative or anchor
-		GameTooltip:SetPoint(anchor, UIParent, anchorRelative, StarTip.environment.x, StarTip.environment.y)
+		GameTooltip:SetPoint(anchor, UIParent, anchorRelative, mod.environment.x, mod.environment.y)
 		StarTip.anchor = false
 	end
 end
@@ -555,7 +570,7 @@ function mod:GameTooltip_SetDefaultAnchor(this, owner)
 	local index = getIndex(owner)
 	local ownername = owner:GetName()
 
-	Evaluator.ExecuteCode(StarTip.environment, "StarTip.Position.animationFrame", self.db.profile.animationFrame)
+	Evaluator.ExecuteCode(mod.environment, "StarTip.Position.animationFrame", self.db.profile.animationFrame)
 
 	if owner == MainMenuMicroButton then -- This one is troublesome, so single it out and anchor right away.
 		delayAnchor() 
