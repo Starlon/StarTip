@@ -72,7 +72,7 @@ return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 		height = 50,
 		points = {{"TOPRIGHT", "StarTipTooltipMain", "BOTTOMRIGHT", -100, -12}},
 		color = [[
-return PowerColor("RAGE", unit)
+return PowerColor("MANA", unit)
 ]],
 		layer = 1,
 		update = 1000,
@@ -216,7 +216,7 @@ function updateHistogram(widget)
 			bar:SetStatusBarColor(r, g, b, a)
 		elseif type(segment) == "number" then
 			bar:SetValue(segment * 100)
-			bar:SetStatusBarColor(0, 0, 1, 1)
+			bar:SetStatusBarColor(.5, .1, .8, 1)
 		end
 		if not UnitExists(StarTip.unit) and not widget.config.alwaysShown then bar:Hide() end
 	end
