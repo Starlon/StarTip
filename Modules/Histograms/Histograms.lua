@@ -72,6 +72,7 @@ return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 		height = 50,
 		points = {{"TOPRIGHT", "StarTipTooltipMain", "BOTTOMRIGHT", -100, -12}},
 		color = [[
+print(PowerColor(nil, unit))
 return PowerColor(nil, unit)
 ]],
 		layer = 1,
