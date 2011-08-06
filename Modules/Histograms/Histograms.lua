@@ -72,7 +72,7 @@ return HPColor(UnitHealth(unit), UnitHealthMax(unit))
 		height = 50,
 		points = {{"TOPRIGHT", "StarTipTooltipMain", "BOTTOMRIGHT", -100, -12}},
 		color = [[
-return PowerColor("MANA", unit)
+return PowerColor(nil, unit)
 ]],
 		layer = 1,
 		update = 1000,
@@ -213,7 +213,7 @@ function updateHistogram(widget)
 		if type(segment) == "table" then
 			bar:SetValue((segment[1] or 0) * 100)
 			local r, g, b, a = widget.history[i][2], widget.history[i][3], widget.history[i][4]
-			bar:SetStatusBarColor(r, g, b, a)
+			bar:SetStatusBarColor(r, g, b, a or 1)
 		elseif type(segment) == "number" then
 			bar:SetValue(segment * 100)
 			bar:SetStatusBarColor(.5, .1, .8, 1)
