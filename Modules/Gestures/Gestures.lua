@@ -69,7 +69,6 @@ StopNoise()
 		cancelBUtton = "",
 		startFunc = [[
 return function(rec, a, b, c, d) 
-print("startFunc")
     local self = rec.widgetData
     self.cdoodle = self.cdoodle or {}
     self.cdoodle.creator = self.name
@@ -79,7 +78,6 @@ end
 ]],
 		updateFunc = [[
 return function(rec, a, b, c, d)
-print("updateFunc")
     local self = rec.widgetData
     if #rec.cdoodle > 0 then
         local l = rec.cdoodle[#rec.cdoodle]
@@ -99,8 +97,7 @@ end
 		stopFunc = false,
 		stopFuncoff = [[
 return function(rec, a, b, c, d)
-print("Stop func")
-    local sefl = rec.widgetData
+    local self = rec.widgetData
     self:Draw()
     self:Start()
     rec.cdoodle = {creator=self.name}
@@ -109,12 +106,10 @@ end
 
 		nextFunc = [[
 return function(rec, a, b, c, d)
-print("nextFunc")
 end
 ]],
 		cancelFunc = [[
 return function(rec, a, b, c, d)
-print("cancelFunc")
     if #rec.cdoodle > 1 then
         local doodle = rec.cdoodle[#rec.cdoodle]
         doodle[3]:Hide()
@@ -123,11 +118,10 @@ print("cancelFunc")
     end
 end
 ]],
-		tooltip = false,
 
 		maxGestures = 1,
 		showTrail = true,
-		tooltip = "Test"
+		tooltip = false
 		
 		
 	}
@@ -200,7 +194,6 @@ function mod:WipeGestures()
 end
 
 function mod:ReInit()
-    self:WipeGestures()
     for k, v in ipairs(defaultWidgets) do
         for j, vv in ipairs(self.db.profile.gestures) do
             if v.name == vv.name then
@@ -219,7 +212,6 @@ function mod:ReInit()
             tinsert(self.db.profile.gestures, copy(v))
         end
     end
-    self:CreateGestures()
 end
 
 function mod:OnInitialize()
