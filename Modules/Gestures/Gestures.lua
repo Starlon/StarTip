@@ -1,7 +1,7 @@
 local mod = StarTip:NewModule("Gestures")
 mod.name = "Gestures"
 mod.toggled = true
-mod.defaultOff = false
+mod.defaultOff = true
 local L = StarTip.L
 local WidgetGestures = LibStub("LibScriptableWidgetGestures-1.0")
 local LibMouse = LibStub("LibMouseGestures-1.0")
