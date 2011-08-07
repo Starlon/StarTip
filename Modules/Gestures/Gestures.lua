@@ -106,10 +106,12 @@ end
 
 		nextFunc = [[
 return function(rec, a, b, c, d)
+    local self = rec.widgetData
 end
 ]],
 		cancelFunc = [[
 return function(rec, a, b, c, d)
+    local self = rec.widgetData
     if #rec.cdoodle > 1 then
         local doodle = rec.cdoodle[#rec.cdoodle]
         doodle[3]:Hide()
