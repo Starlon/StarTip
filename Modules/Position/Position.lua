@@ -33,26 +33,26 @@ local defaults = {
 		anchorScript = [[
 -- Modify locals x and y.They're set to mouse cursor position to start.
 local mod = StarTip:GetModule("Position")
-x = x + mod.db.profile.anchorXOffset
-y = y + mod.db.profile.anchorYOffset
+x = mod.db.profile.anchorXOffset
+y = mod.db.profile.anchorYOffset
 ]],
 		inCombatScript = [[
 -- Modify locals x and y.They're set to mouse cursor position to start.
 local mod = StarTip:GetModule("Position")
-x = x + mod.db.profile.inCombatXOffset
-y = y + mod.db.profile.inCombatYOffset
+x = mod.db.profile.inCombatXOffset
+y = mod.db.profile.inCombatYOffset
 ]],
 		unitFramesScript = [[
 -- Modify locals x and y.They're set to mouse cursor position to start.
 local mod = StarTip:GetModule("Position")
-x = x + mod.db.profile.unitFramesXOffset
-y = y + mod.db.profile.unitFramesYOffset
+x = mod.db.profile.unitFramesXOffset
+y = mod.db.profile.unitFramesYOffset
 ]],
 		otherScript = [[
 -- Modify locals x and y.They're set to mouse cursor position to start.
 local mod = StarTip:GetModule("Position")
-x = x + mod.db.profile.otherXOffset
-y = y + mod.db.profile.otherYOffset
+x = mod.db.profile.otherXOffset
+y = mod.db.profile.otherYOffset
 ]],
 		animationInit = [[
 t = 0
@@ -422,7 +422,7 @@ function mod:GetPosition(x, y)
 			Evaluator.ExecuteCode(environment, "StarTip.Position.other", self.db.profile.otherScript)
 		end
 	end
-	return environment.x, environment.y
+	return x + environment.x, y + environment.y
 end
 
 local function hideGameTooltip()
@@ -541,7 +541,6 @@ local function delayAnchor()
 	local this = currentThis
 	local owner = currentOwner
 	local index = getIndex(owner)
-
 	if index == #selections then
 		this:Hide()
 		return
@@ -558,15 +557,15 @@ local function delayAnchor()
 	elseif GameTooltip:GetUnit() then
 		fakeUpdateTimer:Stop()
 		updateTimer:Stop()
-		StarTip.envirnoment.x = 0
+		StarTip.environment.x = 0
 		mod.environment.y = 0
 		Evaluator.ExecuteCode(mod.environment, "StarTip.Position", mod.db.profile.anchorScript)
+		local effScale = StarTip.tooltipMain:GetEffectiveScale()
 		StarTip.tooltipMain:ClearAllPoints()
-		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], mod.environment.x, mod.environment.y)
+		StarTip.tooltipMain:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], mod.environment.x / effScale, mod.environment.y / effScale)
 	else
 		fakeUpdateTimer:Stop()
 		updateTimer:Stop()
-		GameTooltip:ClearAllPoints()
 		mod.environment.x = 0
 		mod.environment.y = 0
 		mod.environment.i = index
@@ -574,7 +573,9 @@ local function delayAnchor()
 		index = StarTip.envirnment.i
 		local anchor = StarTip.anchor or StarTip.anchors[index]
 		local relative = StarTip.anchorRelative or anchor
-		GameTooltip:SetPoint(anchor, UIParent, anchorRelative, mod.environment.x, mod.environment.y)
+		local effScale = GameTooltip:GetEffectiveScale()
+		GameTooltip:ClearAllPoints()
+		GameTooltip:SetPoint(anchor, UIParent, anchorRelative, mod.environment.x / effScale, mod.environment.y / effScale)
 		StarTip.anchor = false
 	end
 end

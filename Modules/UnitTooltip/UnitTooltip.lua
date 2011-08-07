@@ -284,7 +284,8 @@ return value
 ]],
         rightUpdating = true,
         update = 1000,
-        enabled = true
+        enabled = true,
+	events = {UNIT_HEALTH = true}
     },
     [14] = {
         name = L["Mana"],
@@ -310,8 +311,10 @@ return value
 ]],
         rightUpdating = true,
         enabled = true,
-        update = 1000,
+        update = 0,
 	colorR = "",
+	unitOverride = false,
+	events = {UNIT_POWER=true}
     },
     [15] = {
         name = L["Effects"],
