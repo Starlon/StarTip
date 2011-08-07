@@ -206,8 +206,8 @@ local intersectUpdate = function()
 end
 
 
-function updateBar(widget, bar)
-	assert(widget and bar)
+function updateBar(widget)
+	local bar = widget.bar
 	
 	bar:SetValue(widget.val1 * 100)
 

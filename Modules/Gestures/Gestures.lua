@@ -1,7 +1,7 @@
 local mod = StarTip:NewModule("Gestures")
 mod.name = "Gestures"
 mod.toggled = true
-mod.defaultOff = true
+mod.defaultOff = false
 local L = StarTip.L
 local WidgetGestures = LibStub("LibScriptableWidgetGestures-1.0")
 local LibMouse = LibStub("LibMouseGestures-1.0")
@@ -57,7 +57,7 @@ StopNoise()
 	},
 	[4] = {
 		name = "Draw",
-		enabled = false,
+		enabled = true,
 		gestures = {},
 		drawLayer = "ChatFrame1",
 		expression = [[
