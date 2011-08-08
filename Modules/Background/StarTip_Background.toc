@@ -7,4 +7,4 @@
 ## X-Category: Tooltip
 ## X-Part-Of: StarTip
 
-Clamp.lua
+Background.lua
