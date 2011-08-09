@@ -579,7 +579,7 @@ local function delayAnchor()
 		StarTip.anchor = false
 	end
 end
-local delayTimer = LibTimer:New("Position delay timer", 30, false, delayAnchor)
+local delayTimer = LibTimer:New("Position delay timer", 5, false, delayAnchor)
 
 function mod:GameTooltip_SetDefaultAnchor(this, owner)
 	currentOwner = owner

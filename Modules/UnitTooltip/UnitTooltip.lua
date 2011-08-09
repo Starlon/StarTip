@@ -104,7 +104,7 @@ return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 	update = 500
     },
     [2] = {
-        name = "Target",
+        name = L["Target"],
         left = 'return L["Target:"]',
         right = [[
 -- Here's an example of how to deal with DogTag support.
