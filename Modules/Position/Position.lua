@@ -568,15 +568,12 @@ local function delayAnchor()
 		updateTimer:Stop()
 		mod.environment.x = 0
 		mod.environment.y = 0
-		mod.environment.i = index
 		Evaluator.ExecuteCode(mod.environment, "StarTip.Position", mod.db.profile.otherScript)
-		index = StarTip.envirnment.i
-		local anchor = StarTip.anchor or StarTip.anchors[index]
-		local relative = StarTip.anchorRelative or anchor
+		local anchor = StarTip.anchors[index]
+		local anchorRelative = anchor
 		local effScale = GameTooltip:GetEffectiveScale()
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint(anchor, UIParent, anchorRelative, mod.environment.x / effScale, mod.environment.y / effScale)
-		StarTip.anchor = false
 	end
 end
 local delayTimer = LibTimer:New("Position delay timer", 5, false, delayAnchor)
