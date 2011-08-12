@@ -523,6 +523,7 @@ function StarTip:OnInitialize()
 	self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
 	self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 
+--[[
 	options.args.settings.args.backup = {
 		name = L["Backup"],
 		desc = L["Click to generate a backup."],
@@ -577,6 +578,8 @@ function StarTip:OnInitialize()
 		end,
 		order = 53
 	}
+	]]
+
 	options.args.settings.args.tooltipMain = LibWidget:GetOptions(StarTip.db.profile.tooltipMain, makeNewTooltip)
 	options.args.settings.args.tooltipMain.args.add = nil
 
