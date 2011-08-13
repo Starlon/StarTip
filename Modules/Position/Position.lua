@@ -443,7 +443,7 @@ PositionTooltip = function()
 	x, y = mod:GetPosition(x, y) -- execute user script
 
 
-	local xx, yy = Evaluator.ExecuteCode(mod.environment, "Position.animation", mod.db.profile.animation)
+	--local xx, yy = Evaluator.ExecuteCode(mod.environment, "Position.animation", mod.db.profile.animation)
 	
 	local index = getIndex(environment.anchorFrame)
 	local anchor =  environment.anchor or StarTip.opposites[StarTip.anchors[index]:sub(8)]
@@ -568,12 +568,12 @@ local function delayAnchor()
 		updateTimer:Stop()
 		mod.environment.x = 0
 		mod.environment.y = 0
-		Evaluator.ExecuteCode(mod.environment, "StarTip.Position", mod.db.profile.otherScript)
+		local x, y = mod:GetPosition(0, 0)
 		local anchor = StarTip.anchors[index]
 		local anchorRelative = anchor
 		local effScale = GameTooltip:GetEffectiveScale()
 		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint(anchor, UIParent, anchorRelative, mod.environment.x / effScale, mod.environment.y / effScale)
+		GameTooltip:SetPoint(anchor, UIParent, anchorRelative, x / effScale, y / effScale)
 	end
 end
 local delayTimer = LibTimer:New("Position delay timer", 5, false, delayAnchor)
@@ -614,7 +614,9 @@ function mod:SetSpell()
 		PositionTooltip()
 	else
 		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
+		local effScale = GameTooltip:GetEffectiveScale()
+		local x, y = self:GetPosition(0, 0)
+		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], x / effScale, y / effScale)
 	end
 end
 
@@ -625,7 +627,10 @@ function mod:SetItem()
 		PositionTooltip()
 	else
 		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], xoffset, yoffset)
+		local effScale = GameTooltip:GetEffectiveScale()
+		
+		local x, y = self:GetPosition(0, 0)
+		GameTooltip:SetPoint(StarTip.anchors[index], UIParent, StarTip.anchors[index], x / effScale, y / effScale)
 	end
 end
 
