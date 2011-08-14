@@ -1239,15 +1239,10 @@ function mod:RebuildOpts()
                         desc = L["Move this line up by one"],
                         type = "execute",
                         func = function()
-                            if i == 1 then return end
+                            if i <= 1 then return end
                             local tmp = self.db.profile.lines[i - 1]
-                            if not v.left then v.left = "" end
-                            if not v.right then v.right = "" end
-                            if not tmp.left then tmp.left = "" end
-                            if not tmp.right then tmp.right = "" end
                             self.db.profile.lines[i - 1] = v
                             self.db.profile.lines[i] = tmp
-                            self:RebuildOpts()
                             StarTip:RebuildOpts()
                             self:CreateLines()
                         end,
@@ -1260,11 +1255,6 @@ function mod:RebuildOpts()
                         func = function()
                             if i == #self.db.profile.lines then return end
                             local tmp = self.db.profile.lines[i + 1]
-                            if tmp.deleted then return end
-                            if not v.left then v.left = "" end
-                            if not v.right then v.right = "" end
-                            if not tmp.left then tmp.left = "" end
-                            if not tmp.right then tmp.right = "" end
                             self.db.profile.lines[i + 1] = v
                             self.db.profile.lines[i] = tmp
                             self:RebuildOpts()
