@@ -118,7 +118,7 @@ return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 -- Example: return "\\ FOO \\"
 -- Would print "\ FOO \"
 
-self.unitOverride = unit .. "mouseover"
+self.unitOverride = unit .. "target"
 self.clearOverride = true
 
 if not UnitExists(self.unitOverride) then return L["None"] end
