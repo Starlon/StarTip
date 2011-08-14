@@ -118,10 +118,9 @@ return texture .. Colorize((Name(unit, true) or Name(unit)) .. afk , r, g, b)
 -- Example: return "\\ FOO \\"
 -- Would print "\ FOO \"
 
-self.unitOverride = unit .. "target"
-self.clearOverride = true
+local unit = unit .. "target"
 
-if not UnitExists(self.unitOverride) then return L["None"] end
+if not UnitExists(unit) then return L["None"] end
 
 local dt = '\
 [IsUnit("player") and "<YOU>":ClassColor or Color(Name, %f, %f, %f ) \
@@ -130,11 +129,13 @@ local dt = '\
 end)]'
 
 local r, g, b
-if UnitIsPlayer(self.unitOverride) then
+if UnitIsPlayer(unit) then
     r, g, b = ClassColor(unit)
 else
-    r, g, b = UnitSelectionColor(self.unitOverride)
+    r, g, b = UnitSelectionColor(unit)
 end
+
+self.dogtagUnit = unit
 
 return dt:format(r, g, b)
 ]],
