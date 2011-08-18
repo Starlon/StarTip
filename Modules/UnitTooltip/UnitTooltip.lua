@@ -825,6 +825,19 @@ function mod:ReInit()
             tinsert(self.db.profile.lines, copy(v))
         end
     end
+    for k, v in pairs(self.db.profile.lines) do
+        if v.default then
+            local delete = true
+            for kk, vv in pairs(defaultLines) do
+                if v.name == vv.name then
+                    delete = false
+                end
+            end
+            if delete then
+                self.db.profile.lines[k] = nil
+            end
+	end
+    end
     self:CreateLines()
 end
 function mod:OnInitialize()

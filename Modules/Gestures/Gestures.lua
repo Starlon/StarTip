@@ -145,7 +145,8 @@ local optionsDefaults = {
 				points = {{"TOPLEFT", "GameTooltip", "BOTTOMLEFT", 0, -50}},
 				frame = "UIParent",
 				expression = "return random(100)",
-				custom = true
+				custom = true,
+				gestures = {}
 			}
 			tinsert(mod.db.profile.gestures, widget)
 			StarTip:RebuildOpts()
@@ -218,6 +219,16 @@ end
 
 function mod:OnInitialize()
 	self.db = StarTip.db:RegisterNamespace(self:GetName(), defaults)
+
+	-- account for two UI options bugs.
+	local i = 1
+	while i <= #self.db.profile.gestures do
+		if not self.db.profile.gestures[i].gestures then self.db.profile.gestures[i].gestures = {} end
+		if not self.db.profile.gestures[i].name then self.db.profile.gestures[i] = nil end
+		i = i + 1
+	end
+	--
+
 	self.core = StarTip.core 
 	self:ReInit() -- initialize database if needed
 	StarTip:SetOptionsDisabled(options, true)
@@ -257,7 +268,7 @@ function mod:RebuildOpts()
 			desc = L["Delete this widget"],
 			type = "execute",
 			func = function()
-				self.db.profile.gestures[i] = {}
+				self.db.profile.gestures[i] = nil
 				StarTip:RebuildOpts()
 			end,
 			order = 100
