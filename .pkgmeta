@@ -91,7 +91,6 @@ move-folders:
     StarTip/Modules/Texts: StarTip_Texts
     StarTip/Modules/UnitTooltip: StarTip_UnitTooltip
     StarTip/Modules/Portrait: StarTip_Portrait
-    StarTip/Modules/Gestures: StarTip_Gestures
     StarTip/Modules/Border: StarTip_Border
     StarTip/Modules/Clamp: StarTip_Clamp
     StarTip/Modules/Background: StarTip_Background

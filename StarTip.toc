@@ -1,4 +1,4 @@
-## Interface: 40200
+## Interface: 40300
 ## Title: StarTip
 ## Notes: |cff751f82StarTip (|r|cccf20285Tooltips |r|cff751f82from |r|cff751f82O|r|cff202585u|r|cff751f82t|r|cff202585e|r|cff751f82r|r|cff202585s|r|cff751f82p|r|cff202585a|r|cff751f82c|r|cff202585e|r|cff751f82)|r
 ## Author: Starlon
